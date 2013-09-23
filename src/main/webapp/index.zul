@@ -1,0 +1,10 @@
+<?link rel="stylesheet" type="text/css" href="/style.css"?>
+<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c" ?>
+<!-- protect page by the authentication init  -->
+<?init class="org.hpccsystems.dashboard.controller.AuthenticationInit"?>
+<!-- authentication init have to locate before composition -->
+<?init class="org.zkoss.zk.ui.util.Composition" arg0="/demo/layout/template.zul"?>
+<zk>
+
+	<include id="mainInclude" self="@define(content)" src="/demo/home.zul"/>
+</zk>
