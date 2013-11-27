@@ -94,7 +94,7 @@ public class SidebarAjaxbasedController extends SelectorComposer<Component>{
 							.iterator().next();
 					include.setSrc(locationUri);
 					
-					//advance bookmark control, 
+					//advance bookmark control,  
 					//bookmark with a prefix
 					if(name!=null){
 						getPage().getDesktop().setBookmark("p_"+name);
