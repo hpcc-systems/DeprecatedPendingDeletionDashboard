@@ -1,18 +1,14 @@
-/* 
-	Description:
-		ZK Essentials
-	History:
-		Created by dennis
-
-Copyright (C) 2012 Potix Corporation. All Rights Reserved.
-*/
 package org.hpccsystems.dashboard.services;
 
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-public class UserCredential implements Serializable{
+/**
+ * This class is model for UserCredential.
+ *
+ */
+public class UserCredential  implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
 	String account;
@@ -20,7 +16,7 @@ public class UserCredential implements Serializable{
 	
 	Set<String> roles = new HashSet<String>();
 
-	public UserCredential(String account, String name) {
+	public UserCredential(final String account, final String name) {
 		this.account = account;
 		this.name = name;
 	}
@@ -39,7 +35,7 @@ public class UserCredential implements Serializable{
 		return account;
 	}
 
-	public void setAccount(String account) {
+	public void setAccount(final String account) {
 		this.account = account;
 	}
 
@@ -47,15 +43,15 @@ public class UserCredential implements Serializable{
 		return name;
 	}
 
-	public void setName(String name) {
+	public void setName(final String name) {
 		this.name = name;
 	}
 	
-	public boolean hasRole(String role){
+	public boolean hasRole(final String role){
 		return roles.contains(role);
 	}
 	
-	public void addRole(String role){
+	public void addRole(final String role){
 		roles.add(role);
 	}
 

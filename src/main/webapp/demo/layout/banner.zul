@@ -1,14 +1,16 @@
-<div hflex="1" vflex="1" sclass="banner">
+<div hflex="1" vflex="1">
 	<hbox hflex="1" vflex="1" align="center">
-		<a href="http://www.lexisnexis.com/">
-			<image src="/imgs/logo-lexisnexis.png" width="190px" />
-		</a>
-
+		<vbox align="center" width="200px">
+			<image src="/demo/images/logo_white.png" width="180px"/>
+			<label style="color:white; font-size: larger;">Dashboard</label>
+		</vbox>
 		
 		<hbox apply="org.hpccsystems.dashboard.controller.LogoutController" 
-			hflex="1" vflex="1" pack="end" align="end" >
-			<label  value="${sessionScope.userCredential.name}" if="${not sessionScope.userCredential.anonymous}" sclass="user"/>
-			<label id="logout" value="Logout" if="${not sessionScope.userCredential.anonymous}" sclass="logout"/>
+			hflex="1" vflex="1" pack="end" align="start" style="margin-right:30px">
+			<menubar zclass="user-nav">
+				<menuitem zclass="btn" iconSclass="glyphicon glyphicon-user" id="profile-link" label="${sessionScope.userCredential.name}" if="${not sessionScope.userCredential.anonymous}" />
+				<menuitem zclass="btn" iconSclass="glyphicon glyphicon-share-alt" id="logout" label="Logout" if="${not sessionScope.userCredential.anonymous}"/>
+			</menubar>
 		</hbox>
 	</hbox>
 </div>

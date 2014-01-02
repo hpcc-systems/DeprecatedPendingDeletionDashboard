@@ -5,13 +5,14 @@
 	<artifactId>Dashboard</artifactId>
 	<version>0.0.1-SNAPSHOT</version>
 	<properties>
-		<zk.version>6.5.2</zk.version>
+		<zk.version>7.0.0-Preview</zk.version>
 		<spring.version>3.1.2.RELEASE</spring.version>
 		<commons-io>1.3.1</commons-io>
 		<commons-lang>2.6</commons-lang>
 		<maven.build.timestamp.format>yyyy-MM-dd</maven.build.timestamp.format>
 		<packname>-${project.version}-FL-${maven.build.timestamp}</packname>
 	</properties>
+	
 	<packaging>war</packaging>
 	<name>The Dashboard Project</name>
 	<description>The Dashboard Project</description>
@@ -27,7 +28,13 @@
 			<id>ZK CE</id>
 			<name>ZK CE Repository</name>
 			<url>http://mavensync.zkoss.org/maven2</url>
-		</repository>		
+		</repository>
+		
+		<repository>
+		    <id>ZK PE/EE Evaluation</id>
+		    <url>http://mavensync.zkoss.org/eval/</url>
+		</repository>
+				
 	</repositories>
 	<pluginRepositories>
 		<pluginRepository>
@@ -104,6 +111,46 @@
 			<optional>true</optional>
 		</dependency>
 		 -->
+		 
+		 <!-- ZK EE Dependencies -->
+	    <dependency>
+	      <groupId>org.zkoss.zk</groupId>
+	      <artifactId>zkmax</artifactId>
+	      <version>${zk.version}</version>
+	    </dependency>
+	    <dependency>
+	      <groupId>commons-logging</groupId>
+	      <artifactId>commons-logging</artifactId>
+	      <version>1.1.1</version>
+	    </dependency>
+	     
+	    <!--  Gson: Java to Json conversion -->
+	    <dependency>
+	      <groupId>com.google.code.gson</groupId>
+	      <artifactId>gson</artifactId>
+	      <version>2.2.4</version>
+	      <scope>compile</scope>
+	    </dependency>
+	  	
+	  	<dependency>
+	      <groupId>org.apache.axis</groupId>
+	      <artifactId>axis-jaxrpc</artifactId>
+	      <version>1.4</version>
+	    </dependency>
+	    
+	    <dependency>
+	      <groupId>axis</groupId>
+	      <artifactId>axis</artifactId>
+	      <version>1.4</version>
+	    </dependency>
+	    
+	    <dependency>
+         <groupId>HPCCWebservice</groupId>
+         <artifactId>HPCCWebservice</artifactId>
+         <scope>system</scope>
+         <version>1.0</version>
+         <systemPath>${basedir}\src\lib\HPCCWebservice.jar</systemPath>
+	    </dependency>
 	</dependencies>
 	<build>
 		<finalName>${project.artifactId}</finalName>

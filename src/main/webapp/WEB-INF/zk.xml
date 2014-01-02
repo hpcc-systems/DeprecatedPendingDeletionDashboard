@@ -9,5 +9,9 @@
 		<value>Dashboard</value>
 	</preference>
 	-->
-	
+		
+	<session-config>
+    <device-type>ajax</device-type>    
+    <timeout-uri></timeout-uri>    
+</session-config>
 </zk>

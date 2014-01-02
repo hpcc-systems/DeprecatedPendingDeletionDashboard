@@ -20,19 +20,54 @@ dash_menu_page_location  VARCHAR(100),
 PRIMARY KEY(dash_application_id, dash_menu_id)
 ) ENGINE=InnoDB;
 
+create table dashboard_details (
+application_id    VARCHAR(50) NOT NULL,  
+dashboard_id   INT(20) NOT NULL auto_increment,
+dashboard_name VARCHAR(30) NOT NULL,
+page_layout  VARCHAR(20),
+dashboard_sequence INT(10),
+PRIMARY KEY(dashboard_id)
+) ENGINE=InnoDB;
+
 ALTER TABLE dash_menu ADD CONSTRAINT FOREIGN KEY (dash_application_id)  REFERENCES dash_application (dash_app_id);
 
 LOCK TABLES `dash_application` WRITE;
-INSERT INTO dash_application VALUES ('A001','Demo'),('A002','Telematics'),('A003','Insurance');
+INSERT INTO dash_application(dash_app_id,dash_app_name) VALUES ('A001','Demo'),('A002','Telematics'),('A003','Insurance');
 UNLOCK TABLES;
 
-LOCK TABLES `dash_menu` WRITE;
-INSERT INTO dash_menu VALUES 
-('A001', 'M001', 'Profile',  '/imgs/demo/profile.png',  '/demo/profile-mvc.zul'), 
-('A001', 'M002', 'Dashboard1',  '/imgs/demo/dashboard1.png',  '/demo/dash_board1.zul'), 
-('A001', 'M003', 'Dashboard2',  '/imgs/demo/dashboard2.png',  '/demo/dash_board2.zul'),
-('A001', 'M004', 'Dashboard3',  '/imgs/demo/dashboard3.png',  '/demo/dash_board3.zul'),
-('A002', 'M001', 'Profile',  '/imgs/telematics/profile.png',  '/telematics/profile-mvc.zul'), 
-('A002', 'M002', 'Dashboard1',  '/imgs/telematics/dashboard1.png',  '/telematics/dash_board1.zul'), 
-('A002', 'M003', 'Dashboard2',  '/imgs/telematics/dashboard2.png',  '/ telematics /dash_board2.zul');
-UNLOCK TABLES;
+create table user_details (
+user_id  INT(20) NOT NULL auto_increment,  
+user_name  VARCHAR(40) ,
+password VARCHAR(40) ,
+active_flag CHAR(1),
+PRIMARY KEY(user_id)
+) ENGINE=InnoDB;
+
+INSERT INTO user_details(USER_NAME,PASSWORD,ACTIVE_FLAG) VALUES ('anonymous','1234','N'),('admin','1234','N'),('zkoss','1234','N');
+
+drop table if exists dashboard_details ;
+
+create table dashboard_details (
+DASHBOARD_ID  INT(30) NOT NULL auto_increment,  
+DASHBOARD_NAME  VARCHAR(40) ,
+USER_ID INT(20) ,
+DASHBOARD_STATE  CHAR(1),
+COLUMN_COUNT TINYINT(7),
+SEQUENCE INT(40) ,
+APPLICATION_ID VARCHAR(20) ,
+PRIMARY KEY(DASHBOARD_ID),
+FOREIGN KEY(user_id) REFERENCES user_details(user_id)
+) ENGINE=InnoDB;
+
+create table WIDGET_DETAILS (
+WIDGET_ID  INT(40) NOT NULL auto_increment,  
+DASHBOARD_ID  INT(30) ,
+WIDGET_NAME VARCHAR(30) ,
+WIDGET_STATE CHAR(1) ,
+CHART_TYPE TINYINT(7) ,
+COLUMN_IDENTIFIER TINYINT(7) ,
+WIDGET_SEQUENCE TINYINT(7) ,
+CHART_DATA TEXT ,
+PRIMARY KEY(WIDGET_ID),
+FOREIGN KEY(DASHBOARD_ID) REFERENCES dashboard_details(DASHBOARD_ID)
+) ENGINE=InnoDB;

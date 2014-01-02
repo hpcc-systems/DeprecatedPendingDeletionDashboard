@@ -1,0 +1,158 @@
+<window 
+	border="none"
+	id="dashboardWin"
+	apply="org.hpccsystems.dashboard.controller.DashboardController"
+	zclass="dashboard-container"
+	contentStyle="overflow:hidden"
+	vflex="1">
+
+<style>
+.z-menuitem-image, z-menupopup-separator{
+display:none;
+}
+</style>
+
+<script  defer="true" src="js/barchart.js"></script>
+<script  defer="true" src="js/linechart.js"></script>
+<script  defer="true" src="js/piechart.js"></script>
+
+<caption sclass="panel-heading" zclass="dashboard-header">
+	<div style="padding:0">
+		<hbox pack="stretch" width="100%" style="font-size:12px">
+			<textbox zclass="h1" inplace="true" vflex="1" id="dashboardTitleTxt"></textbox>
+			<toolbar align="end" style="float:right; border-style: none; margin-right:25px;" height="46px" zclass="btn-group">
+				<button id="addPanel" tooltiptext="${labels.addpanel}" zclass="btn btn-default" image="images/add-row.png" />
+				<button id="addColPanel" tooltiptext="${labels.addpanelcolumn}" zclass="btn btn-default" visible="false" image="images/add-column.png"/>
+				<button id="deleteDashboard" tooltiptext="${labels.deleteDashboard}" zclass="glyphicon glyphicon-remove btn btn-link img-btn"></button>
+			</toolbar>
+		</hbox>
+	</div>
+</caption>
+<style>
+.z-panel-head {
+	padding: 0px;
+}
+.z-panel-header {
+	padding: 0px;
+}
+.z-caption input{
+	font-size: 12px;
+}
+
+.panel-heading {
+	padding: 0;
+}
+
+.img-btn {
+	font-size: 16px;
+	padding: 0;
+	border: none;
+	color:#626C6F;
+	margin-left: 4px;
+	margin-right: 4px;
+}
+
+.img-btn:hover {
+	color:#4FAEFF;
+	background: transparent;
+	border-color: transparent;
+	text-decoration: none;
+	outline: none;
+}
+
+.img-btn:focus {
+	color:black;
+	background: transparent;
+	border-color: transparent;
+	text-decoration: none;
+	outline: none;
+}
+
+.img-btn:disabled {
+	cursor: not-allowed;
+	opacity: .4;
+	background: transparent;
+	border-color: transparent;
+	text-decoration: none;
+	outline: none;
+	border:none;
+	background: transparent;
+}
+
+.chartImage {
+	position: absolute;
+	bottom: 10%;
+	left: 10%;
+}
+
+
+.z-navbar-vertical .z-navitem-selected .z-navitem-content {
+	background: #e1edf4;
+	color: #000;
+}
+.z-navbar-vertical .z-navitem-selected .z-navitem-content:hover {
+background: #91C3E0;
+}
+
+.bar {
+  fill: steelblue;
+}
+.bar:hover {
+  fill: brown;
+}
+.axis {
+  font: 10px sans-serif;
+}
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+.x.axis path {
+  display: none;
+}
+
+path { 
+    stroke: steelblue;
+    stroke-width: 2;
+    fill: none;
+}
+
+.axis path,
+.axis line {
+    fill: none;
+    stroke: grey;
+    stroke-width: 1;
+    shape-rendering: crispEdges;
+}
+
+.x.axis.lineChart path {
+  display: block;
+}
+
+.arc path {
+  stroke: #fff;
+}
+
+div.tooltip {   
+  position: absolute;           
+  text-align: center;           
+  width: 120px;                  
+  height: 40px;                 
+  padding: 2px;             
+  font: 12px sans-serif;        
+  background: lightsteelblue;   
+  border: 0px;      
+  border-radius: 8px;           
+  pointer-events: none;         
+}
+</style>
+<vlayout vflex="1" hflex="1" zclass="dashboard-body" style="overflow:auto">
+	<portallayout>
+		<portalchildren visible="false"/>
+		<portalchildren visible="false"/>
+		<portalchildren visible="false"/>
+	</portallayout>
+</vlayout>
+</window>

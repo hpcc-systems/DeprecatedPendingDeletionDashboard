@@ -1,20 +1,14 @@
-/* 
-	Description:
-		ZK Essentials
-	History:
-		Created by dennis
-
-Copyright (C) 2012 Potix Corporation. All Rights Reserved.
-*/
 package org.hpccsystems.dashboard.entity;
 
 import java.io.Serializable;
 import java.util.Date;
 /**
- * User entity
+ * This class is model for User.
  */
-public class User implements Serializable,Cloneable {
+public class User  implements Serializable,Cloneable {	
+
 	private static final long serialVersionUID = 1L;
+	
 	String account;
 	String fullName;
 	String password;
@@ -22,107 +16,227 @@ public class User implements Serializable,Cloneable {
 	Date birthday;
 	String country;
 	String bio;
-	String car;
+	String car;		
+	//Added for persistence
+	String userId;
+	String activeFlag;
+	boolean validUser;
+	
+	public boolean isValidUser() {
+		return validUser;
+	}
 
-	public User(String account, String password, String fullName,String email) {
+	public void setValidUser(boolean validUser) {
+		this.validUser = validUser;
+	}
+
+	public String getUserId() {
+		return userId;
+	}
+
+	public void setUserId(String userId) {
+		this.userId = userId;
+	}
+
+	public String getActiveFlag() {
+		return activeFlag;
+	}
+
+	public void setActiveFlag(String activeFlag) {
+		this.activeFlag = activeFlag;
+	}
+
+	
+	
+	public User(){
+		
+	}
+
+	public User(final String account, final String password, final String fullName,final String email) {
 		this.account = account;
 		this.password = password;
 		this.fullName = fullName;
 		this.email = email;
 	}
 
-	public String getAccount() {
+	/**
+	 * @return the account
+	 */
+	public final String getAccount() {
 		return account;
 	}
 
-	public String getFullName() {
+
+	/**
+	 * @param account the account to set
+	 */
+	public final void setAccount(final String account) {
+		this.account = account;
+	}
+
+
+	/**
+	 * @return the fullName
+	 */
+	public final String getFullName() {
 		return fullName;
 	}
 
-	public void setFullName(String fullName) {
+
+	/**
+	 * @param fullName the fullName to set
+	 */
+	public final void setFullName(final String fullName) {
 		this.fullName = fullName;
 	}
 
-	public String getEmail() {
-		return email;
-	}
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
-
-	public Date getBirthday() {
-		return birthday;
-	}
-
-	public void setBirthday(Date birthday) {
-		this.birthday = birthday;
-	}
-
-	public String getCountry() {
-		return country;
-	}
-
-	public void setCountry(String country) {
-		this.country = country;
-	}
-
-	public String getBio() {
-		return bio;
-	}
-
-	public void setBio(String bio) {
-		this.bio = bio;
-	}
-
-	public String getPassword() {
+	/**
+	 * @return the password
+	 */
+	public final String getPassword() {
 		return password;
 	}
 
-	public void setPassword(String password) {
+
+	/**
+	 * @param password the password to set
+	 */
+	public final void setPassword(final String password) {
 		this.password = password;
 	}
 
-	
-	public String getCar() {
+
+	/**
+	 * @return the email
+	 */
+	public final String getEmail() {
+		return email;
+	}
+
+
+	/**
+	 * @param email the email to set
+	 */
+	public final void setEmail(final String email) {
+		this.email = email;
+	}
+
+
+	/**
+	 * @return the birthday
+	 */
+	public final Date getBirthday() {
+		return birthday;
+	}
+
+
+	/**
+	 * @param birthday the birthday to set
+	 */
+	public final void setBirthday(final Date birthday) {
+		this.birthday = birthday;
+	}
+
+
+	/**
+	 * @return the country
+	 */
+	public final String getCountry() {
+		return country;
+	}
+
+
+	/**
+	 * @param country the country to set
+	 */
+	public final void setCountry(final String country) {
+		this.country = country;
+	}
+
+
+	/**
+	 * @return the bio
+	 */
+	public final String getBio() {
+		return bio;
+	}
+
+
+	/**
+	 * @param bio the bio to set
+	 */
+	public final void setBio(final String bio) {
+		this.bio = bio;
+	}
+
+
+	/**
+	 * @return the car
+	 */
+	public final String getCar() {
 		return car;
 	}
 
-	public void setCar(String car) {
+
+	/**
+	 * @param car the car to set
+	 */
+	public final void setCar(final String car) {
 		this.car = car;
 	}
 
+
 	@Override
 	public int hashCode() {
-		final int prime = 31;
+		int prime = 31;
 		int result = 1;
 		result = prime * result + ((account == null) ? 0 : account.hashCode());
 		return result;
 	}
 
 	@Override
-	public boolean equals(Object obj) {
-		if (this == obj)
+	public boolean equals(final Object obj) {
+		if (this == obj){
 			return true;
-		if (obj == null)
+		}	
+		if (obj == null){
 			return false;
-		if (getClass() != obj.getClass())
+		}	
+		if (getClass() != obj.getClass()){
 			return false;
-		User other = (User) obj;
+		}	
+		final User other = (User) obj;
 		if (account == null) {
-			if (other.account != null)
+			if (other.account != null){
 				return false;
-		} else if (!account.equals(other.account))
+			}	
+		} else if (!account.equals(other.account)){
 			return false;
+		}	
 		return true;
 	}
 	
-	public static User clone(User user){
+	public static User clone(final User user){
 		try {
 			return (User)user.clone();
 		} catch (CloneNotSupportedException e) {
 			//not possible
 		}
 		return null;
+	}
+	
+	@Override
+	public String toString() {
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("User [account=").append(account).append(", fullName=")
+				.append(fullName).append(", password=").append(password)
+				.append(", email=").append(email).append(", birthday=")
+				.append(birthday).append(", country=").append(country)
+				.append(", bio=").append(bio).append(", car=").append(car)
+				.append(", userId=").append(userId).append(", activeFlag=")
+				.append(activeFlag).append(", validUser=").append(validUser)
+				.append("]");
+		return buffer.toString();
 	}
 }

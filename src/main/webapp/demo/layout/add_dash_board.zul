@@ -1,0 +1,39 @@
+<window id="addDashboard" border="normal" width="350px" 
+	apply="org.hpccsystems.dashboard.controller.AddDashboardController"
+    position="center,center" closable="true"
+    action="show: slideDown;hide: slideUp"
+    sclass="panel">
+	<caption iconSclass="glyphicon glyphicon-cog">
+		<label zclass="h5"> Add Dashboard </label>
+	</caption>
+		
+<style>
+	.z-vlayout div:nth-child(2){
+  		text-align:center;
+	}
+	
+	.z-row-inner {
+		border-bottom: 2pt solid rgb(131, 131, 131);
+	}
+
+</style>
+    <vbox align="stretch" hflex="1" style="padding: 10px; width:100%" spacing="0px">
+        <hlayout zclass="form-group">
+			<label zclass="label" >${labels.dashBoardName}</label>
+			<textbox id="nameTxt" zclass="form-control" type="text" constraint="no empty : Please enter valid Dashboard Name."></textbox>
+        </hlayout>
+		<hlayout zclass="form-group">
+			<label zclass="label">${labels.pageLayout}</label>
+		    <div style="padding-left:35px">
+			    <radiogroup id="layoutRgrp">
+			     	  <radio sclass="radio" value="1X2" label="1x2 Layout" />    				            
+			          <radio sclass="radio" value="2X2" label="2x2 Layout" checked="true"/>  
+			          <radio sclass="radio" value="3X3" label="3x3 Layout" />     
+			     </radiogroup>   
+		    </div>
+		</hlayout>
+		<hlayout zclass="form-group" style="text-align:right;">
+        	<button iconSclass="glyphicon glyphicon-ok" id="addBtn" zclass="btn btn-success" label="${labels.addDashBoard}"/>
+        </hlayout>
+    </vbox>
+</window>

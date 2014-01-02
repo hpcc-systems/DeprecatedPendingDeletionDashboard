@@ -1,8 +1,11 @@
-<?link rel="stylesheet" type="text/css" href="/style.css"?>
 <window apply="org.hpccsystems.dashboard.profile.ProfileViewController" 
-	border="normal" hflex="1" vflex="1" contentStyle="overflow:auto">
-	<caption src="/imgs/demo/profile-32.png" sclass="fn-caption" label="Profile"/>
-	<vlayout>
+	border="normal" hflex="1" vflex="1" contentStyle="overflow:auto" zclass="dashboard-container">
+	
+	<caption zclass="dashboard-header">
+		<image src="/imgs/demo/profile-32.png" style="margin-left: 20px; margin-bottom: 15px;"></image>
+		<label zclass="h1">  Profile</label>
+	</caption>
+	<vlayout zclass="dashboard-body">
 		<grid width="500px">
 			<columns>
 				<column align="right" hflex="min"/>
@@ -10,23 +13,23 @@
 			</columns>
 			<rows>
 				<row>
-					<cell sclass="row-title">Account :</cell>
+					<cell sclass="row-title">${labels.account}</cell>
 					<cell><label id="account"/></cell>
 				</row>
 				<row>
-					<cell sclass="row-title">Full Name :</cell>
+					<cell sclass="row-title">${labels.fullName}</cell>
 					<cell><textbox id="fullName" constraint="no empty: Please enter your full name" width="200px"/></cell>
 				</row>
 				<row>
-					<cell sclass="row-title">Email :</cell>
+					<cell sclass="row-title">${labels.email}</cell>
 					<cell><textbox id="email" constraint="/.+@.+\.[a-z]+/: Please enter an e-mail address" width="200px"/></cell>
 				</row>
 				<row>
-					<cell sclass="row-title">Birthday :</cell>
+					<cell sclass="row-title">${labels.birthDay}</cell>
 					<cell><datebox id="birthday" constraint="no future" width="200px"/></cell>
 				</row>
 				<row>
-					<cell sclass="row-title">Country :</cell>
+					<cell sclass="row-title">${labels.country}</cell>
 					<cell>
 						<listbox id="country" mold="select" width="200px">
 							<template name="model">
@@ -36,15 +39,15 @@
 					</cell>
 				</row>
 				<row>
-					<cell sclass="row-title">Bio :</cell>
+					<cell sclass="row-title">${labels.bio}</cell>
 					<cell><textbox id="bio" multiline="true" hflex="1" height="200px" /></cell>
 				</row>
 			</rows>
 		</grid>
-		<div>You are editing <label id="nameLabel"/>'s profile.</div>
+		<div>${labels.youAreEditing}    <label id="nameLabel"/>${labels.sprofile}</div>
 		<hlayout>
-			<button id="saveProfile" label="Save"/>
-			<button id="reloadProfile" label="Reload"/>
+			<button id="saveProfile" label="${labels.save}"/>
+			<button id="reloadProfile" label="${labels.reload}"/>
 		</hlayout>
 	</vlayout>
 </window>

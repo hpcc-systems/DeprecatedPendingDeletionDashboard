@@ -9,126 +9,170 @@ import javax.sql.DataSource;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hpccsystems.dashboard.common.Queries;
 import org.hpccsystems.dashboard.dao.DashboardDao;
-import org.hpccsystems.dashboard.entity.DashboardMenu;
+import org.hpccsystems.dashboard.entity.Application;
+import org.hpccsystems.dashboard.entity.Dashboard;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.object.MappingSqlQuery;
 
+
+/**
+ * DashboardDaoImpl is implementation class for DashboardDao.
+ *
+ */
 public class DashboardDaoImpl implements DashboardDao {
 
-    private final static Log log = LogFactory.getLog(DashboardDaoImpl.class);
+	private static final  Log LOG = LogFactory.getLog(DashboardDaoImpl.class);
 	
+	private JdbcTemplate jdbcTemplate;
+	
+	public JdbcTemplate getJdbcTemplate() {
+		return jdbcTemplate;
+	}
+
+	@Autowired
+	public void setDataSourceToTemplate(DataSource dataSource) {
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
+
 	private DataSource dataSource;
+
+	private SelectDashboardMenus selectDBMenus;
 	
-	private SelectApplicationIds selectApplicationIds;
-	
-	private SelectDashboardMenus selectDashboardMenus;
-	
-	private SelectApplicationIds getSelectApplicationIds() {
-		if (selectApplicationIds == null) {
-			selectApplicationIds = new SelectApplicationIds(dataSource, SelectApplicationIds.SQL);
+	private SelectDashboardMenus getSelectDashboardMenus(final Application application,final String userId) {
+		final StringBuffer sql = new StringBuffer(Queries.RETRIEVE_DASHBOARD);
+		sql.append(application.getAppId())
+		.append("' and user_id='")
+		.append(userId).append("' order by sequence");
+		
+		if (LOG.isDebugEnabled()) {
+			LOG.debug("getSelectDashboardMenus in DashboardDaoImpl");
+			LOG.debug("dashboardmenuquery -->" + sql.toString());
 		}
-		return selectApplicationIds;
+		selectDBMenus = new SelectDashboardMenus(dataSource,
+				sql.toString());
+		return selectDBMenus;
 	}
-	
-	private SelectDashboardMenus getSelectDashboardMenus() {
-		if (selectDashboardMenus == null) {
-			selectDashboardMenus = new SelectDashboardMenus(dataSource, SelectDashboardMenus.SQL);
-		}
-		return selectDashboardMenus;
-	}
 
-	@SuppressWarnings("rawtypes")
-	public class SelectApplicationIds extends MappingSqlQuery {
-
-		public final static String SQL = "SELECT dash_app_name FROM dash_application";
-
-		public SelectApplicationIds(DataSource ds, String sql) {
-			super(ds, sql);			
-			compile();			
-		}
-
-		protected Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-
-			return rs.getString(1).trim();
-		}
-	}
-	
-	@SuppressWarnings("rawtypes")
 	public class SelectDashboardMenus extends MappingSqlQuery {
 
-		public final static String SQL = "SELECT dash_application_id, dash_menu_id, dash_menu_name, dash_menu_image_location, dash_menu_page_location FROM dash_menu where dash_application_id = 'A001'";
-
-		public SelectDashboardMenus(DataSource ds, String sql) {
-			super(ds, sql);			
-			compile();			
+		public SelectDashboardMenus(final DataSource dataSource, final String sql) {
+			super(dataSource, sql);
+			compile();
 		}
 
-		protected Object mapRow(ResultSet rs, int rowNum) throws SQLException {
-
-			DashboardMenu entry = new DashboardMenu();
-			entry.setDashApplicationId(rs.getString(1));
-			entry.setDashMenuId(rs.getString(2));
-			entry.setDashMenuName(rs.getString(3));
-			entry.setDashMenuImageLocation(rs.getString(4));
-			entry.setDashMenuPageLocation(rs.getString(5));
+		protected Object mapRow(final ResultSet resultSet, final int rowNum) throws SQLException {
+			final Dashboard entry = new Dashboard();
+			entry.setApplicationId(resultSet.getString(1));
+			entry.setDashboardId(Integer.parseInt(resultSet.getString(2)));
+			entry.setName(resultSet.getString(3));
+			entry.setDashboardState(resultSet.getString(4));
+			entry.setColumnCount(resultSet.getInt(5));
 			
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("DashboardDaoImpl SelectDashboardMenus in mapRow");
+				LOG.debug("dashboardname -->" + entry.getName());
+				LOG.debug("Column count -->" + entry.getColumnCount());
+			}
 			return entry;
 		}
 	}
-	
+	 /**
+	  * Fetching DashboardMenuPages details from dashboard_details table.
+	 * @param application
+	 * @return List<DashboardMenu>
+	 * @throws DataAccessException
+	 */
 	@SuppressWarnings("unchecked")
-	public List<String> fetchApplicationIds() throws DataAccessException {
-						
-		try {
-			
-			return (List<String>) getSelectApplicationIds().execute();
-			
+	public List<Dashboard> fetchDashboardDetails(final Application application,final String userId)
+			throws DataAccessException {
 
-		} catch (final DataAccessException e) {
-					
-			if (log.isErrorEnabled()) {
-				log.error("DataAccessException occurred during retrieveApplicationIds() in DashboardDaoImpl");
-				log.error(e.getMessage());
-				
-			}
-			throw e;
-		}				
-	}
-	
-	@SuppressWarnings("unchecked")
-	public List<DashboardMenu> fetchDashboardMenuPages() throws DataAccessException {
-						
 		try {
-			
-			return (List<DashboardMenu>) getSelectDashboardMenus().execute();
-			
-
+			return (List<Dashboard>) getSelectDashboardMenus(application,userId)
+					.execute();
 		} catch (final DataAccessException e) {
-						
-			if (log.isErrorEnabled()) {
-				log.error("DataAccessException occurred during retrieveApplicationIds() in DashboardDaoImpl");
-				log.error(e.getMessage());
-				
-			}
+				LOG.error("DataAccessException occurred during retrieveApplicationIds() in DashboardDaoImpl",e);
 			throw e;
-		}				
+		}
 	}
-	
+
 	public void initialize() {
-
 		Validate.notNull(dataSource, "'dataSource' must be set!");
-
 	}
 
 	public DataSource getDataSource() {
 		return dataSource;
 	}
 
-	public void setDataSource(DataSource dataSource) {
+	public void setDataSource(final DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
 
-	
+	/**
+	 * Inserts Dashboard details to dashboard_details table & returns the ID of Dashboard that is inserted.
+	 * @param applnId
+	 * @param dashBoardName
+	 * @param layout
+	 * @throws SQLException
+	 */
+	public int addDashboardDetails(final String applnId, final String dashBoardName,
+			final String userId	) {
+
+		getJdbcTemplate().update(Queries.INSERT_DASHBOARD, new Object[] { 
+				dashBoardName,
+				userId,
+				applnId  
+		});
+		
+		return getJdbcTemplate().queryForObject(Queries.GET_MAX_DASHBOARD_ID, new Object[] {userId} , Integer.class);
+	}
+
+	public void updateSequence(final Integer dashboardId, final int sequence,
+			final String dashboardName) throws SQLException {
+		
+		getJdbcTemplate().update(Queries.UPDATE_DASHBOARD_SEQUENCE, new Object[] { 
+				sequence,
+				dashboardName,
+				dashboardId
+		});
+	}
+
+	public void deleteDashboard(final Integer dashboardId, final String userId) throws SQLException {
+		
+		getJdbcTemplate().update(Queries.DELETE_DASHBOARD_WIDGETS, new Object[] { 
+				dashboardId
+		});
+		
+		getJdbcTemplate().update(Queries.DELETE_DASHBOARD, new Object[] { 
+				dashboardId,
+				userId
+		});
+	}
+
+
+	public void updateDashboardState(final Integer dashboardId,final String emptyState,
+			final int sequence,final String dashboardName) throws SQLException {
+		
+		getJdbcTemplate().update(Queries.UPDATE_DASHBOARD_STATE, new Object[] { 
+				emptyState,
+				sequence,
+				dashboardName,
+				dashboardId
+		});
+	}
+
+	public void updateDashboardDetails(Integer dashboardId, int sequence,
+			String dashboardName, int columnCount) throws SQLException {
+		
+		getJdbcTemplate().update(Queries.UPDATE_DASHBOARD_DETAILS, new Object[] { 
+				sequence,
+				dashboardName,
+				columnCount,
+				dashboardId
+		});
+	}	
 	
 }
