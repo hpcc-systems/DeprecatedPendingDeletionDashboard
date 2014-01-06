@@ -59,10 +59,10 @@ width:90%
 }
 </style>
 		<hbox id="editPortletGrid" hflex="1" spacing="0px" height="542px" style="position: absolute;
-z-index: 15000;
-background: rgba(170, 170, 170, 0.45);
-height: 542px;
-width: 1000px;">
+			z-index: 15000;
+			background: rgba(170, 170, 170, 0.45);
+			height: 542px;
+			width: 1000px;">
 			<hlayout zclass="full-length form-group">
 				<label zclass="label" value="${labels.wsSQL}"></label>
 				<textbox id="wsdlTxt"

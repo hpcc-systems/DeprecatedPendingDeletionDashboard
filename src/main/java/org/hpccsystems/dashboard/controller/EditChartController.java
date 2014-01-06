@@ -268,7 +268,27 @@ public class EditChartController extends SelectorComposer<Component> {
 	public void onDropToYAxisTabBox(final DropEvent dropEvent) {
 
 		final Listitem draggedListitem = (Listitem) ((DropEvent) dropEvent).getDragged();
-		Listitem yAxisItem = new Listitem(draggedListitem.getLabel());
+		final Listitem yAxisItem = new Listitem();
+		Listcell listcell = new Listcell();
+		listcell.setLabel(draggedListitem.getLabel());
+		
+		Button closeBtn = new Button();
+		closeBtn.setSclass("glyphicon glyphicon-remove btn btn-link img-btn");
+		closeBtn.setStyle("float:right");
+		
+		closeBtn.addEventListener(Events.ON_CLICK, new EventListener<Event>() {
+			public void onEvent(final Event event) throws Exception {						
+				yAxisItem.detach();
+				yAxisDropped = false;
+				chartData.setYColumnName(null);
+				doneButton.setDisabled(true);
+				filterListBox.setDroppable("false");
+			}
+		});
+		
+		listcell.appendChild(closeBtn);
+		
+		yAxisItem.appendChild(listcell);
 		yAxisItem.setParent(YAxisListBox);		
 		
 		// passing X,Y axis values to draw the chart
@@ -294,7 +314,27 @@ public class EditChartController extends SelectorComposer<Component> {
 
 		final Listitem draggedListitem = (Listitem) ((DropEvent) dropEvent)
 				.getDragged();
-		Listitem xAxisItem = new Listitem(draggedListitem.getLabel());
+		final Listitem xAxisItem = new Listitem();
+		Listcell listcell = new Listcell();
+		listcell.setLabel(draggedListitem.getLabel());
+		
+		Button closeBtn = new Button();
+		closeBtn.setSclass("glyphicon glyphicon-remove btn btn-link img-btn");
+		closeBtn.setStyle("float:right");
+		
+		closeBtn.addEventListener(Events.ON_CLICK, new EventListener<Event>() {
+			public void onEvent(final Event event) throws Exception {						
+				xAxisItem.detach();
+				xAxisDropped = false;
+				chartData.setXColumnName(null);
+				doneButton.setDisabled(true);
+				filterListBox.setDroppable("false");
+			}
+		});
+		
+		listcell.appendChild(closeBtn);
+		
+		xAxisItem.appendChild(listcell);
 		xAxisItem.setParent(XAxisListBox);		
 			
 		//passing X,Y axis values to draw the chart
@@ -326,17 +366,23 @@ public class EditChartController extends SelectorComposer<Component> {
 		
 		Listitem filterList = new Listitem();		
 		Listcell labelCell = new Listcell(draggedListitem.getLabel());
-		Listcell playCell = new Listcell();
-		Listcell closeCell = new Listcell();
+		
+		Button playBtn = new Button();
+		playBtn.setSclass("glyphicon glyphicon-play btn btn-link img-btn");
+		playBtn.setStyle("float:right");
+		playBtn.addEventListener(Events.ON_CLICK, openFilterListener);
+		
+		Button closeBtn = new Button();
+		closeBtn.setSclass("glyphicon glyphicon-remove btn btn-link img-btn");
+		closeBtn.setStyle("float:right");
+		closeBtn.addEventListener(Events.ON_CLICK, clearListener);
+		labelCell.appendChild(closeBtn);
+		
+		labelCell.appendChild(playBtn);
+		
 		labelCell.setTooltiptext(chartData.getFilter().getColumn());
 		
-		playCell.setIconSclass("glyphicon glyphicon-play");	
-		closeCell.setIconSclass("glyphicon glyphicon-remove");
-		playCell.addEventListener(Events.ON_CLICK, openFilterListener);
-		closeCell.addEventListener(Events.ON_CLICK, clearListener);		
 		filterList.appendChild(labelCell);
-		filterList.appendChild(playCell);
-		filterList.appendChild(closeCell);		
 		filterList.setParent(filterListBox);
 		
 		try	{
@@ -422,8 +468,8 @@ public class EditChartController extends SelectorComposer<Component> {
 	EventListener<Event> clearListener = new EventListener<Event>() {
 
 		public void onEvent(final Event event) throws Exception {			
-			Listitem listItem =(Listitem) event.getTarget().getParent();			
-			filterListBox.removeChild(listItem);
+			Listitem listItem =(Listitem) event.getTarget().getParent().getParent();			
+			listItem.detach();
 		}
 	};
 	

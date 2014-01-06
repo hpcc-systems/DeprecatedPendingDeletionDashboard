@@ -53,6 +53,7 @@ public class HPCCServiceImpl implements HPCCService{
 	public Map<String,String> getColumnSchema(final String Sql,final String userName,final String password,final String url)
 	{
 		final HashMap<String, String> schemaMap=new HashMap<String, String>();
+		
 		String[] rowObj=null,columnObj=null;
 		try 
 		{
@@ -66,16 +67,14 @@ public class HPCCServiceImpl implements HPCCService{
 			req.setName(Sql);
 			req.setCluster("mythor");
 			final DFUInfoResponse result = soap.DFUInfo(req);	
-			/*The below properties needs to be set in later phase of the project */
+			//The below properties needs to be set in later phase of the project 
 			if (LOG.isDebugEnabled()) {
 				LOG.debug(Constants.COLUMN_NAME+userName);
 				LOG.debug(Constants.EDIT_URL+url);
 				LOG.debug(Constants.EDIT_SQL+Sql);
 			}
-			/**Two types of column schema results been parsed here to 
-			 * get column name and datatype
-			 */
-			
+			//Two types of column schema results been parsed here to 
+			// get column name and datatype
 			if(result.getFileDetail()!=null)
 			{
 				final StringBuilder resultString =new StringBuilder(result.getFileDetail().getEcl());
@@ -255,7 +254,7 @@ public class HPCCServiceImpl implements HPCCService{
 		
 		StringBuilder queryTxt=new StringBuilder("select ");
 		
-		if(!chartData.isFiltered())
+		if(!chartData.getIsFiltered())
 		{
 			//Query without filters
 			queryTxt.append(chartData.getXColumnName());
@@ -264,7 +263,7 @@ public class HPCCServiceImpl implements HPCCService{
 			queryTxt.append(" from ");
 			queryTxt.append(chartData.getFileName());
 			//queryTxt.append(" limit 7");
-		} else if( chartData.isFiltered() &&
+		} else if( chartData.getIsFiltered() &&
 				Constants.STRING_DATA.equals(chartData.getFilter().getType())) {
 			//Query with String filters
 			queryTxt.append(chartData.getXColumnName());
@@ -289,7 +288,7 @@ public class HPCCServiceImpl implements HPCCService{
 			queryTxt.append(" )");
 			//queryTxt.append(" limit 7");
 			
-		} else if( chartData.isFiltered() &&
+		} else if( chartData.getIsFiltered() &&
 				Constants.NUMERIC_DATA.equals(chartData.getFilter().getType())) {
 			//Query with Numeric filter
 			queryTxt.append(chartData.getXColumnName());

@@ -91,7 +91,7 @@ public class XYChartData {
 	}
 
 	@XmlElement
-	public Boolean isFiltered() {
+	public Boolean getIsFiltered() {
 		return isFiltered;
 	}
 

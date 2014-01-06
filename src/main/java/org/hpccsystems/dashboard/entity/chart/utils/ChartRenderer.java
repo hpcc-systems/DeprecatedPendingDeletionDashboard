@@ -80,16 +80,16 @@ public class ChartRenderer {
 		}
 		
 		if(LOG.isDebugEnabled()){
-			LOG.debug("Constructing chart \n Is chart has filters - " + chartData.isFiltered());
+			LOG.debug("Constructing chart \n Is chart has filters - " + chartData.getIsFiltered());
 		}
 		
-		if(chartData.isFiltered() &&
+		if(chartData.getIsFiltered() &&
 				Constants.STRING_DATA.equals(chartData.getFilter().getType())) {
 			header.addProperty("filterColumn", chartData.getFilter().getColumn());
 			header.addProperty("stringFilter", 
 					constructFilterTitle(chartData.getFilter().getValues()));
 		
-		} else if (chartData.isFiltered() && 
+		} else if (chartData.getIsFiltered() && 
 				Constants.NUMERIC_DATA.equals(chartData.getFilter().getType())) {
 			header.addProperty("filterColumn", chartData.getFilter().getColumn());
 			header.addProperty("from", chartData.getFilter().getStartValue());
