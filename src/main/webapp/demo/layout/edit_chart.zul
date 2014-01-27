@@ -1,0 +1,46 @@
+<hlayout id="editLayout" apply="org.hpccsystems.dashboard.controller.EditChartController">
+ 	<vbox spacing="0em">
+ 		<vbox height="270px">
+ 			<listbox width="200px" vflex="1" id="measureListBox" droppable="true"> 
+	 			<listhead>
+	            	<listheader label="${labels.measures}"/>
+	            </listhead>
+	 		</listbox>
+ 		</vbox>
+ 		<vbox height="270px">
+ 			<listbox width="200px" vflex="1"  id="attributeListBox" droppable="true">
+	 			<listhead>
+	            	<listheader label="${labels.attributes}"/>
+	            </listhead>
+	 		</listbox>
+ 		</vbox>
+ 	</vbox>
+ 	
+ 	<vbox spacing="0em">
+ 		<vbox height="180px">
+	 		<listbox width="200px" vflex="1" id="YAxisListBox" droppable="true">
+	 			<listhead>
+	            	<listheader label="${labels.chartMeasures}"/>
+	            </listhead>
+	 		</listbox>
+ 		</vbox>
+ 		<vbox height="180px">
+	 		<listbox width="200px" vflex="1" id="XAxisListBox" droppable="true">
+	 			<listhead>
+	            	<listheader label="${labels.chartAttributes}"/>
+	            </listhead>
+	 		</listbox>
+ 		</vbox>
+ 		<vbox height="180px">
+	 		<listbox width="200px" vflex="1" id="filterListBox" droppable="false">
+	 			<listhead>
+	            	<listheader label="${labels.chartFilters}"/>
+	            </listhead>
+	 		</listbox>
+ 		</vbox>
+ 	</vbox>
+ 	
+ 	<div vflex="1" hflex="1" style="border: 1px solid; border-color: rgb(184, 177, 177);" id="chart">
+ 	
+ 	</div>
+ </hlayout>
