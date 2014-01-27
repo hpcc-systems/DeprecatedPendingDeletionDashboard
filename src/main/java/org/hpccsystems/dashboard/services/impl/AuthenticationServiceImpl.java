@@ -10,6 +10,8 @@ import org.hpccsystems.dashboard.entity.User;
 import org.hpccsystems.dashboard.services.AuthenticationService;
 import org.hpccsystems.dashboard.services.UserCredential;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
 import org.zkoss.zk.ui.Session;
 import org.zkoss.zk.ui.Sessions;
@@ -19,6 +21,7 @@ import org.zkoss.zk.ui.Sessions;
  *
  */
 @Service
+@Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class AuthenticationServiceImpl implements AuthenticationService,Serializable{
 	private static final long serialVersionUID = 1L;
 	
@@ -26,9 +29,6 @@ public class AuthenticationServiceImpl implements AuthenticationService,Serializ
 	
 	AuthenticationDao authendicationDao;
 	
-	public AuthenticationDao getAuthendicationDao() {
-		return authendicationDao;
-	}
 	@Autowired
 	public void setAuthendicationDao(AuthenticationDao authendicationDao) {
 		this.authendicationDao = authendicationDao;
@@ -47,23 +47,23 @@ public class AuthenticationServiceImpl implements AuthenticationService,Serializ
 		return false;
 	}
 
-	public void logout(Object object) {
+	public void logout(Object object)throws Exception {
 		if(object!= null)
 		{				
 		try {
 			authendicationDao.updateActiveFlag((User)object);
-		} catch (SQLException e) {
-			LOG.error("SQL Exception", e);
+		} catch (final SQLException e) {
+			throw e;
 		}		
 		}
 	}
 	
-	public User authendicateUser(String userName, String Password) {
+	public User authendicateUser(String userName, String Password)throws Exception {
 		User user = null;
 		try {
 			user = authendicationDao.authendicateUser(userName,Password);
-		}  catch (SQLException e) {
-			LOG.error("SQLException", e);
+		}  catch (final SQLException e) {
+			throw e;
 		}		
 		return user;
 	}

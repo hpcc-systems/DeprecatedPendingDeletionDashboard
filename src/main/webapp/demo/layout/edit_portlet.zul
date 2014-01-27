@@ -1,135 +1,22 @@
 <window id="editPortletWindow" border="normal"
-	apply="org.hpccsystems.dashboard.controller.EditChartController" 
+	apply="org.hpccsystems.dashboard.controller.EditWidgetController" 
 	closable="true" width="1000px" height="575px"
 	sclass="panel">
 	<caption iconSclass="glyphicon glyphicon-cog">
 		<label zclass="h5">Edit Chart</label>
 		<toolbar style="position: absolute; right: 40px;">
-			<button id="doneButton" disabled="true" tooltip="Add Chart to Dashboard" zclass="glyphicon glyphicon-ok btn btn-link img-btn z-button" style="color: #5cb85c"/> 
+			<button id="doneButton" disabled="true" tooltip="Add Chart to Dashboard" zclass="glyphicon glyphicon-ok btn btn-link img-btn z-button" /> 
 		</toolbar>	
 	</caption>
-<style>
-.z-loading { top: 50% !important; left: 45% !important; align:
-		center; vertical-align: middle; }
-.z-row-inner {
-	border-bottom: 0pt solid rgb(131, 131, 131);
-}
-
-path { 
-    stroke: steelblue;
-    stroke-width: 2;
-    fill: none;
-}
-
-.axis path,
-.axis line {
-    fill: none;
-    stroke: grey;
-    stroke-width: 1;
-    shape-rendering: crispEdges;
-}
-
-.z-tabs-content .z-tab-button {
-text-align:left
-width:90%
-}
-
-.z-notification-info .z-notification-content {
-	-webkit-border-radius: 0px;
-	border-radius: 0px;
-	border: 1px solid #900;
-	background: #fee;
-	color: #900;
-	padding: 9px;
-	min-height: 0px;
-}
-
-.form-input{
-	float: left;
-	width: 300px;
-}
-
-.form-label {
-	float: left;
-	margin-left: 300px;
-}
-
-.form-row {
-	height:40px;
-}
-</style>
-		<hbox id="editPortletGrid" hflex="1" spacing="0px" height="542px" style="position: absolute;
-			z-index: 15000;
-			background: rgba(170, 170, 170, 0.45);
-			height: 542px;
-			width: 1000px;">
-			<hlayout zclass="full-length form-group">
-				<label zclass="label" value="${labels.wsSQL}"></label>
-				<textbox id="wsdlTxt"
-					value="${sessionScope.previousWsdl}" constraint="no empty : Please enter valid SQL."  zclass="form-control"/>
-			</hlayout>
-			<hlayout zclass="form-group">
-				<label zclass="label" value="${labels.userName}"></label>
-				<textbox id="editUserTxt" constraint="no empty : Please enter valid Username." value="generic_dashboard" zclass="form-control"></textbox>
-			</hlayout>
-			<hlayout zclass="form-group">
-				<label zclass="label" value="${labels.password}"></label>
-				<textbox id="editPwdTxt" type="password" constraint="no empty : Please enter valid Password." value="password-1" zclass="form-control"></textbox>
-			</hlayout>
-			<hlayout zclass="form-group" width="320px">
-				<label zclass="label" value="${labels.jdbcURL}"></label>
-				<textbox id="editJDBCUrlTxt" constraint="no empty : Please enter valid HPCCSystems Url." value="https://216.19.105.2" zclass="form-control"></textbox>
-			</hlayout>
-			<hlayout zclass="form-group" >
-				<button id="editSubmit" label="${labels.fetchFields}" style="margin-top:10px;"	zclass="btn btn-primary" width="135px" />
-			</hlayout>
-		</hbox>
-
+	<style>
+		.popup {
+			border: 1px solid rgb(240, 240, 240);
+			background-color: rgb(235, 235, 235);
+		}
+		.popup-content {
+			padding: 3px;
+		}
+	</style>
 	
-		<hlayout id="editLayout">
-		 	<vbox spacing="0em">
-		 		<vbox height="270px">
-		 			<listbox width="200px" vflex="1" id="measureListBox" draggable="true" droppable="true" oddRowSclass="non-odd"> 
-			 			<listhead>
-			            	<listheader label="Measures"/>
-			            </listhead>
-			 		</listbox>
-		 		</vbox>
-		 		<vbox height="270px">
-		 			<listbox width="200px" vflex="1"  id="attributeListBox" draggable="true" droppable="true" oddRowSclass="non-odd">
-			 			<listhead>
-			            	<listheader label="Attributes"/>
-			            </listhead>
-			 		</listbox>
-		 		</vbox>
-		 	</vbox>
-		 	
-		 	<vbox spacing="0em">
-		 		<vbox height="180px">
-			 		<listbox width="200px" vflex="1" id="YAxisListBox" droppable="true">
-			 			<listhead>
-			            	<listheader label="Y Axis - Measures"/>
-			            </listhead>
-			 		</listbox>
-		 		</vbox>
-		 		<vbox height="180px">
-			 		<listbox width="200px" vflex="1" id="XAxisListBox" droppable="true">
-			 			<listhead>
-			            	<listheader label="X Axis - Attributes"/>
-			            </listhead>
-			 		</listbox>
-		 		</vbox>
-		 		<vbox height="180px">
-			 		<listbox width="200px" vflex="1" id="filterListBox" droppable="false">
-			 			<listhead>
-			            	<listheader label="Filter - Attributes"/>
-			            </listhead>
-			 		</listbox>
-		 		</vbox>
-		 	</vbox>
-		 	
-		 	<div vflex="1" hflex="1" style="border: 1px solid; border-color: rgb(184, 177, 177);" id="chart">
-		 	
-		 	</div>
-		 </hlayout>
+	<include id="holderInclude" height="542px" ></include>
 </window>

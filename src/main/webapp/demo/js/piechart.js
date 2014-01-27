@@ -33,7 +33,7 @@ function createPieChart(divId, jsonArrayData) {
 		
 		
 		// define dimensions of svg
-		var height = fullHeight,
+		var height = fullHeight-10,
 		    width = fullWidth,
 		    radius = Math.min(width, height) / 2;
 		
@@ -90,44 +90,6 @@ function createPieChart(divId, jsonArrayData) {
 			    return (r1 * r1 <= dist) && (dist <= r2 * r2) && 
 			           (theta1 <= angle) && (angle <= theta2);
 			  }
-		  
-		 /* g.append("text")
-		      .attr("transform", function(d) { return "translate(" + arc.centroid(d) + ")"; })
-		      .attr("dy", ".35em")
-		      .style("text-anchor", "middle")
-		      .attr("fill", "white")
-		      .text(function(d,i) { return data[i].xData; })
-		      .each(function (d) {
-		         var bb = this.getBBox(),
-		             center = arc.centroid(d);
-		             
-		         var topLeft = {
-		           x : center[0] + bb.x,
-		           y : center[1] + bb.y
-		         };
-		         
-		         var topRight = {
-		           x : topLeft.x + bb.width,
-		           y : topLeft.y
-		         };
-		         
-		         var bottomLeft = {
-		           x : topLeft.x,
-		           y : topLeft.y + bb.height
-		         };
-		         
-		         var bottomRight = {
-		           x : topLeft.x + bb.width,
-		           y : topLeft.y + bb.height
-		         };
-		         
-		         d.visible = pointIsInArc(topLeft, d, arc) &&
-		                     pointIsInArc(topRight, d, arc) &&
-		                     pointIsInArc(bottomLeft, d, arc) &&
-		                     pointIsInArc(bottomRight, d, arc);
-		        
-		      })
-		      .style('display', function (d) { return d.visible ? null : "none"; });*/
 		  
 		  var legend = svg.append("g")
 			  .attr("class", "legend")

@@ -13,6 +13,7 @@ import org.hpccsystems.dashboard.dao.WidgetDao;
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.rowmapper.WidgetRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 
@@ -46,7 +47,7 @@ public class WidgetDaoImpl implements WidgetDao{
 		this.dataSource = dataSource;
 	}
 	
-	public void updateWidgetDetails(final Integer dashboardId,final List<Portlet> portlets)  throws SQLException {
+	public void updateWidgetDetails(final Integer dashboardId,final List<Portlet> portlets)  throws DataAccessException {
 		
 		String sql = Queries.UPDATE_WIDGET_DETAILS;
 		getJdbcTemplate().batchUpdate(sql, new BatchPreparedStatementSetter()
@@ -77,7 +78,7 @@ public class WidgetDaoImpl implements WidgetDao{
 		
 	}
 	public void addWidgetDetails(final Integer dashboardId,
-			final List<Portlet> portlets) throws SQLException {
+			final List<Portlet> portlets) throws DataAccessException {
 
 		String sql = Queries.INSERT_WIDGET_DETAILS;
 		
@@ -106,7 +107,7 @@ public class WidgetDaoImpl implements WidgetDao{
 		
 	}
 	public void deleteWidgets(final Integer dashboardId, final List<Portlet> portlets)
-			throws SQLException {
+			throws DataAccessException {
 		String sql =Queries.DELETE_WIDGETS;
 		getJdbcTemplate().batchUpdate(sql, new BatchPreparedStatementSetter() {
 			
@@ -122,7 +123,7 @@ public class WidgetDaoImpl implements WidgetDao{
 	}
 
 	
-	public List<Portlet> retriveWidgetDetails(Integer dashboardId) throws SQLException{
+	public List<Portlet> retriveWidgetDetails(Integer dashboardId) throws DataAccessException{
 			final String sql = Queries.GET_WIDGET_DETAILS;
 			List<Portlet> portlets = getJdbcTemplate().query(sql, new Object[]{dashboardId}, new WidgetRowMapper());
 			return portlets;

@@ -1,12 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
-
 <web-app version="2.4" xmlns="http://java.sun.com/xml/ns/j2ee"
  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
  xsi:schemaLocation="http://java.sun.com/xml/ns/j2ee http://java.sun.com/xml/ns/j2ee/web-app_2_4.xsd"> 
 
 	<description><![CDATA[My ZK Application]]></description>
 	<display-name>Dashboard</display-name>
-
+	
+	<!-- Loading all configuration xml into servletContext -->
+	 <context-param>
+        <param-name>contextConfigLocation</param-name>
+        <param-value>
+        /WEB-INF/dispatcher-servlet.xml
+        /WEB-INF/applicationContext.xml
+        </param-value>
+    </context-param>
+    
 	<!-- Spring configuration -->
 	<!-- Initialize spring context -->
 	<listener>
@@ -94,6 +102,30 @@
 		<servlet-name>auEngine</servlet-name>
 		<url-pattern>/zkau/*</url-pattern>
 	</servlet-mapping>
+	 
+	<!--Spring DispatcherServlet to make Dashboard interact with other appln -->	
+	 <servlet>
+        <servlet-name>dispatcher</servlet-name>
+        <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
+   		 <load-on-startup>2</load-on-startup>        
+    </servlet> 
+
+    <servlet-mapping>
+        <servlet-name>dispatcher</servlet-name>
+        <url-pattern>*.do</url-pattern>
+    </servlet-mapping>
+	
+	<!-- Richlet filters for API -->
+	<filter>
+	    <filter-name>RichletFilter</filter-name>
+	    <filter-class>org.zkoss.zk.ui.http.RichletFilter</filter-class>
+	</filter>
+	 
+	<filter-mapping>
+	    <filter-name>RichletFilter</filter-name>
+	    <url-pattern>/api/*</url-pattern>
+	</filter-mapping>
+	<!-- Richlet filters for API -->	
 
 	<!-- [Optional]
 	Uncomment if you want to use the ZK filter to post process the HTML output

@@ -21,13 +21,13 @@ public interface AuthenticationService  {
 	 * @param Password
 	 * @return boolean
 	 */
-	User  authendicateUser(String userName,String Password);
+	User  authendicateUser(String userName,String Password)throws Exception;
 	
 	/**
 	 * service call to logout an user by resetting the active flag
 	 * @param object
 	 */
-	void logout(Object object);
+	void logout(Object object)throws Exception;
 	
 	
 	

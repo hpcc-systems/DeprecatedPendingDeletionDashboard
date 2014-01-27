@@ -31,11 +31,10 @@
 						${labels.pieChart}
 						<button label="Add" id="pieChartButton" zclass="btn btn-primary"/>
 					</vbox>
-					
 					<vbox align="center">
-						<image src="chart/ScatterPlot.jpg" sclass="addwidget-img"/>
-						${labels.scatterPlot}
-						<button label="Add" disabled="true" sclass="btn btn-default"/>
+						<image src="chart/table.png" zclass="addwidget-img"/>
+						${labels.table}
+						<button id="tableWidget" label="Add" zclass="btn btn-primary"/>
 					</vbox>
 				</row>
 				<row zclass="div">

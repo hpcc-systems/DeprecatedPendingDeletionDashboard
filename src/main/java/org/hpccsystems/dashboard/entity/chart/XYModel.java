@@ -1,5 +1,7 @@
 package org.hpccsystems.dashboard.entity.chart;
 
+import java.util.List;
+
 
 /**
  * This class is model for BarChart Type.
@@ -7,7 +9,7 @@ package org.hpccsystems.dashboard.entity.chart;
  */
 public class XYModel {
 	private Object xAxisVal;
-	private Object yAxisVal;
+	private List<Object> yAxisValues;
 	
 	public XYModel() {
 	}
@@ -29,22 +31,25 @@ public class XYModel {
 	/**
 	 * @return the yAxisVal
 	 */
-	public final Object getyAxisVal() {
-		return yAxisVal;
+	public final List<Object> getyAxisValues() {
+		return yAxisValues;
 	}
 
 	/**
 	 * @param yAxisVal the yAxisVal to set
 	 */
-	public final void setyAxisVal(final Object yAxisVal) {
-		this.yAxisVal = yAxisVal;
+	public final void setyAxisValues(final List<Object> yAxisValues) {
+		this.yAxisValues = yAxisValues;
 	}
 
 	@Override
 	public String toString() {
-		final StringBuilder objState=new StringBuilder();
-		objState.append("xAxisVal:").append(xAxisVal).append(":yAxisVal:").append(yAxisVal);
-		return objState.toString();
+		final StringBuilder obj =new StringBuilder();
+		obj.append("XYModel [xAxisVal=")
+			.append(xAxisVal )
+			.append(", yAxisValues=")
+			.append(yAxisValues)
+			.append("]");
+		return obj.toString();
 	}
-	
 }

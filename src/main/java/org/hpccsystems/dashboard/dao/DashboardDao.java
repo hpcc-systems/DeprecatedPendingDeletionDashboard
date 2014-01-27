@@ -5,7 +5,6 @@ import java.util.List;
 
 import org.hpccsystems.dashboard.entity.Application;
 import org.hpccsystems.dashboard.entity.Dashboard;
-import org.hpccsystems.dashboard.entity.Portlet;
 import org.springframework.dao.DataAccessException;
 
 /**
@@ -16,12 +15,12 @@ public interface DashboardDao {
 		
 	/**
 	 * Inserts Dashboard details to dashboard_details table.
-	 * @param applnId
+	 * @param sourceId
 	 * @param dashBoardName
 	 * @param layout
 	 * @throws SQLException
 	 */
-	 int addDashboardDetails(String applnId,String dashBoardName,String userId) throws SQLException ;
+	 int addDashboardDetails(String sourceId,String source,String dashBoardName,String userId) throws DataAccessException ;
 	
 	 /**
 	  * Fetching DashboardMenuPages details from dashboard_details table.
@@ -29,23 +28,14 @@ public interface DashboardDao {
 	 * @return List<DashboardMenu>
 	 * @throws DataAccessException
 	 */
-	List<Dashboard> fetchDashboardDetails(Application application,String userId) throws DataAccessException;
-
-
-	
-	/**
-	 * method to update sequence of dashboard
-	 * @param dashboardId
-	 * @param sequence
-	 */
-	void updateSequence(Integer dashboardId,int sequence,String dashboardName) throws SQLException;
+	List<Dashboard> fetchDashboardDetails(Application application,String userId) throws DataAccessException;	
 	
 	/**
 	 * method to delete dashboard
 	 * @param dashboardId
 	 * @param deleteStatus
 	 */
-	void deleteDashboard(Integer dashboardId, String userId) throws SQLException;
+	int deleteDashboard(Integer dashboardId, String userId) throws DataAccessException;
 	
 	/**
 	 * Method to update empty state of dashboard
@@ -54,7 +44,7 @@ public interface DashboardDao {
 	 * @param sequence
 	 * @param dashboardName
 	 */
-	void updateDashboardState(Integer dashboardId,String emptyState,int sequence,String dashboardName) throws SQLException;
+	void updateDashboardState(Integer dashboardId,String emptyState,int sequence,String dashboardName) throws DataAccessException;
 	
 	/**
 	 * Method to update entire dashboard details
@@ -63,6 +53,6 @@ public interface DashboardDao {
 	 * @param dashboardName
 	 * @param columnCount
 	 */
-	void updateDashboardDetails(Integer dashboardId,int sequence,String dashboardName,int columnCount) throws SQLException;
+	void updateDashboardDetails(Integer dashboardId,int sequence,String dashboardName,int columnCount) throws DataAccessException;
 
 }

@@ -9,7 +9,9 @@ import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.Portlet;
+import org.hpccsystems.dashboard.entity.chart.utils.TableRenderer;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.Components;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Session;
 import org.zkoss.zk.ui.Sessions;
@@ -17,6 +19,7 @@ import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.select.Selectors;
+import org.zkoss.zul.Box;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Caption;
 import org.zkoss.zul.Div;
@@ -26,6 +29,7 @@ import org.zkoss.zul.Panel;
 import org.zkoss.zul.Panelchildren;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Toolbar;
+import org.zkoss.zul.Vbox;
 import org.zkoss.zul.Window;
 
 /**
@@ -50,13 +54,16 @@ public class ChartPanel extends Panel {
 	final Div chartDiv = new Div();
 	final Textbox textbox = new Textbox();
 	
-	final Image image = new Image();
+	final Box imageContainer = new Box();
 	
 	Portlet portlet;
 
 	public ChartPanel(final Portlet argPortlet) {
 		this.setZclass("panel");
-		this.image.setZclass("img");
+		this.imageContainer.setVflex("1");
+		this.imageContainer.setHflex("1");
+		this.imageContainer.setAlign("center");
+		this.imageContainer.setPack("center");
 		
 		this.portlet = argPortlet;
 		
@@ -108,7 +115,7 @@ public class ChartPanel extends Panel {
 
 		// Creating panel contents
 		final Panelchildren panelchildren = new Panelchildren();
-		holderDiv.setStyle("min-height:385px;");
+		holderDiv.setHeight("385px");
 		panelchildren.appendChild(holderDiv);
 		this.appendChild(panelchildren);
 		
@@ -123,7 +130,13 @@ public class ChartPanel extends Panel {
 			addBtn.addEventListener(Events.ON_CLICK, editListener);
 			resetBtn.setDisabled(false);
 			createChartHolder();
-			drawD3Graph();
+			//To construct Table Widget
+			if(portlet.getChartType().equals(Constants.TABLE_WIDGET)){
+				drawTableWidget();
+			}
+			else{
+				drawD3Graph();
+			}	
 		} else if(portlet.getWidgetState().equals(Constants.STATE_GRAYED_CHART)){
 			//Only Static image is added
 			setStaticImage();
@@ -141,7 +154,6 @@ public class ChartPanel extends Panel {
 	 * Returns null if Chart is not drawn in the panel yet
 	 */
 	public final String drawD3Graph() {
-	
 		if(!portlet.getWidgetState().equals(Constants.STATE_LIVE_CHART)){
 			return null;
 		}	
@@ -153,12 +165,24 @@ public class ChartPanel extends Panel {
 			return "createPieChart('" + chartDiv.getId() +  "','"+ portlet.getChartDataJSON() +"')" ;
 		}
 	}
+	
+	//To construct Table Widget
+	public void drawTableWidget(){
+		if(portlet.getTableDataMap()!=null && portlet.getTableDataMap().size()>0){
+			TableRenderer tableRenderer = new TableRenderer();
+			Vbox vbox = tableRenderer.constructTableWidget(portlet.getTableDataMap(), false);
+			chartDiv.getChildren().clear();
+			chartDiv.appendChild(vbox);
+		}
+	}
 
 	private void setStaticImage() {
 		createChartHolder();
-		image.setSrc(Constants.CHART_URL.get(portlet.getChartType()));
-		image.setSclass("img-responsive chartImage");
-		chartDiv.appendChild(image);
+		Image image = new Image();
+		image.setSrc(Constants.CHART_MAP.get(portlet.getChartType()).getStaticImageURL());
+		image.setSclass("img-responsive");
+		imageContainer.appendChild(image);
+		chartDiv.appendChild(imageContainer);
 		portlet.setWidgetState(Constants.STATE_GRAYED_CHART);
 	}
 	
@@ -208,20 +232,8 @@ public class ChartPanel extends Panel {
 			// Defining parameters to send to Modal Dialog
 			final Map<String, Object> parameters = new HashMap<String, Object>();
 			parameters.put(Constants.PARENT, ChartPanel.this);
-			Sessions.getCurrent().setAttribute(Constants.ACTIVE_PORTLET, portlet);
-			Sessions.getCurrent().setAttribute("currentDiv", chartDiv.getId());
-			Sessions.getCurrent().setAttribute("curStaticImg",image);
-
-			//Sets the Portlet's Wsdl info into session
-			Integer activeID=portlet.getId();
-		    Map<Integer,String> wsdlMap =(Map<Integer,String>)Sessions.getCurrent().getAttribute("portletIdWsdlMap");
-		    String previousWsdl = null;
-		    if(wsdlMap != null)
-		    {
-		    	previousWsdl = wsdlMap.get(activeID);
-		    }  
-		    Sessions.getCurrent().setAttribute("previousWsdl",previousWsdl);
-		    
+			parameters.put(Constants.PORTLET, portlet);
+			
 			final Window window = (Window) Executions.createComponents(
 					"/demo/layout/edit_portlet.zul", holderDiv, parameters);
 			window.doModal();
@@ -236,7 +248,10 @@ public class ChartPanel extends Panel {
         	portlet.setChartDataJSON(null);
         	portlet.setChartDataXML(null);
         	
+        	Components.removeAllChildren(chartDiv);
+        	Components.removeAllChildren(imageContainer);
         	chartDiv.detach();
+        	
         	addBtn.setSclass(ADD_STYLE);
         	resetBtn.setDisabled(true);
         	addBtn.removeEventListener(Events.ON_CLICK, editListener);
@@ -302,5 +317,15 @@ public class ChartPanel extends Panel {
 	 */
 	public Portlet getPortlet() {
 		return portlet;
+	}
+	
+	/**
+	 * Detaches the static image attached to the Chartpanel and returns the chartDiv ID
+	 * @return
+	 * 	The div id to draw chaert on
+	 */
+	public Div removeStaticImage() {
+		imageContainer.detach();
+		return chartDiv;
 	}
 }

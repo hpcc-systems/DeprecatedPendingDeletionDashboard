@@ -32,6 +32,13 @@
     	 <property name="hpccService"><ref bean="hpccService"/></property>
 	</bean>
 	
+	<bean id="fileConverter" class="org.hpccsystems.dashboard.entity.chart.utils.FileConverter" >
+	</bean>
+	
+	<bean id="tableRenderer" class="org.hpccsystems.dashboard.entity.chart.utils.TableRenderer">
+    	 <property name="fileConverter" ref="fileConverter"/>
+	</bean>
+		
 	<bean id="widgetService" class="org.hpccsystems.dashboard.services.impl.WidgetServiceImpl" >
 	    <property name="widgetDao"><ref bean="widgetDao"/></property>
 	</bean> 
@@ -44,7 +51,7 @@
 	</bean> 
 	<bean id="applicationDao" class="org.hpccsystems.dashboard.dao.impl.ApplicationDaoImpl">
 	   <property name="dataSource"><ref bean="mySQLDataSource"/></property>	   
-	</bean>	
+	</bean>	 
  	
  	<bean id="mySQLDataSource" class="org.apache.commons.dbcp.BasicDataSource">
         <property name="driverClassName">

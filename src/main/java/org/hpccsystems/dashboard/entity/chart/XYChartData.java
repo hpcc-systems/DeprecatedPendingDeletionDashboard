@@ -1,5 +1,8 @@
 package org.hpccsystems.dashboard.entity.chart;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
@@ -7,13 +10,15 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class XYChartData {
 	
 	private Integer sourceType;
-	private String URL;
-	private String userName;
-	private String password;
+
+	private HpccConnection hpccConnection;
+	
 	private String fileName;
 	
-	private String xColumnName;
-	private String yColumnName;
+	private List<String> xColumnNames;
+	private List<String> yColumnNames;
+	private List<String> tableColumns;
+	
 	
 	private Boolean isFiltered = false;
 	private Filter filter;
@@ -28,33 +33,6 @@ public class XYChartData {
 	}
 
 	@XmlElement
-	public String getURL() {
-		return URL;
-	}
-
-	public void setURL(String uRL) {
-		URL = uRL;
-	}
-
-	@XmlElement
-	public String getUserName() {
-		return userName;
-	}
-	
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-
-	@XmlElement
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
-	@XmlElement
 	public String getFileName() {
 		return fileName;
 	}
@@ -64,21 +42,27 @@ public class XYChartData {
 	}
 
 	@XmlElement
-	public String getXColumnName() {
-		return xColumnName;
+	public List<String> getXColumnNames() {
+		if(xColumnNames == null) {
+			xColumnNames = new ArrayList<String>();
+		}
+		return xColumnNames;
 	}
 
-	public void setXColumnName(String xColumnName) {
-		this.xColumnName = xColumnName;
+	public void setXColumnNames(List<String> xColumnNames) {
+		this.xColumnNames = xColumnNames;
 	}
 
 	@XmlElement
-	public String getYColumnName() {
-		return yColumnName;
+	public List<String> getYColumnNames() {
+		if(yColumnNames == null) {
+			yColumnNames = new ArrayList<String>();
+		} 
+		return yColumnNames;
 	}
 
-	public void setYColumnName(String yColumnName) {
-		this.yColumnName = yColumnName;
+	public void setYColumnNames(List<String> yColumnNames) {
+		this.yColumnNames = yColumnNames;
 	}
 
 	@XmlElement
@@ -98,4 +82,28 @@ public class XYChartData {
 	public void setIsFiltered(Boolean isFiltered) {
 		this.isFiltered = isFiltered;
 	}
+
+	@XmlElement
+	public final List<String> getTableColumns() {
+		if(tableColumns == null) {
+			tableColumns = new ArrayList<String>();
+		}
+		return tableColumns;
+	}
+
+	public final void setTableColumns(List<String> tableColumnName) {
+		this.tableColumns = tableColumnName;
+	}
+
+	@XmlElement
+	public HpccConnection getHpccConnection() {
+		if(this.hpccConnection == null)
+			this.hpccConnection = new HpccConnection();
+		return hpccConnection;
+	}
+
+	public void setHpccConnection(HpccConnection hpccConnection) {
+		this.hpccConnection = hpccConnection;
+	}
+
 }

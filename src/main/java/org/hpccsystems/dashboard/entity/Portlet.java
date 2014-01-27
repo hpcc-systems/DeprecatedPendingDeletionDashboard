@@ -1,6 +1,7 @@
 package org.hpccsystems.dashboard.entity;
 
-
+import java.util.List;
+import java.util.LinkedHashMap;
 /**
  * This class is model for Portlet.
  *
@@ -16,6 +17,7 @@ public class Portlet {
 	
 	private String chartDataXML;
 	private String chartDataJSON;
+	private LinkedHashMap<String, List<String>> tableDataMap;
 	private boolean persisted = true; 
 	private int widgetSequence;
 	
@@ -145,5 +147,11 @@ public class Portlet {
 	}
 	public void setChartDataXML(String chartData) {
 		this.chartDataXML = chartData;
+	}
+	public final LinkedHashMap<String, List<String>> getTableDataMap() {
+		return tableDataMap;
+	}
+	public final void setTableDataMap(LinkedHashMap<String, List<String>> tableDataMap) {
+		this.tableDataMap = tableDataMap;
 	}
 }

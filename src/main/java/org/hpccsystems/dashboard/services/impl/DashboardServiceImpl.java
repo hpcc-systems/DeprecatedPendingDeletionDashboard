@@ -14,6 +14,7 @@ import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.services.DashboardService;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 /**
@@ -35,18 +36,26 @@ public class DashboardServiceImpl implements DashboardService {
 	 * @return List<SidebarPage>
 	 */
 
-	public List<Dashboard> retrieveDashboardMenuPages(final Application application,String userId) {
+	public List<Dashboard> retrieveDashboardMenuPages(final Application application,String userId)throws Exception {
 		
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Handling 'retrieveDashboardMenuPages' in DashboardServiceImpl");
 		}
 		
 		final HashMap<String,Dashboard> pageMap = new LinkedHashMap<String,Dashboard>();
-		
-		final List<Dashboard> menuList = dashboardDao.fetchDashboardDetails(application,userId);
+		List<Dashboard> menuList = null;
+		try
+		{
+			menuList = dashboardDao.fetchDashboardDetails(application,userId);
+		}
+		catch(final DataAccessException ex)
+		{
+			throw ex;
+		}
 		
 		final String fnName = "fn";
-
+		if(menuList != null)
+		{
 		for (int i = 0; i < menuList.size(); i++) 
 		{
 			final Dashboard entry = (Dashboard)menuList.get(i);
@@ -57,6 +66,7 @@ public class DashboardServiceImpl implements DashboardService {
 			}
 			pageMap.put(fnNameStr, entry);
 						
+		}
 		}
 		return new ArrayList<Dashboard>(pageMap.values());
 	}
@@ -71,38 +81,37 @@ public class DashboardServiceImpl implements DashboardService {
 
 	 /**
 		 * Inserts Dashboard details to dashboard_details table.
-		 * @param applnId
+		 * @param sourceId
 		 * @param dashBoardName
 		 * @param layout
 		 * @throws SQLException
 	 */
 	
-	public int addDashboardDetails(final String applnId, final String dashBoardName,
-			final String userId) throws SQLException {
-		return dashboardDao.addDashboardDetails(applnId,dashBoardName,userId);
-	}
-	
-	
-	/* 
-	 * service to update sequence of a dashboard
-	 *
-	 */
-	public void updateSequence(Integer dashboardId, int sequence,String dashboardName) {		
-		try {
-			dashboardDao.updateSequence(dashboardId,sequence,dashboardName);
-		} catch (SQLException e) {
-			LOG.error("SQLException", e);
+	public int addDashboardDetails(final String sourceId,final String source, final String dashBoardName,
+			final String userId) throws Exception {
+		try
+		{
+		return dashboardDao.addDashboardDetails(sourceId,source,dashBoardName,userId);
+		}
+		catch(DataAccessException ex)
+		{
+			LOG.error("DataAccessException in addDashboardDetails()",ex);
+			throw ex;
 		}
 	}
+	
+	
+	
 	/* 
 	 * service to delete a dashboard
 	 *
 	 */
-	public void deleteDashboard(Integer dashboardId, String userId) {
+	public int deleteDashboard(Integer dashboardId, String userId) throws Exception{
 		try {
-			dashboardDao.deleteDashboard(dashboardId,userId);
-		} catch (SQLException e) {
-			LOG.error("SQLException", e);
+			return dashboardDao.deleteDashboard(dashboardId,userId);
+		} catch (DataAccessException e) {
+			LOG.error("DataAccessException in deleteDashboard()", e);
+			throw e;
 		}		
 	}
 	/* 
@@ -110,11 +119,12 @@ public class DashboardServiceImpl implements DashboardService {
 	 *
 	 */
 	public void updateDashboardSate(Integer dashboardId, String emptyState,
-			int sequence,String dashboardName) {
+			int sequence,String dashboardName)throws Exception {
 		try {
 			dashboardDao.updateDashboardState(dashboardId,emptyState,sequence,dashboardName);
-		} catch (SQLException e) {
-			LOG.error("SQLException", e);
+		} catch (DataAccessException e) {
+			LOG.error("DataAccessException in updateDashboardSate()", e);
+			throw e;
 		}
 	}
 	/* 
@@ -122,11 +132,12 @@ public class DashboardServiceImpl implements DashboardService {
 	 *
 	 */
 	public void updateDashboardDetails(Integer dashboardId, int sequence,
-			String dashboardName, int columnCount) {
+			String dashboardName, int columnCount)throws Exception {
 		try {
 			dashboardDao.updateDashboardDetails(dashboardId,sequence,dashboardName,columnCount);
-		} catch (SQLException e) {
-			LOG.error("SQLException", e);
+		} catch (DataAccessException e) {
+			LOG.error("DataAccessException in updateDashboardDetails()", e);
+			throw e;
 		}
 	}
 

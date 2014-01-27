@@ -446,29 +446,6 @@ body{
 	border: 0px;
 	background-color: #f6f6f6;
 }
-/* Btn Group at top */
-.btn-group-content {
-  background-color: transparent;
-  -webkit-box-shadow: none;
-  box-shadow: none;
-}
-.btn-group-content .btn {
-	line-height: 18px;
-	font-size: 18px;
-	padding: 0px;
-	border: 0px;
-	color: rgba(0, 0, 0, 0.5);
-}
-
-.btn-group-content .btn > img {
-	height: 40px;
-	padding: 8px;
-}
-
-.dashboard-body {
-	margin-top: 30px;
-	margin-left: 5px;
-}
 
 /*
  * Panel styling

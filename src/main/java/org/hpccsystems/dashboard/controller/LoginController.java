@@ -28,6 +28,8 @@ import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zk.ui.util.Clients;
+import org.zkoss.zul.Button;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
@@ -58,7 +60,8 @@ public class LoginController extends SelectorComposer<Component> {
 	Label message;
 	@Wire
 	Listbox apps;
-	
+	@Wire
+	Button login;
 	@WireVariable
 	AuthenticationService  authenticationService;
 	
@@ -73,10 +76,17 @@ public class LoginController extends SelectorComposer<Component> {
 			LOG.debug("Handling 'doAfterCompose' in LoginController");
 			LOG.debug("dashboardService:loginctrler -->"+dashboardService);
 		}
-
+		try
+		{			
 		final List<Application> applicationList = new ArrayList<Application>(applicationService.retrieveApplicationIds());
 		final ListModelList<Application> appModel = new ListModelList<Application>(applicationList);
 		apps.setModel(appModel);
+		}
+		catch(Exception ex)
+		{
+			Clients.showNotification("Unable to retrieve applications", "error", comp, "top_left", 3000, true);
+			LOG.error("Exception while fetching applications from DB", ex);
+		}
 	}
 	
 	@Listen("onClick=#login; onOK=#loginWin")
@@ -88,9 +98,17 @@ public class LoginController extends SelectorComposer<Component> {
 
 		final String name = account.getValue();
 		final String passWord = password.getValue();
-		
-		User user =authenticationService.authendicateUser(name,passWord);
+		User user = null;
+		try
+		{
+		user =authenticationService.authendicateUser(name,passWord);
 		LOG.debug("User authenticated sucessfully..");
+		}
+		catch(Exception ex)
+		{
+			Clients.showNotification("Unable to login to Dashboard", "error", login.getParent().getParent(), "top_left", 3000, true);
+			LOG.error("Exception while authendicating user in doLogin()", ex);
+		}
 		
 		if(user != null)
 		{
@@ -104,11 +122,17 @@ public class LoginController extends SelectorComposer<Component> {
 			return;
 			}*/
 		}
+		else
+		{
+			message.setValue("Account or Password are not correct.");
+			return;
+		}
 		
 		//Fetching the present application Id and setting into session
 		LOG.debug("the present application Id and setting into session");
 		final Session session = Sessions.getCurrent();
-		session.setAttribute("applnid", apps.getItemAtIndex(apps.getSelectedIndex()).getValue());
+		session.setAttribute("sourceid", apps.getItemAtIndex(apps.getSelectedIndex()).getValue());
+		session.setAttribute("source", apps.getItemAtIndex(apps.getSelectedIndex()).getLabel());
 		session.setAttribute("user", user);
 		message.setValue("Welcome, "+user.getFullName());
 		message.setSclass("");

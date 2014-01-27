@@ -9,6 +9,7 @@ import javax.sql.DataSource;
 import org.apache.commons.lang.Validate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.common.Queries;
 import org.hpccsystems.dashboard.dao.DashboardDao;
 import org.hpccsystems.dashboard.entity.Application;
@@ -44,9 +45,15 @@ public class DashboardDaoImpl implements DashboardDao {
 	
 	private SelectDashboardMenus getSelectDashboardMenus(final Application application,final String userId) {
 		final StringBuffer sql = new StringBuffer(Queries.RETRIEVE_DASHBOARD);
-		sql.append(application.getAppId())
-		.append("' and user_id='")
-		.append(userId).append("' order by sequence");
+		sql.append(application.getAppId());
+		//TODO:need to remove this userId null check,when Circuit passing the user details
+		if(userId == null){
+			sql.append("' order by sequence");
+		}
+		else{
+			sql.append("' and user_id='")
+			.append(userId).append("' order by sequence");
+		}	
 		
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("getSelectDashboardMenus in DashboardDaoImpl");
@@ -90,13 +97,8 @@ public class DashboardDaoImpl implements DashboardDao {
 	public List<Dashboard> fetchDashboardDetails(final Application application,final String userId)
 			throws DataAccessException {
 
-		try {
 			return (List<Dashboard>) getSelectDashboardMenus(application,userId)
 					.execute();
-		} catch (final DataAccessException e) {
-				LOG.error("DataAccessException occurred during retrieveApplicationIds() in DashboardDaoImpl",e);
-			throw e;
-		}
 	}
 
 	public void initialize() {
@@ -113,48 +115,47 @@ public class DashboardDaoImpl implements DashboardDao {
 
 	/**
 	 * Inserts Dashboard details to dashboard_details table & returns the ID of Dashboard that is inserted.
-	 * @param applnId
+	 * @param sourceId
 	 * @param dashBoardName
 	 * @param layout
 	 * @throws SQLException
 	 */
-	public int addDashboardDetails(final String applnId, final String dashBoardName,
-			final String userId	) {
+	public int addDashboardDetails(final String sourceId,final String source, final String dashBoardName,
+			final String userId	)throws DataAccessException {
 
 		getJdbcTemplate().update(Queries.INSERT_DASHBOARD, new Object[] { 
 				dashBoardName,
 				userId,
-				applnId  
+				Constants.SOURCE_TYPE_ID.get(source),
+				sourceId  
 		});
 		
 		return getJdbcTemplate().queryForObject(Queries.GET_MAX_DASHBOARD_ID, new Object[] {userId} , Integer.class);
 	}
 
-	public void updateSequence(final Integer dashboardId, final int sequence,
-			final String dashboardName) throws SQLException {
-		
-		getJdbcTemplate().update(Queries.UPDATE_DASHBOARD_SEQUENCE, new Object[] { 
-				sequence,
-				dashboardName,
+	public int deleteDashboard(final Integer dashboardId, final String userId) throws DataAccessException {
+		int rowsdeleted = 0;
+		rowsdeleted = getJdbcTemplate().update(Queries.DELETE_DASHBOARD_WIDGETS, new Object[] { 
 				dashboardId
 		});
-	}
-
-	public void deleteDashboard(final Integer dashboardId, final String userId) throws SQLException {
-		
-		getJdbcTemplate().update(Queries.DELETE_DASHBOARD_WIDGETS, new Object[] { 
-				dashboardId
-		});
-		
-		getJdbcTemplate().update(Queries.DELETE_DASHBOARD, new Object[] { 
+		//TODO : need to disable this userId null check, when circuit passes the user details
+		if(userId != null){
+			rowsdeleted = getJdbcTemplate().update(Queries.DELETE_DASHBOARD, new Object[] { 
 				dashboardId,
 				userId
 		});
+		}else{
+			rowsdeleted = getJdbcTemplate().update(Queries.CIRCUIT_DELETE_DASHBOARD, new Object[] { 
+					dashboardId
+					
+		});
+		}
+		return rowsdeleted;
 	}
 
 
 	public void updateDashboardState(final Integer dashboardId,final String emptyState,
-			final int sequence,final String dashboardName) throws SQLException {
+			final int sequence,final String dashboardName) throws DataAccessException {
 		
 		getJdbcTemplate().update(Queries.UPDATE_DASHBOARD_STATE, new Object[] { 
 				emptyState,
@@ -165,7 +166,7 @@ public class DashboardDaoImpl implements DashboardDao {
 	}
 
 	public void updateDashboardDetails(Integer dashboardId, int sequence,
-			String dashboardName, int columnCount) throws SQLException {
+			String dashboardName, int columnCount) throws DataAccessException {
 		
 		getJdbcTemplate().update(Queries.UPDATE_DASHBOARD_DETAILS, new Object[] { 
 				sequence,

@@ -19,26 +19,26 @@ public interface WidgetService {
 	 * 	A list of Portlet objects corresponding to the provided Dashboard Id
 	 * @throws SQLException
 	 */
-	List<Portlet> retriveWidgetDetails(Integer dashboardId) throws SQLException;
+	List<Portlet> retriveWidgetDetails(Integer dashboardId) throws Exception;
 	
 	/**
 	 * @param dashboardId
 	 * @param portlets
 	 * @param widgetSequence
 	 */
-	void updateWidgetDetails(Integer dashboardId,List<Portlet> portlets)throws SQLException;
+	void updateWidgetDetails(Integer dashboardId,List<Portlet> portlets)throws Exception;
 	/**
 	 * @param dashboardId
 	 * @param portlets
 	 * @param widgetSequence
 	 */
-	void addWidgetDetails(Integer dashboardId,List<Portlet> portlets)throws SQLException;
+	void addWidgetDetails(Integer dashboardId,List<Portlet> portlets)throws Exception;
 	
 	/**
 	 * @param dashboardId
 	 * @param portlets
 	 * @throws SQLException
 	 */
-	void deleteWidgets(Integer dashboardId,List<Portlet> portlets)throws SQLException;
+	void deleteWidgets(Integer dashboardId,List<Portlet> portlets)throws Exception;
 
 }

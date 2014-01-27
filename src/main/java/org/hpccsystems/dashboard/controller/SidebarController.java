@@ -1,6 +1,5 @@
 package org.hpccsystems.dashboard.controller;
 
-import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -73,19 +72,30 @@ public class SidebarController extends GenericForwardComposer<Component>{
 		Selectors.wireVariables(navBar, this, Selectors.newVariableResolvers(getClass(), null));
 		
 		final Application viewModel = new Application();
-		viewModel.setAppId((String) session.getAttribute("applnid"));
+		viewModel.setAppId((String) session.getAttribute("sourceid"));
+		viewModel.setAppName((String) session.getAttribute("source"));
 		
 		User user = (User)session.getAttribute("user");
-		final List<Dashboard> sideBarPageList = new ArrayList<Dashboard>(dashboardService.retrieveDashboardMenuPages(viewModel,user.getUserId()));
+		List<Dashboard> sideBarPageList = null;
+		try
+		{
+			sideBarPageList =new ArrayList<Dashboard>(dashboardService.retrieveDashboardMenuPages(viewModel,user.getUserId()));
+		}
+		catch(Exception ex)
+		{
+			Clients.showNotification("Unable to retrieve available Dashboards", "error", comp, "top_left", 3000, true);
+			LOG.error("Exception while retrieving dashboards from DB", ex);
+		}
 		
 		Navitem firstNavitem = null; 
 		Boolean firstSet = false;
 		Dashboard entry=null;
 		Navitem navitem=null;
-		
+		if(sideBarPageList != null){
 		for (final Iterator<Dashboard> iter = sideBarPageList.iterator(); iter.hasNext();) {
 			entry = (Dashboard) iter.next();
-			navitem  = constructNavItem(entry.getDashboardId(), entry.getName(), entry.getColumnCount(), null);
+			entry.setPersisted(true);
+			navitem  = constructNavItem(entry);
 			navBar.appendChild(navitem);
 
 			// Retriving first NavItem, to set as default
@@ -93,7 +103,7 @@ public class SidebarController extends GenericForwardComposer<Component>{
 				firstNavitem = navitem;
 				firstSet = !firstSet;
 			}
-		}
+		}}
 		
 		// Displaying first menu item as default page
 		if(firstSet) {
@@ -111,41 +121,11 @@ public class SidebarController extends GenericForwardComposer<Component>{
 		Sessions.getCurrent().setAttribute(Constants.NAVBAR, navBar);
 	}
 
-	/**
-	 * Creates the side Navbar and its associated Dashboard object
-	 * 
-	 * @param dashboardId
-	 * @param name
-	 * @param columCount - must set null when creating dashboard from preset
-	 * @param layout - must set null when not constructing from a preset
-	 * @return
-	 */
-	private Navitem constructNavItem(final Integer dashboardId, final String name,	final Integer columnCount, final String layout) {
+	private Navitem constructNavItem(final Dashboard dashboard) {
 		
 		final Navitem navitem = new Navitem();
-		navitem.setLabel(name);
-		
-		//Constructing empty dashboards and Add it to session map
-		final Dashboard dashboard = new Dashboard();
-		dashboard.setName(name);
-		
-		//Column count will only be present for persisted Dashboards
-		//Deciding weather the dashboard is persisted
-		if(LOG.isDebugEnabled()) {
-			LOG.debug("Constructing nav Bar");
-			LOG.debug("Layout - " + layout);
-			LOG.debug("Column Count - " + columnCount);
-		}
-		
-		if(columnCount == null) {
-			dashboard.setLayout(layout);
-			dashboard.setPersisted(false);
-		} else if (layout == null) {
-			dashboard.setColumnCount(columnCount);
-			dashboard.setPersisted(true);
-		}
-		dashboard.setDashboardId(dashboardId);
-		
+		navitem.setLabel(dashboard.getName());
+				
 		Map<Integer, Dashboard> dashboardMap = new HashMap<Integer, Dashboard>();
 		final Session session = Sessions.getCurrent(); 
 		if(session.getAttribute(Constants.DASHBOARD_LIST) != null){
@@ -153,9 +133,10 @@ public class SidebarController extends GenericForwardComposer<Component>{
 		} else {
 			session.setAttribute(Constants.DASHBOARD_LIST, dashboardMap);
 		}		
-		dashboardMap.put(dashboardId, dashboard);
+		dashboardMap.put(dashboard.getDashboardId(), dashboard);
+		
 		//Setting dashboard id to be retrived onClick
-		navitem.setAttribute(Constants.DASHBOARD_ID, dashboardId);
+		navitem.setAttribute(Constants.DASHBOARD_ID, dashboard.getDashboardId());
 		navitem.addEventListener(Events.ON_CLICK, navItemSelectLisnr);
 		navitem.setIconSclass("glyphicon glyphicon-stats");
 		navitem.setZclass("list");
@@ -218,7 +199,7 @@ public class SidebarController extends GenericForwardComposer<Component>{
 			parameters.put(Constants.PARENT, sidebarContainer);
 
 			final Window window = (Window) Executions.createComponents(
-					"/demo/layout/add_dash_board.zul", sidebarContainer,
+					"/demo/layout/dashboard_config.zul", sidebarContainer,
 					parameters);
 			window.doModal();
 		}
@@ -232,33 +213,31 @@ public class SidebarController extends GenericForwardComposer<Component>{
 	 * @param event
 	 */
 	public void onCloseDialog(final Event event) {
-		final Object mapObj = event.getData();
-		String dashBoardName = "";
-		String layoutType = "";
-		String applnId = "";
-		int dashboardId =0;
-		if (mapObj instanceof Map) {
-			Map<String, String> paramMap = (HashMap<String, String>) event.getData();
-			if (paramMap != null) {
-				dashBoardName = paramMap.get(Constants.DASHBOARD_NAME);
-				layoutType = paramMap.get(Constants.DASHBOARD_LAYOUT);
-				
-			}
-			// Make entry of new dashboard details into DB
-			try {
-				Session session = Sessions.getCurrent();
-				applnId = (String) session.getAttribute("applnid");
-				User user = (User)session.getAttribute("user");
-				dashboardId = dashboardService.addDashboardDetails(applnId, dashBoardName,
-						user.getUserId());
-			} catch (SQLException exception) {
-				if(LOG.isDebugEnabled()){
-					LOG.debug("Exception In SideBar" +exception);
-				}
-			}
+		
+		final Dashboard dashboard = (Dashboard) event.getData();
+		
+		String sourceId = "",source="";
+		
+		// Make entry of new dashboard details into DB
+		try {
+			Session session = Sessions.getCurrent();
+			sourceId = (String) session.getAttribute("sourceid");
+			source = (String) session.getAttribute("source");
+			User user = (User)session.getAttribute("user");
+			dashboard.setDashboardId(
+					dashboardService.addDashboardDetails(
+							sourceId,source, dashboard.getName(),user.getUserId()
+						)
+				);
+		} catch (Exception exception) {
+			Clients.showNotification("Unable to add new Dashboard", "error", event.getTarget(), "top_left", 3000, true);
+			LOG.error("Exception while adding new dashboard to DB", exception);
 		}
-		final Navitem navitem = constructNavItem(dashboardId, dashBoardName, null, layoutType);
+		
+		dashboard.setPersisted(false);
+		final Navitem navitem = constructNavItem(dashboard);
 		navBar.appendChild(navitem);
+		
 		// Redirect to the recently added page
 		Events.sendEvent(new Event("onClick", navitem));
 		navitem.setSelected(true);

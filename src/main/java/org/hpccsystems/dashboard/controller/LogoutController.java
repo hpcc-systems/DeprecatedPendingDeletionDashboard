@@ -25,10 +25,13 @@ import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
+import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zkmax.zul.Navbar;
 import org.zkoss.zkmax.zul.Navitem;
 import org.zkoss.zul.Include;
+import org.zkoss.zul.Menuitem;
 
 
 /**
@@ -54,6 +57,8 @@ public class LogoutController extends SelectorComposer<Component> {
 	@WireVariable
 	private WidgetService widgetService;
 	
+	@Wire
+	Menuitem logout;
 	
 	@Listen("onClick=#logout")
 	public void doLogout() throws SQLException {
@@ -82,17 +87,24 @@ public class LogoutController extends SelectorComposer<Component> {
         	}
         }
         }
-        final String applnid = (String) (Sessions.getCurrent().getAttribute("applnid"));
+        final String sourceid = (String) (Sessions.getCurrent().getAttribute("sourceid"));
         
         //Call to DB update
         updateDashboardWidgetDetails(dashBoardIdList); 
        
         if(LOG.isDebugEnabled()){
-        	LOG.debug("Application Id details while logut the application" +applnid);
+        	LOG.debug("Source Id details while logut the application" +sourceid);
 			LOG.debug("dashBoardIdList details while logut the application" +dashBoardIdList);
 		}
-        //dashboardService.addDashBoardPosition(applnid, dashBoardIdList);
+        try
+        {
         authenticationService.logout(session.getAttribute("user"));
+        }
+        catch(Exception ex)
+        {
+        	Clients.showNotification("Unable to logout from Dahboard", "error", logout.getParent().getParent().getParent(), "top_left", 3000, true);
+			LOG.error("Exception while doing logout", ex);
+        }
         session.removeAttribute("user");
         Executions.sendRedirect("/demo/");
         Sessions.getCurrent().invalidate();
@@ -142,7 +154,7 @@ public class LogoutController extends SelectorComposer<Component> {
 								dashboard.getName(),
 								dashboard.getColumnCount());
 						if(LOG.isDebugEnabled()){
-							LOG.debug("portletList ->" + portletList);
+							LOG.debug("portletList ->" + portletList); 
 						}
 						List<Portlet> persistedPortlets = new ArrayList<Portlet>();
 						List<Portlet> newPortlets = new ArrayList<Portlet>();
@@ -201,11 +213,10 @@ public class LogoutController extends SelectorComposer<Component> {
 				}
 			}
 		}
-		catch (SQLException exception) {
-			if(LOG.isDebugEnabled()){
-				LOG.debug("Exception In SideBar" +exception);
+		catch (Exception ex) {
+			Clients.showNotification("Unable to update Dahboard details into DB", "error", logout.getParent().getParent().getParent(), "top_left", 3000, true);
+			LOG.error("Exception updateDashboardWidgetDetails()", ex);
 			}
-		}
 		if(LOG.isDebugEnabled()){
 		LOG.debug("Logged out sucessfully");
 		}

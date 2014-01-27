@@ -8,6 +8,7 @@ import org.hpccsystems.dashboard.services.ApplicationService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 /**
  * 
@@ -30,8 +31,15 @@ public class ApplicationServiceImpl implements ApplicationService {
 		this.applicationDao = applicationDao;
 	}
 
-	public List<Application> retrieveApplicationIds() {
+	public List<Application> retrieveApplicationIds() throws Exception{
+		try
+		{
 		return applicationDao.retrieveApplicationIds();
+		}
+		catch(DataAccessException ex)
+		{
+			throw ex;
+		}
 	}
 
 }

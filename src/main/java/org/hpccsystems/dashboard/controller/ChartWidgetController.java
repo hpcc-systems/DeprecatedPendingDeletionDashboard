@@ -7,6 +7,7 @@ import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.controller.component.ChartPanel;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.Sessions;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
@@ -34,6 +35,8 @@ public class ChartWidgetController extends GenericForwardComposer<Component> {
 	@Wire
 	Button pieChartButton;
 	@Wire
+	Button tableWidget;
+	@Wire
 	Window idWindow;
 	
 		
@@ -48,9 +51,14 @@ public class ChartWidgetController extends GenericForwardComposer<Component> {
 		pieChartButton.setAttribute("URL", "chart/PieChart_black.jpg");
 		pieChartButton.setAttribute("chartType", "PieChart");
 		
+		tableWidget.setAttribute("URL", "chart/TableWidget.jpg");
+		tableWidget.setAttribute("chartType", "TableWidget");
+		
 		barChartButton.setAttribute(Constants.CHART_TYPE, Constants.BAR_CHART);
 		lineChartButton.setAttribute(Constants.CHART_TYPE, Constants.LINE_CHART);
 		pieChartButton.setAttribute(Constants.CHART_TYPE, Constants.PIE_CHART);
+		tableWidget.setAttribute(Constants.CHART_TYPE, Constants.TABLE_WIDGET);
+		Sessions.getCurrent().setAttribute("TABLE_WIDGET", Constants.CHART_TYPE);
 		
 		//Retrieve parameters passed here by the caller
 		parentDiv = (ChartPanel) arg.get(Constants.PARENT);
@@ -72,6 +80,7 @@ public class ChartWidgetController extends GenericForwardComposer<Component> {
 		barChartButton.addEventListener(Events.ON_CLICK, closeClick);
 		lineChartButton.addEventListener(Events.ON_CLICK, closeClick);
 		pieChartButton.addEventListener(Events.ON_CLICK, closeClick);
+		tableWidget.addEventListener(Events.ON_CLICK, closeClick);
 	}
 
 }

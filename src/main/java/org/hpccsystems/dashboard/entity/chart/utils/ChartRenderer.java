@@ -1,19 +1,20 @@
 package org.hpccsystems.dashboard.entity.chart.utils;
 
+import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
-
+import javax.xml.parsers.ParserConfigurationException;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hpccsystems.dashboard.controller.util.EncryptDecrypt;
 import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.entity.chart.XYChartData;
@@ -21,9 +22,9 @@ import org.hpccsystems.dashboard.entity.chart.XYModel;
 import org.hpccsystems.dashboard.services.DashboardService;
 import org.hpccsystems.dashboard.services.HPCCService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.xml.sax.SAXException;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.util.Clients;
-
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -66,13 +67,20 @@ public class ChartRenderer {
 	 * @return
 	 *  Generates JSON into passed Portlet object	
 	 */
-	public void constructChartJSON(XYChartData chartData, Portlet portlet, Boolean isEditWindow) {
+	public void constructChartJSON(XYChartData chartData, Portlet portlet, Boolean isEditWindow)throws Exception {
 
 		final JsonArray array = new JsonArray();
 		
 		final JsonObject header = new JsonObject();
-		header.addProperty("xName", chartData.getXColumnName());
-		header.addProperty("yName", chartData.getYColumnName());
+		if(chartData.getYColumnNames().size() > 0 && 
+				chartData.getXColumnNames().size() > 0) {
+			header.addProperty("xName", chartData.getXColumnNames().get(0));
+			header.addProperty("yName", chartData.getYColumnNames().get(0));
+			
+			if(chartData.getYColumnNames().size() > 1) {
+				header.addProperty("yName2", chartData.getYColumnNames().get(1));
+			}
+		}
 		if(isEditWindow) {
 			header.addProperty("portletId", "e_" + portlet.getId());
 		} else {
@@ -96,28 +104,55 @@ public class ChartRenderer {
 			header.addProperty("to", chartData.getFilter().getEndValue());
 		}
 		
-		if(LOG.isDebugEnabled()){
+				if(LOG.isDebugEnabled()){
 			LOG.debug("Drawing chart");
 			LOG.debug("Chart Type - " + portlet.getChartType());
 		}	
 		
-			ArrayList<XYModel> list = (ArrayList<XYModel>) getHpccService().getChartData(chartData);
-			final Iterator<XYModel> iterator = list.iterator();
-
+			ArrayList<XYModel> list = null;
+			Iterator<XYModel> iterator =null;	
+			try
+			{
+			list =(ArrayList<XYModel>) getHpccService().getChartData(chartData);
+			iterator = list.iterator();	
+			}catch(Exception e)
+			{
+				throw e;
+			}
 			Integer yLength = 0;
 			Integer xLength = 0;
 			String xVal=null;BigDecimal yVal=null;
 			JsonObject json = null;
+			if(iterator != null){
 			while(iterator.hasNext()){
 				final XYModel bar = iterator.next();
 				json = new JsonObject();
 				json.addProperty("xData",(String) bar.getxAxisVal());
-				json.addProperty("yData", (BigDecimal)bar.getyAxisVal());
+				
+				//TODO - make this logic dynamic
+				if(Constants.BAR_CHART.equals(portlet.getChartType())){
+					json.addProperty(chartData.getYColumnNames().get(0), (BigDecimal)bar.getyAxisValues().get(0));
+					if(bar.getyAxisValues().size() > 1) {
+						json.addProperty(chartData.getYColumnNames().get(1), (BigDecimal)bar.getyAxisValues().get(1));
+						header.addProperty("secondLine", true);
+					} else {
+						header.addProperty("secondLine", false);
+					}
+				} else {
+					json.addProperty("yData", (BigDecimal)bar.getyAxisValues().get(0));
+					if(bar.getyAxisValues().size() > 1) {
+						json.addProperty("yData2", (BigDecimal)bar.getyAxisValues().get(1));
+						header.addProperty("secondLine", true);
+					} else {
+						header.addProperty("secondLine", false);
+					}
+				}
+				
 				array.add(json);
 
 				//Finding word count in x Axis Labels
 				xVal=(String) bar.getxAxisVal();
-				yVal=(BigDecimal)bar.getyAxisVal();
+				yVal=(BigDecimal)bar.getyAxisValues().get(0);
 				if(xVal.split(" ").length > xLength){
 					xLength = xVal.split(" ").length;
 				}	
@@ -125,7 +160,7 @@ public class ChartRenderer {
 				if(String.valueOf(yVal.intValue()).length() > yLength){
 					yLength = String.valueOf(yVal.intValue()).length();
 				}
-			}	
+			}	}
 				
 			//Adding a default pading of 5 and 10px per digit
 			header.addProperty("yWidth", (yLength<2)? yLength*10 + 30:(yLength<3)? yLength*10 + 10: yLength*10);
@@ -145,21 +180,17 @@ public class ChartRenderer {
 	 * Must Construct JSON before invoking this method
 	 * 
 	 * Draws D3 chart onto the 'divToDraw' of the specified type
-	 * Constructs the JSON data for the portlet from chartData, if JSON is not constructed already
+	 * Must construct JSON before calling this function
 	 * 
 	 * @param chartData
 	 * @param chartType
 	 * @param divToDraw
 	 * @param portlet
 	 */
-	public void drawChart(XYChartData chartData, String divToDraw, Portlet portlet) {
+	public void drawChart(XYChartData chartData, String divToDraw, Portlet portlet) throws Exception{
 
 		if( portlet.getChartDataJSON() == null) {
-			if(divToDraw.equals(Constants.EDIT_WINDOW_CHART_DIV)){
-				constructChartJSON(chartData, portlet, true);
-			} else {
-				constructChartJSON(chartData, portlet, false);
-			}
+			Clients.showNotification("No data available to draw Chart",	true);
 		}
 		
 		if(Constants.BAR_CHART.equals(portlet.getChartType()) )	{
@@ -206,23 +237,30 @@ public class ChartRenderer {
 	 * @param xml
 	 * @return
 	 * 	XYChartData object
+	 * @throws ParserConfigurationException 
+	 * @throws IOException 
+	 * @throws SAXException 
 	 */
-	public XYChartData parseXML(String xml) {
-		
+	public XYChartData parseXML(String xml) throws ParserConfigurationException, SAXException, IOException {
+		String encryptedpassWord="";
+		String decryptedPassword="";
+		EncryptDecrypt decrypter = new EncryptDecrypt("");
 		XYChartData chartData = null;
-		
 		JAXBContext jaxbContext;
 		try {
 			jaxbContext = JAXBContext.newInstance(XYChartData.class);
 			Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-			chartData = (XYChartData) jaxbUnmarshaller.unmarshal( new StringReader(xml));
+			chartData = (XYChartData) jaxbUnmarshaller.unmarshal(new StringReader(xml));
+			//decrypt password
+			encryptedpassWord = chartData.getHpccConnection().getPassword();
+			decryptedPassword = decrypter.decrypt(encryptedpassWord);
+			chartData.getHpccConnection().setPassword(decryptedPassword);
 		} catch (JAXBException e) {
-			e.printStackTrace();
+			LOG.error("EXCEPTION: JAXBException in ChartRenderer",e);
 		}
-		 
 		return chartData;
 	}
-	
+		
 	/**
 	 * Constructs XML string from the Object
 	 * @param chartData
@@ -230,6 +268,10 @@ public class ChartRenderer {
 	 */
 	public String convertToXML(XYChartData chartData) {
 		
+		//encrypt password
+		EncryptDecrypt encrypter = new EncryptDecrypt("");
+		String encrypted = encrypter.encrypt(chartData.getHpccConnection().getPassword());
+		chartData.getHpccConnection().setPassword(encrypted);
 		java.io.StringWriter sw = new StringWriter();
 		JAXBContext jaxbContext;
 		try {
@@ -238,9 +280,8 @@ public class ChartRenderer {
 			marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
 			marshaller.marshal(chartData, sw);
 		} catch (JAXBException e) {
-			e.printStackTrace();
+			LOG.error("EXCEPTION: JAXBException in ChartRenderer",e);
 		}
-
 	    return sw.toString();
 	}
 }

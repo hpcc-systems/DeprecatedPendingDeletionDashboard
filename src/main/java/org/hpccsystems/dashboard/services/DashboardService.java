@@ -14,12 +14,12 @@ public interface DashboardService {
 
 	 /**
 		 * Inserts Dashboard details to dashboard_details table.
-		 * @param applnId
+		 * @param sourceId
 		 * @param dashBoardName
 		 * @param layout
 		 * @throws SQLException
 	 */
-	int addDashboardDetails(String applnId,String dashBoardName,String userId) throws SQLException ;
+	int addDashboardDetails(String sourceId,String source,String dashBoardName,String userId) throws Exception ;
 	
 	
 	/**
@@ -27,25 +27,22 @@ public interface DashboardService {
 	 * @param viewModel
 	 * @return List<SidebarPage>
 	 */
-	List<Dashboard> retrieveDashboardMenuPages(Application application,String userId);
+	List<Dashboard> retrieveDashboardMenuPages(Application application,String userId)throws Exception;
 	
-	/**service to update sequence of a dashboard
-	 * @param dashboard
-	 */
-	void updateSequence(Integer dashboardId,int sequence,String dashboardName);
+	
 	
 	/**
 	 * @param dashboardId
 	 * @param deleteStatus
 	 */
-	void deleteDashboard(Integer dashboardId,String userId);
+	int deleteDashboard(Integer dashboardId,String userId)throws Exception;
 	
 	/**
 	 * @param dashboardId
 	 * @param emptyState
 	 * @param sequence
 	 */
-	void updateDashboardSate(Integer dashboardId,String emptyState,int sequence,String dashboardName);
+	void updateDashboardSate(Integer dashboardId,String emptyState,int sequence,String dashboardName)throws Exception;
 	
 	/**
 	 * @param dashboardId
@@ -53,6 +50,6 @@ public interface DashboardService {
 	 * @param dashboardName
 	 * @param columnCount
 	 */
-	void updateDashboardDetails(Integer dashboardId,int sequence,String dashboardName,int columnCount);
+	void updateDashboardDetails(Integer dashboardId,int sequence,String dashboardName,int columnCount)throws Exception;
 
 }
