@@ -108,13 +108,11 @@ public class EditChartController extends SelectorComposer<Component> {
 			filterListBox.setDroppable("true");
 			XAxisListBox.setDroppable("false");
 			validateYAxisDrops();
-			try
-			{
-			chartRenderer.constructChartJSON(chartData, portlet, true);
-			chartRenderer.drawChart(chartData,Constants.EDIT_WINDOW_CHART_DIV, portlet);
-			}catch(Exception ex)
-			{
-				Clients.showNotification("Unable to fetch column data from Hpcc", "error", comp, "top_left", 3000, true);
+			try	{
+				chartRenderer.constructChartJSON(chartData, portlet, true);
+				chartRenderer.drawChart(chartData,Constants.EDIT_WINDOW_CHART_DIV, portlet);
+			} catch(Exception ex) {
+				Clients.showNotification("Unable to fetch column data from Hpcc", "error", comp, "middle_center", 3000, true);
 				LOG.error("Exception while fetching column data from Hpcc", ex);
 			}
 			
@@ -125,11 +123,10 @@ public class EditChartController extends SelectorComposer<Component> {
 		} 
 		
 		Map<String,String> columnSchemaMap = null;
-		try
-		{
+		try	{
 			columnSchemaMap = hpccService.getColumnSchema(chartData.getFileName(), chartData.getHpccConnection());
-		}catch(Exception e){
-			Clients.showNotification("Unable to fetch columns from HPCC", "error", comp, "top_left", 3000, true);
+		} catch(Exception e) {
+			Clients.showNotification("Unable to fetch columns from HPCC", "error", comp, "middle_center", 3000, true);
 			LOG.error(Constants.ERROR_RETRIEVE_COLUMNS, e);
 		}
 		Listitem listItem;
@@ -192,13 +189,12 @@ public class EditChartController extends SelectorComposer<Component> {
 		
 		
 		if(xAxisDropped){
-			try
-			{
-			chartRenderer.constructChartJSON(chartData, portlet, true);
-			chartRenderer.drawChart(chartData,Constants.EDIT_WINDOW_CHART_DIV , portlet);
+			try	{
+				chartRenderer.constructChartJSON(chartData, portlet, true);
+				chartRenderer.drawChart(chartData,Constants.EDIT_WINDOW_CHART_DIV , portlet);
 			}catch(Exception ex)
 			{
-				Clients.showNotification("Unable to fetch column data from Hpcc", "error", YAxisListBox, "top_left", 3000, true);
+				Clients.showNotification("Unable to fetch column data from Hpcc", "error", this.getSelf(), "middle_center", 3000, true);
 				LOG.error("Exception while fetching column data from Hpcc", ex);
 			}
 			
@@ -300,13 +296,12 @@ public class EditChartController extends SelectorComposer<Component> {
 		chartData.getXColumnNames().add(draggedListitem.getLabel());
 		
 		if(yAxisDropped){
-			try
-			{
-			chartRenderer.constructChartJSON(chartData, portlet, true);
-			chartRenderer.drawChart(chartData, Constants.EDIT_WINDOW_CHART_DIV, portlet);
+			try	{
+				chartRenderer.constructChartJSON(chartData, portlet, true);
+				chartRenderer.drawChart(chartData, Constants.EDIT_WINDOW_CHART_DIV, portlet);
 			}catch(Exception ex)
 			{
-				Clients.showNotification("Unable to fetch column data from Hpcc", "error", XAxisListBox, "top_left", 3000, true);
+				Clients.showNotification("Unable to fetch column data from HPCC", "error", this.getSelf(), "middle_center", 3000, true);
 				LOG.error("Exception while fetching column data from Hpcc", ex);
 			}
 			
@@ -435,12 +430,11 @@ public class EditChartController extends SelectorComposer<Component> {
 			
 			chartData.setIsFiltered(false);
 			chartData.setFilter(null);
-			try{
-			chartRenderer.constructChartJSON(chartData, portlet, true);
-			chartRenderer.drawChart(chartData, Constants.EDIT_WINDOW_CHART_DIV, portlet);
-			}catch(Exception ex)
-			{
-				Clients.showNotification("Unable to fetch column data from Hpcc", "error", filterListBox, "top_left", 3000, true);
+			try {
+				chartRenderer.constructChartJSON(chartData, portlet, true);
+				chartRenderer.drawChart(chartData, Constants.EDIT_WINDOW_CHART_DIV, portlet);
+			} catch(Exception ex) {
+				Clients.showNotification("Unable to fetch column data from HPCC", "error", EditChartController.this.getSelf() , "middle_center", 3000, true);
 				LOG.error("Exception while fetching column data from Hpcc", ex);
 			}			
 			//Enabling drops to filter list box

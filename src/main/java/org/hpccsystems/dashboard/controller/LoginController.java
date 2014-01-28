@@ -84,7 +84,7 @@ public class LoginController extends SelectorComposer<Component> {
 		}
 		catch(Exception ex)
 		{
-			Clients.showNotification("Unable to retrieve applications", "error", comp, "top_left", 3000, true);
+			Clients.showNotification("Unable to retrieve applications from DB. Please try reloading the page", false);
 			LOG.error("Exception while fetching applications from DB", ex);
 		}
 	}
@@ -99,31 +99,25 @@ public class LoginController extends SelectorComposer<Component> {
 		final String name = account.getValue();
 		final String passWord = password.getValue();
 		User user = null;
-		try
-		{
-		user =authenticationService.authendicateUser(name,passWord);
-		LOG.debug("User authenticated sucessfully..");
-		}
-		catch(Exception ex)
-		{
-			Clients.showNotification("Unable to login to Dashboard", "error", login.getParent().getParent(), "top_left", 3000, true);
+		try	{
+			user =authenticationService.authendicateUser(name,passWord);
+			LOG.debug("User authenticated sucessfully..");
+		} catch(Exception ex) {
+			Clients.showNotification("Your login attempt failed. Please try again", false);
 			LOG.error("Exception while authendicating user in doLogin()", ex);
 		}
 		
-		if(user != null)
-		{
-		if(!user.isValidUser()){
-			message.setValue("account or password are not correct.");
-			return;
-		}
-		/*if("Y".equals(user.getActiveFlag()))
-			{
-			message.setValue("Hi "+user.getFullName()+" you have already logged in.");
-			return;
-			}*/
-		}
-		else
-		{
+		if(user != null) {
+			if(!user.isValidUser()){
+				message.setValue("account or password are not correct.");
+				return;
+			}
+			/*if("Y".equals(user.getActiveFlag()))
+				{
+				message.setValue("Hi "+user.getFullName()+" you have already logged in.");
+				return;
+				}*/
+		} else	{
 			message.setValue("Account or Password are not correct.");
 			return;
 		}

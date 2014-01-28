@@ -62,12 +62,13 @@ public class NumericFilterController extends SelectorComposer<Component>{
 		doneButton = (Button) Executions.getCurrent().getAttribute(Constants.EDIT_WINDOW_DONE_BUTTON);
 		
 		Map<Integer, Integer> map = null;
-		try
-		{
+		try	{
 			map = hpccService.fetchFilterMinMax(chartData);
-		}catch(Exception e){
-			Clients.showNotification("Unable to fetch data for selected Filter From Hpcc", "error", comp, "top_left", 3000, true);
+		} catch(Exception e) {
+			Clients.showNotification("Unable to fetch data to Filter for the column dropped", 
+					"error", doneButton.getParent().getParent().getParent(), "middle_center", 3000, true);
 			LOG.error("Exception while fetching data from Hpcc for selected Numeric filter", e);
+			return;
 		}
 		
 		Integer min = map.get(Constants.FILTER_MINIMUM);
@@ -110,14 +111,14 @@ public class NumericFilterController extends SelectorComposer<Component>{
 		chartData.getFilter().setStartValue((double) minimumSlider.getCurpos());
 		chartData.getFilter().setEndValue((double) maximumSlider.getCurpos());
 		chartData.setIsFiltered(true);
-		try
-		{
-		chartRenderer.constructChartJSON(chartData, portlet, true);
-		chartRenderer.drawChart(chartData, Constants.EDIT_WINDOW_CHART_DIV, portlet);
-		}catch(Exception ex)
-		{
-			Clients.showNotification("Unable to fetch column data from Hpcc", "error", filtersSelectedBtn.getParent(), "top_left", 3000, true);
+		try	{
+			chartRenderer.constructChartJSON(chartData, portlet, true);
+			chartRenderer.drawChart(chartData, Constants.EDIT_WINDOW_CHART_DIV, portlet);
+		}catch(Exception ex) {
+			Clients.showNotification("Unable to fetch column data from HPCC", "error", 
+					doneButton.getParent().getParent().getParent(), "middle_center", 3000, true);
 			LOG.error("Exception while fetching column data from Hpcc", ex);
+			return;
 		}		
 
 		doneButton.setDisabled(false);		

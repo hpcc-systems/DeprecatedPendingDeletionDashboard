@@ -77,13 +77,10 @@ public class SidebarController extends GenericForwardComposer<Component>{
 		
 		User user = (User)session.getAttribute("user");
 		List<Dashboard> sideBarPageList = null;
-		try
-		{
+		try	{
 			sideBarPageList =new ArrayList<Dashboard>(dashboardService.retrieveDashboardMenuPages(viewModel,user.getUserId()));
-		}
-		catch(Exception ex)
-		{
-			Clients.showNotification("Unable to retrieve available Dashboards", "error", comp, "top_left", 3000, true);
+		} catch(Exception ex) {
+			Clients.showNotification("Unable to retrieve available Dashboards. Please try reloading the page.", true);
 			LOG.error("Exception while retrieving dashboards from DB", ex);
 		}
 		
@@ -230,8 +227,9 @@ public class SidebarController extends GenericForwardComposer<Component>{
 						)
 				);
 		} catch (Exception exception) {
-			Clients.showNotification("Unable to add new Dashboard", "error", event.getTarget(), "top_left", 3000, true);
+			Clients.showNotification("Adding new Dashboard failed. Please try again", true);
 			LOG.error("Exception while adding new dashboard to DB", exception);
+			return;
 		}
 		
 		dashboard.setPersisted(false);

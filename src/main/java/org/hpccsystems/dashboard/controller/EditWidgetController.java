@@ -129,17 +129,15 @@ public class EditWidgetController extends SelectorComposer<Component> {
 		}
 		else{
 			final String divToDraw = div.getId(); 
-			try
-			{
-			chartRenderer.constructChartJSON(chartData, portlet, true);
-			chartRenderer.drawChart(chartData, divToDraw, portlet);
-			}catch(Exception ex)
-			{
-				Clients.showNotification("Unable to fetch column data from Hpcc", "error", doneButton.getParent(), "top_left", 3000, true);
+			try	{
+				chartRenderer.constructChartJSON(chartData, portlet, true);
+				chartRenderer.drawChart(chartData, divToDraw, portlet);
+			} catch(Exception ex) {
+				Clients.showNotification("Unable to fetch column data from HPCC", "error", this.getSelf(), "middle_center", 3000, true);
 				LOG.error("Exception while fetching column data from Hpcc", ex);
+				return;
 			}
 			
-	
 			if (LOG.isDebugEnabled()) {
 				LOG.debug("Drawn chart in portlet..");
 				LOG.debug("Portlet - Div ID --> " + divToDraw);

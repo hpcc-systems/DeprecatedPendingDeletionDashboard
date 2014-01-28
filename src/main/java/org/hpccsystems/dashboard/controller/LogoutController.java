@@ -88,22 +88,20 @@ public class LogoutController extends SelectorComposer<Component> {
         }
         }
         final String sourceid = (String) (Sessions.getCurrent().getAttribute("sourceid"));
-        
-        //Call to DB update
-        updateDashboardWidgetDetails(dashBoardIdList); 
        
         if(LOG.isDebugEnabled()){
         	LOG.debug("Source Id details while logut the application" +sourceid);
 			LOG.debug("dashBoardIdList details while logut the application" +dashBoardIdList);
 		}
-        try
-        {
-        authenticationService.logout(session.getAttribute("user"));
-        }
-        catch(Exception ex)
-        {
-        	Clients.showNotification("Unable to logout from Dahboard", "error", logout.getParent().getParent().getParent(), "top_left", 3000, true);
+        try {
+        	//Call to DB update
+        	updateDashboardWidgetDetails(dashBoardIdList); 
+        	
+        	authenticationService.logout(session.getAttribute("user"));
+        } catch(Exception ex) {
+        	Clients.showNotification("Error occurred while loging out. Please try again.", true);
 			LOG.error("Exception while doing logout", ex);
+			return;
         }
         session.removeAttribute("user");
         Executions.sendRedirect("/demo/");
@@ -122,9 +120,9 @@ public class LogoutController extends SelectorComposer<Component> {
 	
 	/**
 	 * @param dashBoardIdList
+	 * @throws Exception 
 	 */
-	private void updateDashboardWidgetDetails(List<Dashboard> dashBoardIdList)
-	{
+	private void updateDashboardWidgetDetails(List<Dashboard> dashBoardIdList) throws Exception {
 		try {
 			if (dashBoardIdList != null && !dashBoardIdList.isEmpty()) {
 				for (int count = 1; count <= dashBoardIdList.size(); count++) {
@@ -212,13 +210,12 @@ public class LogoutController extends SelectorComposer<Component> {
 					}
 				}
 			}
-		}
-		catch (Exception ex) {
-			Clients.showNotification("Unable to update Dahboard details into DB", "error", logout.getParent().getParent().getParent(), "top_left", 3000, true);
+		} catch (Exception ex) {
 			LOG.error("Exception updateDashboardWidgetDetails()", ex);
-			}
+			throw ex;
+		}
 		if(LOG.isDebugEnabled()){
-		LOG.debug("Logged out sucessfully");
+			LOG.debug("Logged out sucessfully");
 		}
 	}
 }	

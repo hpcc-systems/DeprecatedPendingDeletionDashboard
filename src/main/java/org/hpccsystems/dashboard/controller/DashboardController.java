@@ -141,8 +141,8 @@ public class DashboardController extends SelectorComposer<Component>{
 				dashboard.setPortletList((ArrayList<Portlet>) widgetService.retriveWidgetDetails(dashboardId));
 				} catch(Exception ex) {
 					Clients.showNotification(
-							"Unableto retrieve Widget details from DB for the Dashboard",
-							"error", comp, "top_left", 3000, true);
+							"Unable to retrieve Widget details from DB for the Dashboard",
+							"error", comp, "middle_center", 3000, true);
 					LOG.error("Exception while fetching widget details from DB", ex);
 				}
 				
@@ -162,7 +162,7 @@ public class DashboardController extends SelectorComposer<Component>{
 								}catch(Exception e){
 									Clients.showNotification(
 											"Unable to fetch table data from Hpcc ",
-											"error", comp, "top_left", 3000,
+											"error", comp, "middle_center", 3000,
 											true);
 									LOG.error("Exception while fetching data from Hpcc for table columns", e);
 								}
@@ -176,7 +176,7 @@ public class DashboardController extends SelectorComposer<Component>{
 								}catch(Exception ex)
 								{
 									Clients.showNotification("Unable to fetch column data from Hpcc", 
-											"error", comp, "top_left", 3000, true);
+											"error", comp, "middle_center", 3000, true);
 									LOG.error("Exception while fetching column data from Hpcc", ex);
 								}
 							}

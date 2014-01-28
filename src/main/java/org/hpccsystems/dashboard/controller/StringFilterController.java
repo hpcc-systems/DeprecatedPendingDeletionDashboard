@@ -61,7 +61,8 @@ public class StringFilterController extends SelectorComposer<Component>{
 		{
 			valueList = hpccService.fetchFilterData(chartData);
 		}catch(Exception e){
-			Clients.showNotification("Unable to fetch data from Hpcc for filtered columns", "error", comp, "top_left", 3000, true);
+			Clients.showNotification("nable to fetch data to Filter for the column dropped", "error", 
+					doneButton.getParent().getParent().getParent(), "top_left", 3000, true);
 			LOG.error("Exception while fetching data from Hpcc for selected String filter", e);
 		}
 		List<String> filteredList = null;
@@ -107,8 +108,10 @@ public class StringFilterController extends SelectorComposer<Component>{
 		chartRenderer.drawChart(chartData, Constants.EDIT_WINDOW_CHART_DIV, portlet);
 		}catch(Exception ex)
 		{
-			Clients.showNotification("Unable to fetch column data from Hpcc", "error", filtersSelectedBtn.getParent(), "top_left", 3000, true);
+			Clients.showNotification("Unable to fetch column data from HPCC", "error", 
+					doneButton.getParent().getParent().getParent(), "top_left", 3000, true);
 			LOG.error("Exception while fetching column data from Hpcc", ex);
+			return;
 		}
 		doneButton.setDisabled(false);
 		
