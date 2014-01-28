@@ -15,7 +15,7 @@
 	    <property name="dashboardDao"><ref bean="dashboardDao"/></property>	
 	</bean> 
 	
-	<bean id="dashboardDao" class="org.hpccsystems.dashboard.dao.impl.DashboardDaoImpl" init-method="initialize">
+	<bean id="dashboardDao" class="org.hpccsystems.dashboard.dao.impl.DashboardDaoImpl" >
 	   <property name="dataSource"><ref bean="mySQLDataSource"/></property>	   
 	</bean>
 	

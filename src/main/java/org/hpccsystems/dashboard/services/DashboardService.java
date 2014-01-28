@@ -52,4 +52,12 @@ public interface DashboardService {
 	 */
 	void updateDashboardDetails(Integer dashboardId,int sequence,String dashboardName,int columnCount)throws Exception;
 
+	
+	/**
+	 * @param dashboardId
+	 * @return Dashboard
+	 * @throws Exception
+	 */
+	Dashboard getDashboard(Integer dashboardId,Integer sourceType)throws Exception;
+
 }

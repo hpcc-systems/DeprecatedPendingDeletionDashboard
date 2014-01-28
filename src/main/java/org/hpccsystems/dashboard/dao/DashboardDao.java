@@ -54,5 +54,12 @@ public interface DashboardDao {
 	 * @param columnCount
 	 */
 	void updateDashboardDetails(Integer dashboardId,int sequence,String dashboardName,int columnCount) throws DataAccessException;
+	
+	/**
+	 * @param dashboardId
+	 * @return Dashboard
+	 * @throws Exception
+	 */
+	Dashboard getDashboard(Integer dashboardId,Integer sourceType) throws DataAccessException;
 
 }

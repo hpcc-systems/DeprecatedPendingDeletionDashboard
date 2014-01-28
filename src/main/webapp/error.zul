@@ -11,6 +11,6 @@
     
     <zscript>
     org.zkoss.util.logging.Log.lookup("Fatal").error(
-        requestScope.get("javax.servlet.error.exception"));
+          requestScope.get("javax.servlet.error.exception"));
     </zscript>
 </window>

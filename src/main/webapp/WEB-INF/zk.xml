@@ -12,11 +12,19 @@
 	<!-- API Richlets -->
 	<richlet>
 	   <richlet-name>chartSettings</richlet-name>
-	   <richlet-class>org.hpccsystems.dashboard.api.ChartSettings</richlet-class>
+	   <richlet-class>org.hpccsystems.dashboard.api.richlet.ChartSettings</richlet-class>
 	</richlet>
 	<richlet-mapping>
 	    <richlet-name>chartSettings</richlet-name>
 	    <url-pattern>/api/chart_config/*</url-pattern>
+	</richlet-mapping>
+	<richlet>
+	   <richlet-name>ViewDashboard</richlet-name>
+	   <richlet-class>org.hpccsystems.dashboard.api.richlet.ViewDashboard</richlet-class>
+	</richlet>
+	<richlet-mapping>
+	    <richlet-name>ViewDashboard</richlet-name>
+	    <url-pattern>/api/view_dashboard/*</url-pattern>
 	</richlet-mapping>
 	<!-- API Richlets -->
 	
