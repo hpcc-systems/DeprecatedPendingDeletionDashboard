@@ -1,5 +1,6 @@
 package org.hpccsystems.dashboard.api.controller;
 
+import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -11,11 +12,17 @@ import javax.servlet.http.HttpServletResponse;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hpccsystems.dashboard.api.entity.ChartConfiguration;
+import org.hpccsystems.dashboard.api.entity.Field;
 import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.entity.Application;
 import org.hpccsystems.dashboard.entity.ChartDetails;
 import org.hpccsystems.dashboard.entity.Dashboard;
+import org.hpccsystems.dashboard.entity.Portlet;
+import org.hpccsystems.dashboard.entity.chart.XYChartData;
+import org.hpccsystems.dashboard.entity.chart.utils.ChartRenderer;
 import org.hpccsystems.dashboard.services.DashboardService;
+import org.hpccsystems.dashboard.services.WidgetService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -23,6 +30,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.zkoss.json.JSONArray;
 import org.zkoss.json.JSONObject;
 
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
@@ -35,10 +43,24 @@ import com.google.gson.JsonObject;
 public class DashboardCircuitController {	
 	private static final  Log LOG = LogFactory.getLog(DashboardCircuitController.class); 
 	DashboardService dashboardService;
+	WidgetService widgetService;
+	ChartRenderer chartRenderer;
+	
 	@Autowired
 	public void setDashboardService(DashboardService dashboardService) {
 		this.dashboardService = dashboardService;
 	}
+	@Autowired
+	public void setWidgetService(WidgetService widgetService) {
+		this.widgetService = widgetService;
+	}
+	
+	@Autowired
+	public void setChartRenderer(ChartRenderer chartRenderer) {
+		this.chartRenderer = chartRenderer;
+	}
+	
+	XYChartData chartData = new XYChartData();
 /**
  * Method to process delete dashboard request from circuit
  * @param request
@@ -162,6 +184,113 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
 		}
 	}
 
+/**
+ * validateDashboard() is responsible for validate that the field list sent in contains all fields needed to render a dashboard. 
+ * @param request
+ * @param response
+ * @throws IOException
+ */
+@RequestMapping(value = Constants.CIRCUIT_VALIDATE_REQ, method = RequestMethod.GET)
+public void validateDashboard(HttpServletRequest request, HttpServletResponse response) throws IOException {
+	try {
+		PrintWriter out = response.getWriter();
+		String circuitFields = request.getParameter(Constants.CIRCUIT_CONFIG);
+		String dashboard_id = request.getParameter(Constants.CIRCUIT_DASHBOARD_ID);
+		ChartConfiguration configuration = new GsonBuilder().create().fromJson(circuitFields, ChartConfiguration.class);
 
+		XYChartData chartData = null;
+		List<String> xColumnList = null;
+		List<String> yColumnList = null;
+		String fieldName = null;
+		Integer filterType=0;
+		List<Portlet> portletList = widgetService.retriveWidgetDetails(Integer.valueOf(dashboard_id));
+		for (Portlet portlet : portletList) {
+					chartData = chartRenderer.parseXML(portlet.getChartDataXML());
+					if (chartData != null) {
+						xColumnList = chartData.getXColumnNames();
+						yColumnList = chartData.getYColumnNames();
+						if (chartData.getIsFiltered()) {
+							fieldName = chartData.getFilter().getColumn() ;		
+							filterType = chartData.getFilter().getType();
+						}
+					}
+		}
+		
+		// For YAxis comparison
+		Boolean yAxisStatus = false;
+		for (String fieldValue : yColumnList) {
+			for (Field entry : configuration.getFields()) {
+				if (fieldValue.equals(entry.getColumnName().trim()) && checkNumeric(entry.getDataType().trim())) {
+					yAxisStatus = true;
+					break;
+				}
+			}
+		}
+		
+		// For XAxis comparison
+		Boolean xAxisStatus = false;
+		for (String fieldValue : xColumnList) {
+			for (Field entry : configuration.getFields()) {
+				if (fieldValue.equals(entry.getColumnName().trim())) {
+					xAxisStatus = true;
+					break;
+				}
+			}
+		}
+		
+		// For filterColumn comparison
+		Boolean filterColumnStatus = false;
+		String fieldDataType=null;
+			if(Constants.NUMERIC_DATA == filterType){
+				fieldDataType = "integer";
+			}else if(Constants.STRING_DATA == filterType){
+				fieldDataType = "STRING";
+			}	
+				
+			for(Field entry : configuration.getFields()) {
+				if(fieldName.equals(entry.getColumnName().trim()) && fieldDataType.equals(entry.getDataType().trim())){
+					filterColumnStatus = true;
+					break;
+				}			
+			}
+
+		JsonObject jsObj = new JsonObject();
+		if (yAxisStatus && xAxisStatus && filterColumnStatus) {
+			jsObj.addProperty(Constants.STATUS, Constants.STATUS_SUCCESS);
+
+		} else {
+			jsObj.addProperty(Constants.STATUS, Constants.STATUS_FAIL);
+			jsObj.addProperty(Constants.STATUS_MESSAGE,	Constants.FIELD_NOT_EXIST);
+		}
+		response.setContentType(Constants.RES_TEXT_TYPE_JSON);
+		response.setCharacterEncoding(Constants.CHAR_CODE);
+		try {
+			response.getWriter().write(jsObj.toString());
+		} catch (Exception ex) {
+			LOG.error("Exception while writing JSON response to Circuit", ex);
+		}
+
+	} catch (Exception e) {
+		LOG.error("Exception while writing JSON response to Circuit", e);
+	}
+}		
+
+/**
+ * Checks whether a column is numeric.
+ * @param column
+ * @param dataType
+ * @return
+ */
+private boolean checkNumeric(final String dataType)
+	 {
+		boolean numericColumn = false;
+			if(dataType.contains("integer")	|| 
+					dataType.contains("real") || 
+					dataType.contains("decimal") ||  
+					dataType.contains("unsigned"))	{
+				numericColumn = true;
+			}
+		return numericColumn;
+	 }
 }
 
