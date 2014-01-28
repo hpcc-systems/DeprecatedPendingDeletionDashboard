@@ -146,4 +146,11 @@ public class Constants {
 		
 	}
 	
+	//For Circuit project
+	
+	public static final String CIRCUIT_VALIDATE_REQ = "/validate.do";
+	public static final String CIRCUIT_CONFIG = "config";
+	public static final String CIRCUIT_DASHBOARD_ID = "dashboard_id";
+	public static final String FIELD_NOT_EXIST = "X field CITY is missing";
+	
 }
