@@ -170,7 +170,6 @@ public class ChartRenderer {
 			
 			final String data = header.toString();
 			
-			portlet.setWidgetState(Constants.STATE_LIVE_CHART);
 			portlet.setChartDataJSON(data);
 					
 	}
@@ -257,6 +256,8 @@ public class ChartRenderer {
 			chartData.getHpccConnection().setPassword(decryptedPassword);
 		} catch (JAXBException e) {
 			LOG.error("EXCEPTION: JAXBException in ChartRenderer",e);
+		} catch (Exception e) {
+			
 		}
 		return chartData;
 	}

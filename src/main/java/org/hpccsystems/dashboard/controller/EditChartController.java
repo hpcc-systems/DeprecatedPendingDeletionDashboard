@@ -96,6 +96,7 @@ public class EditChartController extends SelectorComposer<Component> {
 		
 		doneButton = (Button) Executions.getCurrent().getAttribute(Constants.EDIT_WINDOW_DONE_BUTTON);
 		
+		// When live chart is present in ChartPanel
 		if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())){
 			for (String colName : chartData.getXColumnNames()) {
 				createXListChild(colName);
@@ -192,8 +193,7 @@ public class EditChartController extends SelectorComposer<Component> {
 			try	{
 				chartRenderer.constructChartJSON(chartData, portlet, true);
 				chartRenderer.drawChart(chartData,Constants.EDIT_WINDOW_CHART_DIV , portlet);
-			}catch(Exception ex)
-			{
+			}catch(Exception ex) {
 				Clients.showNotification("Unable to fetch column data from Hpcc", "error", this.getSelf(), "middle_center", 3000, true);
 				LOG.error("Exception while fetching column data from Hpcc", ex);
 			}
