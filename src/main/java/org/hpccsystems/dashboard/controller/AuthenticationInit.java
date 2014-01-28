@@ -18,7 +18,6 @@ public class AuthenticationInit implements Initiator {
 	private static final  Log LOG = LogFactory.getLog(AuthenticationInit.class); 
 	
     public void doInit(Page page, Map<String, Object> args) throws Exception {
-            
             UserCredential cre = authService.getUserCredential();
             if(cre==null || cre.isAnonymous()){
             	if(LOG.isDebugEnabled()){

@@ -170,6 +170,12 @@
 		<session-timeout>60</session-timeout>
 	</session-config>
 
+	<!-- Error page-->
+	<error-page>
+	    <exception-type>java.lang.Throwable</exception-type>    
+	    <location>/error_page.zul</location>    
+	</error-page>
+	
 	<!-- [Optional] MIME mapping -->
 	<mime-mapping>
 		<extension>doc</extension>

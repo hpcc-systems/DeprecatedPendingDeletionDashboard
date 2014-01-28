@@ -98,7 +98,6 @@ public class DashboardController extends SelectorComposer<Component>{
 		//TODO Delete dashboard state is not considered right now 
 		
 		super.doAfterCompose(comp);
-				
 		
 		final Session session = Sessions.getCurrent();
 		dashboardId = (Integer) session.getAttribute(Constants.ACTIVE_DASHBOARD_ID);
@@ -211,6 +210,7 @@ public class DashboardController extends SelectorComposer<Component>{
 			LOG.debug("Created Dashboard");
 			LOG.debug("Panel Count - " + dashboard.getColumnCount());
 		}
+		
 	}	
 	
 	@Listen("onClick = #addWidget")
