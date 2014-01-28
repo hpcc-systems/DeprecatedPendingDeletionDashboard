@@ -29,6 +29,7 @@ public class ChartSettigsController extends SelectorComposer<Component>{
 		ChartConfiguration configuration = (ChartConfiguration) Executions.getCurrent().getArg().get(Constants.PARAMS);
 		ChartPanel chartPanel = (ChartPanel) Executions.getCurrent().getArg().get(Constants.PARENT);
 		
+		//comment added by senthil
 		Listitem listItem;
 		for (Field field : configuration.getFields()) {
 			listItem = new Listitem(field.getColumnName());
