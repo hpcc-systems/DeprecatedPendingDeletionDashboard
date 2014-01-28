@@ -142,7 +142,7 @@ function createChart(divId, chartData) {
 			  .data(ageNames.slice().reverse())
 			  .enter().append("g")
 			  .attr("class", "legend")
-			  .attr("transform", function(d, i) { var i=i+1;return "translate(0," + i * 5 + ")"; });
+			  .attr("transform", function(d, i) {return "translate(0," + i * 20 + ")"; });
 	
 			legend.append("rect")
 			  .attr("x", width - 18)
