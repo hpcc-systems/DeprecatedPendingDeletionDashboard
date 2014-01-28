@@ -113,6 +113,16 @@ public class DashboardController extends SelectorComposer<Component>{
 			
 			nameLabel.setValue(dashboard.getName());
 			
+			//Preparing the layout
+			Integer count = 0;
+			for (Portalchildren portalchildren : portalChildren) {
+				if( count < dashboard.getColumnCount()) {
+					portalchildren.setVisible(true);
+					portalchildren.setWidth(100/dashboard.getColumnCount() + PERCENTAGE_SIGN);
+				}
+				count ++;
+			}
+			
 			if( !dashboard.getPortletList().isEmpty() ) {
 				//Dashboard is present in session or Newly created dashboard
 				if(LOG.isDebugEnabled()){
@@ -124,8 +134,6 @@ public class DashboardController extends SelectorComposer<Component>{
 					if(!portlet.getWidgetState().equals(Constants.STATE_DELETE)){
 						final ChartPanel panel = new ChartPanel(portlet);
 						portalChildren.get(portlet.getColumn()).appendChild(panel);
-						portalChildren.get(portlet.getColumn()).setWidth(100/dashboard.getColumnCount() + PERCENTAGE_SIGN);
-						portalChildren.get(portlet.getColumn()).setVisible(true);
 						if(panel.drawD3Graph() != null){
 							Clients.evalJavaScript(panel.drawD3Graph());
 						}
@@ -151,30 +159,26 @@ public class DashboardController extends SelectorComposer<Component>{
 				ChartPanel panel = null;
 				for (Portlet portlet : dashboard.getPortletList()) {
 					if(!portlet.getWidgetState().equals(Constants.STATE_DELETE)){
+						
 						//Constructing chart data only when live chart is drawn
 						if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())){
 							chartData = chartRenderer.parseXML(portlet.getChartDataXML());
-							//Fetching data and setting into portlet to construct Table Widget
+							
 							if(portlet.getChartType().equals(Constants.TABLE_WIDGET)){
-								try
-								{
-								portlet.setTableDataMap(hpccService.fetchTableData(chartData));
+								//Fetching data and setting into portlet to construct Table Widget
+								try	{
+									portlet.setTableDataMap(hpccService.fetchTableData(chartData));
 								}catch(Exception e){
 									Clients.showNotification(
 											"Unable to fetch table data from Hpcc ",
-											"error", comp, "middle_center", 3000,
-											true);
+											"error", comp, "middle_center", 3000, true);
 									LOG.error("Exception while fetching data from Hpcc for table columns", e);
 								}
-								
-							}
-							else{
-								try
-								{
-								
-								chartRenderer.constructChartJSON(chartData, portlet, false);
-								}catch(Exception ex)
-								{
+							} else {
+								//For chart widgets
+								try	{
+									chartRenderer.constructChartJSON(chartData, portlet, false);
+								}catch(Exception ex) {
 									Clients.showNotification("Unable to fetch column data from Hpcc", 
 											"error", comp, "middle_center", 3000, true);
 									LOG.error("Exception while fetching column data from Hpcc", ex);
@@ -184,8 +188,6 @@ public class DashboardController extends SelectorComposer<Component>{
 						
 						panel = new ChartPanel(portlet);
 						portalChildren.get(portlet.getColumn()).appendChild(panel);
-						portalChildren.get(portlet.getColumn()).setWidth(100/dashboard.getColumnCount() + PERCENTAGE_SIGN);
-						portalChildren.get(portlet.getColumn()).setVisible(true);
 						
 						if(panel.drawD3Graph() != null){
 							Clients.evalJavaScript(panel.drawD3Graph());
@@ -224,9 +226,19 @@ public class DashboardController extends SelectorComposer<Component>{
 		portlet.setWidgetState(Constants.STATE_EMPTY);
 		portlet.setPersisted(false);
 		dashboard.getPortletList().add(portlet);
-		portlet.setColumn(dashboard.getColumnCount() -1);
+		
+		// Adding new Widget to the column with lowest number of widgets
+		Integer count = 0, childCount = 0, column = 0;
+		for (Portalchildren portalchildren : portalChildren) {
+			if(portalchildren.getChildren().size() < childCount) {
+				column = count;
+			}
+			childCount = portalchildren.getChildren().size();
+			count ++;
+		}
+		portlet.setColumn(column);
 		ChartPanel chartPanel = new ChartPanel(portlet);
-		portalChildren.get(dashboard.getColumnCount() - 1).appendChild(chartPanel);
+		portalChildren.get(portlet.getColumn()).appendChild(chartPanel);
 		chartPanel.focus();
 	}
 	
