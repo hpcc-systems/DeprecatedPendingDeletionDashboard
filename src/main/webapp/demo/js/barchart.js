@@ -142,16 +142,16 @@ function createChart(divId, chartData) {
 			  .data(ageNames.slice().reverse())
 			  .enter().append("g")
 			  .attr("class", "legend")
-			  .attr("transform", function(d, i) {return "translate(0," + i * 20 + ")"; });
+			  .attr("transform", function(d, i) {return "translate(0," + ((i * 20) + 3)  + ")"; }); //Additional 3 for top-margin
 	
 			legend.append("rect")
-			  .attr("x", width - 18)
+			  .attr("x", fullWidth - 18 - 10) // 10 for padding
 			  .attr("width", 18)
 			  .attr("height", 18)
 			  .style("fill", color);
 	
 		    legend.append("text")
-			  .attr("x", width - 24)
+			  .attr("x", fullWidth - 24 - 10) // 10 for padding
 			  .attr("y", 9)
 			  .attr("dy", ".35em")
 			  .style("text-anchor", "end")
