@@ -141,4 +141,15 @@ public class DashboardServiceImpl implements DashboardService {
 		}
 	}
 
+	@Override
+	public Dashboard getDashboard(Integer dashboardId,Integer sourceType) throws Exception {
+		Dashboard dashboard = null;
+		try {
+			dashboard = dashboardDao.getDashboard(dashboardId,sourceType);
+		} catch (DataAccessException e) {
+			LOG.error("DataAccessException in updateDashboardDetails()", e);
+			throw e;
+	}
+		return dashboard;
+	}
 }

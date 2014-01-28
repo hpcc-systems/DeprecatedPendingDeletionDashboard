@@ -1,12 +1,10 @@
 package org.hpccsystems.dashboard.dao.impl;
 
-import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.List;
 
 import javax.sql.DataSource;
 
-import org.apache.commons.lang.Validate;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.common.Constants;
@@ -14,10 +12,10 @@ import org.hpccsystems.dashboard.common.Queries;
 import org.hpccsystems.dashboard.dao.DashboardDao;
 import org.hpccsystems.dashboard.entity.Application;
 import org.hpccsystems.dashboard.entity.Dashboard;
+import org.hpccsystems.dashboard.rowmapper.DashboardRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
-import org.springframework.jdbc.object.MappingSqlQuery;
 
 
 /**
@@ -33,60 +31,11 @@ public class DashboardDaoImpl implements DashboardDao {
 	public JdbcTemplate getJdbcTemplate() {
 		return jdbcTemplate;
 	}
-
 	@Autowired
-	public void setDataSourceToTemplate(DataSource dataSource) {
+	public void setDataSource(DataSource dataSource) {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
-
-	private DataSource dataSource;
-
-	private SelectDashboardMenus selectDBMenus;
 	
-	private SelectDashboardMenus getSelectDashboardMenus(final Application application,final String userId) {
-		final StringBuffer sql = new StringBuffer(Queries.RETRIEVE_DASHBOARD);
-		sql.append(application.getAppId());
-		//TODO:need to remove this userId null check,when Circuit passing the user details
-		if(userId == null){
-			sql.append("' order by sequence");
-		}
-		else{
-			sql.append("' and user_id='")
-			.append(userId).append("' order by sequence");
-		}	
-		
-		if (LOG.isDebugEnabled()) {
-			LOG.debug("getSelectDashboardMenus in DashboardDaoImpl");
-			LOG.debug("dashboardmenuquery -->" + sql.toString());
-		}
-		selectDBMenus = new SelectDashboardMenus(dataSource,
-				sql.toString());
-		return selectDBMenus;
-	}
-
-	public class SelectDashboardMenus extends MappingSqlQuery {
-
-		public SelectDashboardMenus(final DataSource dataSource, final String sql) {
-			super(dataSource, sql);
-			compile();
-		}
-
-		protected Object mapRow(final ResultSet resultSet, final int rowNum) throws SQLException {
-			final Dashboard entry = new Dashboard();
-			entry.setApplicationId(resultSet.getString(1));
-			entry.setDashboardId(Integer.parseInt(resultSet.getString(2)));
-			entry.setName(resultSet.getString(3));
-			entry.setDashboardState(resultSet.getString(4));
-			entry.setColumnCount(resultSet.getInt(5));
-			
-			if (LOG.isDebugEnabled()) {
-				LOG.debug("DashboardDaoImpl SelectDashboardMenus in mapRow");
-				LOG.debug("dashboardname -->" + entry.getName());
-				LOG.debug("Column count -->" + entry.getColumnCount());
-			}
-			return entry;
-		}
-	}
 	 /**
 	  * Fetching DashboardMenuPages details from dashboard_details table.
 	 * @param application
@@ -95,23 +44,25 @@ public class DashboardDaoImpl implements DashboardDao {
 	 */
 	@SuppressWarnings("unchecked")
 	public List<Dashboard> fetchDashboardDetails(final Application application,final String userId)
-			throws DataAccessException {
+ throws DataAccessException {
+		StringBuffer sqlBuffer = new StringBuffer();
+		sqlBuffer
+				.append("SELECT sourceid,dashboard_id,dashboard_name,dashboard_state,column_count FROM dashboard_details where !(dashboard_state <=> 'D') and  sourceid ='")
+				.append(application.getAppId());
+			//TODO:need to remove this userId null check,when Circuit passing the user details
+				if(userId == null){
+					sqlBuffer.append("' order by sequence");
+				}else{
+					sqlBuffer.append("' and user_id='")
+					.append(userId).append("' order by sequence");
+				}
 
-			return (List<Dashboard>) getSelectDashboardMenus(application,userId)
-					.execute();
+		List<Dashboard> dashboardList = getJdbcTemplate().query(sqlBuffer.toString(),
+				new DashboardRowMapper());
+		return dashboardList;
 	}
 
-	public void initialize() {
-		Validate.notNull(dataSource, "'dataSource' must be set!");
-	}
-
-	public DataSource getDataSource() {
-		return dataSource;
-	}
-
-	public void setDataSource(final DataSource dataSource) {
-		this.dataSource = dataSource;
-	}
+	
 
 	/**
 	 * Inserts Dashboard details to dashboard_details table & returns the ID of Dashboard that is inserted.
@@ -174,6 +125,14 @@ public class DashboardDaoImpl implements DashboardDao {
 				columnCount,
 				dashboardId
 		});
+	}
+
+	@Override
+	public Dashboard getDashboard(Integer dashboardId,Integer sourceType)
+			throws DataAccessException {
+		Dashboard dashboard = getJdbcTemplate().queryForObject(Queries.GET_DASHBOARD, new Object[] { 
+				dashboardId,sourceType}, new  DashboardRowMapper());
+		return dashboard;
 	}	
 	
 }
