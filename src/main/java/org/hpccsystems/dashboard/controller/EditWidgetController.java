@@ -113,9 +113,10 @@ public class EditWidgetController extends SelectorComposer<Component> {
 	@Listen("onClick=#doneButton")
 	public void closeEditWindow(final MouseEvent event) {
 		Div div = chartPanel.removeStaticImage();
+		portlet.setWidgetState(Constants.STATE_LIVE_CHART);
+		
 		//For Table Widget
 		if(portlet.getChartType().equals(Constants.TABLE_WIDGET)) {
-			portlet.setWidgetState(Constants.STATE_LIVE_CHART);
 			portlet.setChartDataXML(chartRenderer.convertToXML(chartData));
 			
 			div.getChildren().clear();
@@ -126,8 +127,8 @@ public class EditWidgetController extends SelectorComposer<Component> {
 						);
 			editPortletWindow.detach();
 			return;
-		}
-		else{
+		} else {
+		//For Chart Widgets
 			final String divToDraw = div.getId(); 
 			try	{
 				chartRenderer.constructChartJSON(chartData, portlet, true);
@@ -142,6 +143,7 @@ public class EditWidgetController extends SelectorComposer<Component> {
 				LOG.debug("Drawn chart in portlet..");
 				LOG.debug("Portlet - Div ID --> " + divToDraw);
 			}
+			
 			portlet.setChartDataXML(chartRenderer.convertToXML(chartData));
 			editPortletWindow.detach();
 		}
