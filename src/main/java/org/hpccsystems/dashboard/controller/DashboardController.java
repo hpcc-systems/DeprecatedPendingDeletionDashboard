@@ -230,6 +230,9 @@ public class DashboardController extends SelectorComposer<Component>{
 		// Adding new Widget to the column with lowest number of widgets
 		Integer count = 0, childCount = 0, column = 0;
 		for (Portalchildren portalchildren : portalChildren) {
+			if(! (count < dashboard.getColumnCount())) {
+				break;
+			}
 			if(portalchildren.getChildren().size() < childCount) {
 				column = count;
 			}
