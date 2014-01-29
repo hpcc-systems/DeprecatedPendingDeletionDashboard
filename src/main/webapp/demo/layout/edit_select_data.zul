@@ -18,7 +18,7 @@
 		</hlayout>
 		<hlayout zclass="form-group" hflex="0">
 			<label zclass="label" value="Connection Type"></label>
-			<checkbox id="sslCheckbox" label="SSL" checked="true"></checkbox>
+			<checkbox style="margin-top: 4px; margin-left: 10px;" id="sslCheckbox" label="SSL" checked="true"></checkbox>
 		</hlayout>
 		<hlayout zclass="form-group" >
 			<button id="submitBtn" label="${labels.fetchFields}" style="margin-top:10px;"	zclass="btn btn-primary" width="135px" />

@@ -131,7 +131,8 @@ public class EditWidgetController extends SelectorComposer<Component> {
 		//For Chart Widgets
 			final String divToDraw = div.getId(); 
 			try	{
-				chartRenderer.constructChartJSON(chartData, portlet, true);
+				//isEdit Window is set to false as we are constructing the JSON to be drawn in the Widget itself
+				chartRenderer.constructChartJSON(chartData, portlet, false); 
 				chartRenderer.drawChart(chartData, divToDraw, portlet);
 			} catch(Exception ex) {
 				Clients.showNotification("Unable to fetch column data from HPCC", "error", this.getSelf(), "middle_center", 3000, true);
