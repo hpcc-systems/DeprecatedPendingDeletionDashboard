@@ -9,6 +9,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.common.Constants;
+import org.hpccsystems.dashboard.entity.ApiConfiguration;
 import org.hpccsystems.dashboard.entity.Application;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.User;
@@ -31,6 +32,7 @@ import org.zkoss.zk.ui.util.GenericForwardComposer;
 import org.zkoss.zkmax.zul.Navbar;
 import org.zkoss.zkmax.zul.Navitem;
 import org.zkoss.zul.Button;
+import org.zkoss.zul.Center;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.Window;
@@ -56,6 +58,7 @@ public class SidebarController extends GenericForwardComposer<Component>{
 	@Wire
 	Button addDash;
 	
+	private ApiConfiguration apiConfig;
 	
 	@WireVariable
 	private DashboardService dashboardService;
@@ -76,9 +79,32 @@ public class SidebarController extends GenericForwardComposer<Component>{
 		viewModel.setAppName((String) session.getAttribute("source"));
 		
 		User user = (User)session.getAttribute("user");
+		apiConfig = (ApiConfiguration) session.getAttribute("apiConfiguration");
+		
 		List<Dashboard> sideBarPageList = null;
 		try	{
-			sideBarPageList =new ArrayList<Dashboard>(dashboardService.retrieveDashboardMenuPages(viewModel,user.getUserId()));
+			//Circuit/External Source Flow	
+			if(apiConfig != null && apiConfig.isApiEnabled()){			
+				String dashboardId =  Executions.getCurrent().getParameter(Constants.DB_DASHBOARD_ID);
+				String sourceTypeString =  Executions.getCurrent().getParameter(Constants.SOURCE);
+				Integer sourceTypeInt = 0;
+				if(sourceTypeString != null){
+					sourceTypeInt =Constants.SOURCE_TYPE_ID.get(sourceTypeString.trim());
+				}
+				if(LOG.isDebugEnabled()){
+					LOG.debug("External Source: "+sourceTypeString);
+					LOG.debug("Requested Dashboard Id : "+dashboardId);
+				}
+				Dashboard dashboard = dashboardService.getDashboard(Integer.valueOf(dashboardId), Integer.valueOf(sourceTypeInt));
+				sideBarPageList =new ArrayList<Dashboard>();
+				sideBarPageList.add(dashboard);
+			}//Dashboard Flow
+			else
+			{
+				//Add dashboard
+				addDash.addEventListener(Events.ON_CLICK, addDashboardBtnLisnr);				
+				sideBarPageList =new ArrayList<Dashboard>(dashboardService.retrieveDashboardMenuPages(viewModel,user.getUserId()));		
+			}
 		} catch(Exception ex) {
 			Clients.showNotification("Unable to retrieve available Dashboards. Please try reloading the page.", true);
 			LOG.error("Exception while retrieving dashboards from DB", ex);
@@ -111,9 +137,6 @@ public class SidebarController extends GenericForwardComposer<Component>{
 			Clients.evalJavaScript("showPopUp()");
 		}
 		
-		//Add dashboard
-		addDash.addEventListener(Events.ON_CLICK, addDashboardBtnLisnr);
-		
 		//Setting to session for logout controller
 		Sessions.getCurrent().setAttribute(Constants.NAVBAR, navBar);
 	}
@@ -134,7 +157,11 @@ public class SidebarController extends GenericForwardComposer<Component>{
 		
 		//Setting dashboard id to be retrived onClick
 		navitem.setAttribute(Constants.DASHBOARD_ID, dashboard.getDashboardId());
-		navitem.addEventListener(Events.ON_CLICK, navItemSelectLisnr);
+		if(apiConfig != null && apiConfig.isApiEnabled()){
+		navitem.addEventListener(Events.ON_CLICK, apiNavItemSelectLisnr);
+		}else{
+			navitem.addEventListener(Events.ON_CLICK, navItemSelectLisnr);
+		}
 		navitem.setIconSclass("glyphicon glyphicon-stats");
 		navitem.setZclass("list");
 		
@@ -167,6 +194,37 @@ public class SidebarController extends GenericForwardComposer<Component>{
 			final Include newInclude = new Include("/demo/layout/dashboard.zul");
 			newInclude.setId("mainInclude");
 			component.appendChild(newInclude);
+		}
+	};
+	
+	/**
+	 * Listener for onClick of a dashboard when request triggered from Circuit/external Source 
+	 */
+	EventListener<Event> apiNavItemSelectLisnr = new SerializableEventListener<Event>() {
+
+		private static final long serialVersionUID = 1L;
+
+		public void onEvent(final Event event) throws Exception {
+			if(LOG.isDebugEnabled()){
+				LOG.debug("Setting active dashboard to session in Api flow" + event.getTarget().getAttribute(Constants.DASHBOARD_ID));
+			}
+			//Setting currently active Dashboard in session
+			Sessions.getCurrent().setAttribute(Constants.ACTIVE_DASHBOARD_ID, event.getTarget().getAttribute(Constants.DASHBOARD_ID));
+			Iterator<Component> iterator = sidebarContainer.getParent().getParent().getFellows().iterator();
+			Component centerComp =null;
+			while(iterator.hasNext())
+			{
+				Component comp = iterator.next();
+				if(comp instanceof Center)
+				{
+					centerComp = comp;
+				}
+			}
+			final Include newInclude = new Include("/demo/layout/dashboard.zul");
+			newInclude.setId("mainInclude");
+			if(centerComp != null){
+				centerComp.appendChild(newInclude);
+			}
 		}
 	};
 	
@@ -259,7 +317,11 @@ public class SidebarController extends GenericForwardComposer<Component>{
 						navBar.insertBefore(dropped, dragged);
 						return;
 					}
-				currentNavitem.addEventListener(Events.ON_CLICK, navItemSelectLisnr);
+					if(apiConfig != null && apiConfig.isApiEnabled()){
+						currentNavitem.addEventListener(Events.ON_CLICK, apiNavItemSelectLisnr);
+					}else{
+						currentNavitem.addEventListener(Events.ON_CLICK, navItemSelectLisnr);
+					}
 				}
 			}
 		}
