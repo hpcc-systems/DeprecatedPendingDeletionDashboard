@@ -80,8 +80,7 @@ public class DashboardController extends SelectorComposer<Component>{
 	Portallayout portalLayout;
     
 	@Wire("portalchildren")
-    List<Portalchildren> portalChildren;
-    Integer panelCount = 0;
+    List<Portalchildren> portalChildren; Integer panelCount = 0;
     
     private static final String PERCENTAGE_SIGN = "%";
     
