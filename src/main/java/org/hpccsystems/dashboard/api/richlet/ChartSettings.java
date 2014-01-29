@@ -39,6 +39,7 @@ public class ChartSettings extends GenericRichlet{
 			config = args.get("config")[0];
 		} catch (Exception e) {
 			Clients.showNotification("Malformated URL string", false);
+			Executions.sendRedirect("/demo/index.zul");
 			return;
 		}
 		
@@ -63,6 +64,7 @@ public class ChartSettings extends GenericRichlet{
 		}
 		
 		Executions.createComponents("/api/chart_settings.zul", window, parameters);
+		
 		window.setPage(page);
 	}
 

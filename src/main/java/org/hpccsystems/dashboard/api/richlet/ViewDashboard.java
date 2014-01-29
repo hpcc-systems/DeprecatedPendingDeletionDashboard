@@ -1,21 +1,22 @@
 package org.hpccsystems.dashboard.api.richlet;
 
-import java.util.HashMap;
-import java.util.Map;
-
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.common.Constants;
+import org.hpccsystems.dashboard.entity.ApiConfiguration;
 import org.hpccsystems.dashboard.entity.User;
 import org.hpccsystems.dashboard.services.DashboardService;
+import org.hpccsystems.dashboard.services.UserCredential;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.GenericRichlet;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.Session;
 import org.zkoss.zk.ui.Sessions;
-import org.zkoss.zul.Window;
 
 public class ViewDashboard extends GenericRichlet {
 
+	private static final  Log LOG = LogFactory.getLog(ViewDashboard.class);
 	DashboardService dashboardService;
 	@Autowired
 	public void setDashboardService(DashboardService dashboardService) {
@@ -24,27 +25,30 @@ public class ViewDashboard extends GenericRichlet {
 	@Override
 	public void service(Page page) throws Exception {
 		try {
-			Map<String, String[]> args = Executions.getCurrent().getParameterMap();
-			String dashboardId =args.get(Constants.DB_DASHBOARD_ID)[0];
-			String sourceTypeString = args.get(Constants.SOURCE)[0];
-			Integer sourceTypeInt = 0;
-			if(sourceTypeString != null)
-			{
-				sourceTypeInt =Constants.SOURCE_TYPE_ID.get(sourceTypeString.trim());
-			}
-			//Dashboard dashboard = dashboardService.getDashboard(Integer.valueOf(dashboardId), sourceTypeInt);
 			final Session session = Sessions.getCurrent();
+			//TODO:Have to reset user and User credential values passed from circuit
 			User user = new User();
 			user.setFullName("admin");
 			user.setUserId("2");
 			user.setValidUser(true);
 			user.setActiveFlag("Y");
 			session.setAttribute("user", user);
-			Window window = new Window("View Dashboard", "normal", true);		
+			UserCredential userCredential = new UserCredential(user.getFullName(), user.getFullName());
+			session.setAttribute("userCredential", userCredential);
+			ApiConfiguration config = new ApiConfiguration();
+			config.setApiEnabled(true);
+			session.setAttribute("apiConfiguration", config);
+			String dashboardId  =Executions.getCurrent().getParameter(Constants.DB_DASHBOARD_ID);;
+			String sourceTypeString =Executions.getCurrent().getParameter(Constants.SOURCE);			
 			
-			Map<String,Object> parameters = new HashMap<String, Object>();
-			Executions.createComponents("/demo/index.zul", window, parameters);
-			window.setPage(page);
+			StringBuilder url = new StringBuilder("/demo/index.zul?");
+			if(LOG.isDebugEnabled()){
+				LOG.debug("URL from External/Circuit source : "+url);				
+			}
+			url.append(Constants.SOURCE).append("=").append(sourceTypeString)
+				.append("&").append(Constants.DB_DASHBOARD_ID).append("=").append(dashboardId);
+			Executions.sendRedirect(url.toString());
+		
 		} catch (Exception ex) {
 
 		}

@@ -39,49 +39,43 @@ function createLineChart(divId, chartData) {
 	            return datum.xData;
 	        });
 			
-			var main_x = d3.scale.ordinal()
-			.rangeRoundBands([0, main_width], 1),
-			mini_x = d3.scale.ordinal()
-			.rangeRoundBands([0, main_width], 1);
+			var main_x = d3.scale.ordinal().rangeRoundBands([0, main_width], 1),
+				mini_x = d3.scale.ordinal().rangeRoundBands([0, main_width], 1);
 			
-			var main_y0 = d3.scale.linear()
-			.range([main_height, 0]),
-			mini_y0 = d3.scale.linear()
-			.range([mini_height, 0]);
+			var main_y0 = d3.scale.linear().range([main_height, 0]),
+				mini_y0 = d3.scale.linear().range([mini_height, 0]);
 			
-			var main_y1 = d3.scale.linear()
-			.range([main_height, 0]),
-			mini_y1 = d3.scale.linear()
-			.range([mini_height, 0]);
+			var main_y1 = d3.scale.linear().range([main_height, 0]),
+				mini_y1 = d3.scale.linear().range([mini_height, 0]);
 			
 			var main_xAxis = d3.svg.axis()
-			.scale(main_x)
-			.orient("bottom");
+				.scale(main_x)
+				.orient("bottom");
 			
 			var main_yAxisLeft = d3.svg.axis()
-			.scale(main_y0)
-			.orient("left")
-			.tickFormat(d3.format(".2s"));
+				.scale(main_y0)
+				.orient("left")
+				.tickFormat(d3.format(".2s"));
 			
 			var brush = d3.svg.brush()
-			.x(mini_x)
-			.on("brush", brush);
+				.x(mini_x)
+				.on("brush", brush);
 			
 			var main_line0 = d3.svg.line()
-			.x(function(d) { return main_x(d.xData); })
-			.y(function(d) { return main_y0(d.yData); });
+				.x(function(d) { return main_x(d.xData); })
+				.y(function(d) { return main_y0(d.yData); });
 			
 			var main_line1 = d3.svg.line()
-			.x(function(d) { return main_x(d.xData); })
-			.y(function(d) { return main_y0(d.yData2); });
+				.x(function(d) { return main_x(d.xData); })
+				.y(function(d) { return main_y0(d.yData2); });
 			
 			var mini_line0 = d3.svg.line()
-			.x(function(d) { return mini_x(d.xData); })
-			.y(function(d) { return mini_y0(d.yData); });
+				.x(function(d) { return mini_x(d.xData); })
+				.y(function(d) { return mini_y0(d.yData); });
 			
 			var mini_line1 = d3.svg.line()
-			.x(function(d) { return mini_x(d.xData); })
-			.y(function(d) { return mini_y1(d.yData2); });
+				.x(function(d) { return mini_x(d.xData); })
+				.y(function(d) { return mini_y0(d.yData2); });
 			
 			var maxValue = d3.max(data,function(d){ return d.yData; });
 			main_x.domain(barLabels);
@@ -95,60 +89,59 @@ function createLineChart(divId, chartData) {
 					main_y0.domain([0, maxValue_y1]);
 				main_y1.domain([0, maxValue_y1]);
 				mini_y1.domain(main_y1.domain());
-			}
-			else
-			{
+			} else	{
 				main_y0.domain([0, maxValue]);
 			}
 			mini_y0.domain(main_y0.domain());
+			
 			if(data.length > 11)
 				main_xAxis.tickFormat(function (d) { return ''; });
+			
 			//preparing text/header for chart
-			divToDraw.append('text').text(function(){
+			var title_text = function(){
 				if(secondLine) {
 					return response.yName + ' & ' + response.yName2 + ' by ' + response.xName;
 				} else {
 					return response.yName + ' by ' + response.xName;
 				}
-					
-			});
-			if(response.filterColumn != null && response.from != null)
-			{
-				divToDraw.append('text').text( ' where '
-						+ response.filterColumn + ' between ' + response.from
-						+ ' and ' + response.to);
+			};
+			if(response.filterColumn != null && response.from != null) {
+				title_text += ' where '
+							+ response.filterColumn + ' between ' + response.from
+							+ ' and ' + response.to;
 			}
+			
 			var svg = divToDraw.append("svg")
-			.attr("width", main_width + main_margin.left + main_margin.right)
-			.attr("height", main_height + main_margin.top + main_margin.bottom);
+						.attr("width", main_width + main_margin.left + main_margin.right)
+						.attr("height", main_height + main_margin.top + main_margin.bottom);
 			
 			svg.append("defs").append("clipPath")
-			.attr("id", "clip")
-			.append("rect")
-			.attr("width", main_width)
-			.attr("height", main_height);
+				.attr("id", "clip")
+				.append("rect")
+				.attr("width", main_width)
+				.attr("height", main_height);
 			
 			var main = svg.append("g")
-			.attr("transform", "translate(" + main_margin.left + "," + main_margin.top + ")");
+						.attr("transform", "translate(" + main_margin.left + "," + main_margin.top + ")");
 			
 			var mini = svg.append("g")
-			.attr("transform", "translate(" + mini_margin.left + "," + mini_margin.top + ")");
+				.attr("transform", "translate(" + mini_margin.left + "," + mini_margin.top + ")");
 			
 			main.append("path")
-			.datum(data)
-			.attr("clip-path", "url(#clip)")
-			.attr("class", "line line0")
-			.attr("d", main_line0);
+				.datum(data)
+				.attr("clip-path", "url(#clip)")
+				.attr("class", "line line0")
+				.attr("d", main_line0);
 			
 			main.append("g")
-			.attr("class", "x linechart_axis")
-			.attr("transform", "translate(0," + main_height + ")")
-			.call(main_xAxis)
-			.append("text")
-			.attr("transform", "translate(" + main_width/2 + ",0)")
-			.attr("dy",response.xWidth + 10)
-			.style("text-anchor", "middle")
-			.text(response.xName);
+				.attr("class", "x linechart_axis")
+				.attr("transform", "translate(0," + main_height + ")")
+				.call(main_xAxis)
+				.append("text")
+				.attr("transform", "translate(" + main_width/2 + ",0)")
+				.attr("dy",response.xWidth + 10)
+				.style("text-anchor", "middle")
+				.text(response.xName);
 			
 			var yLabel = main.append("g") 
 				.attr("transform", "translate(-43,"+(main_height/2)+")")
@@ -156,7 +149,9 @@ function createLineChart(divId, chartData) {
     		    .attr("transform", "rotate(-90)")
 			    .attr("dy", ".71em")
 			    .style("text-anchor", "middle");
+			
 			yLabel.text(response.yName);
+			
 			if(secondLine) {
 				yLabel.text(response.yName + " & " + response.yName2);
 				main.append("path")
@@ -195,61 +190,60 @@ function createLineChart(divId, chartData) {
 				.attr("y", -6)
 				.attr("height", mini_height + 7);
 			}
-			
-			main.append("rect")
-			.attr("class", "overlay")
-			.attr("width", main_width)
-			.attr("height", main_height);
-			
+			 
 			var focus = main.append("g")
-			.attr("class", "focus")
-			.style("display", "none");
-			
+				.attr("class", "focus")
+				.style("display", "none");
+				
 			// Display on the x Axis
 			focus.append("line")
-			.attr("class", "x")
-			.attr("y1", main_y0(0) - 6)
-			.attr("y2", main_y0(0) + 6)
+				.attr("class", "x")
+				.attr("y1", main_y0(0) - 6)
+				.attr("y2", main_y0(0) + 6)
 			
 			// Display for first line
 			focus.append("line")
-			.attr("class", "y0")
-			.attr("x1", main_width - 6) // nach links
-			.attr("x2", main_width + 6); // nach rechts
-			
+				.attr("class", "y0")
+				.attr("x1", main_width - 6) // nach links
+				.attr("x2", main_width + 6); // nach rechts
+				
 			focus.append("circle")
-			.attr("class", "y0")
-			.attr("r", 4);
-			
+				.attr("class", "y0")
+				.attr("r", 4);
+			 
 			focus.append("text")
-			.attr("class", "y0")
-			.attr("dy", "-1em");
+				.attr("class", "y0")  
+				.attr("dy", "-1em"); 
 			
 			if(secondLine) {
 				//Display for second line
 				focus.append("line")
-				.attr("class", "y1")
-				.attr("x1", main_width - 6)
-				.attr("x2", main_width + 6);
-				
+					.attr("class", "y1")
+					.attr("x1", main_width - 6)
+					.attr("x2", main_width + 6);
+					
 				focus.append("circle")
-				.attr("class", "y1")
-				.attr("r", 4);
+					.attr("class", "y1")
+					.attr("r", 4);
 				
 				focus.append("text")
-				.attr("class", "y1")
-				.attr("dy", "-1em");
+					.attr("class", "y1")  
+					.attr("dy", "-1em");
 			}
 			
+			
 			main.append("rect")
-			.attr("class", "overlay")
-			.attr("width", main_width)
-			.attr("height", main_height)
-			.on("mouseover", function() { focus.style("display", null); })
-			.on("mouseout", function() { focus.style("display", "none"); })
-			.on("mousemove", mousemove);
+				.attr("class", "overlay")
+				.attr("width", main_width)
+				.attr("height", main_height)
+				.on("mouseover", function() { focus.style("display", null); })
+				.on("mouseout", function() { focus.style("display", "none"); })
+				.on("mousemove", mousemove);
 			
 			function mousemove() {
+				
+				console.log(this);
+				
 				var xPos = d3.mouse(this)[0];
 				var leftEdges = main_x.range();
 				var width = main_x.rangeBand();
@@ -257,7 +251,8 @@ function createLineChart(divId, chartData) {
 				for(j=0; xPos > (leftEdges[j] + width); j++) {}
 				d = data[j];
 				if(d === undefined) {
-				return;}
+					return;
+				}
 				
 				focus.select("circle.y0").attr("transform", "translate(" + main_x(d.xData) + "," + main_y0(d.yData) + ")");
 				focus.select("text.y0").attr("transform", "translate(" + main_x(d.xData) + "," + main_y0(d.yData) + ")").text(d.yData);
@@ -298,16 +293,16 @@ function createLineChart(divId, chartData) {
 			
 			// Checking when no nodes are selected
 			if(newData.length > 0 ) {
-			main.datum(newData);
-			data = newData;
+				main.datum(newData);
+				data = newData;
 			} else {
-			main.datum(datum);
-			data = datum;
+				main.datum(datum);
+				data = datum;
 			}	
 			main.select(".line0").attr("d", main_line0);
-			
+			 
 			if(secondLine) {
-			main.select(".line1").attr("d", main_line1);
+				main.select(".line1").attr("d", main_line1);
 			}
 			
 			main.select(".x.linechart_axis").call(main_xAxis);
@@ -321,6 +316,7 @@ function createLineChart(divId, chartData) {
 			//Legend
 			var legendData = new Array();
 			legendData.push(response.yName)
+			
 			if(secondLine) {
 				legendData.push(response.yName2)
 			}

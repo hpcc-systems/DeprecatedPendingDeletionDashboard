@@ -40,8 +40,8 @@ import com.google.gson.JsonObject;
  */
 @Controller
 @RequestMapping("*.do")
-public class DashboardCircuitController {	
-	private static final  Log LOG = LogFactory.getLog(DashboardCircuitController.class); 
+public class DashboardApiController {	
+	private static final  Log LOG = LogFactory.getLog(DashboardApiController.class); 
 	DashboardService dashboardService;
 	WidgetService widgetService;
 	ChartRenderer chartRenderer;

@@ -10,10 +10,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.controller.component.ChartPanel;
+import org.hpccsystems.dashboard.entity.ApiConfiguration;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.entity.chart.XYChartData;
 import org.hpccsystems.dashboard.entity.chart.utils.ChartRenderer;
+import org.hpccsystems.dashboard.helper.DashboardHelper;
 import org.hpccsystems.dashboard.services.DashboardService;
 import org.hpccsystems.dashboard.services.HPCCService;
 import org.hpccsystems.dashboard.services.WidgetService;
@@ -70,7 +72,9 @@ public class DashboardController extends SelectorComposer<Component>{
     @Wire
     Button configureDashboard;
     @Wire
-    Button addWidget;
+    Button addWidget;    
+    @Wire
+    Button saveApiView;
     
     @Wire("portallayout")
 	Portallayout portalLayout;
@@ -93,6 +97,11 @@ public class DashboardController extends SelectorComposer<Component>{
     @WireVariable
 	HPCCService hpccService;
     
+    @WireVariable
+	private DashboardHelper dashboardHelper;
+    
+    private ApiConfiguration apiConfig;
+    
 	@Override
 	public void doAfterCompose(final Component comp) throws Exception {
 		//TODO Delete dashboard state is not considered right now 
@@ -101,6 +110,7 @@ public class DashboardController extends SelectorComposer<Component>{
 		
 		final Session session = Sessions.getCurrent();
 		dashboardId = (Integer) session.getAttribute(Constants.ACTIVE_DASHBOARD_ID);
+		apiConfig = (ApiConfiguration) session.getAttribute("apiConfiguration");
 		final Map<Integer,Dashboard> dashboardMap = (HashMap<Integer, Dashboard>) session.getAttribute(Constants.DASHBOARD_LIST);
 		
 		if(dashboardId != null && dashboardMap != null){
@@ -121,8 +131,8 @@ public class DashboardController extends SelectorComposer<Component>{
 					portalchildren.setWidth(100/dashboard.getColumnCount() + PERCENTAGE_SIGN);
 				}
 				count ++;
-			}
-			
+			}		
+
 			if( !dashboard.getPortletList().isEmpty() ) {
 				//Dashboard is present in session or Newly created dashboard
 				if(LOG.isDebugEnabled()){
@@ -166,12 +176,12 @@ public class DashboardController extends SelectorComposer<Component>{
 							
 							if(portlet.getChartType().equals(Constants.TABLE_WIDGET)){
 								//Fetching data and setting into portlet to construct Table Widget
-								try	{
+								try{
 									portlet.setTableDataMap(hpccService.fetchTableData(chartData));
 								}catch(Exception e){
 									Clients.showNotification(
 											"Unable to fetch table data from Hpcc ",
-											"error", comp, "middle_center", 3000, true);
+											"error", comp, "middle_center", 3000,true);
 									LOG.error("Exception while fetching data from Hpcc for table columns", e);
 								}
 							} else {
@@ -198,16 +208,19 @@ public class DashboardController extends SelectorComposer<Component>{
 			
 		} else {
 			dashboardWin.setBorder("none");
+			if(apiConfig == null){
 			configureDashboard.setVisible(false);
 			deleteDashboard.setVisible(false);
 			addWidget.setVisible(false);
+			}
 			return;
 		}
 		
 		dashboardWin.addEventListener("onPortalClose", onPanelClose);
 		dashboardWin.addEventListener("onLayoutChange", onLayoutChange);
-		
-		
+		if(apiConfig != null && apiConfig.isApiEnabled()){
+		saveApiView.addEventListener(Events.ON_CLICK, saveApiChanges); 
+		}
 		if(LOG.isDebugEnabled()){
 			LOG.debug("Created Dashboard");
 			LOG.debug("Panel Count - " + dashboard.getColumnCount());
@@ -479,5 +492,27 @@ public class DashboardController extends SelectorComposer<Component>{
                Messagebox.Button.YES, Messagebox.Button.NO }, Messagebox.QUESTION, clickListener);
    
   }
-	
+	/**
+	 * Event listener to listen to 'ViewDashboard API request changes'
+	 */
+	final EventListener<Event> saveApiChanges = new EventListener<Event>() {
+
+		@Override
+		public void onEvent(Event event) throws Exception {
+			final List<Dashboard> dashBoardIdList = dashboardHelper.getSessionDashboardList();
+			try
+			{
+				dashboardHelper.updateDashboardWidgetDetails(dashBoardIdList);
+				Messagebox.show("Your Dahboard details are Saved.You can close the window","",1,Messagebox.ON_OK);
+				Sessions.getCurrent().removeAttribute("apiConfiguration");
+				Sessions.getCurrent().removeAttribute("user");
+				Sessions.getCurrent().removeAttribute("userCredential");
+			}catch(Exception ex)
+			{
+				Clients.showNotification("Unable to update Dahboard details into DB", "error", dashboardWin.getParent(), "middle_center", 3000, true);
+	        	LOG.error("Exception saveApiChanges Listener in DashboardController", ex);
+			}
+		
+		}
+	};	
 }

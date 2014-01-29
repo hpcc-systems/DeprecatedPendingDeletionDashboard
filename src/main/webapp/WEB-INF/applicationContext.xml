@@ -35,6 +35,9 @@
 	<bean id="fileConverter" class="org.hpccsystems.dashboard.entity.chart.utils.FileConverter" >
 	</bean>
 	
+	<bean id="dashboardHelper" class="org.hpccsystems.dashboard.helper.DashboardHelper" >
+	</bean>
+	
 	<bean id="tableRenderer" class="org.hpccsystems.dashboard.entity.chart.utils.TableRenderer">
     	 <property name="fileConverter" ref="fileConverter"/>
 	</bean>
