@@ -81,8 +81,9 @@ public class DashboardController extends SelectorComposer<Component>{
     
 	@Wire("portalchildren")
     List<Portalchildren> portalChildren;
+	
     Integer panelCount = 0;
-    
+        
     private static final String PERCENTAGE_SIGN = "%";
     
     @WireVariable
