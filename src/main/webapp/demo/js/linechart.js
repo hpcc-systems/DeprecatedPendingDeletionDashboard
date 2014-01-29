@@ -317,6 +317,34 @@ function createLineChart(divId, chartData) {
 			
 			if(data.length < 11)
 				main.selectAll('g.x.linechart_axis g text').each(insertLinebreaks);
+			
+			//Legend
+			var legendData = new Array();
+			legendData.push(response.yName)
+			if(secondLine) {
+				legendData.push(response.yName2)
+			}
+
+			var legend = svg.selectAll(".legend")
+			  .data(legendData)
+			  .enter().append("g")
+			  .attr("class", "legend")
+			  .attr("transform", function(d, i) {return "translate(0," + ((i * 20) + 3)  + ")"; }); //Additional 3 for top-margin
+
+			legend.append("line")
+			  .attr("x2", fullWidth - 18 - 10) // 10 for padding
+			  .attr("x1", fullWidth - 34 - 10)
+			  .attr("y1", 10)
+			  .attr("y2", 10)
+			  .style("stroke", function(d,i){ if(i==0) return "steelblue"; else return "indianred"; });
+
+			legend.append("text")
+			  .attr("x", fullWidth - 40 - 10) // 10 for padding
+			  .attr("y", 9)
+			  .attr("dy", ".35em")
+			  .style("text-anchor", "end")
+			  .text(function(d) { return d; });
+			
 });
 	
 }
