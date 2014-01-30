@@ -49,7 +49,7 @@ public class DashboardHelper {
 	 * Method to get Dashboards list from session with updated name
 	 * @return List<Dashboard>
 	 */
-	public List<Dashboard> getSessionDashboardList()
+	public List<Dashboard> getSessionDashboardList()throws Exception
 	{
 		final List<Dashboard> dashBoardIdList = new ArrayList<Dashboard>();
 		final Session session = Sessions.getCurrent(); 

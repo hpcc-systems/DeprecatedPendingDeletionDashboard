@@ -39,13 +39,13 @@ public class ViewDashboard extends GenericRichlet {
 			config.setApiEnabled(true);
 			session.setAttribute("apiConfiguration", config);
 			String dashboardId  =Executions.getCurrent().getParameter(Constants.DB_DASHBOARD_ID);;
-			String sourceTypeString =Executions.getCurrent().getParameter(Constants.SOURCE);			
+			String sourceType =Executions.getCurrent().getParameter(Constants.SOURCE);			
 			
 			StringBuilder url = new StringBuilder("/demo/index.zul?");
 			if(LOG.isDebugEnabled()){
 				LOG.debug("URL from External/Circuit source : "+url);				
 			}
-			url.append(Constants.SOURCE).append("=").append(sourceTypeString)
+			url.append(Constants.SOURCE).append("=").append(sourceType)
 				.append("&").append(Constants.DB_DASHBOARD_ID).append("=").append(dashboardId);
 			Executions.sendRedirect(url.toString());
 		

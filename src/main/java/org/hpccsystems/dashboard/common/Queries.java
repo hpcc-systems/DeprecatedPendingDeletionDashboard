@@ -19,7 +19,7 @@ public class Queries {
 	public static final String UPDATE_DASHBOARD_DETAILS = "update dashboard_details set sequence=?,dashboard_name=?,column_count=? where dashboard_id=?";
 	public static final String UPDATE_WIDGET_DETAILS = "update widget_details set WIDGET_NAME=?,WIDGET_STATE=?,CHART_TYPE=?,COLUMN_IDENTIFIER=?,WIDGET_SEQUENCE=?,CHART_DATA=? where WIDGET_ID=? and DASHBOARD_ID=?";
 	public static final String INSERT_WIDGET_DETAILS = "insert into WIDGET_DETAILS(DASHBOARD_ID,WIDGET_NAME,WIDGET_STATE,CHART_TYPE,COLUMN_IDENTIFIER,WIDGET_SEQUENCE,CHART_DATA) values(?,?,?,?,?,?,?)";
-	public static final String RETRIEVE_DASHBOARD = "SELECT sourceid,dashboard_id,dashboard_name,dashboard_state,column_count FROM dashboard_details where !(dashboard_state <=> 'D') and  sourceid = ? and user_id=?";
+	public static final String RETRIEVE_DASHBOARD = "SELECT sourceid,dashboard_id,dashboard_name,dashboard_state,column_count FROM dashboard_details where !(dashboard_state <=> 'D') and  sourceid = '";
 	public static final String GET_USER_DETAILs = "select user_id,password,active_flag,user_name from user_details where user_name=?"; 
 	public static final String GET_APPLICATIONS = "SELECT dash_app_id,dash_app_name FROM dash_application";
 	public static final String RESET_USER_FLAG = "update user_details set active_flag=? where user_id=?";
