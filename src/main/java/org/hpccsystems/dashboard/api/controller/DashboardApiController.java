@@ -1,7 +1,6 @@
 package org.hpccsystems.dashboard.api.controller;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -44,7 +43,6 @@ public class DashboardApiController {
 	private static final  Log LOG = LogFactory.getLog(DashboardApiController.class); 
 	DashboardService dashboardService;
 	WidgetService widgetService;
-	ChartRenderer chartRenderer;
 	
 	@Autowired
 	public void setDashboardService(DashboardService dashboardService) {
@@ -55,12 +53,6 @@ public class DashboardApiController {
 		this.widgetService = widgetService;
 	}
 	
-	@Autowired
-	public void setChartRenderer(ChartRenderer chartRenderer) {
-		this.chartRenderer = chartRenderer;
-	}
-	
-	XYChartData chartData = new XYChartData();
 /**
  * Method to process delete dashboard request from circuit
  * @param request
@@ -105,7 +97,6 @@ public void deleteDashboard(HttpServletRequest request, HttpServletResponse resp
 public void getChartList(HttpServletRequest request, HttpServletResponse response)throws Exception
  {
 		try {
-			PrintWriter out = response.getWriter();
 			String paramValue = request.getParameter(Constants.CHARTLIST_FORMAT);			
 			if (paramValue != null &&Constants.JSON .equals(paramValue)) {
 				JsonObject json;
@@ -115,16 +106,13 @@ public void getChartList(HttpServletRequest request, HttpServletResponse respons
 					json = new JsonObject();
 					json.addProperty(Constants.VALUE, entry.getValue().getChartId());
 					json.addProperty(Constants.LABEL, entry.getValue().getChartName());
-					json.addProperty(Constants.DESCRIPTION, entry.getValue()
-							.getChartDesc());
-
+					json.addProperty(Constants.DESCRIPTION, entry.getValue().getChartDesc());
 					array.add(json);
 				}
 				JsonObject result = new JsonObject();
 				result.add(Constants.CHART_LIST, array);
 				response.setContentType(Constants.RES_TEXT_TYPE_JSON);
-				out.print(result.toString());
-				out.flush();
+				response.getWriter().write(result.toString());
 			} 
 		} catch (Exception e) {
 			LOG.error("Exception while processing ChartLsit Request from Circuit", e);
@@ -138,12 +126,10 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
  {
 		try {
 			final Application application = new Application();
-			PrintWriter out = response.getWriter();
 			String sourceName = request.getParameter(Constants.SOURCE);
 			String sourceId = request.getParameter(Constants.SOURCE_ID);
 			application.setAppId(sourceId);			
 			application.setAppName(sourceName);
-
 			List<Dashboard> dashboardList = null;
 			Dashboard dashBoard = null;
 
@@ -151,15 +137,13 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
 			JSONObject jsonResposeObj = new JSONObject();
 			JSONArray jsonObjList = new JSONArray();
 			try{
-			dashboardList = new ArrayList<Dashboard>(
-					dashboardService.retrieveDashboardMenuPages(application,null));
+			dashboardList = new ArrayList<Dashboard>(dashboardService.retrieveDashboardMenuPages(application,null));
 			}catch(Exception ex){
 				LOG.error("Exception while fetching dahhboards from DB",ex);
 				jsonResposeObj.put(Constants.STATUS_FAIL,ex.getMessage());
 			}
 			if (dashboardList != null) {
-				for (final Iterator<Dashboard> iter = dashboardList.iterator(); iter
-						.hasNext();) {
+				for (final Iterator<Dashboard> iter = dashboardList.iterator(); iter.hasNext();) {
 					dashBoard = (Dashboard) iter.next();
 					obj = new JSONObject();
 					obj.put(Constants.NAME_SMALL, dashBoard.getName());
@@ -171,15 +155,11 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
 				}else{
 					jsonResposeObj.put(Constants.DASHBOARDS,"No Dashboard Exists for the given Source" );
 				}
-					
 			}			
 			response.setContentType(Constants.RES_TEXT_TYPE_JSON);
-			out.print(jsonResposeObj);
-			out.flush();
+			response.getWriter().write(jsonResposeObj.toString());
 		} catch (Exception e) {
-			LOG.error(
-					"Exception while processing Search dahhboard request from Circuit",
-					e);
+			LOG.error("Exception while processing Search dahhboard request from Circuit", e);
 			throw new Exception("Unable to process Search Request");
 		}
 	}
@@ -191,106 +171,158 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
  * @throws IOException
  */
 @RequestMapping(value = Constants.CIRCUIT_VALIDATE_REQ, method = RequestMethod.GET)
-public void validateDashboard(HttpServletRequest request, HttpServletResponse response) throws IOException {
-	try {
-		PrintWriter out = response.getWriter();
-		String circuitFields = request.getParameter(Constants.CIRCUIT_CONFIG);
-		String dashboard_id = request.getParameter(Constants.CIRCUIT_DASHBOARD_ID);
-		ChartConfiguration configuration = new GsonBuilder().create().fromJson(circuitFields, ChartConfiguration.class);
+public void validateDashboard(HttpServletRequest request, HttpServletResponse response) throws Exception {
 
-		XYChartData chartData = null;
-		List<String> xColumnList = null;
-		List<String> yColumnList = null;
-		String fieldName = null;
-		Integer filterType=0;
-		List<Portlet> portletList = widgetService.retriveWidgetDetails(Integer.valueOf(dashboard_id));
-		for (Portlet portlet : portletList) {
-					chartData = chartRenderer.parseXML(portlet.getChartDataXML());
-					if (chartData != null) {
-						xColumnList = chartData.getXColumnNames();
-						yColumnList = chartData.getYColumnNames();
-						if (chartData.getIsFiltered()) {
-							fieldName = chartData.getFilter().getColumn() ;		
-							filterType = chartData.getFilter().getType();
+	 try {
+			ChartRenderer chartRenderer = new ChartRenderer();
+			XYChartData chartData = null;
+			List<String> xColumnList = null;
+			List<String> yColumnList = null;
+			String filterColumn = null;
+			Integer filterDataType = 0;
+			ChartConfiguration chartConfiguration = null;
+			JsonObject jsonObject = new JsonObject();
+			List<String> failedValColumnList = new ArrayList<String>();
+			String circuitFields = request.getParameter(Constants.CIRCUIT_CONFIG);
+			String dashboard_id = request.getParameter(Constants.CIRCUIT_DASHBOARD_ID);
+			chartConfiguration = new GsonBuilder().create().fromJson(circuitFields, ChartConfiguration.class);
+			try {
+				List<Portlet> portletList = widgetService.retriveWidgetDetails(Integer.valueOf(dashboard_id));
+				if(portletList != null){
+				for (Portlet portlet : portletList) {
+						chartData = chartRenderer.parseXML(portlet.getChartDataXML());
+						if (chartData != null) {
+							xColumnList = chartData.getXColumnNames();
+							yColumnList = chartData.getYColumnNames();
+							// For XAxis & YAxis Validation
+							failedValColumnList.addAll(xColumnValidation(failedValColumnList, xColumnList, chartConfiguration));
+							failedValColumnList.addAll(yColumnValidation(failedValColumnList, yColumnList, chartConfiguration));
+							//Filter Column Validation
+							if (chartData.getIsFiltered()) {
+								filterColumn = chartData.getFilter().getColumn();
+								filterDataType = chartData.getFilter().getType();
+								failedValColumnList.addAll(filterColumnValidation(failedValColumnList, filterColumn, filterDataType, chartConfiguration));
+							}
 						}
-					}
-		}
-		
-		// For YAxis comparison
-		Boolean yAxisStatus = false;
-		for (String fieldValue : yColumnList) {
-			for (Field entry : configuration.getFields()) {
-				if (fieldValue.equals(entry.getColumnName().trim()) && checkNumeric(entry.getDataType().trim())) {
-					yAxisStatus = true;
-					break;
+				}}
+			} catch (Exception ex) {
+				LOG.error("Exception while fetching Widgets from DB",	ex);
+				jsonObject.addProperty(Constants.STATUS, Constants.STATUS_FAIL);
+				jsonObject.addProperty(Constants.STATUS_MESSAGE, ex.getMessage());
+			}
+			if (failedValColumnList.isEmpty()) {
+				jsonObject.addProperty(Constants.STATUS, Constants.STATUS_SUCCESS);
+			} else {
+				jsonObject.addProperty(Constants.STATUS, Constants.STATUS_FAIL);
+				for (String failedColumn : failedValColumnList) {
+					jsonObject.addProperty(Constants.STATUS_MESSAGE, failedColumn + Constants.FIELD_NOT_EXIST);
 				}
 			}
+			response.setContentType(Constants.RES_TEXT_TYPE_JSON);
+			response.setCharacterEncoding(Constants.CHAR_CODE);
+			response.getWriter().write(jsonObject.toString());
+		} catch (Exception e) {
+			LOG.error("Exception while processing Validate dashboard request from Circuit", e);
+			throw new Exception("Unable to process Validate Request");
 		}
-		
-		// For XAxis comparison
-		Boolean xAxisStatus = false;
+	}
+
+	/**
+	 * xColumnValidation() is responsible for Validate the xColumn.
+	 * @param failedColumnList
+	 * @param xColumnList
+	 * @param configuration
+	 * @return
+	 */
+	private List<String> xColumnValidation(List<String> failedColumnList,
+			List<String> xColumnList, ChartConfiguration configuration) {
+		Boolean xAxisValStatus = false;
+		if(xColumnList != null){
 		for (String fieldValue : xColumnList) {
 			for (Field entry : configuration.getFields()) {
 				if (fieldValue.equals(entry.getColumnName().trim())) {
-					xAxisStatus = true;
+					xAxisValStatus = true;
 					break;
 				}
 			}
-		}
-		
-		// For filterColumn comparison
-		Boolean filterColumnStatus = false;
-		String fieldDataType=null;
-			if(Constants.NUMERIC_DATA == filterType){
-				fieldDataType = "integer";
-			}else if(Constants.STRING_DATA == filterType){
-				fieldDataType = "STRING";
-			}	
-				
-			for(Field entry : configuration.getFields()) {
-				if(fieldName.equals(entry.getColumnName().trim()) && fieldDataType.equals(entry.getDataType().trim())){
-					filterColumnStatus = true;
-					break;
-				}			
+			if (!xAxisValStatus && !failedColumnList.contains(fieldValue.trim())) {
+				failedColumnList.add(fieldValue.trim());
 			}
-
-		JsonObject jsObj = new JsonObject();
-		if (yAxisStatus && xAxisStatus && filterColumnStatus) {
-			jsObj.addProperty(Constants.STATUS, Constants.STATUS_SUCCESS);
-
-		} else {
-			jsObj.addProperty(Constants.STATUS, Constants.STATUS_FAIL);
-			jsObj.addProperty(Constants.STATUS_MESSAGE,	Constants.FIELD_NOT_EXIST);
-		}
-		response.setContentType(Constants.RES_TEXT_TYPE_JSON);
-		response.setCharacterEncoding(Constants.CHAR_CODE);
-		try {
-			response.getWriter().write(jsObj.toString());
-		} catch (Exception ex) {
-			LOG.error("Exception while writing JSON response to Circuit", ex);
-		}
-
-	} catch (Exception e) {
-		LOG.error("Exception while writing JSON response to Circuit", e);
+			xAxisValStatus = false;
+		}}
+		return failedColumnList;
 	}
-}		
 
-/**
- * Checks whether a column is numeric.
- * @param column
- * @param dataType
- * @return
- */
-private boolean checkNumeric(final String dataType)
-	 {
-		boolean numericColumn = false;
-			if(dataType.contains("integer")	|| 
-					dataType.contains("real") || 
-					dataType.contains("decimal") ||  
-					dataType.contains("unsigned"))	{
-				numericColumn = true;
+
+	/**
+	 * yColumnValidation() is responsible for Validate the yColumn.
+	 * @param failedColumnList
+	 * @param yColumnList
+	 * @param configuration
+	 * @return
+	 */
+	private List<String> yColumnValidation(List<String> failedColumnList, 
+			List<String> yColumnList, ChartConfiguration configuration) {
+		Boolean yAxisValStatus = false;
+		if(yColumnList != null){
+		for (String fieldValue : yColumnList) {
+			for (Field entry : configuration.getFields()) {
+				if (fieldValue.equals(entry.getColumnName().trim())
+						&& Constants.NUMERIC_DATA == checkNumeric(entry.getDataType().trim())) {
+					yAxisValStatus = true;
+					break;
+				}
 			}
-		return numericColumn;
-	 }
-}
+			if (!yAxisValStatus && !failedColumnList.contains(fieldValue.trim())) {
+				failedColumnList.add(fieldValue.trim());
+			}
+			yAxisValStatus = false;
+		}}
+		return failedColumnList;
+	}
 
+	/**
+	 * filterColumnValidation() is responsible for Validate the filterColumn.
+	 * @param failedColumnList
+	 * @param filterColumn
+	 * @param filterDataType
+	 * @param configuration
+	 * @return
+	 */
+	private List<String> filterColumnValidation(List<String> failedColumnList,
+			String filterColumn, Integer filterDataType, ChartConfiguration configuration) {
+		Boolean filterColumnValStatus = false;
+		for (Field entry : configuration.getFields()) {
+			if (filterColumn.equals(entry.getColumnName().trim())
+					&& filterDataType == checkNumeric(entry.getDataType().trim())) {
+				filterColumnValStatus = true;
+				break;
+			}
+		}
+		if (!filterColumnValStatus
+				&& !failedColumnList.contains(filterColumn.trim())) {
+			failedColumnList.add(filterColumn.trim());
+		}
+		return failedColumnList;
+	}
+
+	/**
+	 * Checks whether a column is numeric.
+	 * 
+	 * @param column
+	 * @param dataType
+	 * @return
+	 */
+	private Integer checkNumeric(final String dataType) {
+		Integer dataTypeValue = 0;
+		if (dataType.contains("integer") || dataType.contains("real")
+				|| dataType.contains("decimal")
+				|| dataType.contains("unsigned")) {
+			dataTypeValue = 1;
+		}
+		else if (dataType.contains("STRING") || dataType.contains("string")) {
+			dataTypeValue = 2;
+		}
+		return dataTypeValue;
+	}
+}
