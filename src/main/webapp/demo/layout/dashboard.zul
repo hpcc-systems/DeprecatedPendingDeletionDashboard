@@ -23,7 +23,7 @@
 			</toolbar>
 			<toolbar align="end" style="float:right; border-style: none; margin-right:25px;" height="46px" zclass="btn-group"
 				 if="${sessionScope.apiConfiguration.apiEnabled}">
-				<button id="saveApiView" iconSclass="glyphicon glyphicon-save" zclass="btn btn-sm btn-primary" label=" Save"></button>
+				<button id="saveApiView" iconSclass="glyphicon glyphicon-floppy-disk" zclass="btn btn-sm btn-success" label=" Save"></button>
 			</toolbar>
 		</hbox>
 	</div>

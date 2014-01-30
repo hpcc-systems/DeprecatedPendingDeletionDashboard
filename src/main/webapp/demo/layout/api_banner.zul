@@ -1,6 +1,0 @@
-<div hflex="1" vflex="1">
-			<vbox align="center" width="200px">
-				<image src="/demo/images/logo_white.png" width="180px"/>
-				<label style="color:white; font-size: larger;">Dashboard</label>
-			</vbox>
-</div>
