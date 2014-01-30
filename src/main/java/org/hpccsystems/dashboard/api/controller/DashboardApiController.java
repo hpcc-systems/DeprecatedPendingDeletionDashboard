@@ -194,13 +194,13 @@ public void validateDashboard(HttpServletRequest request, HttpServletResponse re
 							xColumnList = chartData.getXColumnNames();
 							yColumnList = chartData.getYColumnNames();
 							// For XAxis & YAxis Validation
-							failedValColumnList.addAll(xColumnValidation(failedValColumnList, xColumnList, chartConfiguration));
-							failedValColumnList.addAll(yColumnValidation(failedValColumnList, yColumnList, chartConfiguration));
+							xColumnValidation(failedValColumnList, xColumnList, chartConfiguration);
+							yColumnValidation(failedValColumnList, yColumnList, chartConfiguration);
 							//Filter Column Validation
 							if (chartData.getIsFiltered()) {
 								filterColumn = chartData.getFilter().getColumn();
 								filterDataType = chartData.getFilter().getType();
-								failedValColumnList.addAll(filterColumnValidation(failedValColumnList, filterColumn, filterDataType, chartConfiguration));
+								filterColumnValidation(failedValColumnList, filterColumn, filterDataType, chartConfiguration);
 							}
 						}
 				}
@@ -213,9 +213,17 @@ public void validateDashboard(HttpServletRequest request, HttpServletResponse re
 				jsonObject.addProperty(Constants.STATUS, Constants.STATUS_SUCCESS);
 			} else {
 				jsonObject.addProperty(Constants.STATUS, Constants.STATUS_FAIL);
+				StringBuffer failedStr =new StringBuffer();
+				int index = 0;
 				for (String failedColumn : failedValColumnList) {
-					jsonObject.addProperty(Constants.STATUS_MESSAGE, failedColumn + Constants.FIELD_NOT_EXIST);
+					if (index != failedValColumnList.size() - 1) {
+						failedStr.append(failedColumn).append(",");
+					} else if (index == failedValColumnList.size() - 1) {
+						failedStr.append(failedColumn);
+					}
+					index++;
 				}
+				jsonObject.addProperty(Constants.STATUS_MESSAGE, failedStr + Constants.FIELD_NOT_EXIST);
 			}
 			response.setContentType(Constants.RES_TEXT_TYPE_JSON);
 			response.setCharacterEncoding(Constants.CHAR_CODE);
@@ -233,7 +241,7 @@ public void validateDashboard(HttpServletRequest request, HttpServletResponse re
 	 * @param configuration
 	 * @return
 	 */
-	private List<String> xColumnValidation(List<String> failedColumnList,
+	private void xColumnValidation(List<String> failedColumnList,
 			List<String> xColumnList, ChartConfiguration configuration) {
 		Boolean xAxisValStatus = false;
 		for (String fieldValue : xColumnList) {
@@ -248,7 +256,6 @@ public void validateDashboard(HttpServletRequest request, HttpServletResponse re
 			}
 			xAxisValStatus = false;
 		}
-		return failedColumnList;
 	}
 
 
@@ -259,13 +266,13 @@ public void validateDashboard(HttpServletRequest request, HttpServletResponse re
 	 * @param configuration
 	 * @return
 	 */
-	private List<String> yColumnValidation(List<String> failedColumnList, 
+	private void yColumnValidation(List<String> failedColumnList, 
 			List<String> yColumnList, ChartConfiguration configuration) {
 		Boolean yAxisValStatus = false;
 		for (String fieldValue : yColumnList) {
 			for (Field entry : configuration.getFields()) {
 				if (fieldValue.equals(entry.getColumnName().trim())
-						&& Constants.NUMERIC_DATA == checkNumeric(entry.getDataType().trim())) {
+						&& Constants.NUMERIC_DATA == checkDataType(entry.getDataType().trim())) {
 					yAxisValStatus = true;
 					break;
 				}
@@ -275,7 +282,6 @@ public void validateDashboard(HttpServletRequest request, HttpServletResponse re
 			}
 			yAxisValStatus = false;
 		}
-		return failedColumnList;
 	}
 
 	/**
@@ -286,12 +292,12 @@ public void validateDashboard(HttpServletRequest request, HttpServletResponse re
 	 * @param configuration
 	 * @return
 	 */
-	private List<String> filterColumnValidation(List<String> failedColumnList,
+	private void filterColumnValidation(List<String> failedColumnList,
 			String filterColumn, Integer filterDataType, ChartConfiguration configuration) {
 		Boolean filterColumnValStatus = false;
 		for (Field entry : configuration.getFields()) {
 			if (filterColumn.equals(entry.getColumnName().trim())
-					&& filterDataType == checkNumeric(entry.getDataType().trim())) {
+					&& filterDataType == checkDataType(entry.getDataType().trim())) {
 				filterColumnValStatus = true;
 				break;
 			}
@@ -300,7 +306,6 @@ public void validateDashboard(HttpServletRequest request, HttpServletResponse re
 				&& !failedColumnList.contains(filterColumn.trim())) {
 			failedColumnList.add(filterColumn.trim());
 		}
-		return failedColumnList;
 	}
 
 	/**
@@ -310,15 +315,12 @@ public void validateDashboard(HttpServletRequest request, HttpServletResponse re
 	 * @param dataType
 	 * @return
 	 */
-	private Integer checkNumeric(final String dataType) {
-		Integer dataTypeValue = 0;
+	private Integer checkDataType(final String dataType) {
+		Integer dataTypeValue = 2;
 		if (dataType.contains("integer") || dataType.contains("real")
 				|| dataType.contains("decimal")
 				|| dataType.contains("unsigned")) {
 			dataTypeValue = 1;
-		}
-		else if (dataType.contains("STRING") || dataType.contains("string")) {
-			dataTypeValue = 2;
 		}
 		return dataTypeValue;
 	}
