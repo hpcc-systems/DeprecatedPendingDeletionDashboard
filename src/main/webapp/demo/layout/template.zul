@@ -8,8 +8,7 @@
 	<!-- create only when the currentUser is not an anonymous  -->
 	<borderlayout hflex="1" vflex="1" if="${sessionScope.user.validUser}" >
 		<north height="70px" style="background-color: #292929;" border="none" zclass="banner" >		
-			<include src="/demo/layout/api_banner.zul" if="${sessionScope.apiConfiguration.apiEnabled}"/>
-			<include src="/demo/layout/banner.zul" if="${not sessionScope.apiConfiguration.apiEnabled}"/>
+			<include src="/demo/layout/banner.zul" />
 		</north>
 		<west width="205px" border="none" minsize="300">
 			<include src="/demo/layout/sidebar.zul"/>
