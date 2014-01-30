@@ -45,9 +45,9 @@ public class DashboardDaoImpl implements DashboardDao {
 	@SuppressWarnings("unchecked")
 	public List<Dashboard> fetchDashboardDetails(final Application application,final String userId)
  throws DataAccessException {
-		StringBuffer sqlBuffer = new StringBuffer();
+		StringBuilder sqlBuffer = new StringBuilder();
 		sqlBuffer
-				.append("SELECT sourceid,dashboard_id,dashboard_name,dashboard_state,column_count FROM dashboard_details where !(dashboard_state <=> 'D') and  sourceid ='")
+				.append(Queries.RETRIEVE_DASHBOARD)
 				.append(application.getAppId());
 			//TODO:need to remove this userId null check,when Circuit passing the user details
 				if(userId == null){

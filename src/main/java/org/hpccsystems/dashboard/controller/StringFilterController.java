@@ -80,7 +80,7 @@ public class StringFilterController extends SelectorComposer<Component>{
 				
 				filterListBox.appendChild(listitem);
 			}
-		} else {
+		} else if(valueList != null) {
 			for (String value : valueList) {
 				listitem = new Listitem();
 				listcell = new Listcell(value);

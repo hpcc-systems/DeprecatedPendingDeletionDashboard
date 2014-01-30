@@ -7,13 +7,8 @@
 
 	<!-- create only when the currentUser is not an anonymous  -->
 	<borderlayout hflex="1" vflex="1" if="${sessionScope.user.validUser}" >
-		<north height="70px" style="background-color: #292929;" border="none" zclass="banner" >
-		<div hflex="1" vflex="1" if="${sessionScope.apiConfiguration.apiEnabled}">
-			<vbox align="center" width="200px">
-				<image src="/demo/images/logo_white.png" width="180px"/>
-				<label style="color:white; font-size: larger;">Dashboard</label>
-			</vbox>
-		</div>
+		<north height="70px" style="background-color: #292929;" border="none" zclass="banner" >		
+			<include src="/demo/layout/api_banner.zul" if="${sessionScope.apiConfiguration.apiEnabled}"/>
 			<include src="/demo/layout/banner.zul" if="${not sessionScope.apiConfiguration.apiEnabled}"/>
 		</north>
 		<west width="205px" border="none" minsize="300">
