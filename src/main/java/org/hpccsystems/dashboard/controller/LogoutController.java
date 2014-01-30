@@ -58,17 +58,16 @@ public class LogoutController extends SelectorComposer<Component> {
 	Menuitem logout;
 	
 	@Listen("onClick=#logout")
-	public void doLogout() throws SQLException {
-		
+	public void doLogout() throws Exception {
+		try
+        {
 		final List<Dashboard> dashBoardIdList = dashboardHelper.getSessionDashboardList();		
         final String sourceid = (String) (Sessions.getCurrent().getAttribute("sourceid"));
         if(LOG.isDebugEnabled()){
         	LOG.debug("Source Id details while logut the application" +sourceid);
 			LOG.debug("dashBoardIdList details while logut the application" +dashBoardIdList);
 		}   
-        //Call to DB update
-        try
-        {
+        //Call to DB update        
         	dashboardHelper.updateDashboardWidgetDetails(dashBoardIdList); 
         	authenticationService.logout(session.getAttribute("user"));
         } catch(Exception ex) {
