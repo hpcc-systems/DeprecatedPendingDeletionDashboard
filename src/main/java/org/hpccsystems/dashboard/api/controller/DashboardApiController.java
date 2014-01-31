@@ -188,6 +188,7 @@ public void validateDashboard(HttpServletRequest request, HttpServletResponse re
 			chartConfiguration = new GsonBuilder().create().fromJson(circuitFields, ChartConfiguration.class);
 			try {
 				List<Portlet> portletList = widgetService.retriveWidgetDetails(Integer.valueOf(dashboard_id));
+				if(portletList != null){
 				for (Portlet portlet : portletList) {
 						chartData = chartRenderer.parseXML(portlet.getChartDataXML());
 						if (chartData != null) {
@@ -203,9 +204,9 @@ public void validateDashboard(HttpServletRequest request, HttpServletResponse re
 								failedValColumnList.addAll(filterColumnValidation(failedValColumnList, filterColumn, filterDataType, chartConfiguration));
 							}
 						}
-				}
+				}}
 			} catch (Exception ex) {
-				LOG.error("Exception while processing 'Validate' request from Circuit",	ex);
+				LOG.error("Exception while fetching Widgets from DB",	ex);
 				jsonObject.addProperty(Constants.STATUS, Constants.STATUS_FAIL);
 				jsonObject.addProperty(Constants.STATUS_MESSAGE, ex.getMessage());
 			}
@@ -236,6 +237,7 @@ public void validateDashboard(HttpServletRequest request, HttpServletResponse re
 	private List<String> xColumnValidation(List<String> failedColumnList,
 			List<String> xColumnList, ChartConfiguration configuration) {
 		Boolean xAxisValStatus = false;
+		if(xColumnList != null){
 		for (String fieldValue : xColumnList) {
 			for (Field entry : configuration.getFields()) {
 				if (fieldValue.equals(entry.getColumnName().trim())) {
@@ -247,7 +249,7 @@ public void validateDashboard(HttpServletRequest request, HttpServletResponse re
 				failedColumnList.add(fieldValue.trim());
 			}
 			xAxisValStatus = false;
-		}
+		}}
 		return failedColumnList;
 	}
 
@@ -262,6 +264,7 @@ public void validateDashboard(HttpServletRequest request, HttpServletResponse re
 	private List<String> yColumnValidation(List<String> failedColumnList, 
 			List<String> yColumnList, ChartConfiguration configuration) {
 		Boolean yAxisValStatus = false;
+		if(yColumnList != null){
 		for (String fieldValue : yColumnList) {
 			for (Field entry : configuration.getFields()) {
 				if (fieldValue.equals(entry.getColumnName().trim())
@@ -274,7 +277,7 @@ public void validateDashboard(HttpServletRequest request, HttpServletResponse re
 				failedColumnList.add(fieldValue.trim());
 			}
 			yAxisValStatus = false;
-		}
+		}}
 		return failedColumnList;
 	}
 

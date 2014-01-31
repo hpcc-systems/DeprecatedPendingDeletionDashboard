@@ -82,7 +82,7 @@ public class EditTableController extends SelectorComposer<Component> {
 				}
 			}			
 			tableHolder.appendChild(
-					tableRenderer.constructTableWidget(portlet.getTableDataMap(), true)
+					tableRenderer.constructTableWidget(portlet.getTableDataMap(), true,portlet.getName())
 				);
 		} else {
 			for (Map.Entry<String, String> entry : columnSchemaMap.entrySet()) {
@@ -135,7 +135,7 @@ public class EditTableController extends SelectorComposer<Component> {
 				
 				tableHolder.getChildren().clear();
 				tableHolder.appendChild(
-						tableRenderer.constructTableWidget(tableValues, true)
+						tableRenderer.constructTableWidget(tableValues, true,portlet.getName())
 						);
 			} catch (Exception e) {
 				Clients.showNotification("Table Creation failed. Please try again.", "error", tableHolder, "middle_center", 3000, true);
