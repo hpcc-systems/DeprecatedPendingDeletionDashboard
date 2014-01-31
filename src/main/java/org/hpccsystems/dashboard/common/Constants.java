@@ -92,6 +92,7 @@ public class Constants {
 	public static final String SOURCE_ID = "source_id";
 	public static final String NAME_SMALL = "name";
 	public static final String DASHBOARDS =  "dashboards";
+	public static final String CHART_TITLE =  "Chart Title";
 	
 	public static final Map<Integer, ChartDetails> CHART_MAP = new HashMap<Integer, ChartDetails>(){
 		private static final long serialVersionUID = 1L;
