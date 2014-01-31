@@ -170,7 +170,7 @@ public class ChartPanel extends Panel {
 	public void drawTableWidget(){
 		if(portlet.getTableDataMap()!=null && portlet.getTableDataMap().size()>0){
 			TableRenderer tableRenderer = new TableRenderer();
-			Vbox vbox = tableRenderer.constructTableWidget(portlet.getTableDataMap(), false);
+			Vbox vbox = tableRenderer.constructTableWidget(portlet.getTableDataMap(), false,portlet.getName());
 			chartDiv.getChildren().clear();
 			chartDiv.appendChild(vbox);
 		}
