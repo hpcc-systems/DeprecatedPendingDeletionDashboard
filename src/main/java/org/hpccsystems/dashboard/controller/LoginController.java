@@ -13,6 +13,7 @@ import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.entity.Application;
 import org.hpccsystems.dashboard.entity.User;
 import org.hpccsystems.dashboard.services.ApplicationService;
@@ -23,6 +24,7 @@ import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Session;
 import org.zkoss.zk.ui.Sessions;
+import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
@@ -33,7 +35,9 @@ import org.zkoss.zul.Button;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Textbox;
+import org.zkoss.zul.Messagebox.ClickEvent;
 
 
 /**
@@ -72,18 +76,22 @@ public class LoginController extends SelectorComposer<Component> {
 	@Override
 	public void doAfterCompose(final Component comp) throws Exception {
 		super.doAfterCompose(comp);
+		
+		//Redirecting if the user is already logged in.
+		if(!authenticationService.getUserCredential().isAnonymous()) {
+			Executions.sendRedirect("/demo/");
+			return;
+		}
+		
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Handling 'doAfterCompose' in LoginController");
 			LOG.debug("dashboardService:loginctrler -->"+dashboardService);
 		}
-		try
-		{			
-		final List<Application> applicationList = new ArrayList<Application>(applicationService.retrieveApplicationIds());
-		final ListModelList<Application> appModel = new ListModelList<Application>(applicationList);
-		apps.setModel(appModel);
-		}
-		catch(Exception ex)
-		{
+		try	{			
+			final List<Application> applicationList = new ArrayList<Application>(applicationService.retrieveApplicationIds());
+			final ListModelList<Application> appModel = new ListModelList<Application>(applicationList);
+			apps.setModel(appModel);
+		} catch(Exception ex) {
 			Clients.showNotification("Unable to retrieve applications from DB. Please try reloading the page", false);
 			LOG.error("Exception while fetching applications from DB", ex);
 		}
@@ -95,9 +103,11 @@ public class LoginController extends SelectorComposer<Component> {
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Handling 'doLogin' in LoginController");
 		}
-
+		
 		final String name = account.getValue();
 		final String passWord = password.getValue();
+		final Session session = Sessions.getCurrent();
+		
 		User user = null;
 		try	{
 			user =authenticationService.authendicateUser(name,passWord);
@@ -124,7 +134,6 @@ public class LoginController extends SelectorComposer<Component> {
 		
 		//Fetching the present application Id and setting into session
 		LOG.debug("the present application Id and setting into session");
-		final Session session = Sessions.getCurrent();
 		session.setAttribute("sourceid", apps.getItemAtIndex(apps.getSelectedIndex()).getValue());
 		session.setAttribute("source", apps.getItemAtIndex(apps.getSelectedIndex()).getLabel());
 		session.setAttribute("user", user);
@@ -136,6 +145,7 @@ public class LoginController extends SelectorComposer<Component> {
 		session.setAttribute("userCredential",cre);
 		
 		LOG.debug("Loged in. sending redirect...");
-		Executions.sendRedirect("/demo/");
+		Executions.sendRedirect("/demo/");		
 	}
+	
 }

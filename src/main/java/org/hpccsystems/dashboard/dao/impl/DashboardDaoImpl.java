@@ -1,6 +1,7 @@
 package org.hpccsystems.dashboard.dao.impl;
 
 import java.sql.SQLException;
+import java.sql.Date;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -46,8 +47,7 @@ public class DashboardDaoImpl implements DashboardDao {
 	public List<Dashboard> fetchDashboardDetails(final Application application,final String userId)
  throws DataAccessException {
 		StringBuilder sqlBuffer = new StringBuilder();
-		sqlBuffer
-				.append(Queries.RETRIEVE_DASHBOARD)
+		sqlBuffer.append(Queries.RETRIEVE_DASHBOARD)
 				.append(application.getAppId());
 			//TODO:need to remove this userId null check,when Circuit passing the user details
 				if(userId == null){
@@ -56,7 +56,6 @@ public class DashboardDaoImpl implements DashboardDao {
 					sqlBuffer.append("' and user_id='")
 					.append(userId).append("' order by sequence");
 				}
-
 		List<Dashboard> dashboardList = getJdbcTemplate().query(sqlBuffer.toString(),
 				new DashboardRowMapper());
 		return dashboardList;
@@ -72,13 +71,14 @@ public class DashboardDaoImpl implements DashboardDao {
 	 * @throws SQLException
 	 */
 	public int addDashboardDetails(final String sourceId,final String source, final String dashBoardName,
-			final String userId	)throws DataAccessException {
+			final String userId, final Date dashBoardDate)throws DataAccessException {
 
 		getJdbcTemplate().update(Queries.INSERT_DASHBOARD, new Object[] { 
 				dashBoardName,
 				userId,
 				Constants.SOURCE_TYPE_ID.get(source),
-				sourceId  
+				sourceId ,
+				dashBoardDate
 		});
 		
 		return getJdbcTemplate().queryForObject(Queries.GET_MAX_DASHBOARD_ID, new Object[] {userId} , Integer.class);
@@ -106,23 +106,24 @@ public class DashboardDaoImpl implements DashboardDao {
 
 
 	public void updateDashboardState(final Integer dashboardId,final String emptyState,
-			final int sequence,final String dashboardName) throws DataAccessException {
-		
+			final int sequence,final String dashboardName, Date updatedDate) throws DataAccessException {
 		getJdbcTemplate().update(Queries.UPDATE_DASHBOARD_STATE, new Object[] { 
 				emptyState,
 				sequence,
 				dashboardName,
+				updatedDate,
 				dashboardId
+				
 		});
 	}
 
 	public void updateDashboardDetails(Integer dashboardId, int sequence,
-			String dashboardName, int columnCount) throws DataAccessException {
-		
+			String dashboardName, int columnCount, Date updatedDate) throws DataAccessException {
 		getJdbcTemplate().update(Queries.UPDATE_DASHBOARD_DETAILS, new Object[] { 
 				sequence,
 				dashboardName,
-				columnCount,
+				columnCount,				
+				updatedDate,
 				dashboardId
 		});
 	}

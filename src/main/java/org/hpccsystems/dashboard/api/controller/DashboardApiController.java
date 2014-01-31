@@ -99,18 +99,18 @@ public void getChartList(HttpServletRequest request, HttpServletResponse respons
 		try {
 			String paramValue = request.getParameter(Constants.CHARTLIST_FORMAT);			
 			if (paramValue != null &&Constants.JSON .equals(paramValue)) {
-				JsonObject json;
-				JsonArray array = new JsonArray();
+				JsonObject jsonObject;
+				JsonArray jsonArray = new JsonArray();
 				Map<Integer, ChartDetails> chartdetailsMap = Constants.CHART_MAP;
 				for (Map.Entry<Integer, ChartDetails> entry : chartdetailsMap.entrySet()) {
-					json = new JsonObject();
-					json.addProperty(Constants.VALUE, entry.getValue().getChartId());
-					json.addProperty(Constants.LABEL, entry.getValue().getChartName());
-					json.addProperty(Constants.DESCRIPTION, entry.getValue().getChartDesc());
-					array.add(json);
+					jsonObject = new JsonObject();
+					jsonObject.addProperty(Constants.VALUE, entry.getValue().getChartId());
+					jsonObject.addProperty(Constants.LABEL, entry.getValue().getChartName());
+					jsonObject.addProperty(Constants.DESCRIPTION, entry.getValue().getChartDesc());
+					jsonArray.add(jsonObject);
 				}
 				JsonObject result = new JsonObject();
-				result.add(Constants.CHART_LIST, array);
+				result.add(Constants.CHART_LIST, jsonArray);
 				response.setContentType(Constants.RES_TEXT_TYPE_JSON);
 				response.getWriter().write(result.toString());
 			} 
@@ -126,16 +126,13 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
  {
 		try {
 			final Application application = new Application();
-			String sourceName = request.getParameter(Constants.SOURCE);
-			String sourceId = request.getParameter(Constants.SOURCE_ID);
-			application.setAppId(sourceId);			
-			application.setAppName(sourceName);
+			application.setAppId(request.getParameter(Constants.SOURCE_ID));			
+			application.setAppName(request.getParameter(Constants.SOURCE));
 			List<Dashboard> dashboardList = null;
 			Dashboard dashBoard = null;
-
-			JSONObject obj = null;
+			JSONObject jsonObject = null;
 			JSONObject jsonResposeObj = new JSONObject();
-			JSONArray jsonObjList = new JSONArray();
+			JSONArray jsonArray = new JSONArray();
 			try{
 			dashboardList = new ArrayList<Dashboard>(dashboardService.retrieveDashboardMenuPages(application,null));
 			}catch(Exception ex){
@@ -145,13 +142,14 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
 			if (dashboardList != null) {
 				for (final Iterator<Dashboard> iter = dashboardList.iterator(); iter.hasNext();) {
 					dashBoard = (Dashboard) iter.next();
-					obj = new JSONObject();
-					obj.put(Constants.NAME_SMALL, dashBoard.getName());
-					obj.put(Constants.DB_DASHBOARD_ID, dashBoard.getDashboardId());
-					jsonObjList.add(obj);
+					jsonObject = new JSONObject();
+					jsonObject.put(Constants.NAME_SMALL, dashBoard.getName());
+					jsonObject.put(Constants.DB_DASHBOARD_ID, dashBoard.getDashboardId());
+					jsonObject.put(Constants.UPDATED_DATE, dashBoard.getUpdatedDate());
+					jsonArray.add(jsonObject);
 				}
-				if(jsonObjList.size() > 0){
-					jsonResposeObj.put(Constants.DASHBOARDS, jsonObjList);
+				if(jsonArray.size() > 0){
+					jsonResposeObj.put(Constants.DASHBOARDS, jsonArray);
 				}else{
 					jsonResposeObj.put(Constants.DASHBOARDS,"No Dashboard Exists for the given Source" );
 				}
@@ -188,6 +186,7 @@ public void validateDashboard(HttpServletRequest request, HttpServletResponse re
 			chartConfiguration = new GsonBuilder().create().fromJson(circuitFields, ChartConfiguration.class);
 			try {
 				List<Portlet> portletList = widgetService.retriveWidgetDetails(Integer.valueOf(dashboard_id));
+				if(portletList != null){
 				for (Portlet portlet : portletList) {
 						chartData = chartRenderer.parseXML(portlet.getChartDataXML());
 						if (chartData != null) {
@@ -204,8 +203,9 @@ public void validateDashboard(HttpServletRequest request, HttpServletResponse re
 							}
 						}
 				}
+			  }
 			} catch (Exception ex) {
-				LOG.error("Exception while processing 'Validate' request from Circuit",	ex);
+				LOG.error("Exception while fetching Widgets from DB",	ex);
 				jsonObject.addProperty(Constants.STATUS, Constants.STATUS_FAIL);
 				jsonObject.addProperty(Constants.STATUS_MESSAGE, ex.getMessage());
 			}
@@ -244,6 +244,7 @@ public void validateDashboard(HttpServletRequest request, HttpServletResponse re
 	private void xColumnValidation(List<String> failedColumnList,
 			List<String> xColumnList, ChartConfiguration configuration) {
 		Boolean xAxisValStatus = false;
+		if(xColumnList != null){
 		for (String fieldValue : xColumnList) {
 			for (Field entry : configuration.getFields()) {
 				if (fieldValue.equals(entry.getColumnName().trim())) {
@@ -255,9 +256,9 @@ public void validateDashboard(HttpServletRequest request, HttpServletResponse re
 				failedColumnList.add(fieldValue.trim());
 			}
 			xAxisValStatus = false;
+		  }
 		}
 	}
-
 
 	/**
 	 * yColumnValidation() is responsible for Validate the yColumn.
@@ -269,6 +270,7 @@ public void validateDashboard(HttpServletRequest request, HttpServletResponse re
 	private void yColumnValidation(List<String> failedColumnList, 
 			List<String> yColumnList, ChartConfiguration configuration) {
 		Boolean yAxisValStatus = false;
+		if(yColumnList != null){
 		for (String fieldValue : yColumnList) {
 			for (Field entry : configuration.getFields()) {
 				if (fieldValue.equals(entry.getColumnName().trim())
@@ -281,6 +283,7 @@ public void validateDashboard(HttpServletRequest request, HttpServletResponse re
 				failedColumnList.add(fieldValue.trim());
 			}
 			yAxisValStatus = false;
+		  }
 		}
 	}
 

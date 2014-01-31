@@ -116,10 +116,10 @@ function createLineChart(divId, chartData) {
 						.attr("height", main_height + main_margin.top + main_margin.bottom);
 			
 			svg.append("defs").append("clipPath")
-				.attr("id", "clip")
+					.attr("id", "clip")
 				.append("rect")
-				.attr("width", main_width)
-				.attr("height", main_height);
+					.attr("width", main_width)
+					.attr("height", main_height);
 			
 			var main = svg.append("g")
 						.attr("transform", "translate(" + main_margin.left + "," + main_margin.top + ")");
@@ -134,14 +134,14 @@ function createLineChart(divId, chartData) {
 				.attr("d", main_line0);
 			
 			main.append("g")
-				.attr("class", "x linechart_axis")
-				.attr("transform", "translate(0," + main_height + ")")
+					.attr("class", "x linechart_axis")
+					.attr("transform", "translate(0," + main_height + ")")
 				.call(main_xAxis)
 				.append("text")
-				.attr("transform", "translate(" + main_width/2 + ",0)")
-				.attr("dy",response.xWidth + 10)
-				.style("text-anchor", "middle")
-				.text(response.xName);
+					.attr("transform", "translate(" + main_width/2 + ",0)")
+					.attr("dy",response.xWidth + 10)
+					.style("text-anchor", "middle")
+					.text(response.xName);
 			
 			var yLabel = main.append("g") 
 				.attr("transform", "translate(-43,"+(main_height/2)+")")

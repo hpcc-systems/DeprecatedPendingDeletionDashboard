@@ -1,6 +1,8 @@
 package org.hpccsystems.dashboard.helper;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.sql.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -74,6 +76,7 @@ public class DashboardHelper {
         		navitem = (Navitem) childNavBar;
         		dashBoard = dashboardMap.get(navitem.getAttribute(Constants.DASHBOARD_ID));
         		dashBoard.setName(navitem.getLabel());
+        		dashBoard.setUpdatedDate(new Date(Calendar.getInstance().getTime().getTime()));
         		dashBoardIdList.add(dashBoard);
         	}
         	}
@@ -106,7 +109,8 @@ public class DashboardHelper {
 						dashboardService.updateDashboardSate(
 								dashboard.getDashboardId(),
 								dashboardState, count,
-								dashboard.getName());
+								dashboard.getName(),
+								dashboard.getUpdatedDate());
 						
 					} else if (!portletList.isEmpty()) {
 						// Dashboard is already persisted in the table
@@ -114,7 +118,8 @@ public class DashboardHelper {
 						dashboardService.updateDashboardDetails(
 								dashboard.getDashboardId(), count,
 								dashboard.getName(),
-								dashboard.getColumnCount());
+								dashboard.getColumnCount(),
+								dashboard.getUpdatedDate());
 						if(LOG.isDebugEnabled()){
 							LOG.debug("portletList ->" + portletList); 
 						}

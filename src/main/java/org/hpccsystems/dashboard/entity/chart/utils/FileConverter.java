@@ -4,6 +4,7 @@ import java.io.ByteArrayOutputStream;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hpccsystems.dashboard.common.Constants;
 import org.zkoss.util.media.AMedia;
 import org.zkoss.zul.Filedownload;
 import org.zkoss.zul.Listbox;
@@ -19,15 +20,16 @@ public class FileConverter {
 	/**
 	 * Writing table content into Excel File
 	 */
-	public void exportListboxToExcel(Listbox listBox) {
+	public void exportListboxToExcel(Listbox listBox,String chartTitle) {
 		org.zkoss.exporter.excel.ExcelExporter exporter = new org.zkoss.exporter.excel.ExcelExporter();	
 		exporter.getExportContext();
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		try
 		{
 		exporter.export(listBox, outputStream);
-		
-		AMedia amedia = new AMedia("Excel_Table_Report.xlsx", "xls", "application/file", outputStream.toByteArray());
+		if(Constants.CHART_TITLE.equalsIgnoreCase(chartTitle))
+			chartTitle="Excel_Table_Report";
+		AMedia amedia = new AMedia(chartTitle+".xlsx", "xls", "application/file", outputStream.toByteArray());
 		Filedownload.save(amedia);
 		
 		outputStream.close();
@@ -42,7 +44,7 @@ public class FileConverter {
 	/**
 	 * Writing table content into CSV File
 	 */
-	public void exportListboxToCsv(Listbox listBox)
+	public void exportListboxToCsv(Listbox listBox,String chartTitle)
 	{
 		try
 		{
@@ -83,8 +85,10 @@ public class FileConverter {
 			}
 			fileContent.append(itemData).append("\n");
 		}
+		if(Constants.CHART_TITLE.equalsIgnoreCase(chartTitle))
+			chartTitle="Csv_Table_Report";
 		Filedownload.save(fileContent.toString().getBytes(), "text/plain",
-				"Csv_Table_Report.csv");
+				chartTitle+".csv");
 	}
 	catch(Exception ex)
 	{

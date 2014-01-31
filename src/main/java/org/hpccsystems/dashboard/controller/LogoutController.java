@@ -1,7 +1,6 @@
 package org.hpccsystems.dashboard.controller;
 
 
-import java.sql.SQLException;
 import java.util.List;
 
 import org.apache.commons.logging.Log;
@@ -35,10 +34,12 @@ import org.zkoss.zul.Menuitem;
  */
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class LogoutController extends SelectorComposer<Component> {
-	 final Session session = Sessions.getCurrent(); 
-	 String userId =((User) session.getAttribute("user")).getUserId();
+	
+	final Session session = Sessions.getCurrent(); 
+	String userId =((User) session.getAttribute("user")).getUserId();
 	private static final  Log LOG = LogFactory.getLog(LogoutController.class);
 	private static final long serialVersionUID = 1L;	
+	
 	@WireVariable
 	private DashboardService dashboardService;
 	
@@ -67,6 +68,7 @@ public class LogoutController extends SelectorComposer<Component> {
         	LOG.debug("Source Id details while logut the application" +sourceid);
 			LOG.debug("dashBoardIdList details while logut the application" +dashBoardIdList);
 		}   
+        System.out.println("dashBoardIdList value======" +dashBoardIdList);
         //Call to DB update        
         	dashboardHelper.updateDashboardWidgetDetails(dashBoardIdList); 
         	authenticationService.logout(session.getAttribute("user"));
