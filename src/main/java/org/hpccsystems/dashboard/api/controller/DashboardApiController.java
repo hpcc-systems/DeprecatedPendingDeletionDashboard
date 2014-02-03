@@ -137,7 +137,7 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
 			JSONObject jsonResposeObj = new JSONObject();
 			JSONArray jsonObjList = new JSONArray();
 			try{
-			dashboardList = new ArrayList<Dashboard>(dashboardService.retrieveDashboardMenuPages(application,null));
+			dashboardList = new ArrayList<Dashboard>(dashboardService.retrieveDashboardMenuPages(application,null,null));
 			}catch(Exception ex){
 				LOG.error("Exception while fetching dahhboards from DB",ex);
 				jsonResposeObj.put(Constants.STATUS_FAIL,ex.getMessage());
