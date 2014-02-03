@@ -1,6 +1,8 @@
 package org.hpccsystems.dashboard.controller;
 
+import java.sql.Date;
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -18,7 +20,6 @@ import org.zkoss.zul.Radio;
 import org.zkoss.zul.Radiogroup;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Window;
-
 public class DashboardConfigurationController extends SelectorComposer<Component>{
 
 	private static final long serialVersionUID = 1L;
@@ -38,7 +39,7 @@ public class DashboardConfigurationController extends SelectorComposer<Component
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		super.doAfterCompose(comp);
-		
+		   
 		parent = (Component) Executions.getCurrent().getArg().get(Constants.PARENT);
 		
 		if(parent instanceof Window) {
@@ -72,6 +73,7 @@ public class DashboardConfigurationController extends SelectorComposer<Component
 			Dashboard dashboard = new Dashboard();
 			dashboard.setName(nameTextbox.getValue());
 			dashboard.setColumnCount(Integer.parseInt(layoutRadiogroup.getSelectedItem().getValue().toString()));
+			dashboard.setUpdatedDate(new Date(Calendar.getInstance().getTime().getTime()));
 			
 			//Deciding Columns and rows
 			Integer panelCount = null;

@@ -1,10 +1,10 @@
 package org.hpccsystems.dashboard.services;
 import java.sql.SQLException;
+import java.sql.Date;
 import java.util.List;
 
 import org.hpccsystems.dashboard.entity.Application;
 import org.hpccsystems.dashboard.entity.Dashboard;
-import org.hpccsystems.dashboard.entity.Portlet;
 
 /**
  * DashboardService is used to interact with Database for Dashboard project.
@@ -19,7 +19,7 @@ public interface DashboardService {
 		 * @param layout
 		 * @throws SQLException
 	 */
-	int addDashboardDetails(String sourceId,String source,String dashBoardName,String userId) throws Exception ;
+	int addDashboardDetails(String sourceId,String source,String dashBoardName,String userId, Date dashBoardDate) throws Exception ;
 	
 	
 	/**
@@ -27,7 +27,7 @@ public interface DashboardService {
 	 * @param viewModel
 	 * @return List<SidebarPage>
 	 */
-	List<Dashboard> retrieveDashboardMenuPages(Application application,String userId)throws Exception;
+	List<Dashboard> retrieveDashboardMenuPages(Application application,String userId,List<String> dashboardIdList)throws Exception;
 	
 	
 	
@@ -42,7 +42,7 @@ public interface DashboardService {
 	 * @param emptyState
 	 * @param sequence
 	 */
-	void updateDashboardSate(Integer dashboardId,String emptyState,int sequence,String dashboardName)throws Exception;
+	void updateDashboardSate(Integer dashboardId,String emptyState,int sequence,String dashboardName, Date updatedDate)throws Exception;
 	
 	/**
 	 * @param dashboardId
@@ -50,14 +50,7 @@ public interface DashboardService {
 	 * @param dashboardName
 	 * @param columnCount
 	 */
-	void updateDashboardDetails(Integer dashboardId,int sequence,String dashboardName,int columnCount)throws Exception;
-
+	void updateDashboardDetails(Integer dashboardId,int sequence,String dashboardName,int columnCount,Date updatedDate)throws Exception;
 	
-	/**
-	 * @param dashboardId
-	 * @return Dashboard
-	 * @throws Exception
-	 */
-	Dashboard getDashboard(Integer dashboardId,Integer sourceType)throws Exception;
 
 }

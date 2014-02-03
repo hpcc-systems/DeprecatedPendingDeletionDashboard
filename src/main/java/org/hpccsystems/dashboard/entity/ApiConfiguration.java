@@ -6,6 +6,15 @@ package org.hpccsystems.dashboard.entity;
  */
 public class ApiConfiguration {
 	private boolean apiEnabled;
+	private boolean apiChartSetting;
+
+	public boolean isApiChartSetting() {
+		return apiChartSetting;
+	}
+
+	public void setApiChartSetting(boolean apiChartSetting) {
+		this.apiChartSetting = apiChartSetting;
+	}
 
 	public boolean isApiEnabled() {
 		return apiEnabled;

@@ -43,17 +43,6 @@ public class ChartWidgetController extends GenericForwardComposer<Component> {
 	@Override
 	public void doAfterCompose(final Component comp) throws Exception {
 		super.doAfterCompose(comp);		
-
-
-		lineChartButton.setAttribute("URL", "chart/Linechart_black.jpg") ;
-		lineChartButton.setAttribute("chartType", "LineChart");
-
-		pieChartButton.setAttribute("URL", "chart/PieChart_black.jpg");
-		pieChartButton.setAttribute("chartType", "PieChart");
-		
-		tableWidget.setAttribute("URL", "chart/TableWidget.jpg");
-		tableWidget.setAttribute("chartType", "TableWidget");
-		
 		barChartButton.setAttribute(Constants.CHART_TYPE, Constants.BAR_CHART);
 		lineChartButton.setAttribute(Constants.CHART_TYPE, Constants.LINE_CHART);
 		pieChartButton.setAttribute(Constants.CHART_TYPE, Constants.PIE_CHART);

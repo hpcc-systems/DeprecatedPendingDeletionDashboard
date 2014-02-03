@@ -72,18 +72,22 @@ public class LoginController extends SelectorComposer<Component> {
 	@Override
 	public void doAfterCompose(final Component comp) throws Exception {
 		super.doAfterCompose(comp);
+		
+		//Redirecting if the user is already logged in.
+		if(!authenticationService.getUserCredential().isAnonymous()) {
+			Executions.sendRedirect("/demo/");
+			return;
+		}
+		
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Handling 'doAfterCompose' in LoginController");
 			LOG.debug("dashboardService:loginctrler -->"+dashboardService);
 		}
-		try
-		{			
-		final List<Application> applicationList = new ArrayList<Application>(applicationService.retrieveApplicationIds());
-		final ListModelList<Application> appModel = new ListModelList<Application>(applicationList);
-		apps.setModel(appModel);
-		}
-		catch(Exception ex)
-		{
+		try	{			
+			final List<Application> applicationList = new ArrayList<Application>(applicationService.retrieveApplicationIds());
+			final ListModelList<Application> appModel = new ListModelList<Application>(applicationList);
+			apps.setModel(appModel);
+		} catch(Exception ex) {
 			Clients.showNotification("Unable to retrieve applications from DB. Please try reloading the page", false);
 			LOG.error("Exception while fetching applications from DB", ex);
 		}
@@ -95,9 +99,11 @@ public class LoginController extends SelectorComposer<Component> {
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Handling 'doLogin' in LoginController");
 		}
-
+		
 		final String name = account.getValue();
 		final String passWord = password.getValue();
+		final Session session = Sessions.getCurrent();
+		
 		User user = null;
 		try	{
 			user =authenticationService.authendicateUser(name,passWord);
@@ -124,7 +130,6 @@ public class LoginController extends SelectorComposer<Component> {
 		
 		//Fetching the present application Id and setting into session
 		LOG.debug("the present application Id and setting into session");
-		final Session session = Sessions.getCurrent();
 		session.setAttribute("sourceid", apps.getItemAtIndex(apps.getSelectedIndex()).getValue());
 		session.setAttribute("source", apps.getItemAtIndex(apps.getSelectedIndex()).getLabel());
 		session.setAttribute("user", user);
@@ -136,6 +141,7 @@ public class LoginController extends SelectorComposer<Component> {
 		session.setAttribute("userCredential",cre);
 		
 		LOG.debug("Loged in. sending redirect...");
-		Executions.sendRedirect("/demo/");
+		Executions.sendRedirect("/demo/");		
 	}
+	
 }

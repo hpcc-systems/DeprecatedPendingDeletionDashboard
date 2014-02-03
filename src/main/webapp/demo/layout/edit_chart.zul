@@ -1,4 +1,6 @@
-<hlayout id="editLayout" apply="org.hpccsystems.dashboard.controller.EditChartController">
+
+<vlayout  apply="org.hpccsystems.dashboard.controller.EditChartController">
+ <hlayout id="editLayout">
  	<vbox spacing="0em">
  		<vbox height="270px">
  			<listbox width="200px" vflex="1" id="measureListBox" droppable="true"> 
@@ -44,3 +46,11 @@
  	
  	</div>
  </hlayout>
+ <div id ="apiChartSettingDiv"  if="${sessionScope.apiConfiguration.apiChartSetting}">
+	 <hbox>
+		 <button id="apiSaveButton" tooltip="Save Chart data" iconSclass="glyphicon glyphicon-floppy-disk" zclass="btn btn-sm btn-success" label=" Save " /> 
+		 <button id="apiCancelButton" tooltip="Cancel Chart data" iconSclass="glyphicon glyphicon-floppy-remove" zclass="btn btn-sm btn-danger" label=" Cancel "/> 
+	 </hbox>
+ </div>
+ </vlayout>
+ 

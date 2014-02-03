@@ -1,5 +1,6 @@
 package org.hpccsystems.dashboard.dao;
 
+import java.sql.Date;
 import java.sql.SQLException;
 import java.util.List;
 
@@ -20,7 +21,7 @@ public interface DashboardDao {
 	 * @param layout
 	 * @throws SQLException
 	 */
-	 int addDashboardDetails(String sourceId,String source,String dashBoardName,String userId) throws DataAccessException ;
+	 int addDashboardDetails(String sourceId,String source,String dashBoardName,String userId, Date dashBoardDate) throws DataAccessException ;
 	
 	 /**
 	  * Fetching DashboardMenuPages details from dashboard_details table.
@@ -28,7 +29,7 @@ public interface DashboardDao {
 	 * @return List<DashboardMenu>
 	 * @throws DataAccessException
 	 */
-	List<Dashboard> fetchDashboardDetails(Application application,String userId) throws DataAccessException;	
+	List<Dashboard> fetchDashboardDetails(Application application,String userId,List<String> dashboardIdList) throws DataAccessException;	
 	
 	/**
 	 * method to delete dashboard
@@ -44,7 +45,7 @@ public interface DashboardDao {
 	 * @param sequence
 	 * @param dashboardName
 	 */
-	void updateDashboardState(Integer dashboardId,String emptyState,int sequence,String dashboardName) throws DataAccessException;
+	void updateDashboardState(Integer dashboardId,String emptyState,int sequence,String dashboardName, Date updatedDate) throws DataAccessException;
 	
 	/**
 	 * Method to update entire dashboard details
@@ -53,13 +54,7 @@ public interface DashboardDao {
 	 * @param dashboardName
 	 * @param columnCount
 	 */
-	void updateDashboardDetails(Integer dashboardId,int sequence,String dashboardName,int columnCount) throws DataAccessException;
+	void updateDashboardDetails(Integer dashboardId,int sequence,String dashboardName,int columnCount, Date updatedDate) throws DataAccessException;
 	
-	/**
-	 * @param dashboardId
-	 * @return Dashboard
-	 * @throws Exception
-	 */
-	Dashboard getDashboard(Integer dashboardId,Integer sourceType) throws DataAccessException;
 
 }

@@ -32,8 +32,7 @@ public class TableRenderer {
 		public void setFileConverter(FileConverter fileConverter) {
 			this.fileConverter = fileConverter;
 		}
-
-	
+		
 		/**
 		 * Constructs a table widget
 		 * 
@@ -44,10 +43,9 @@ public class TableRenderer {
 		 * @return
 		 * 	Table as Listbox
 		 */	
-		public Vbox constructTableWidget(LinkedHashMap<String, List<String>> tableDataMap, Boolean isEditing){		
+		public Vbox constructTableWidget(LinkedHashMap<String, List<String>> tableDataMap, Boolean isEditing,final String chartTitle){		
 			
 			final Listbox listBox = new Listbox();
-			
 			listBox.setMold("paging");
 			listBox.setSizedByContent(true);
 			listBox.setHflex("1");
@@ -96,7 +94,7 @@ public class TableRenderer {
 			button.setLabel("Excel");
 			button.addEventListener(Events.ON_CLICK, new EventListener<Event>() {
 				public void onEvent(Event event) throws Exception {
-					fileConverter.exportListboxToExcel(listBox);
+					fileConverter.exportListboxToExcel(listBox,chartTitle);
 				}
 			});
 			hbox.appendChild(button);
@@ -107,7 +105,7 @@ public class TableRenderer {
 			button.setLabel("CSV");
 			button.addEventListener(Events.ON_CLICK, new EventListener<Event>() {
 				public void onEvent(Event event) throws Exception {
-					fileConverter.exportListboxToCsv(listBox);
+					fileConverter.exportListboxToCsv(listBox,chartTitle);
 				}
 			});
 			hbox.appendChild(button);

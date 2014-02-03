@@ -1,5 +1,6 @@
 package org.hpccsystems.dashboard.controller;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -84,26 +85,31 @@ public class SidebarController extends GenericForwardComposer<Component>{
 		List<Dashboard> sideBarPageList = null;
 		try	{
 			//Circuit/External Source Flow	
-			if(apiConfig != null && apiConfig.isApiEnabled()){			
+			if(apiConfig != null && apiConfig.isApiEnabled()){
+				List<String> dashboardIdList = new ArrayList<String>();				
 				String dashboardId =  Executions.getCurrent().getParameter(Constants.DB_DASHBOARD_ID);
 				String sourceTypeString =  Executions.getCurrent().getParameter(Constants.SOURCE);
-				Integer sourceTypeInt = 0;
+				String sourceId = Executions.getCurrent().getParameter(Constants.SOURCE_ID);
+				dashboardIdList.add(dashboardId);
+				viewModel.setAppId(sourceId);
+				viewModel.setAppName(sourceTypeString);				
 				if(sourceTypeString != null){
-					sourceTypeInt =Constants.SOURCE_TYPE_ID.get(sourceTypeString.trim());
+					viewModel.setAppTypeId(Constants.SOURCE_TYPE_ID.get(sourceTypeString.trim()));
 				}
 				if(LOG.isDebugEnabled()){
 					LOG.debug("External Source: "+sourceTypeString);
 					LOG.debug("Requested Dashboard Id : "+dashboardId);
 				}
-				Dashboard dashboard = dashboardService.getDashboard(Integer.valueOf(dashboardId), Integer.valueOf(sourceTypeInt));
-				sideBarPageList =new ArrayList<Dashboard>();
-				sideBarPageList.add(dashboard);
+				sideBarPageList =new ArrayList<Dashboard>(dashboardService.retrieveDashboardMenuPages(viewModel,user.getUserId(),dashboardIdList));	
+				if(LOG.isDebugEnabled()){
+					LOG.debug("sideBarPageList: "+sideBarPageList);
+				}
 			}//Dashboard Flow
 			else
 			{
 				//Add dashboard
 				addDash.addEventListener(Events.ON_CLICK, addDashboardBtnLisnr);				
-				sideBarPageList =new ArrayList<Dashboard>(dashboardService.retrieveDashboardMenuPages(viewModel,user.getUserId()));		
+				sideBarPageList =new ArrayList<Dashboard>(dashboardService.retrieveDashboardMenuPages(viewModel,user.getUserId(),null));		
 			}
 		} catch(Exception ex) {
 			Clients.showNotification("Unable to retrieve available Dashboards. Please try reloading the page.", true);
@@ -281,7 +287,8 @@ public class SidebarController extends GenericForwardComposer<Component>{
 			User user = (User)session.getAttribute("user");
 			dashboard.setDashboardId(
 					dashboardService.addDashboardDetails(
-							sourceId,source, dashboard.getName(),user.getUserId()
+							sourceId,source, dashboard.getName(),user.getUserId(),
+							new Date(new java.util.Date().getTime())
 						)
 				);
 		} catch (Exception exception) {

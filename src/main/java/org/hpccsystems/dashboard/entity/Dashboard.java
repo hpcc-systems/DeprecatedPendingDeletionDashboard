@@ -1,6 +1,7 @@
 package org.hpccsystems.dashboard.entity;
 
 import java.util.ArrayList;
+import java.sql.Date;
 
 /**
  * This class is model for Dashboard.
@@ -15,6 +16,7 @@ public class Dashboard {
 		.append(", dashboardId=").append(dashboardId).append(", applicationId=" )
 		.append(applicationId).append(", dashboardState=").append(dashboardState)
 		.append(", isPersisted=").append(isPersisted).append(", portletList=").append(portletList)
+		.append(", updatedDate=").append(updatedDate)
 		.append("]");
 		return buffer.toString();
 	}
@@ -26,6 +28,7 @@ public class Dashboard {
 	
 	private String applicationId;
 	private String dashboardState;
+	private Date updatedDate;
 	
 	public String getDashboardState() {
 		return dashboardState;
@@ -33,6 +36,21 @@ public class Dashboard {
 
 	public void setDashboardState(String dashboardState) {
 		this.dashboardState = dashboardState;
+	}
+
+
+	/**
+	 * @return the updatedDate
+	 */
+	public final Date getUpdatedDate() {
+		return updatedDate;
+	}
+
+	/**
+	 * @param updatedDate the updatedDate to set
+	 */
+	public final void setUpdatedDate(Date updatedDate) {
+		this.updatedDate = updatedDate;
 	}
 
 	public String getApplicationId() {

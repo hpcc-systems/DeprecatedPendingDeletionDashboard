@@ -9,9 +9,35 @@ public class HpccConnection {
 	
 	String username;
 	String password;
-		
 	Boolean isSSL;
 	Boolean allowInvalidCerts;
+	public HpccConnection(String hostIp, Integer port, String clusterName,
+			String username, String password, Boolean isSSL,
+			Boolean allowInvalidCerts) {
+		super();
+		this.hostIp = hostIp;
+		this.port = port;
+		this.clusterName = clusterName;
+		this.username = username;
+		this.password = password;
+		this.isSSL = isSSL;
+		this.allowInvalidCerts = allowInvalidCerts;
+	}
+	public HpccConnection() {
+		super();
+	}
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("HpccConnection [hostIp=").append(hostIp)
+				.append(", port=").append(port).append(", clusterName=")
+				.append(clusterName).append(", username=").append(username)
+				.append(", password=").append(password).append(", isSSL=")
+				.append(isSSL).append(", allowInvalidCerts=")
+				.append(allowInvalidCerts).append("]");
+		return builder.toString() ;
+	}
+	
 	
 	@XmlElement
 	public String getHostIp() {

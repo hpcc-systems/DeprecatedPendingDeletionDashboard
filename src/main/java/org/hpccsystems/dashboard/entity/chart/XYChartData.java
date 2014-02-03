@@ -16,6 +16,18 @@ public class XYChartData {
 	private String fileName;
 	
 	private List<String> xColumnNames;
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("XYChartData [sourceType=").append(sourceType)
+				.append(", hpccConnection=").append(hpccConnection).append(", fileName=")
+				.append(fileName).append(", xColumnNames=").append(xColumnNames)
+				.append(", yColumnNames=" ).append(yColumnNames).append(", tableColumns=")
+				.append(tableColumns).append(", isFiltered=")
+				.append(isFiltered).append(", filter=").append(filter).append("]");
+		return  builder.toString();
+	}
+
 	private List<String> yColumnNames;
 	private List<String> tableColumns;
 	

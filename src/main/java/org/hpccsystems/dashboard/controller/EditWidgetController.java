@@ -122,7 +122,7 @@ public class EditWidgetController extends SelectorComposer<Component> {
 			div.getChildren().clear();
 			div.appendChild(
 					tableRenderer.constructTableWidget(
-							portlet.getTableDataMap(), false
+							portlet.getTableDataMap(), false,portlet.getName()
 							)
 						);
 			editPortletWindow.detach();

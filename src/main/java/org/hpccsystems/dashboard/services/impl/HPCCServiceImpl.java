@@ -101,6 +101,7 @@ public class HPCCServiceImpl implements HPCCService{
 					{
 						columnObj=rowString.split(" ");
 						if(columnObj!=null && columnObj.length>1){
+						//put columnName as map 'key' and column datatype as map 'value'
 						schemaMap.put(columnObj[1], columnObj[0]);
 						}
 					}

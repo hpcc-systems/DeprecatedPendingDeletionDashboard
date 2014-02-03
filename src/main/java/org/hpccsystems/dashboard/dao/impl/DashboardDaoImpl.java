@@ -1,6 +1,7 @@
 package org.hpccsystems.dashboard.dao.impl;
 
 import java.sql.SQLException;
+import java.sql.Date;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -43,25 +44,33 @@ public class DashboardDaoImpl implements DashboardDao {
 	 * @throws DataAccessException
 	 */
 	@SuppressWarnings("unchecked")
-	public List<Dashboard> fetchDashboardDetails(final Application application,final String userId)
- throws DataAccessException {
+	public List<Dashboard> fetchDashboardDetails(final Application application,final String userId,List<String> dashboardIdList)
+			throws DataAccessException {
+		List<Dashboard> dashboardList = null;
 		StringBuilder sqlBuffer = new StringBuilder();
-		sqlBuffer
-				.append(Queries.RETRIEVE_DASHBOARD)
-				.append(application.getAppId());
-			//TODO:need to remove this userId null check,when Circuit passing the user details
-				if(userId == null){
-					sqlBuffer.append("' order by sequence");
-				}else{
-					sqlBuffer.append("' and user_id='")
-					.append(userId).append("' order by sequence");
+		sqlBuffer.append(Queries.RETRIEVE_DASHBOARD_DETAILS).append(
+				application.getAppId());
+		if (userId != null && dashboardIdList == null) {
+			sqlBuffer.append("' and user_id='").append(userId)
+					.append("' order by sequence");
+		} else if (dashboardIdList != null && dashboardIdList.size() > 0) {
+			sqlBuffer.append(Queries.DASHBOARD_IN_CLAUSE).append("( '");
+			int count = 1;
+			for (String dashboardId : dashboardIdList) {
+				sqlBuffer.append(dashboardId).append("'");
+				if (count != dashboardIdList.size()) {
+					sqlBuffer.append(",'");
 				}
-
-		List<Dashboard> dashboardList = getJdbcTemplate().query(sqlBuffer.toString(),
+				count++;
+			}
+			sqlBuffer.append(")").append(" order by sequence");
+		}
+		LOG.info("retrieveDashboardDetails() Query -->" + sqlBuffer);
+		dashboardList = getJdbcTemplate().query(sqlBuffer.toString(),
 				new DashboardRowMapper());
+
 		return dashboardList;
 	}
-
 	
 
 	/**
@@ -72,13 +81,14 @@ public class DashboardDaoImpl implements DashboardDao {
 	 * @throws SQLException
 	 */
 	public int addDashboardDetails(final String sourceId,final String source, final String dashBoardName,
-			final String userId	)throws DataAccessException {
+			final String userId, final Date dashBoardDate)throws DataAccessException {
 
 		getJdbcTemplate().update(Queries.INSERT_DASHBOARD, new Object[] { 
 				dashBoardName,
 				userId,
 				Constants.SOURCE_TYPE_ID.get(source),
-				sourceId  
+				sourceId ,
+				dashBoardDate
 		});
 		
 		return getJdbcTemplate().queryForObject(Queries.GET_MAX_DASHBOARD_ID, new Object[] {userId} , Integer.class);
@@ -106,33 +116,27 @@ public class DashboardDaoImpl implements DashboardDao {
 
 
 	public void updateDashboardState(final Integer dashboardId,final String emptyState,
-			final int sequence,final String dashboardName) throws DataAccessException {
-		
+			final int sequence,final String dashboardName, Date updatedDate) throws DataAccessException {
 		getJdbcTemplate().update(Queries.UPDATE_DASHBOARD_STATE, new Object[] { 
 				emptyState,
 				sequence,
 				dashboardName,
+				updatedDate,
 				dashboardId
+				
 		});
 	}
 
 	public void updateDashboardDetails(Integer dashboardId, int sequence,
-			String dashboardName, int columnCount) throws DataAccessException {
-		
+			String dashboardName, int columnCount, Date updatedDate) throws DataAccessException {
 		getJdbcTemplate().update(Queries.UPDATE_DASHBOARD_DETAILS, new Object[] { 
 				sequence,
 				dashboardName,
-				columnCount,
+				columnCount,				
+				updatedDate,
 				dashboardId
 		});
 	}
-
-	@Override
-	public Dashboard getDashboard(Integer dashboardId,Integer sourceType)
-			throws DataAccessException {
-		Dashboard dashboard = getJdbcTemplate().queryForObject(Queries.GET_DASHBOARD, new Object[] { 
-				dashboardId,sourceType}, new  DashboardRowMapper());
-		return dashboard;
-	}	
+		
 	
 }
