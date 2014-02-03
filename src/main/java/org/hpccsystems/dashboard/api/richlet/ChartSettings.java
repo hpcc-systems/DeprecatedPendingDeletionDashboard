@@ -24,30 +24,38 @@ public class ChartSettings extends GenericRichlet{
 		String config;
 		
 		try {
+			try{
 			Map<String, String[]> args = Executions.getCurrent().getParameterMap();
 			source = args.get("source")[0];
 			sourceId = args.get("source_id")[0];
 			format = args.get("format")[0];
 			config = args.get("config")[0];
+			}catch(Exception ex){
+				Clients.showNotification("Malformated URL string", false);
+				LOG.error("Exception while parsing Request Parameter in ChartSettings.service()", ex);
+				return;			
+			}
+			ApiConfiguration apiConfig = new ApiConfiguration();
+			apiConfig.setApiChartSetting(true);
+			Sessions.getCurrent().setAttribute("apiConfiguration", apiConfig);	
+			//TODO: have to set user details into session
+			Sessions.getCurrent().setAttribute("user", new User());	
+			if(LOG.isDebugEnabled()) {
+				LOG.debug("Creating API edit portlet screen...");
+			}
+			StringBuilder url = new StringBuilder("/demo/layout/edit_chart.zul?");
+			url.append("source").append("=").append(source).append("&")
+					.append("source_id").append("=").append(sourceId).append("&")
+					.append("format").append("=").append(format).append("&")
+					.append("config").append("=").append(config);
+			Executions.sendRedirect(url.toString());		
 		} catch (Exception e) {
-			Clients.showNotification("Malformated URL string", false);
+			Clients.showNotification("Unable to open Configure Window.Please input correct data", false);
+			LOG.error("Exception while parsing Request Parameter in ChartSettings.service()", e);
 			//Executions.sendRedirect("/demo/index.zul");
 			return;
 		}
-		ApiConfiguration apiConfig = new ApiConfiguration();
-		apiConfig.setApiChartSetting(true);
-		Sessions.getCurrent().setAttribute("apiConfiguration", apiConfig);	
-		//TODO: have to set user details into session
-		Sessions.getCurrent().setAttribute("user", new User());	
-		if(LOG.isDebugEnabled()) {
-			LOG.debug("Creating API edit portlet screen...");
-		}
-		StringBuilder url = new StringBuilder("/demo/layout/edit_chart.zul?");
-		url.append("source").append("=").append(source).append("&")
-				.append("source_id").append("=").append(sourceId).append("&")
-				.append("format").append("=").append(format).append("&")
-				.append("config").append("=").append(config);
-		Executions.sendRedirect(url.toString());		
+		
 	}
 
 }

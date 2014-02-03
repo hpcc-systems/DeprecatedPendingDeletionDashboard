@@ -170,11 +170,9 @@ public class DashboardController extends SelectorComposer<Component>{
 				ChartPanel panel = null;
 				for (Portlet portlet : dashboard.getPortletList()) {
 					if(!portlet.getWidgetState().equals(Constants.STATE_DELETE)){
-						//System.out.println("portlet.getWidgetState() -->"+portlet.getWidgetState());
 						//Constructing chart data only when live chart is drawn
 						if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())){
 							chartData = chartRenderer.parseXML(portlet.getChartDataXML());
-							//System.out.println(chartData);
 							if(portlet.getChartType().equals(Constants.TABLE_WIDGET)){
 								//Fetching data and setting into portlet to construct Table Widget
 								try{
