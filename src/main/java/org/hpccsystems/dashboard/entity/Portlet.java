@@ -8,6 +8,23 @@ import java.util.LinkedHashMap;
  */
 public class Portlet {
 	
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Portlet [name=").append(name)
+				.append(", id=").append(id)
+				.append(", chartType=").append(chartType)
+				.append(", xColName=").append(xColName)
+				.append(", yColName=").append(yColName)
+				.append(", widgetState=").append(widgetState)
+				.append(", chartDataXML=").append(chartDataXML)
+				.append(", chartDataJSON=").append(chartDataJSON)
+				.append(", tableDataMap=").append(tableDataMap)
+				.append(", persisted=").append(persisted)
+				.append(", widgetSequence=").append(widgetSequence)
+				.append(", column=").append(column).append("]");
+		return  builder.toString() ;
+	}
 	private String name;
 	private Integer id;
 	private Integer chartType;

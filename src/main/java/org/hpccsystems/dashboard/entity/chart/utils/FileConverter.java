@@ -1,9 +1,11 @@
 package org.hpccsystems.dashboard.entity.chart.utils;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hpccsystems.dashboard.common.Constants;
 import org.zkoss.util.media.AMedia;
 import org.zkoss.zul.Filedownload;
 import org.zkoss.zul.Listbox;
@@ -19,15 +21,16 @@ public class FileConverter {
 	/**
 	 * Writing table content into Excel File
 	 */
-	public void exportListboxToExcel(Listbox listBox) {
+	public void exportListboxToExcel(Listbox listBox,String chartTitle) {
 		org.zkoss.exporter.excel.ExcelExporter exporter = new org.zkoss.exporter.excel.ExcelExporter();	
 		exporter.getExportContext();
 		ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
 		try
-		{
+		{		
 		exporter.export(listBox, outputStream);
-		
-		AMedia amedia = new AMedia("Excel_Table_Report.xlsx", "xls", "application/file", outputStream.toByteArray());
+		if(Constants.CHART_TITLE.equalsIgnoreCase(chartTitle))
+			chartTitle="Excel_Table_Report";
+		AMedia amedia = new AMedia(chartTitle+".xlsx", "xls", "application/file", outputStream.toByteArray());
 		Filedownload.save(amedia);
 		
 		outputStream.close();
@@ -35,6 +38,13 @@ public class FileConverter {
 		catch(Exception ex)
 		{
 			LOG.error("Exception while writing to Excel" , ex);
+		}finally{
+			try{
+				outputStream.close();
+			}catch(IOException ex)
+			{
+				LOG.error("Exception while closing OutputStream" , ex);
+			}
 		}
 		
 	}
@@ -42,15 +52,15 @@ public class FileConverter {
 	/**
 	 * Writing table content into CSV File
 	 */
-	public void exportListboxToCsv(Listbox listBox)
+	public void exportListboxToCsv(Listbox listBox,String chartTitle)
 	{
 		try
 		{
 		StringBuffer comma = new StringBuffer(",");
 		StringBuffer fileContent = new StringBuffer();
-
+		StringBuffer headerData = null;
 		for (Object head : listBox.getHeads()) {
-			StringBuffer headerData = new StringBuffer("");
+			headerData = new StringBuffer("");
 			int headCount = 1;
 			for (Object header : ((Listhead) head).getChildren()) {				
 				headerData.append(((Listheader) header).getLabel());
@@ -62,17 +72,20 @@ public class FileConverter {
 			}
 			fileContent.append(headerData).append("\n");
 		}
-		
+		StringBuffer itemData = null;
+		int cellCount = 0;
+		StringBuffer cellData = null;
 		for (Object item : listBox.getItems()) {
-			StringBuffer itemData = new StringBuffer("");
-			int cellCount = 1;
+			itemData = new StringBuffer("");
+			cellCount = 1;
 			for (Object cell : ((Listitem) item).getChildren()) {
-				StringBuffer cellData = new StringBuffer();
+				cellData = new StringBuffer();
 				 cellData.append(((Listcell) cell).getLabel());
 				if(cellData.toString().matches("^[a-zA-Z0-9 -!$%^&*()_+|~]*$")
 						 && !cellData.toString().matches("^[0-9]*$"))
 				{
-					cellData=new StringBuffer("\"").append(cellData).append("\"");
+					cellData.delete(0, cellData.length());
+					cellData.append("\"").append(cellData).append("\"");
 				}
 				itemData.append(cellData.toString());
 				if(cellCount != ((Listitem) item).getChildren().size())
@@ -83,8 +96,10 @@ public class FileConverter {
 			}
 			fileContent.append(itemData).append("\n");
 		}
+		if(Constants.CHART_TITLE.equalsIgnoreCase(chartTitle))
+			chartTitle="Csv_Table_Report";
 		Filedownload.save(fileContent.toString().getBytes(), "text/plain",
-				"Csv_Table_Report.csv");
+				chartTitle+".csv");
 	}
 	catch(Exception ex)
 	{
