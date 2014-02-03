@@ -7,6 +7,7 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.common.Constants;
+import org.hpccsystems.dashboard.entity.ApiConfiguration;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.entity.chart.utils.TableRenderer;
@@ -103,8 +104,11 @@ public class ChartPanel extends Panel {
 		deleteBtn.addEventListener(Events.ON_CLICK, deleteListener);
 
 		toolbar.appendChild(addBtn);
+		ApiConfiguration apiConfig = (ApiConfiguration) Sessions.getCurrent().getAttribute("apiConfiguration");
+		if(apiConfig == null){
 		toolbar.appendChild(resetBtn);
 		toolbar.appendChild(deleteBtn);
+		}
 
 		hbox.appendChild(textbox);
 		hbox.appendChild(toolbar);
