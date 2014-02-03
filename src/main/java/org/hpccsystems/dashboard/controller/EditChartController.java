@@ -120,7 +120,7 @@ public class EditChartController extends SelectorComposer<Component> {
 			//apiCancelButton.addEventListener(Events.ON_CLICK, saveApiChartSettings);
 		}
 		//Dashboard chart edit flow
-		if(apiConfig == null)
+		if(apiConfig == null || (apiConfig != null && apiConfig.isApiEnabled()))
 		{
 		portlet = (Portlet) Executions.getCurrent().getAttribute(Constants.PORTLET);
 		
@@ -219,7 +219,7 @@ public class EditChartController extends SelectorComposer<Component> {
 		yAxisDropped = true;
 		chartData.getYColumnNames().add(draggedListitem.getLabel());
 		//need to render chart only in dashboard flow.Not in Api Chart config/edit flow
-		if(apiConfig == null){
+		if(apiConfig == null || (apiConfig != null && apiConfig.isApiEnabled())){
 		if(xAxisDropped){
 			
 			try	{
@@ -284,7 +284,7 @@ public class EditChartController extends SelectorComposer<Component> {
 			chartData.getYColumnNames().remove(axisName);
 			
 			//Disabling doneButton in Api chart config/edit flow
-			if(apiConfig == null){	
+			if(apiConfig == null || (apiConfig != null && apiConfig.isApiEnabled())){	
 			doneButton.setDisabled(true);
 			filterListBox.setDroppable("false");
 			
@@ -330,7 +330,7 @@ public class EditChartController extends SelectorComposer<Component> {
 		xAxisDropped = true;
 		chartData.getXColumnNames().add(draggedListitem.getLabel());
 		//need to render chart only in dashboard flow.Not in Api Chart config/edit flow
-		if(apiConfig == null){
+		if(apiConfig == null || (apiConfig != null && apiConfig.isApiEnabled())){
 		if(yAxisDropped){
 			
 			try	{
@@ -381,7 +381,7 @@ public class EditChartController extends SelectorComposer<Component> {
 			chartData.getXColumnNames().remove(axisName);
 			
 			//Disabling doneButton in Api Chart config/edit flow
-			if(apiConfig == null){		
+			if(apiConfig == null || (apiConfig != null && apiConfig.isApiEnabled())){		
 			filterListBox.setDroppable("false");
 			doneButton.setDisabled(true);
 			
