@@ -1,6 +1,5 @@
 package org.hpccsystems.dashboard.controller;
-
-import java.sql.Date;
+ 
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -110,6 +109,7 @@ public class SidebarController extends GenericForwardComposer<Component>{
 				//Add dashboard
 				addDash.addEventListener(Events.ON_CLICK, addDashboardBtnLisnr);				
 				sideBarPageList =new ArrayList<Dashboard>(dashboardService.retrieveDashboardMenuPages(viewModel,user.getUserId(),null));		
+
 			}
 		} catch(Exception ex) {
 			Clients.showNotification("Unable to retrieve available Dashboards. Please try reloading the page.", true);
@@ -285,12 +285,7 @@ public class SidebarController extends GenericForwardComposer<Component>{
 			sourceId = (String) session.getAttribute("sourceid");
 			source = (String) session.getAttribute("source");
 			User user = (User)session.getAttribute("user");
-			dashboard.setDashboardId(
-					dashboardService.addDashboardDetails(
-							sourceId,source, dashboard.getName(),user.getUserId(),
-							new Date(new java.util.Date().getTime())
-						)
-				);
+			dashboard.setDashboardId(dashboardService.addDashboardDetails(sourceId,source, dashboard.getName(),user.getUserId(),dashboard.getUpdatedDate()));
 		} catch (Exception exception) {
 			Clients.showNotification("Adding new Dashboard failed. Please try again", true);
 			LOG.error("Exception while adding new dashboard to DB", exception);

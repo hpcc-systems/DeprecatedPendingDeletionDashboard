@@ -68,6 +68,7 @@ public class LogoutController extends SelectorComposer<Component> {
         	LOG.debug("Source Id details while logut the application" +sourceid);
 			LOG.debug("dashBoardIdList details while logut the application" +dashBoardIdList);
 		}   
+        System.out.println("dashBoardIdList value======" +dashBoardIdList);
         //Call to DB update        
         	dashboardHelper.updateDashboardWidgetDetails(dashBoardIdList); 
         	authenticationService.logout(session.getAttribute("user"));
