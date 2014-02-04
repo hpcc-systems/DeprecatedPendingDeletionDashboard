@@ -269,7 +269,8 @@ public class SidebarController extends GenericForwardComposer<Component>{
 			sourceId = (String) session.getAttribute("sourceid");
 			source = (String) session.getAttribute("source");
 			User user = (User)session.getAttribute("user");
-			dashboard.setDashboardId(dashboardService.addDashboardDetails(sourceId,source, dashboard.getName(),user.getUserId(),dashboard.getUpdatedDate()));
+			final Application application = new Application(sourceId,source,Constants.SOURCE_TYPE_ID.get(source));
+			dashboard.setDashboardId(dashboardService.addDashboardDetails(dashboard,application,user.getUserId()));
 		} catch (Exception exception) {
 			Clients.showNotification("Adding new Dashboard failed. Please try again", true);
 			LOG.error("Exception while adding new dashboard to DB", exception);

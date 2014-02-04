@@ -11,6 +11,7 @@ import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.Sessions;
 import org.zkoss.zk.ui.util.Clients;
 
+
 public class ChartSettings extends GenericRichlet{
 
 	private static final Log LOG = LogFactory.getLog(ChartSettings.class);
@@ -38,7 +39,12 @@ public class ChartSettings extends GenericRichlet{
 			apiConfig.setApiChartSetting(true);
 			Sessions.getCurrent().setAttribute("apiConfiguration", apiConfig);	
 			//TODO: have to set user details into session
-			Sessions.getCurrent().setAttribute("user", new User());	
+			User user =  new User();
+			user.setFullName("admin");
+			user.setUserId("2");
+			user.setValidUser(true);
+			user.setActiveFlag("Y"); 
+			Sessions.getCurrent().setAttribute("user", user);	
 			if(LOG.isDebugEnabled()) {
 				LOG.debug("Creating API edit portlet screen...");
 			}

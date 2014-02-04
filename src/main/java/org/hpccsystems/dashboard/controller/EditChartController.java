@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.api.entity.ChartConfiguration;
@@ -20,6 +21,7 @@ import org.hpccsystems.dashboard.entity.chart.XYModel;
 import org.hpccsystems.dashboard.entity.chart.utils.ChartRenderer;
 import org.hpccsystems.dashboard.services.DashboardService;
 import org.hpccsystems.dashboard.services.HPCCService;
+import org.hpccsystems.dashboard.services.WidgetService;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
@@ -39,8 +41,9 @@ import org.zkoss.zul.Include;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Listitem;
+import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Popup;
-
+import org.zkoss.zul.Vlayout;
 import com.google.gson.GsonBuilder;
 
 /**
@@ -64,6 +67,9 @@ public class EditChartController extends SelectorComposer<Component> {
 	
 	@WireVariable
 	HPCCService hpccService;
+	
+	@WireVariable
+	private WidgetService widgetService;	
 
 	@Wire
 	Listbox measureListBox;
@@ -97,6 +103,8 @@ public class EditChartController extends SelectorComposer<Component> {
 	Button apiSaveButton;
 	@Wire
 	Button apiCancelButton;
+	@Wire
+	Vlayout editWindowLayout;
 	
 	List<String> parameterList = new ArrayList<String>();
 	final Map<String, Object> parameters = new HashMap<String, Object>();
@@ -113,9 +121,7 @@ public class EditChartController extends SelectorComposer<Component> {
 		{
 			columnSchemaMap = configureChartSettingData();
 			filterListBox.setStyle("backgroundr:gray;");
-			filterListBox.invalidate();
-			apiSaveButton.addEventListener(Events.ON_CLICK, saveApiChartSettings);
-			//apiCancelButton.addEventListener(Events.ON_CLICK, saveApiChartSettings);
+			filterListBox.invalidate();			
 		}
 		//Dashboard chart edit flow
 		if(apiConfig == null || (apiConfig != null && apiConfig.isApiEnabled()))
@@ -506,18 +512,20 @@ public class EditChartController extends SelectorComposer<Component> {
 		dashboard.setApplicationId(sourceId);
 		dashboard.setColumnCount(1);
 		dashboard.setName(configuration.getDashboardTitle());
+		dashboard.setUpdatedDate(new Date(new java.util.Date().getTime()));
 		application = new Application(sourceId,source,Constants.SOURCE_TYPE_ID.get(source));
 		//creating portlet
 		Portlet portlet = new Portlet();
 		portlet.setWidgetState(Constants.STATE_LIVE_CHART);
 		portlet.setChartType(configuration.getChartType());
+		//TODO: when external source creating more than one chart,
+		//have to set portlet column dynamically
 		portlet.setColumn(0);
-		portlet.setName(configuration.getChartTitle());
-		portlet.setPersisted(false);
 		portlet.setWidgetSequence(1);
+		portlet.setName(configuration.getChartTitle());
+		portlet.setPersisted(false);		
 		portlet.setId(portlet.getWidgetSequence());
-		this.portlet = portlet;
-		
+		this.portlet = portlet;		
 		//creating chartData
 		chartData.setSourceType(Constants.SOURCE_TYPE_ID.get(source));
 		chartData.setFileName(configuration.getDatasetName());			
@@ -528,6 +536,8 @@ public class EditChartController extends SelectorComposer<Component> {
 		{
 			columnSchemaMap.put(feild.getColumnName(), feild.getDataType());
 		}
+		apiSaveButton.addEventListener(Events.ON_CLICK, saveApiChartSettings);
+		apiCancelButton.addEventListener(Events.ON_CLICK, cancelApiChartSettings);
 		return columnSchemaMap;
 	}
 	
@@ -537,10 +547,34 @@ public class EditChartController extends SelectorComposer<Component> {
 	EventListener<Event> saveApiChartSettings = new EventListener<Event>() {
 		public void onEvent(Event event) throws Exception {
 			User user = (User)Sessions.getCurrent().getAttribute("user");
+			portlet.setChartDataXML(chartRenderer.convertToXML(chartData));
+			dashboard.getPortletList().add(portlet);
 			dashboard.setDashboardId(
-					dashboardService.addDashboardDetails(
-							application.getAppId(),application.getAppName(), dashboard.getName(),user.getUserId(),
-							new Date(new java.util.Date().getTime())));
+					dashboardService.addDashboardDetails(dashboard,application ,user.getUserId()));
+			List<Portlet> newPortlets = new ArrayList<Portlet>();
+			for(Portlet widget : dashboard.getPortletList())
+			{
+				newPortlets.add(widget);
+			}
+			widgetService.addWidgetDetails(dashboard.getDashboardId(), newPortlets);
+			Messagebox.show("The Chart Settings data are Saved.You can close the window","",1,Messagebox.ON_OK);			
+			Sessions.getCurrent().removeAttribute("apiConfiguration");
+			Sessions.getCurrent().removeAttribute("user");
+			Sessions.getCurrent().removeAttribute("userCredential");	
+			editWindowLayout.detach();
+		}
+	};
+	
+	/**
+	 * Listener to Cancel API chart setting data
+	 */
+	EventListener<Event> cancelApiChartSettings = new EventListener<Event>() {
+		public void onEvent(Event event) throws Exception {
+			Messagebox.show("The Chart Settings data are not Saved.You can close the window","",1,Messagebox.ON_OK);			
+			Sessions.getCurrent().removeAttribute("apiConfiguration");
+			Sessions.getCurrent().removeAttribute("user");
+			Sessions.getCurrent().removeAttribute("userCredential");	
+			editWindowLayout.detach();
 		}
 	};
 }

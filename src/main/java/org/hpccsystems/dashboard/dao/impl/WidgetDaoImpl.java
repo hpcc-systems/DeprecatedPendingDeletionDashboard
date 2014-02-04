@@ -3,9 +3,7 @@ package org.hpccsystems.dashboard.dao.impl;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
-
 import javax.sql.DataSource;
-
 import org.apache.commons.lang.Validate;
 import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.common.Queries;
@@ -21,7 +19,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
  * Dao class to do widget related DB hits
  * @author 
  *
- */
+ */ 
 public class WidgetDaoImpl implements WidgetDao{
 	
 	private JdbcTemplate jdbcTemplate;

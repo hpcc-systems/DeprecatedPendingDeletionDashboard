@@ -43,8 +43,8 @@ public class ViewDashboard extends GenericRichlet {
 			session.setAttribute("apiConfiguration", config);
 			String sourceType =Executions.getCurrent().getParameter(Constants.SOURCE);
 			String sourceId = Executions.getCurrent().getParameter(Constants.SOURCE_ID);
-			String[] DashboardIdArray = ((String[])Executions.getCurrent().getParameterValues(Constants.DB_DASHBOARD_ID));
-			List<String> dashIdList =Arrays.asList(DashboardIdArray);
+			String[] dashboardIdArray = ((String[])Executions.getCurrent().getParameterValues(Constants.DB_DASHBOARD_ID));
+			List<String> dashIdList =Arrays.asList(dashboardIdArray);
 			StringBuilder url = new StringBuilder("/demo/index.zul?");
 			if(LOG.isDebugEnabled()){
 				LOG.debug("URL from External/Circuit source : "+url);				
