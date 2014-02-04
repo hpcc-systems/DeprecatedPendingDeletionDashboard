@@ -170,11 +170,9 @@ public class DashboardController extends SelectorComposer<Component>{
 				ChartPanel panel = null;
 				for (Portlet portlet : dashboard.getPortletList()) {
 					if(!portlet.getWidgetState().equals(Constants.STATE_DELETE)){
-						
 						//Constructing chart data only when live chart is drawn
 						if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())){
 							chartData = chartRenderer.parseXML(portlet.getChartDataXML());
-							
 							if(portlet.getChartType().equals(Constants.TABLE_WIDGET)){
 								//Fetching data and setting into portlet to construct Table Widget
 								try{
@@ -199,7 +197,6 @@ public class DashboardController extends SelectorComposer<Component>{
 						
 						panel = new ChartPanel(portlet);
 						portalChildren.get(portlet.getColumn()).appendChild(panel);
-						
 						if(panel.drawD3Graph() != null){
 							Clients.evalJavaScript(panel.drawD3Graph());
 						}

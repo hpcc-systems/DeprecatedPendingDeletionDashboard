@@ -1,6 +1,7 @@
 package org.hpccsystems.dashboard.controller;
  
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -73,11 +74,7 @@ public class SidebarController extends GenericForwardComposer<Component>{
 		
 		// Wire Spring Bean
 		Selectors.wireVariables(navBar, this, Selectors.newVariableResolvers(getClass(), null));
-		
 		final Application viewModel = new Application();
-		viewModel.setAppId((String) session.getAttribute("sourceid"));
-		viewModel.setAppName((String) session.getAttribute("source"));
-		
 		User user = (User)session.getAttribute("user");
 		apiConfig = (ApiConfiguration) session.getAttribute("apiConfiguration");
 		
@@ -85,28 +82,13 @@ public class SidebarController extends GenericForwardComposer<Component>{
 		try	{
 			//Circuit/External Source Flow	
 			if(apiConfig != null && apiConfig.isApiEnabled()){
-				List<String> dashboardIdList = new ArrayList<String>();				
-				String dashboardId =  Executions.getCurrent().getParameter(Constants.DB_DASHBOARD_ID);
-				String sourceTypeString =  Executions.getCurrent().getParameter(Constants.SOURCE);
-				String sourceId = Executions.getCurrent().getParameter(Constants.SOURCE_ID);
-				dashboardIdList.add(dashboardId);
-				viewModel.setAppId(sourceId);
-				viewModel.setAppName(sourceTypeString);				
-				if(sourceTypeString != null){
-					viewModel.setAppTypeId(Constants.SOURCE_TYPE_ID.get(sourceTypeString.trim()));
-				}
-				if(LOG.isDebugEnabled()){
-					LOG.debug("External Source: "+sourceTypeString);
-					LOG.debug("Requested Dashboard Id : "+dashboardId);
-				}
-				sideBarPageList =new ArrayList<Dashboard>(dashboardService.retrieveDashboardMenuPages(viewModel,user.getUserId(),dashboardIdList));	
-				if(LOG.isDebugEnabled()){
-					LOG.debug("sideBarPageList: "+sideBarPageList);
-				}
-			}//Dashboard Flow
+				sideBarPageList = getApiViewDashboardList(user,viewModel);				
+			}
 			else
-			{
-				//Add dashboard
+			{//Dashboard Flow
+				//Add dashboard				
+				viewModel.setAppId((String) session.getAttribute("sourceid"));
+				viewModel.setAppName((String) session.getAttribute("source"));
 				addDash.addEventListener(Events.ON_CLICK, addDashboardBtnLisnr);				
 				sideBarPageList =new ArrayList<Dashboard>(dashboardService.retrieveDashboardMenuPages(viewModel,user.getUserId(),null));		
 
@@ -225,10 +207,12 @@ public class SidebarController extends GenericForwardComposer<Component>{
 				{
 					centerComp = comp;
 				}
-			}
-			final Include newInclude = new Include("/demo/layout/dashboard.zul");
-			newInclude.setId("mainInclude");
+			}	
 			if(centerComp != null){
+				Component childComp = centerComp.getFirstChild();
+				centerComp.removeChild(childComp);
+				final Include newInclude = new Include("/demo/layout/dashboard.zul");			
+				newInclude.setId("mainInclude");
 				centerComp.appendChild(newInclude);
 			}
 		}
@@ -328,4 +312,27 @@ public class SidebarController extends GenericForwardComposer<Component>{
 			}
 		}
 	};
+	
+	private List<Dashboard> getApiViewDashboardList(final User user,final Application viewModel)throws Exception {
+		
+		String[] DashboardIdArray = ((String[])Executions.getCurrent().getParameterValues(Constants.DB_DASHBOARD_ID));
+		List<String> dashboardIdList =Arrays.asList(DashboardIdArray);
+		String sourceTypeString =  Executions.getCurrent().getParameter(Constants.SOURCE);
+		String sourceId = Executions.getCurrent().getParameter(Constants.SOURCE_ID);
+		viewModel.setAppId(sourceId);
+		viewModel.setAppName(sourceTypeString);				
+		if(sourceTypeString != null){
+			viewModel.setAppTypeId(Constants.SOURCE_TYPE_ID.get(sourceTypeString.trim()));
+		}
+		if(LOG.isDebugEnabled()){
+			LOG.debug("External Source: "+sourceTypeString);
+			LOG.debug("Requested Dashboard Id : "+dashboardIdList);
+		}
+		List<Dashboard> sideBarPageList =new ArrayList<Dashboard>(dashboardService.retrieveDashboardMenuPages(viewModel,user.getUserId(),dashboardIdList));	
+		if(LOG.isDebugEnabled()){
+			LOG.debug("sideBarPageList: "+sideBarPageList);
+		}
+		return sideBarPageList;
+		
+	}
 }

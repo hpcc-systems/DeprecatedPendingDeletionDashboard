@@ -152,8 +152,10 @@ public class DashboardHelper {
 							for (int index = 1; index <= portletList.size(); index++) {
 								// insert portlet details into widget table
 								Portlet portlet = portletList.get(index - 1);
+								if(!"D".equals(portlet.getWidgetState())){
 								portlet.setWidgetSequence(index);
-								newPortlets.add(portlet);								
+								newPortlets.add(portlet);	
+								}
 							}
 						}
 						if(LOG.isDebugEnabled()){
