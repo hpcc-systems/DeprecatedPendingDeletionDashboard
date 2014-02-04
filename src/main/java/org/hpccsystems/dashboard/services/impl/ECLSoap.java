@@ -111,11 +111,12 @@ public class ECLSoap {
 
 				Authenticator.setDefault(eclauth);
 				String host = "https://" + hostname + ":" + port + path;
+				URL url = new URL(host);
 				if(LOG.isDebugEnabled())
 				{
 					LOG.debug("HOST: " + host);
+					LOG.debug("Connection" + url.openConnection());
 				}
-				URL url = new URL(host);
 				// Send data
 				conn = url.openConnection();
 				conn.setDoOutput(true);
