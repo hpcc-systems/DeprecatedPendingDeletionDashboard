@@ -2,7 +2,6 @@ package org.hpccsystems.dashboard.dao;
 
 import java.sql.Date;
 import java.sql.SQLException;
-import java.sql.Date;
 import java.util.List;
 
 import org.hpccsystems.dashboard.entity.Application;
@@ -56,6 +55,4 @@ public interface DashboardDao {
 	 * @param columnCount
 	 */
 	void updateDashboardDetails(Integer dashboardId,int sequence,String dashboardName,int columnCount, Date updatedDate) throws DataAccessException;
-	
-
 }

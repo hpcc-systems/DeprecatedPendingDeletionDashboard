@@ -52,5 +52,4 @@ public interface DashboardService {
 	 */
 	void updateDashboardDetails(Integer dashboardId,int sequence,String dashboardName,int columnCount,Date updatedDate)throws Exception;
 	
-
 }
