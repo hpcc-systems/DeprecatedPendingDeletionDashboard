@@ -42,7 +42,7 @@ public class ChartSettings extends GenericRichlet{
 			user.setFullName("admin");
 			user.setUserId("2");
 			user.setValidUser(true);
-			user.setActiveFlag("Y");
+			user.setActiveFlag("Y"); 
 			Sessions.getCurrent().setAttribute("user", user);	
 			if(LOG.isDebugEnabled()) {
 				LOG.debug("Creating API edit portlet screen...");

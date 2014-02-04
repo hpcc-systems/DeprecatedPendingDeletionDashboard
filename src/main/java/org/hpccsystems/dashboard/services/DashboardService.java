@@ -2,7 +2,6 @@ package org.hpccsystems.dashboard.services;
 import java.sql.SQLException;
 import java.sql.Date;
 import java.util.List;
-
 import org.hpccsystems.dashboard.entity.Application;
 import org.hpccsystems.dashboard.entity.Dashboard;
 

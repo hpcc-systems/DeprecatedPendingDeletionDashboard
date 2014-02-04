@@ -3,7 +3,6 @@ package org.hpccsystems.dashboard.dao;
 import java.sql.Date;
 import java.sql.SQLException;
 import java.util.List;
-
 import org.hpccsystems.dashboard.entity.Application;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.springframework.dao.DataAccessException;

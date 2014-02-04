@@ -6,7 +6,6 @@ import java.sql.Date;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.dao.DashboardDao;
@@ -142,6 +141,5 @@ public class DashboardServiceImpl implements DashboardService {
 			throw e;
 		}
 	}
-
 	
 }

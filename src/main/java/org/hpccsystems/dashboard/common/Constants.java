@@ -1,8 +1,6 @@
 package org.hpccsystems.dashboard.common;
-
 import java.util.HashMap;
 import java.util.Map;
-
 import org.hpccsystems.dashboard.entity.ChartDetails;
 /**
  * Constants class is used to maintain the constant's for Dashboard project.

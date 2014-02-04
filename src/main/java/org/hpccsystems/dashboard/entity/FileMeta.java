@@ -2,6 +2,7 @@ package org.hpccsystems.dashboard.entity;
 
 import java.util.List;
 
+
 public class FileMeta {
 	
 	private String fileName;
