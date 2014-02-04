@@ -1,5 +1,5 @@
 
-<vlayout  apply="org.hpccsystems.dashboard.controller.EditChartController">
+<vlayout id="editWindowLayout" apply="org.hpccsystems.dashboard.controller.EditChartController">
  <hlayout id="editLayout">
  	<vbox spacing="0em">
  		<vbox height="270px">

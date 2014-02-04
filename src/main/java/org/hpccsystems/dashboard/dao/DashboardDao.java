@@ -2,12 +2,11 @@ package org.hpccsystems.dashboard.dao;
 
 import java.sql.Date;
 import java.sql.SQLException;
-import java.sql.Date;
 import java.util.List;
-
 import org.hpccsystems.dashboard.entity.Application;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.springframework.dao.DataAccessException;
+
 
 /**
  * DashboardDao class is used for database operations for Dashboard project.
@@ -22,7 +21,7 @@ public interface DashboardDao {
 	 * @param layout
 	 * @throws SQLException
 	 */
-	 int addDashboardDetails(String sourceId,String source,String dashBoardName,String userId, Date dashBoardDate) throws DataAccessException ;
+	 int addDashboardDetails(Dashboard dashboard,Application application,String userId) throws DataAccessException ;
 	
 	 /**
 	  * Fetching DashboardMenuPages details from dashboard_details table.
@@ -56,6 +55,4 @@ public interface DashboardDao {
 	 * @param columnCount
 	 */
 	void updateDashboardDetails(Integer dashboardId,int sequence,String dashboardName,int columnCount, Date updatedDate) throws DataAccessException;
-	
-
 }

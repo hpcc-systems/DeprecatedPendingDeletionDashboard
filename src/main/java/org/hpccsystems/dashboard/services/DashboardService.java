@@ -2,7 +2,6 @@ package org.hpccsystems.dashboard.services;
 import java.sql.SQLException;
 import java.sql.Date;
 import java.util.List;
-
 import org.hpccsystems.dashboard.entity.Application;
 import org.hpccsystems.dashboard.entity.Dashboard;
 
@@ -19,7 +18,7 @@ public interface DashboardService {
 		 * @param layout
 		 * @throws SQLException
 	 */
-	int addDashboardDetails(String sourceId,String source,String dashBoardName,String userId, Date dashBoardDate) throws Exception ;
+	int addDashboardDetails(Dashboard dashboard,Application application,String userId) throws Exception ;
 	
 	
 	/**
@@ -42,7 +41,7 @@ public interface DashboardService {
 	 * @param emptyState
 	 * @param sequence
 	 */
-	void updateDashboardSate(Integer dashboardId,String emptyState,int sequence,String dashboardName, Date updatedDate)throws Exception;
+	void updateDashboardState(Integer dashboardId,String emptyState,int sequence,String dashboardName, Date updatedDate)throws Exception;
 	
 	/**
 	 * @param dashboardId
@@ -52,5 +51,4 @@ public interface DashboardService {
 	 */
 	void updateDashboardDetails(Integer dashboardId,int sequence,String dashboardName,int columnCount,Date updatedDate)throws Exception;
 	
-
 }

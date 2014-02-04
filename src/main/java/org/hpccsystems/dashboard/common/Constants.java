@@ -1,9 +1,8 @@
 package org.hpccsystems.dashboard.common;
-
 import java.util.HashMap;
 import java.util.Map;
-
 import org.hpccsystems.dashboard.entity.ChartDetails;
+
 /**
  * Constants class is used to maintain the constant's for Dashboard project.
  *
@@ -154,5 +153,6 @@ public class Constants {
 	public static final String FIELD_NOT_EXIST = " is missing";
 	public static final String UPDATED_DATE = "updatedDate";
 	public static final String CHART_TITLE = "Chart Title";
+	public static final String DASHBOARD_NOT_EXISTS = " is Invalid Dashboard";
 	
 }
