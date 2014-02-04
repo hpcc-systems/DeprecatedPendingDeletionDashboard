@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.api.entity.ChartConfiguration;
@@ -43,7 +44,6 @@ import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Popup;
 import org.zkoss.zul.Vlayout;
-
 import com.google.gson.GsonBuilder;
 
 /**

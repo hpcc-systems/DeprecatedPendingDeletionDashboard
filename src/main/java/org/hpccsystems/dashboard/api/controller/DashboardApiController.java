@@ -20,6 +20,7 @@ import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.entity.chart.XYChartData;
 import org.hpccsystems.dashboard.entity.chart.utils.ChartRenderer;
+import org.hpccsystems.dashboard.services.ApplicationService;
 import org.hpccsystems.dashboard.services.DashboardService;
 import org.hpccsystems.dashboard.services.WidgetService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -28,7 +29,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.zkoss.json.JSONArray;
 import org.zkoss.json.JSONObject;
-
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -43,6 +43,7 @@ public class DashboardApiController {
 	private static final  Log LOG = LogFactory.getLog(DashboardApiController.class); 
 	DashboardService dashboardService;
 	WidgetService widgetService;
+	ApplicationService applicationService;
 	
 	@Autowired
 	public void setDashboardService(DashboardService dashboardService) {
@@ -51,6 +52,10 @@ public class DashboardApiController {
 	@Autowired
 	public void setWidgetService(WidgetService widgetService) {
 		this.widgetService = widgetService;
+	}
+	@Autowired
+	public void setApplicationService(ApplicationService applicationService) {
+		this.applicationService = applicationService;
 	}
 	
 /**
@@ -169,9 +174,8 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
  * @throws IOException
  */
 @RequestMapping(value = Constants.CIRCUIT_VALIDATE_REQ, method = RequestMethod.GET)
-public void validateDashboard(HttpServletRequest request, HttpServletResponse response) throws Exception {
-
-	 try {
+	public void validateDashboard(HttpServletRequest request, HttpServletResponse response) throws Exception {
+		try {
 			ChartRenderer chartRenderer = new ChartRenderer();
 			XYChartData chartData = null;
 			List<String> xColumnList = null;
@@ -184,52 +188,58 @@ public void validateDashboard(HttpServletRequest request, HttpServletResponse re
 			String circuitFields = request.getParameter(Constants.CIRCUIT_CONFIG);
 			String dashboard_id = request.getParameter(Constants.CIRCUIT_DASHBOARD_ID);
 			chartConfiguration = new GsonBuilder().create().fromJson(circuitFields, ChartConfiguration.class);
+			List<Portlet> portletList = new ArrayList<Portlet>();
 			try {
-				List<Portlet> portletList = widgetService.retriveWidgetDetails(Integer.valueOf(dashboard_id));
-				if(portletList != null){
-				for (Portlet portlet : portletList) {
-						chartData = chartRenderer.parseXML(portlet.getChartDataXML());
-						if (chartData != null) {
-							xColumnList = chartData.getXColumnNames();
-							yColumnList = chartData.getYColumnNames();
-							// For XAxis & YAxis Validation
-							xColumnValidation(failedValColumnList, xColumnList, chartConfiguration);
-							yColumnValidation(failedValColumnList, yColumnList, chartConfiguration);
-							//Filter Column Validation
-							if (chartData.getIsFiltered()) {
-								filterColumn = chartData.getFilter().getColumn();
-								filterDataType = chartData.getFilter().getType();
-								filterColumnValidation(failedValColumnList, filterColumn, filterDataType, chartConfiguration);
-							}
-						}
-				}
-			  }
+				portletList = widgetService.retriveWidgetDetails(Integer.valueOf(dashboard_id));
 			} catch (Exception ex) {
-				LOG.error("Exception while fetching Widgets from DB",	ex);
+				LOG.error("Exception while fetching Widgets from DB", ex);
 				jsonObject.addProperty(Constants.STATUS, Constants.STATUS_FAIL);
 				jsonObject.addProperty(Constants.STATUS_MESSAGE, ex.getMessage());
 			}
-			if (failedValColumnList.isEmpty()) {
-				jsonObject.addProperty(Constants.STATUS, Constants.STATUS_SUCCESS);
+			if (portletList != null && portletList.size() > 0) {
+				for (Portlet portlet : portletList) {
+					chartData = chartRenderer.parseXML(portlet.getChartDataXML());
+					if (chartData != null) {
+						xColumnList = chartData.getXColumnNames();
+						yColumnList = chartData.getYColumnNames();
+						// For XAxis & YAxis Validation
+						xColumnValidation(failedValColumnList, xColumnList,	chartConfiguration);
+						yColumnValidation(failedValColumnList, yColumnList,	chartConfiguration);
+						// Filter Column Validation
+						if (chartData.getIsFiltered()) {
+							filterColumn = chartData.getFilter().getColumn();
+							filterDataType = chartData.getFilter().getType();
+							filterColumnValidation(failedValColumnList,	filterColumn, filterDataType, chartConfiguration);
+						}
+					}
+				}
+				if (failedValColumnList.isEmpty()) {
+					jsonObject.addProperty(Constants.STATUS, Constants.STATUS_SUCCESS);
+				} else {
+					jsonObject.addProperty(Constants.STATUS, Constants.STATUS_FAIL);
+					StringBuffer failedStr = new StringBuffer();
+					int index = 0;
+					for (String failedColumn : failedValColumnList) {
+						if (index != failedValColumnList.size() - 1) {
+							failedStr.append(failedColumn).append(",");
+						} else if (index == failedValColumnList.size() - 1) {
+							failedStr.append(failedColumn);
+						}
+						index++;
+					}
+					jsonObject.addProperty(Constants.STATUS_MESSAGE, failedStr + Constants.FIELD_NOT_EXIST);
+				}
+
 			} else {
 				jsonObject.addProperty(Constants.STATUS, Constants.STATUS_FAIL);
-				StringBuffer failedStr =new StringBuffer();
-				int index = 0;
-				for (String failedColumn : failedValColumnList) {
-					if (index != failedValColumnList.size() - 1) {
-						failedStr.append(failedColumn).append(",");
-					} else if (index == failedValColumnList.size() - 1) {
-						failedStr.append(failedColumn);
-					}
-					index++;
-				}
-				jsonObject.addProperty(Constants.STATUS_MESSAGE, failedStr + Constants.FIELD_NOT_EXIST);
+				jsonObject.addProperty(Constants.STATUS_MESSAGE, dashboard_id + Constants.DASHBOARD_NOT_EXISTS);
 			}
 			response.setContentType(Constants.RES_TEXT_TYPE_JSON);
 			response.setCharacterEncoding(Constants.CHAR_CODE);
 			response.getWriter().write(jsonObject.toString());
 		} catch (Exception e) {
-			LOG.error("Exception while processing Validate dashboard request from Circuit", e);
+			LOG.error(
+					"Exception while processing Validate dashboard request from Circuit", e);
 			throw new Exception("Unable to process Validate Request");
 		}
 	}

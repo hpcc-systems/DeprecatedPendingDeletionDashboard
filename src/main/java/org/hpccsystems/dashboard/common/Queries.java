@@ -22,10 +22,11 @@ public class Queries {
 	public static final String GET_USER_DETAILs = "select user_id,password,active_flag,user_name from user_details where user_name=?"; 
 	public static final String GET_APPLICATIONS = "SELECT dash_app_id,dash_app_name FROM dash_application";
 	public static final String RESET_USER_FLAG = "update user_details set active_flag=? where user_id=?";
-	public static final String GET_WIDGET_DETAILS = "SELECT WIDGET_ID,WIDGET_NAME,WIDGET_STATE,COLUMN_IDENTIFIER,CHART_TYPE,CHART_DATA FROM widget_details where  DASHBOARD_ID = ? order by WIDGET_SEQUENCE";
+	public static final String GET_WIDGET_DETAILS = "SELECT WIDGET_ID,WIDGET_NAME,WIDGET_STATE,COLUMN_IDENTIFIER,CHART_TYPE,CHART_DATA FROM widget_details where  DASHBOARD_ID = ";
 	public static final String CIRCUIT_DELETE_DASHBOARD = "delete from dashboard_details where DASHBOARD_ID=? ";
 	public static final String GET_WIDGET = "select * from widget_details where DASHBOARD_ID=? order by WIDGET_SEQUENCE";
-	public static final String RETRIEVE_DASHBOARD_DETAILS = "select * from dashboard_details where sourceid = '";
+	public static final String RETRIEVE_DASHBOARD_DETAILS = "select * from dashboard_details where sourceid = ";
+	public static final String RETRIEVE_DASHBOARD_IDS = "select dashboard_id from dashboard_details where dashboard_id = ";
 	public static final String DASHBOARD_IN_CLAUSE = "' and DASHBOARD_ID in ";
 
 }

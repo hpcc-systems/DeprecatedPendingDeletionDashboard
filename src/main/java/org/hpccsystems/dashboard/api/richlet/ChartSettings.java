@@ -11,6 +11,7 @@ import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.Sessions;
 import org.zkoss.zk.ui.util.Clients;
 
+
 public class ChartSettings extends GenericRichlet{
 
 	private static final Log LOG = LogFactory.getLog(ChartSettings.class);
