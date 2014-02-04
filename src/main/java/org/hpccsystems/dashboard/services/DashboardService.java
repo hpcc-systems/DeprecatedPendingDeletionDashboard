@@ -19,7 +19,7 @@ public interface DashboardService {
 		 * @param layout
 		 * @throws SQLException
 	 */
-	int addDashboardDetails(String sourceId,String source,String dashBoardName,String userId, Date dashBoardDate) throws Exception ;
+	int addDashboardDetails(Dashboard dashboard,Application application,String userId) throws Exception ;
 	
 	
 	/**
@@ -42,7 +42,7 @@ public interface DashboardService {
 	 * @param emptyState
 	 * @param sequence
 	 */
-	void updateDashboardSate(Integer dashboardId,String emptyState,int sequence,String dashboardName, Date updatedDate)throws Exception;
+	void updateDashboardState(Integer dashboardId,String emptyState,int sequence,String dashboardName, Date updatedDate)throws Exception;
 	
 	/**
 	 * @param dashboardId

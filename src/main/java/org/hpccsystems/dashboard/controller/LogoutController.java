@@ -6,14 +6,12 @@ import java.util.List;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.entity.Dashboard;
-import org.hpccsystems.dashboard.entity.User;
 import org.hpccsystems.dashboard.helper.DashboardHelper;
 import org.hpccsystems.dashboard.services.AuthenticationService;
 import org.hpccsystems.dashboard.services.DashboardService;
 import org.hpccsystems.dashboard.services.WidgetService;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
-import org.zkoss.zk.ui.Session;
 import org.zkoss.zk.ui.Sessions;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.select.SelectorComposer;
@@ -35,8 +33,7 @@ import org.zkoss.zul.Menuitem;
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class LogoutController extends SelectorComposer<Component> {
 	
-	final Session session = Sessions.getCurrent(); 
-	String userId =((User) session.getAttribute("user")).getUserId();
+
 	private static final  Log LOG = LogFactory.getLog(LogoutController.class);
 	private static final long serialVersionUID = 1L;	
 	
@@ -70,14 +67,14 @@ public class LogoutController extends SelectorComposer<Component> {
 		}   
         //Call to DB update        
         	dashboardHelper.updateDashboardWidgetDetails(dashBoardIdList); 
-        	authenticationService.logout(session.getAttribute("user"));
+        	authenticationService.logout(Sessions.getCurrent().getAttribute("user"));
         } catch(Exception ex) {
         	Clients.showNotification("Error occurred while loging out. Please try again.", true);
 			LOG.error("Exception while doing logout", ex);
 			return;
         }      
            
-        session.removeAttribute("user");
+		Sessions.getCurrent().removeAttribute("user");
         if(LOG.isDebugEnabled()){
     		LOG.debug("Logged out sucessfully");
     		}

@@ -31,7 +31,6 @@ public class DashboardHelper {
 	
 	private static final long serialVersionUID = 1L;	
 	private static final  Log LOG = LogFactory.getLog(LogoutController.class);	
-	private String userId;
 	
 	private DashboardService dashboardService;
 	
@@ -90,7 +89,7 @@ public class DashboardHelper {
 	 */
 	public void updateDashboardWidgetDetails(List<Dashboard> dashBoardIdList) throws Exception
 	{
-		 userId =((User) Sessions.getCurrent().getAttribute("user")).getUserId();
+		final String userId =((User) Sessions.getCurrent().getAttribute("user")).getUserId();
 			if (dashBoardIdList != null && !dashBoardIdList.isEmpty()) {
 				for (int count = 1; count <= dashBoardIdList.size(); count++) {
 					Dashboard dashboard = dashBoardIdList.get(count - 1);
@@ -106,7 +105,7 @@ public class DashboardHelper {
 						if (Constants.STATE_EMPTY.equals(dashboard.getDashboardState())) {
 							dashboardState = Constants.STATE_EMPTY;							
 						}
-						dashboardService.updateDashboardSate(
+						dashboardService.updateDashboardState(
 								dashboard.getDashboardId(),
 								dashboardState, count,
 								dashboard.getName(),

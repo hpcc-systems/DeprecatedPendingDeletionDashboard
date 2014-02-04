@@ -88,11 +88,12 @@ public class DashboardServiceImpl implements DashboardService {
 		 * @throws SQLException
 	 */
 	
-	public int addDashboardDetails(final String sourceId,final String source, final String dashBoardName,
-			final String userId, final Date dashBoardDate) throws Exception {
+	public int addDashboardDetails(final Dashboard dashboard,
+			final Application application, final String userId)
+			throws Exception {
 		try
 		{
-		return dashboardDao.addDashboardDetails(sourceId,source,dashBoardName,userId,dashBoardDate);
+		return dashboardDao.addDashboardDetails(dashboard,application,userId);
 		}
 		catch(DataAccessException ex)
 		{
@@ -119,7 +120,7 @@ public class DashboardServiceImpl implements DashboardService {
 	 * service to update sequence,name,state of a dashboard
 	 *
 	 */
-	public void updateDashboardSate(Integer dashboardId, String emptyState,
+	public void updateDashboardState(Integer dashboardId, String emptyState,
 			int sequence,String dashboardName, Date updatedDate)throws Exception {
 		try {
 			dashboardDao.updateDashboardState(dashboardId,emptyState,sequence,dashboardName,updatedDate);
