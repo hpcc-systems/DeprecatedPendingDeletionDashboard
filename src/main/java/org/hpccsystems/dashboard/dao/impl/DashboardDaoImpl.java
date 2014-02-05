@@ -45,11 +45,13 @@ public class DashboardDaoImpl implements DashboardDao {
 			throws DataAccessException {
 		List<Dashboard> dashboardList = null;
 		StringBuilder sqlBuffer = new StringBuilder();
-		sqlBuffer.append(Queries.RETRIEVE_DASHBOARD_DETAILS).append("'").append(
-				application.getAppId());
+		sqlBuffer.append(Queries.RETRIEVE_DASHBOARD_DETAILS);
+		if(userId == null && dashboardIdList == null){
+			sqlBuffer.append("'").append(application.getAppId()).append("'");
+		}
 		if (userId != null && dashboardIdList == null) {
-			sqlBuffer.append("' and user_id='").append(userId)
-					.append("' order by sequence");
+			sqlBuffer.append("'").append(application.getAppId());
+			sqlBuffer.append("' and user_id='").append(userId).append("' order by sequence");
 		} else if (dashboardIdList != null && dashboardIdList.size() > 0) {
 			sqlBuffer.append(Queries.DASHBOARD_IN_CLAUSE).append("( '");
 			int count = 1;
@@ -62,6 +64,7 @@ public class DashboardDaoImpl implements DashboardDao {
 			}
 			sqlBuffer.append(")").append((" order by sequence"));
 		}
+		System.out.println("sqlBuffer=========" +sqlBuffer);
 		LOG.info("retrieveDashboardDetails() Query -->" + sqlBuffer);
 		dashboardList = getJdbcTemplate().query(sqlBuffer.toString(),
 				new DashboardRowMapper());
