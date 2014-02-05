@@ -6,19 +6,29 @@ function clearChart(divId)
 function createChart(divId, chartData) {
 	jq.getScript('js/lib/d3.v3.min.js', function() {
 		jq.getScript('js/lib/c3.js', function() {
-			
+			 
 			var response = jq.parseJSON(chartData);
 			console.log(response);
 			
 			var datum = response.chartData;
 			var divElement = jq('$'+divId).empty();
 			
+			var showLegend = false;
+			if(Object.keys(response.yNames).length > 1) 
+				showLegend = true;
+			
 			jq("#" + divElement.attr("id"))
 				.append(
 						jq("<div style='margin-left: 3px; height: 15px;'>" + response.title +" </div>" ), 
-						jq( "<div id='"+ response.portletId + "holderDiv" +"'/>" 
-						)
-				);
+						jq( "<table> <tr>" +
+								"<td> " +
+									"<div style='margin-top:" + showLegend ? 60 : 20 +"px; font-size: 10px; width: 15px; height: 15px; writing-mode:tb-rl; -webkit-transform:rotate(-90deg); -moz-transform:rotate(-90deg); -o-transform: rotate(-90deg); white-space:nowrap; display:block;'>" +
+										response.yName +
+									"</div> </td>" +
+								"<td> <div id='"+ response.portletId + "holderDiv" +"'/> </td>" +
+							"</tr> </table>"),
+						jq("<div style='margin-left: 50px; height: 15px; font-size:10px; text-align: center;'>" + response.xName +" </div>" )
+					);
 			
 			var fullHeight = divElement.height();
 			var fullWidth = divElement.width();
@@ -26,9 +36,6 @@ function createChart(divId, chartData) {
 			if(fullWidth < 50 ){ fullWidth = 400; }
 			if(fullHeight < 50 ){ fullHeight = 385; }
 			
-			var showLegend = false;
-			if(Object.keys(response.yNames).length > 1) 
-				showLegend = true;
 			
 			console.log("Height = " + fullHeight);
 			console.log("Width = " + fullWidth);
@@ -46,24 +53,25 @@ function createChart(divId, chartData) {
 				},
 				bindto: "#" + response.portletId + "holderDiv",
 				size: { 
-					width:fullWidth,
-					height:fullHeight - 15
+					width:fullWidth - 15,
+					height:fullHeight - 15 - 20
 				},
 				axis: {
 					y: {
-						label: response.yName,
 						tick: {
 			                format: d3.format(".2s")
 			            }
 					},
 					x: {
 						type: 'categorized',
-						categories: response.xValues,
-						label: response.xName
+						categories: response.xValues
 					}
 				},
 				legend: {
-			        show: showLegend
+			        show: showLegend,
+			        item: {
+			        	width: 120
+			        }
 			    },
 				subchart: {
 			        show: isLargeGraph
