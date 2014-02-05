@@ -19,6 +19,7 @@ import org.hpccsystems.dashboard.entity.chart.Filter;
 import org.hpccsystems.dashboard.entity.chart.XYChartData;
 import org.hpccsystems.dashboard.entity.chart.XYModel;
 import org.hpccsystems.dashboard.entity.chart.utils.ChartRenderer;
+import org.hpccsystems.dashboard.helper.DashboardHelper;
 import org.hpccsystems.dashboard.services.DashboardService;
 import org.hpccsystems.dashboard.services.HPCCService;
 import org.hpccsystems.dashboard.services.WidgetService;
@@ -44,6 +45,7 @@ import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Popup;
 import org.zkoss.zul.Vlayout;
+
 import com.google.gson.GsonBuilder;
 
 /**
@@ -70,6 +72,9 @@ public class EditChartController extends SelectorComposer<Component> {
 	
 	@WireVariable
 	private WidgetService widgetService;	
+	
+	@WireVariable
+	private DashboardHelper dashboardHelper;
 
 	@Wire
 	Listbox measureListBox;
@@ -105,6 +110,8 @@ public class EditChartController extends SelectorComposer<Component> {
 	Button apiCancelButton;
 	@Wire
 	Vlayout editWindowLayout;
+	@Wire
+	Button apiConfigSaveButton;
 	
 	List<String> parameterList = new ArrayList<String>();
 	final Map<String, Object> parameters = new HashMap<String, Object>();
@@ -116,22 +123,31 @@ public class EditChartController extends SelectorComposer<Component> {
 		super.doAfterCompose(comp);
 		apiConfig =(ApiConfiguration) Sessions.getCurrent().getAttribute("apiConfiguration");
 		Map<String,String> columnSchemaMap = null;
-		//API chart config flow
-		if(apiConfig != null && apiConfig.isApiChartSetting())
+		//API chart config flow without chart
+		if(apiConfig != null && apiConfig.isApiConfig())
 		{
 			columnSchemaMap = configureChartSettingData();
 			filterListBox.setStyle("backgroundr:gray;");
 			filterListBox.invalidate();			
 		}
-		//Dashboard chart edit flow
-		if(apiConfig == null || (apiConfig != null && apiConfig.isApiEnabled()))
-		{
-		portlet = (Portlet) Executions.getCurrent().getAttribute(Constants.PORTLET);
-		
-		chartData = (XYChartData) Executions.getCurrent().getAttribute(Constants.CHART_DATA);
-		
-		doneButton = (Button) Executions.getCurrent().getAttribute(Constants.EDIT_WINDOW_DONE_BUTTON);		
-		
+		//Dashboard chart edit flow and API Dashboard View flow,API chart config flow with chart
+		if(apiConfig == null || (apiConfig != null && !apiConfig.isApiConfig()))
+		{			
+			//API chart config flow with chart
+			if(apiConfig != null && apiConfig.isApiChartConfig())
+			{
+				configureDashboardPortlet();
+			} else {
+				//Other flows:Dashboard chart edit flow & API Dashboard View flow
+				portlet = (Portlet) Executions.getCurrent().getAttribute(
+						Constants.PORTLET);
+
+				chartData = (XYChartData) Executions.getCurrent().getAttribute(
+						Constants.CHART_DATA);
+
+				doneButton = (Button) Executions.getCurrent().getAttribute(
+						Constants.EDIT_WINDOW_DONE_BUTTON);
+			}
 		// When live chart is present in ChartPanel
 		if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())){
 			for (String colName : chartData.getXColumnNames()) {
@@ -222,25 +238,41 @@ public class EditChartController extends SelectorComposer<Component> {
 		// passing X,Y axis values to draw the chart
 		yAxisDropped = true;
 		chartData.getYColumnNames().add(draggedListitem.getLabel());
-		//need to render chart only in dashboard flow.Not in Api Chart config/edit flow
-		if(apiConfig == null || (apiConfig != null && apiConfig.isApiEnabled())){
-		if(xAxisDropped){
-			
-			try	{
-				chartRenderer.constructChartJSON(chartData, portlet, true);
-				chartRenderer.drawChart(chartData,Constants.EDIT_WINDOW_CHART_DIV , portlet);
-			}catch(Exception ex) {
-				Clients.showNotification("Unable to fetch column data from Hpcc", "error", this.getSelf(), "middle_center", 3000, true);
-				LOG.error("Exception while fetching column data from Hpcc", ex);
-			}
-			doneButton.setDisabled(false);
-			filterListBox.setDroppable("true");
-			}			
+		
+		if (xAxisDropped) {
+			constructChartData();	
 		}
 		
 		validateYAxisDrops();
 	}
 	
+	/**
+	 * Method to process with X/Y column data add/clearance function
+	 */
+	private void constructChartData() {		
+		//Disabling filter and chart clearance function in Api chart config/edit flow without chart
+		if(apiConfig == null || (apiConfig != null && !apiConfig.isApiConfig())){				
+			try {
+				chartRenderer.constructChartJSON(chartData, portlet, true);
+				chartRenderer.drawChart(chartData,	Constants.EDIT_WINDOW_CHART_DIV, portlet);
+			} catch (Exception ex) {
+				Clients.showNotification(
+						"Unable to fetch column data from Hpcc", "error",
+						this.getSelf(), "middle_center", 3000, true);
+				LOG.error("Exception while fetching column data from Hpcc",ex);
+			}			
+			filterListBox.setDroppable("true");
+		}
+		//Disabling done button in API Chart Config flow with & without chart
+		if(apiConfig == null || (apiConfig != null && (!apiConfig.isApiChartConfig()
+				&& !apiConfig.isApiConfig()))){
+			doneButton.setDisabled(false);				
+		}		
+
+	}
+
+
+
 	/**
 	 * Disables Drops in Y axis list box based on conditions
 	 *  2 Columns for Line & Bar chart
@@ -282,17 +314,19 @@ public class EditChartController extends SelectorComposer<Component> {
 			Listcell listcell = (Listcell) event.getTarget().getParent();
 			Listitem yAxisItem = (Listitem) listcell.getParent();
 			String axisName =listcell.getLabel();
-			
 			yAxisItem.detach();
 			yAxisDropped = false;
 			chartData.getYColumnNames().remove(axisName);
 			
-			//Disabling doneButton in Api chart config/edit flow
-			if(apiConfig == null || (apiConfig != null && apiConfig.isApiEnabled())){	
-			doneButton.setDisabled(true);
-			filterListBox.setDroppable("false");
-			
+			//Disabling filter and chart clearance function in Api chart config/edit flow without chart
+			if(apiConfig == null || (apiConfig != null && !apiConfig.isApiConfig())){				
+			filterListBox.setDroppable("false");			
 			Clients.evalJavaScript("clearChart('" + Constants.EDIT_WINDOW_CHART_DIV +  "')");
+			}
+			//Disabling done button in API Chart Config flow
+			if(apiConfig == null || (apiConfig != null && (!apiConfig.isApiChartConfig()
+					&& !apiConfig.isApiConfig()))){
+				doneButton.setDisabled(true);				
 			}
 			//Enabling drops based on chart type
 			// 2 Columns for Bar/Line chart - 1 for others
@@ -333,21 +367,9 @@ public class EditChartController extends SelectorComposer<Component> {
 		//passing X,Y axis values to draw the chart
 		xAxisDropped = true;
 		chartData.getXColumnNames().add(draggedListitem.getLabel());
-		//need to render chart only in dashboard flow.Not in Api Chart config/edit flow
-		if(apiConfig == null || (apiConfig != null && apiConfig.isApiEnabled())){
+		
 		if(yAxisDropped){
-			
-			try	{
-				chartRenderer.constructChartJSON(chartData, portlet, true);
-				chartRenderer.drawChart(chartData, Constants.EDIT_WINDOW_CHART_DIV, portlet);
-			}catch(Exception ex)
-			{
-				Clients.showNotification("Unable to fetch column data from HPCC", "error", this.getSelf(), "middle_center", 3000, true);
-				LOG.error("Exception while fetching column data from Hpcc", ex);
-			}			
-			doneButton.setDisabled(false);
-			filterListBox.setDroppable("true");
-			}			
+			constructChartData();
 		}
 		
 		//disabling drops if Atleast one column is dropped
@@ -382,14 +404,17 @@ public class EditChartController extends SelectorComposer<Component> {
 			xAxisItem.detach();
 			
 			xAxisDropped = false;
-			chartData.getXColumnNames().remove(axisName);
+			chartData.getXColumnNames().remove(axisName);			
 			
-			//Disabling doneButton in Api Chart config/edit flow
-			if(apiConfig == null || (apiConfig != null && apiConfig.isApiEnabled())){		
-			filterListBox.setDroppable("false");
-			doneButton.setDisabled(true);
-			
+			//Disabling filter and chart clearance function in Api chart config/edit flow without chart
+			if(apiConfig == null || (apiConfig != null && !apiConfig.isApiConfig())){				
+			filterListBox.setDroppable("false");			
 			Clients.evalJavaScript("clearChart('" + Constants.EDIT_WINDOW_CHART_DIV +  "')");
+			}
+			//Disabling done button in API Chart Config flow
+			if(apiConfig == null || (apiConfig != null && (!apiConfig.isApiChartConfig()
+					&& !apiConfig.isApiConfig()))){
+				doneButton.setDisabled(true);				
 			}
 			//Enabling drops if no column is dropped
 			if(LOG.isDebugEnabled()){
@@ -439,11 +464,24 @@ public class EditChartController extends SelectorComposer<Component> {
 		Include include = new Include();
 		include.setDynamicProperty(Constants.PORTLET, portlet);
 		include.setDynamicProperty(Constants.CHART_DATA, chartData);
+		if(apiConfig == null || (apiConfig != null && (!apiConfig.isApiChartConfig()
+				&& !apiConfig.isApiConfig()))){
 		include.setDynamicProperty(Constants.EDIT_WINDOW_DONE_BUTTON, doneButton);
-		if(Constants.NUMERIC_DATA.equals(chartData.getFilter().getType())){
-			include.setSrc("layout/numeric_filter_popup.zul");
-		} else {
-			include.setSrc("layout/string_filter_popup.zul");
+		}
+		if(apiConfig != null && apiConfig.isApiChartConfig()){
+			if(Constants.NUMERIC_DATA.equals(chartData.getFilter().getType())){
+				include.setSrc("numeric_filter_popup.zul");
+			} else {
+				include.setSrc("string_filter_popup.zul");
+			}
+		}else
+		{
+			if(Constants.NUMERIC_DATA.equals(chartData.getFilter().getType())){
+				include.setSrc("layout/numeric_filter_popup.zul");
+			} else {
+				include.setSrc("layout/string_filter_popup.zul");
+			}
+			
 		}
 		
 		labelCell.appendChild(popup);
@@ -483,9 +521,11 @@ public class EditChartController extends SelectorComposer<Component> {
 			}			
 			//Enabling drops to filter list box
 			filterListBox.setDroppable("true");
-			
+			//Disabling done button in API Chart Config flow
+			if(apiConfig == null || (apiConfig != null && !apiConfig.isApiChartConfig())){
 			if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())){
 				doneButton.setDisabled(false);
+			}
 			}
 		}
 	};
@@ -575,6 +615,95 @@ public class EditChartController extends SelectorComposer<Component> {
 			Sessions.getCurrent().removeAttribute("user");
 			Sessions.getCurrent().removeAttribute("userCredential");	
 			editWindowLayout.detach();
+		}
+	};
+	
+	/**
+	 * Method to create a Dashboard from DB
+	 * @throws Exception
+	 */
+	private void configureDashboardPortlet()throws Exception {
+		Execution exe = Executions.getCurrent();
+		String source = exe.getParameter("source");
+		String sourceId = exe.getParameter("source_id");		
+		String dashboardId = exe.getParameter(Constants.DASHBOARD_ID);
+		final Application application = new Application(sourceId,source,Constants.SOURCE_TYPE_ID.get(source));		
+		List<String> dashboardIdList =new ArrayList<String>();
+		dashboardIdList.add(dashboardId);
+		User user = (User)Sessions.getCurrent().getAttribute("user");
+		List<Dashboard> sideBarPageList = null;
+		try{
+			sideBarPageList =new ArrayList<Dashboard>(dashboardService.retrieveDashboardMenuPages(application,user.getUserId(),dashboardIdList));	
+		} catch (Exception ex) {
+			Clients.showNotification("Unable to fetch Dashboard from DB.Input valid Dashboard ID",false);
+			LOG.error("Exception while fetching column data from Hpcc", ex);
+		}
+		if(LOG.isDebugEnabled()){
+			LOG.debug("sideBarPageList in configurePortlet(): "+sideBarPageList);
+		}
+		if(sideBarPageList != null && sideBarPageList.size() > 0){
+			dashboard = sideBarPageList.get(0);
+		}
+		try{
+			configurePortlet();		
+		}catch(Exception ex){
+			Clients.showNotification("Unable to Configure Portlet in configureDashboardPortlet()", true);
+			LOG.error("Exception in configureDashboardPortlet() ", ex);
+		}
+		apiConfigSaveButton.addEventListener(Events.ON_CLICK, saveApiChartConfigData);
+	}
+
+	/**
+	 * Method to create a portlet for the chart data retrieved from DB
+	 */
+	private void configurePortlet() throws Exception{
+		try	{
+			dashboard.setPortletList((ArrayList<Portlet>) widgetService.retriveWidgetDetails(dashboard.getDashboardId()));
+			} catch(Exception ex) {
+				Clients.showNotification(
+						"Unable to retrieve Widget details from DB for the Dashboard", false);
+				LOG.error("Exception while fetching widget details from DB", ex);
+			}
+		if(LOG.isDebugEnabled()){
+			LOG.debug("PortletList in configurePortlet(): "+dashboard.getPortletList());
+		}
+		String chartType = Executions.getCurrent().getParameter(Constants.CHART_TYPE);
+		//As in Api flow each dashboard has single chart/widget, getting first widget
+		portlet = dashboard.getPortletList().get(0);
+		//portlet.setChartType(Integer.valueOf(chartType));
+			if(!portlet.getWidgetState().equals(Constants.STATE_DELETE)){
+				//Constructing chart data only when live chart is drawn
+				if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())){
+					chartData = chartRenderer.parseXML(portlet.getChartDataXML());					
+				}
+			}
+	}
+	
+	/**
+	 * Event to Save API chart configuration data to DB
+	 */
+	final EventListener<Event> saveApiChartConfigData = new EventListener<Event>() {
+
+		@Override
+		public void onEvent(Event event) throws Exception {
+			portlet.setChartDataXML(chartRenderer.convertToXML(chartData));
+			final List<Dashboard> dashBoardIdList = new ArrayList<Dashboard>();
+			dashboard.setUpdatedDate(new Date(new java.util.Date().getTime()));
+			dashboard.setPersisted(true);
+			dashBoardIdList.add(dashboard);
+			try
+			{
+				dashboardHelper.updateDashboardWidgetDetails(dashBoardIdList);
+				Messagebox.show("Your Chart details are Saved.You can close the window","",1,Messagebox.ON_OK);
+				Sessions.getCurrent().removeAttribute("apiConfiguration");
+				Sessions.getCurrent().removeAttribute("user");
+				Sessions.getCurrent().removeAttribute("userCredential");
+			}catch(Exception ex)
+			{
+				Clients.showNotification("Unable to update Chart details into DB", true);
+	        	LOG.error("Exception saveApiChartConfigData Listener in DashboardController", ex);
+			}
+		
 		}
 	};
 }

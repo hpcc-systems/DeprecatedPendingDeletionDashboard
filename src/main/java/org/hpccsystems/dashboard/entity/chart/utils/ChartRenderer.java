@@ -1,4 +1,4 @@
-package org.hpccsystems.dashboard.entity.chart.utils;
+package org.hpccsystems.dashboard.entity.chart.utils; 
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -7,15 +7,17 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hpccsystems.dashboard.controller.util.EncryptDecrypt;
 import org.hpccsystems.dashboard.common.Constants;
+import org.hpccsystems.dashboard.controller.util.EncryptDecrypt;
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.entity.chart.XYChartData;
 import org.hpccsystems.dashboard.entity.chart.XYModel;
@@ -237,8 +239,8 @@ public class ChartRenderer {
 
 		if( portlet.getChartDataJSON() == null) {
 			Clients.showNotification("No data available to draw Chart",	true);
-		}
-		
+		}	
+
 		if((Constants.BAR_CHART.equals(portlet.getChartType()) || 
 				Constants.LINE_CHART.equals(portlet.getChartType())) )	{
 			Clients.evalJavaScript("createChart('" + divToDraw +  "','"+ portlet.getChartDataJSON() +"')" );
@@ -302,8 +304,8 @@ public class ChartRenderer {
 		} catch (JAXBException e) {
 			LOG.error("EXCEPTION: JAXBException in ChartRenderer",e);
 		} catch (Exception e) {
-			
-		}
+			LOG.error("EXCEPTION in parseXML()",e);
+		}		
 		return chartData;
 	}
 		

@@ -1,4 +1,4 @@
-function clearChart(divId)
+function clearChart(divId) 
 {
 	jq('$'+divId).empty();	
 }
