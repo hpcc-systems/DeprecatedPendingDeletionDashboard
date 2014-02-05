@@ -64,7 +64,6 @@ public class DashboardDaoImpl implements DashboardDao {
 			}
 			sqlBuffer.append(")").append((" order by sequence"));
 		}
-		System.out.println("sqlBuffer=========" +sqlBuffer);
 		LOG.info("retrieveDashboardDetails() Query -->" + sqlBuffer);
 		dashboardList = getJdbcTemplate().query(sqlBuffer.toString(),
 				new DashboardRowMapper());
