@@ -193,7 +193,8 @@
         var translate = {
         	main : function () { return "translate(" + margin.left + "," + legendHeight + ")"; },
         	//CHANGED TO MOVE LEGEND TO TOP - ORIGINAL - main : function () { return "translate(" + margin.left + "," + margin.top + ")"; },
-            context : function () { return "translate(" + margin2.left + "," + margin2.top + ")"; },
+        	context : function () { return "translate(" + margin2.left + "," + (margin2.top + legendHeight) + ")"; },
+        	//CHANGED TO MOVE LEGEND TO TOP - ORIGINAL -context : function () { return "translate(" + margin2.left + "," + margin2.top + ")"; },
             legend : function () { return "translate(" + margin3.left + "," + 0 + ")"; },
             //CHANGED TO MOVE LEGEND TO TOP - ORIGINAL -legend : function () { return "translate(" + margin3.left + "," + margin3.top + ")"; },
             y2 : function () { return "translate(" + (__axis_rotated ? 0 : width) + "," + (__axis_rotated ? 10 : 0) + ")"; },
