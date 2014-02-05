@@ -28,7 +28,7 @@ public class FileConverter {
 		try
 		{		
 		exporter.export(listBox, outputStream);
-		if(Constants.CHART_TITLE.equalsIgnoreCase(chartTitle))
+		if(chartTitle==null || Constants.CHART_TITLE.equalsIgnoreCase(chartTitle))
 			chartTitle="Excel_Table_Report";
 		AMedia amedia = new AMedia(chartTitle+".xlsx", "xls", "application/file", outputStream.toByteArray());
 		Filedownload.save(amedia);
@@ -83,9 +83,8 @@ public class FileConverter {
 				 cellData.append(((Listcell) cell).getLabel());
 				if(cellData.toString().matches("^[a-zA-Z0-9 -!$%^&*()_+|~]*$")
 						 && !cellData.toString().matches("^[0-9]*$"))
-				{
-					cellData.delete(0, cellData.length());
-					cellData.append("\"").append(cellData).append("\"");
+				{				
+					cellData = new StringBuffer("\"").append(cellData).append("\"");
 				}
 				itemData.append(cellData.toString());
 				if(cellCount != ((Listitem) item).getChildren().size())
@@ -96,7 +95,7 @@ public class FileConverter {
 			}
 			fileContent.append(itemData).append("\n");
 		}
-		if(Constants.CHART_TITLE.equalsIgnoreCase(chartTitle))
+		if(chartTitle==null || Constants.CHART_TITLE.equalsIgnoreCase(chartTitle))
 			chartTitle="Csv_Table_Report";
 		Filedownload.save(fileContent.toString().getBytes(), "text/plain",
 				chartTitle+".csv");

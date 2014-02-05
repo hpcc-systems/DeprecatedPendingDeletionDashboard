@@ -536,6 +536,8 @@ public class HPCCServiceImpl implements HPCCService{
 	public List<FileMeta> getFileList(String scope, HpccConnection hpccConnection) throws Exception{
 		ECLSoap soap = new ECLSoap();
 		soap.setHostname(hpccConnection.getHostIp());
+		soap.setUser(hpccConnection.getUsername());
+		soap.setPass(hpccConnection.getPassword());
 		
 		if(hpccConnection.getIsSSL()) {
 			soap.setPort(18010);

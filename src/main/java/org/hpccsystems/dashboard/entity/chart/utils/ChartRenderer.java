@@ -1,4 +1,4 @@
-package org.hpccsystems.dashboard.entity.chart.utils;
+package org.hpccsystems.dashboard.entity.chart.utils; 
 
 import java.io.IOException;
 import java.io.StringReader;
@@ -28,6 +28,7 @@ import org.xml.sax.SAXException;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.util.Clients;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonPrimitive;
 
@@ -238,8 +239,8 @@ public class ChartRenderer {
 
 		if( portlet.getChartDataJSON() == null) {
 			Clients.showNotification("No data available to draw Chart",	true);
-		}		
-				
+		}	
+
 		if((Constants.BAR_CHART.equals(portlet.getChartType()) || 
 				Constants.LINE_CHART.equals(portlet.getChartType())) )	{
 			Clients.evalJavaScript("createChart('" + divToDraw +  "','"+ portlet.getChartDataJSON() +"')" );

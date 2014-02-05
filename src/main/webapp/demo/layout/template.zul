@@ -2,9 +2,6 @@
 <style src="css/bootstrap/css/bootstrap.min.css"/>
 <style src="css/flat.css"></style>
 
-<script  defer="true" src="js/barchart.js"></script>
-<script  defer="true" src="js/linechart.js"></script>
-
 	<!-- create only when the currentUser is not an anonymous  -->
 	<borderlayout hflex="1" vflex="1" if="${sessionScope.user.validUser}" >
 		<north height="70px" style="background-color: #292929;" border="none" zclass="banner" >		

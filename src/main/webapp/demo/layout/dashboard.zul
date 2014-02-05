@@ -6,9 +6,9 @@
 	contentStyle="overflow:hidden"
 	vflex="1">
 <style src="css/dashboard.css"></style>
+<style src="css/c3.css"></style>
 
 <script  defer="true" src="js/barchart.js"></script>
-<script  defer="true" src="js/linechart.js"></script>
 <script  defer="true" src="js/piechart.js"></script>
 
 <caption sclass="panel-heading" zclass="dashboard-header">
