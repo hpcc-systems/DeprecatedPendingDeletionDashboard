@@ -1,4 +1,4 @@
-function clearChart(divId) 
+function clearChart(divId)
 {
 	jq('$'+divId).empty();	
 }
@@ -14,15 +14,19 @@ function createChart(divId, chartData) {
 			var divElement = jq('$'+divId).empty();
 			
 			var showLegend = false;
-			if(Object.keys(response.yNames).length > 1) 
+			if(Object.keys(response.yNames).length > 1) {
 				showLegend = true;
+			} 
+			
+			var yColumnMargin = 20;
+			if(showLegend){yColumnMargin = 60}
 			
 			jq("#" + divElement.attr("id"))
 				.append(
 						jq("<div style='margin-left: 3px; height: 15px;'>" + response.title +" </div>" ), 
 						jq( "<table> <tr>" +
 								"<td> " +
-									"<div style='margin-top:" + showLegend ? 60 : 20 +"px; font-size: 10px; width: 15px; height: 15px; writing-mode:tb-rl; -webkit-transform:rotate(-90deg); -moz-transform:rotate(-90deg); -o-transform: rotate(-90deg); white-space:nowrap; display:block;'>" +
+									"<div style='margin-top:" + yColumnMargin +"px; margin-left: 3px; font-size: 10px; width: 15px; height: 15px; writing-mode:tb-rl; -webkit-transform:rotate(-90deg); -moz-transform:rotate(-90deg); -o-transform: rotate(-90deg); white-space:nowrap; display:block;'>" +
 										response.yName +
 									"</div> </td>" +
 								"<td> <div id='"+ response.portletId + "holderDiv" +"'/> </td>" +
@@ -53,7 +57,7 @@ function createChart(divId, chartData) {
 				},
 				bindto: "#" + response.portletId + "holderDiv",
 				size: { 
-					width:fullWidth - 15,
+					width:fullWidth - 15 - 5,
 					height:fullHeight - 15 - 20
 				},
 				axis: {

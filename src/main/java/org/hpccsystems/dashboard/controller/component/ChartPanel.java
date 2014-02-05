@@ -1,8 +1,9 @@
 package org.hpccsystems.dashboard.controller.component;
 
 import java.util.ArrayList;
-import java.util.HashMap; 
+import java.util.HashMap;
 import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.common.Constants;
