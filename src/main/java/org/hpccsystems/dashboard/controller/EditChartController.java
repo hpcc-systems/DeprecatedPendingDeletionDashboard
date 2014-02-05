@@ -651,20 +651,26 @@ public class EditChartController extends SelectorComposer<Component> {
 		try{
 			sideBarPageList =new ArrayList<Dashboard>(dashboardService.retrieveDashboardMenuPages(application,user.getUserId(),dashboardIdList));	
 		} catch (Exception ex) {
-			Clients.showNotification("Unable to fetch Dashboard from DB.Input valid Dashboard ID",false);
+			Clients.showNotification("Unable to fetch Dashboard from DB.Input valid Dashboard ID",true);
 			LOG.error("Exception while fetching column data from Hpcc", ex);
+			return;
 		}
 		if(LOG.isDebugEnabled()){
 			LOG.debug("sideBarPageList in configurePortlet(): "+sideBarPageList);
 		}
 		if(sideBarPageList != null && sideBarPageList.size() > 0){
 			dashboard = sideBarPageList.get(0);
+		}else
+		{
+			Clients.showNotification("Invalid Dashboard ID.Please input a valid Dashboard ID",true);
+			return;
 		}
 		try{
 			configurePortlet();		
 		}catch(Exception ex){
 			Clients.showNotification("Unable to Configure Portlet in configureDashboardPortlet()", true);
 			LOG.error("Exception in configureDashboardPortlet() ", ex);
+			return;
 		}
 		apiConfigSaveButton.addEventListener(Events.ON_CLICK, saveApiChartConfigData);
 	}
@@ -677,12 +683,14 @@ public class EditChartController extends SelectorComposer<Component> {
 			dashboard.setPortletList((ArrayList<Portlet>) widgetService.retriveWidgetDetails(dashboard.getDashboardId()));
 			} catch(Exception ex) {
 				Clients.showNotification(
-						"Unable to retrieve Widget details from DB for the Dashboard", false);
+						"Unable to retrieve Widget details from DB for the Dashboard", true);
 				LOG.error("Exception while fetching widget details from DB", ex);
+				return;
 			}
 		if(LOG.isDebugEnabled()){
 			LOG.debug("PortletList in configurePortlet(): "+dashboard.getPortletList());
 		}
+		if(dashboard.getPortletList() != null && dashboard.getPortletList().size() >0){
 		String chartType = Executions.getCurrent().getParameter(Constants.CHART_TYPE);
 		//As in Api flow each dashboard has single chart/widget, getting first widget
 		portlet = dashboard.getPortletList().get(0);
@@ -693,6 +701,11 @@ public class EditChartController extends SelectorComposer<Component> {
 					chartData = chartRenderer.parseXML(portlet.getChartDataXML());					
 				}
 			}
+		}else{
+			Clients.showNotification(
+					"The requested Dashboard doesn't have any Chart.Input valid Dashboard Id", true);
+			return;
+		}
 	}
 	
 	/**
