@@ -1,4 +1,5 @@
 <zk xmlns="http://www.zkoss.org/2005/zul"> 
+
 	<style src="/demo/css/bootstrap/css/bootstrap.min.css" />
 	<style src="/demo/css/flat.css"></style>
 	<style src="/demo/css/dashboard.css"></style>
@@ -18,7 +19,9 @@
 					zclass="btn btn-sm btn-danger" label=" Cancel " />
 			</hbox>
 		</div>
-		
+		<div if="${sessionScope.apiConfiguration.apiChartConfig}"> 		
+		 <button id="apiConfigSaveButton" tooltip="Save Chart " iconSclass="glyphicon glyphicon-floppy-disk" zclass="btn btn-sm btn-success" label=" Save " />
+	</div>
 		<hlayout id="editLayout">
 			<vbox spacing="0em">
 				<vbox height="270px">
@@ -36,47 +39,6 @@
 					</listbox>
 				</vbox>
 			</vbox>
-
-<<<<<<< HEAD
-<zk xmlns="http://www.zkoss.org/2005/zul">
-	<style src="/demo/css/bootstrap/css/bootstrap.min.css" />
-	<style src="/demo/css/flat.css"></style>
-	<style src="/demo/css/dashboard.css"></style>
-	<style src="/demo/css/c3.css"></style>
-	
-	<script  defer="true" src="js/barchart.js"></script>
-	<script  defer="true" src="js/linechart.js"></script>
-	<script  defer="true" src="js/piechart.js"></script>
-
-<vlayout id="editWindowLayout" apply="org.hpccsystems.dashboard.controller.EditChartController">
-	<div id="apiChartSettingDiv" if="${sessionScope.apiConfiguration.apiChartSetting}" style="margin: 5px;">
-			<hbox hflex="1" pack="end">
-				<button id="apiSaveButton" tooltip="Save Chart data" iconSclass="glyphicon glyphicon-floppy-disk"
-					zclass="btn btn-sm btn-success" label=" Save " />
-				<button id="apiCancelButton" tooltip="Cancel Chart data" iconSclass="glyphicon glyphicon-remove"
-					zclass="btn btn-sm btn-danger" label=" Cancel " />
-			</hbox>
-	</div>		
- 	<div if="${sessionScope.apiConfiguration.apiChartConfig}"> 		
-		 <button id="apiConfigSaveButton" tooltip="Save Chart " iconSclass="glyphicon glyphicon-floppy-disk" zclass="btn btn-sm btn-success" label=" Save " />
-	</div>
- <hlayout id="editLayout">
- 	<vbox spacing="0em">
- 		<vbox height="270px">
- 			<listbox width="200px" vflex="1" id="measureListBox" droppable="true"> 
-	 			<listhead>
-	            	<listheader label="${labels.measures}"/>
-	            </listhead>
-	 		</listbox>
- 		</vbox>
- 		<vbox height="270px">
- 			<listbox width="200px" vflex="1"  id="attributeListBox" droppable="true">
-	 			<listhead>
-	            	<listheader label="${labels.attributes}"/>
-	            </listhead>
-	 		</listbox>
- 		</vbox>
- 	</vbox>
  	
  	<vbox spacing="0em">
  		<vbox height="180px">
@@ -110,37 +72,4 @@
  </vlayout>
 
  </zk> 
- 
-=======
-			<vbox spacing="0em">
-				<vbox height="180px">
-					<listbox width="200px" vflex="1" id="YAxisListBox" droppable="true">
-						<listhead>
-							<listheader label="${labels.chartMeasures}" />
-						</listhead>
-					</listbox>
-				</vbox>
-				<vbox height="180px">
-					<listbox width="200px" vflex="1" id="XAxisListBox" droppable="true">
-						<listhead>
-							<listheader
-								label="${labels.chartAttributes}" />
-						</listhead>
-					</listbox>
-				</vbox>
-				<vbox height="180px">
-					<listbox width="200px" vflex="1" id="filterListBox" droppable="false">
-						<listhead>
-							<listheader label="${labels.chartFilters}" />
-						</listhead>
-					</listbox>
-				</vbox>
-			</vbox>
 
-			<div vflex="1" hflex="1"
-				style="border: 1px solid; border-color: rgb(184, 177, 177);" id="chart">
-			</div>
-		</hlayout>
-	</vlayout>
-</zk>
->>>>>>> branch 'master' of https://github.com/dhanasiddharth/Dashboard
