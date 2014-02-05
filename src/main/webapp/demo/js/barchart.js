@@ -12,7 +12,13 @@ function createChart(divId, chartData) {
 			
 			var datum = response.chartData;
 			var divElement = jq('$'+divId).empty();
-			divElement.append("text", response.title);
+			
+			jq("#" + divElement.attr("id"))
+				.append(
+						jq("<div style='margin-left: 3px; height: 15px;'>" + response.title +" </div>" ), 
+						jq( "<div id='"+ response.portletId + "holderDiv" +"'/>" 
+						)
+				);
 			
 			var fullHeight = divElement.height();
 			var fullWidth = divElement.width();
@@ -20,11 +26,14 @@ function createChart(divId, chartData) {
 			if(fullWidth < 50 ){ fullWidth = 400; }
 			if(fullHeight < 50 ){ fullHeight = 385; }
 			
-			var divToDraw = '#' + divElement.attr("id");
+			var showLegend = false;
+			if(Object.keys(response.yNames).length > 1) 
+				showLegend = true;
 			
 			console.log("Height = " + fullHeight);
 			console.log("Width = " + fullWidth);
-			
+			console.log("Legend = " + showLegend);
+			 
 			var isLargeGraph = false;
 			if(response.xValues.length > 25){
 				isLargeGraph = true;
@@ -35,8 +44,8 @@ function createChart(divId, chartData) {
 					rows: response.yValues,
 					types: response.yNames
 				},
-				bindto: divToDraw,
-				size: {
+				bindto: "#" + response.portletId + "holderDiv",
+				size: { 
 					width:fullWidth,
 					height:fullHeight - 15
 				},
@@ -53,6 +62,9 @@ function createChart(divId, chartData) {
 						label: response.xName
 					}
 				},
+				legend: {
+			        show: showLegend
+			    },
 				subchart: {
 			        show: isLargeGraph
 			    },

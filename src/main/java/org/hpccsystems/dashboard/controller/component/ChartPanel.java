@@ -160,10 +160,9 @@ public class ChartPanel extends Panel {
 		if(!portlet.getWidgetState().equals(Constants.STATE_LIVE_CHART)){
 			return null;
 		}	
-		if(portlet.getChartType().equals(Constants.BAR_CHART)){
+		if(portlet.getChartType().equals(Constants.BAR_CHART) || 
+				portlet.getChartType().equals(Constants.LINE_CHART)){
 			return "createChart('" + chartDiv.getId() +  "','"+ portlet.getChartDataJSON() +"')" ;
-		} else if(portlet.getChartType().equals(Constants.LINE_CHART)) {
-			return "createLineChart('" + chartDiv.getId() +  "','"+ portlet.getChartDataJSON() +"')" ;
 		} else {
 			return "createPieChart('" + chartDiv.getId() +  "','"+ portlet.getChartDataJSON() +"')" ;
 		}

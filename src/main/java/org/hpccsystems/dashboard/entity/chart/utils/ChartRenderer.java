@@ -84,7 +84,8 @@ public class ChartRenderer {
 				yName.append(colName);
 				yName.append(" & ");
 			}
-			header.addProperty("yName", yName.toString().substring(0, yName.toString().lastIndexOf('&') - 1));
+			yName.replace(yName.lastIndexOf("&"), yName.length(), "");
+			header.addProperty("yName", yName.toString());
 		}
 		title.append(chartData.getXColumnNames().get(0) + " BY " + yName.toString());
 		
@@ -162,15 +163,18 @@ public class ChartRenderer {
 				json = new JsonObject();
 				json.addProperty("xData",(String) bar.getxAxisVal());
 				
+				JsonObject yNames = new JsonObject();
+				for (String colName : chartData.getYColumnNames()) {
+					if(Constants.BAR_CHART.equals(portlet.getChartType())){
+						yNames.addProperty(colName, "bar");
+					} else if(Constants.LINE_CHART.equals(portlet.getChartType())){
+						yNames.addProperty(colName, "line");
+					}
+				}
+				header.add("yNames", yNames);
+				
 				//TODO - make this logic dynamic
 				if(Constants.BAR_CHART.equals(portlet.getChartType())){
-					JsonObject yNames = new JsonObject();
-					for (String colName : chartData.getYColumnNames()) {
-						yNames.addProperty(colName, "bar");
-					}
-					
-					header.add("yNames", yNames);
-					
 					json.addProperty(chartData.getYColumnNames().get(0), (BigDecimal)bar.getyAxisValues().get(0));
 					if(bar.getyAxisValues().size() > 1) {
 						json.addProperty(chartData.getYColumnNames().get(1), (BigDecimal)bar.getyAxisValues().get(1));
@@ -235,15 +239,13 @@ public class ChartRenderer {
 			Clients.showNotification("No data available to draw Chart",	true);
 		}
 		
-		if(Constants.BAR_CHART.equals(portlet.getChartType()) )	{
+		if((Constants.BAR_CHART.equals(portlet.getChartType()) || 
+				Constants.LINE_CHART.equals(portlet.getChartType())) )	{
 			Clients.evalJavaScript("createChart('" + divToDraw +  "','"+ portlet.getChartDataJSON() +"')" );
 		}
 		else if(Constants.PIE_CHART.equals(portlet.getChartType()))	{
 			Clients.evalJavaScript("createPieChart('" + divToDraw +  "','"+ portlet.getChartDataJSON() +"')" ); 
 		} 
-		else if (Constants.LINE_CHART.equals(portlet.getChartType())) {
-			Clients.evalJavaScript("createLineChart('" + divToDraw +  "','"+ portlet.getChartDataJSON() +"')" );
-		}		 
 	}
 	
 	/**
