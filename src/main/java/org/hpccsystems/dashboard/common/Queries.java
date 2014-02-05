@@ -27,6 +27,6 @@ public class Queries {
 	public static final String GET_WIDGET = "select * from widget_details where DASHBOARD_ID=? order by WIDGET_SEQUENCE";
 	public static final String RETRIEVE_DASHBOARD_DETAILS = "select * from dashboard_details where sourceid = ";
 	public static final String RETRIEVE_DASHBOARD_IDS = "select dashboard_id from dashboard_details where dashboard_id = ";
-	public static final String DASHBOARD_IN_CLAUSE = "' and DASHBOARD_ID in ";
+	public static final String DASHBOARD_IN_CLAUSE = " and DASHBOARD_ID in ";
 
 }

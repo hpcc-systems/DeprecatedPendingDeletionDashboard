@@ -42,16 +42,18 @@ public class DashboardDaoImpl implements DashboardDao {
 	 */
 	@SuppressWarnings("unchecked")
 	public List<Dashboard> fetchDashboardDetails(final Application application,final String userId,List<String> dashboardIdList)
-			throws DataAccessException {
+			throws DataAccessException {	
+		
 		List<Dashboard> dashboardList = null;
 		StringBuilder sqlBuffer = new StringBuilder();
-		sqlBuffer.append(Queries.RETRIEVE_DASHBOARD_DETAILS);
+		sqlBuffer.append(Queries.RETRIEVE_DASHBOARD_DETAILS).append("'").append(
+				application.getAppId()).append("'");
 		if(userId == null && dashboardIdList == null){
-			sqlBuffer.append("'").append(application.getAppId()).append("'").append(" order by updateddate desc");
+			sqlBuffer.append(" order by updateddate desc");
 		}
-		if (userId != null && dashboardIdList == null) {
-			sqlBuffer.append("'").append(application.getAppId());
-			sqlBuffer.append("' and user_id='").append(userId).append("' order by sequence");
+		else if (userId != null && dashboardIdList == null) {
+			sqlBuffer.append(" and user_id='").append(userId)
+					.append("' order by sequence");
 		} else if (dashboardIdList != null && dashboardIdList.size() > 0) {
 			sqlBuffer.append(Queries.DASHBOARD_IN_CLAUSE).append("( '");
 			int count = 1;
