@@ -1,19 +1,18 @@
 package org.hpccsystems.dashboard.controller;
 
-import java.util.ArrayList;
-import java.util.List;
 import java.util.Map;
-import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.common.Constants;
+import org.hpccsystems.dashboard.entity.ApiConfiguration;
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.entity.chart.XYChartData;
 import org.hpccsystems.dashboard.entity.chart.utils.ChartRenderer;
 import org.hpccsystems.dashboard.services.HPCCService;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.Sessions;
 import org.zkoss.zk.ui.event.ScrollEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
@@ -52,6 +51,7 @@ public class NumericFilterController extends SelectorComposer<Component>{
 	Label maximumLabel;
 	@Wire
 	Button filtersSelectedBtn;
+	private ApiConfiguration apiConfig;
 	
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
@@ -60,7 +60,7 @@ public class NumericFilterController extends SelectorComposer<Component>{
 		portlet = (Portlet) Executions.getCurrent().getAttribute(Constants.PORTLET);
 		chartData = (XYChartData) Executions.getCurrent().getAttribute(Constants.CHART_DATA);
 		doneButton = (Button) Executions.getCurrent().getAttribute(Constants.EDIT_WINDOW_DONE_BUTTON);
-		
+		apiConfig =(ApiConfiguration) Sessions.getCurrent().getAttribute("apiConfiguration");
 		Map<Integer, Integer> map = null;
 		try	{
 			map = hpccService.fetchFilterMinMax(chartData);
@@ -120,8 +120,9 @@ public class NumericFilterController extends SelectorComposer<Component>{
 			LOG.error("Exception while fetching column data from Hpcc", ex);
 			return;
 		}		
-
-		doneButton.setDisabled(false);		
+		if(apiConfig == null || (apiConfig != null && !apiConfig.isApiChartConfig())){
+			doneButton.setDisabled(false);	
+		}
 
 		if(LOG.isDebugEnabled()){
 			LOG.debug("Drawn filtered chart with Numeric filter");

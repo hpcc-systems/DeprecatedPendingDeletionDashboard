@@ -7,15 +7,17 @@ import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
+
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
 import javax.xml.parsers.ParserConfigurationException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hpccsystems.dashboard.controller.util.EncryptDecrypt;
 import org.hpccsystems.dashboard.common.Constants;
+import org.hpccsystems.dashboard.controller.util.EncryptDecrypt;
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.entity.chart.XYChartData;
 import org.hpccsystems.dashboard.entity.chart.XYModel;
@@ -27,6 +29,7 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.util.Clients;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonPrimitive;
 
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
@@ -72,15 +75,21 @@ public class ChartRenderer {
 		final JsonArray array = new JsonArray();
 		
 		final JsonObject header = new JsonObject();
+		StringBuilder yName = new StringBuilder();
+		StringBuilder title = new StringBuilder();
 		if(chartData.getYColumnNames().size() > 0 && 
 				chartData.getXColumnNames().size() > 0) {
 			header.addProperty("xName", chartData.getXColumnNames().get(0));
-			header.addProperty("yName", chartData.getYColumnNames().get(0));
 			
-			if(chartData.getYColumnNames().size() > 1) {
-				header.addProperty("yName2", chartData.getYColumnNames().get(1));
+			for (String colName : chartData.getYColumnNames()) {
+				yName.append(colName);
+				yName.append(" & ");
 			}
+			yName.replace(yName.lastIndexOf("&"), yName.length(), "");
+			header.addProperty("yName", yName.toString());
 		}
+		title.append(chartData.getXColumnNames().get(0) + " BY " + yName.toString());
+		
 		if(isEditWindow) {
 			header.addProperty("portletId", "e_" + portlet.getId());
 		} else {
@@ -96,12 +105,19 @@ public class ChartRenderer {
 			header.addProperty("filterColumn", chartData.getFilter().getColumn());
 			header.addProperty("stringFilter", 
 					constructFilterTitle(chartData.getFilter().getValues()));
+			
+			title.append(" WHERE " + chartData.getFilter().getColumn());
+			title.append(constructFilterTitle(chartData.getFilter().getValues()));
 		
 		} else if (chartData.getIsFiltered() && 
 				Constants.NUMERIC_DATA.equals(chartData.getFilter().getType())) {
 			header.addProperty("filterColumn", chartData.getFilter().getColumn());
 			header.addProperty("from", chartData.getFilter().getStartValue());
 			header.addProperty("to", chartData.getFilter().getEndValue());
+			
+			title.append(" WHERE " + chartData.getFilter().getColumn());
+			title.append(" BETWEEN " + chartData.getFilter().getStartValue());
+			title.append(" AND " + chartData.getFilter().getEndValue());
 		}
 		
 				if(LOG.isDebugEnabled()){
@@ -123,11 +139,40 @@ public class ChartRenderer {
 			Integer xLength = 0;
 			String xVal=null;BigDecimal yVal=null;
 			JsonObject json = null;
+			
+			JsonArray xValues = new JsonArray();
+			
+			JsonArray rows = new JsonArray();
+			JsonArray row = new JsonArray();
+			
+			for (String colName : chartData.getYColumnNames()) {
+				row.add(new JsonPrimitive(colName));
+			}
+			rows.add(row);
+			
 			if(iterator != null){
 			while(iterator.hasNext()){
 				final XYModel bar = iterator.next();
+				row = new JsonArray();
+				for (Object object: bar.getyAxisValues()) {
+					row.add(new JsonPrimitive((BigDecimal)object));
+				}
+				
+				rows.add(row);
+				xValues.add(new JsonPrimitive(bar.getxAxisVal().toString()));
+				
 				json = new JsonObject();
 				json.addProperty("xData",(String) bar.getxAxisVal());
+				
+				JsonObject yNames = new JsonObject();
+				for (String colName : chartData.getYColumnNames()) {
+					if(Constants.BAR_CHART.equals(portlet.getChartType())){
+						yNames.addProperty(colName, "bar");
+					} else if(Constants.LINE_CHART.equals(portlet.getChartType())){
+						yNames.addProperty(colName, "line");
+					}
+				}
+				header.add("yNames", yNames);
 				
 				//TODO - make this logic dynamic
 				if(Constants.BAR_CHART.equals(portlet.getChartType())){
@@ -165,8 +210,11 @@ public class ChartRenderer {
 			//Adding a default pading of 5 and 10px per digit
 			header.addProperty("yWidth", (yLength<2)? yLength*10 + 30:(yLength<3)? yLength*10 + 10: yLength*10);
 			header.addProperty("xWidth", xLength*15 + 5);
+			header.addProperty("title", title.toString());
 			
 			header.add("chartData", array);
+			header.add("yValues", rows);
+			header.add("xValues", xValues);
 			
 			final String data = header.toString();
 			
@@ -190,17 +238,15 @@ public class ChartRenderer {
 
 		if( portlet.getChartDataJSON() == null) {
 			Clients.showNotification("No data available to draw Chart",	true);
-		}
-		
-		if(Constants.BAR_CHART.equals(portlet.getChartType()) )	{
+		}		
+				
+		if((Constants.BAR_CHART.equals(portlet.getChartType()) || 
+				Constants.LINE_CHART.equals(portlet.getChartType())) )	{
 			Clients.evalJavaScript("createChart('" + divToDraw +  "','"+ portlet.getChartDataJSON() +"')" );
 		}
 		else if(Constants.PIE_CHART.equals(portlet.getChartType()))	{
 			Clients.evalJavaScript("createPieChart('" + divToDraw +  "','"+ portlet.getChartDataJSON() +"')" ); 
 		} 
-		else if (Constants.LINE_CHART.equals(portlet.getChartType())) {
-			Clients.evalJavaScript("createLineChart('" + divToDraw +  "','"+ portlet.getChartDataJSON() +"')" );
-		}		 
 	}
 	
 	/**
@@ -210,7 +256,7 @@ public class ChartRenderer {
 	 */
 	private String constructFilterTitle(List<String> filteredValues)
 	{
-		StringBuffer stringFilterValue = new StringBuffer(" is ");
+		StringBuffer stringFilterValue = new StringBuffer(" IS ");
 		int index=0;
 		for(String filter :filteredValues)
 		{
@@ -257,8 +303,8 @@ public class ChartRenderer {
 		} catch (JAXBException e) {
 			LOG.error("EXCEPTION: JAXBException in ChartRenderer",e);
 		} catch (Exception e) {
-			
-		}
+			LOG.error("EXCEPTION in parseXML()",e);
+		}		
 		return chartData;
 	}
 		

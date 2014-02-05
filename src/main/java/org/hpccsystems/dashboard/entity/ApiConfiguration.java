@@ -6,15 +6,34 @@ package org.hpccsystems.dashboard.entity;
  */
 public class ApiConfiguration {
 	private boolean apiEnabled;
-	private boolean apiChartSetting;
-
-	public boolean isApiChartSetting() {
-		return apiChartSetting;
+	private boolean apiConfig;
+	private boolean apiChartConfig;
+	
+	public boolean isApiChartConfig() {
+		return apiChartConfig;
 	}
 
-	public void setApiChartSetting(boolean apiChartSetting) {
-		this.apiChartSetting = apiChartSetting;
+	public void setApiChartConfig(boolean apiChartConfig) {
+		this.apiChartConfig = apiChartConfig;
 	}
+
+	@Override
+	public String toString() {
+		
+		StringBuffer buffer = new StringBuffer();
+		buffer.append("ApiConfiguration [apiEnabled=" ).append(apiEnabled).append(", apiConfig=")
+		.append(apiConfig).append(", apiChartConfig=" ).append(apiChartConfig)
+		.append("]");
+		return buffer.toString();
+	}
+
+	public boolean isApiConfig() {
+		return apiConfig;
+	}
+
+	public void setApiConfig(boolean apiConfig) {
+		this.apiConfig = apiConfig;
+	}		
 
 	public boolean isApiEnabled() {
 		return apiEnabled;

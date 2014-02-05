@@ -1,5 +1,26 @@
 
+<zk xmlns="http://www.zkoss.org/2005/zul">
+	<style src="/demo/css/bootstrap/css/bootstrap.min.css" />
+	<style src="/demo/css/flat.css"></style>
+	<style src="/demo/css/dashboard.css"></style>
+	<style src="/demo/css/c3.css"></style>
+	
+	<script  defer="true" src="js/barchart.js"></script>
+	<script  defer="true" src="js/linechart.js"></script>
+	<script  defer="true" src="js/piechart.js"></script>
+
 <vlayout id="editWindowLayout" apply="org.hpccsystems.dashboard.controller.EditChartController">
+	<div id="apiChartSettingDiv" if="${sessionScope.apiConfiguration.apiChartSetting}" style="margin: 5px;">
+			<hbox hflex="1" pack="end">
+				<button id="apiSaveButton" tooltip="Save Chart data" iconSclass="glyphicon glyphicon-floppy-disk"
+					zclass="btn btn-sm btn-success" label=" Save " />
+				<button id="apiCancelButton" tooltip="Cancel Chart data" iconSclass="glyphicon glyphicon-remove"
+					zclass="btn btn-sm btn-danger" label=" Cancel " />
+			</hbox>
+	</div>		
+ 	<div if="${sessionScope.apiConfiguration.apiChartConfig}"> 		
+		 <button id="apiConfigSaveButton" tooltip="Save Chart " iconSclass="glyphicon glyphicon-floppy-disk" zclass="btn btn-sm btn-success" label=" Save " />
+	</div>
  <hlayout id="editLayout">
  	<vbox spacing="0em">
  		<vbox height="270px">
@@ -43,14 +64,11 @@
  	</vbox>
  	
  	<div vflex="1" hflex="1" style="border: 1px solid; border-color: rgb(184, 177, 177);" id="chart">
- 	
+ 		
  	</div>
- </hlayout>
- <div id ="apiChartSettingDiv"  if="${sessionScope.apiConfiguration.apiChartSetting}">
-	 <hbox>
-		 <button id="apiSaveButton" tooltip="Save Chart data" iconSclass="glyphicon glyphicon-floppy-disk" zclass="btn btn-sm btn-success" label=" Save " /> 
-		 <button id="apiCancelButton" tooltip="Cancel Chart data" iconSclass="glyphicon glyphicon-floppy-remove" zclass="btn btn-sm btn-danger" label=" Cancel "/> 
-	 </hbox>
- </div>
+ 	
+ </hlayout> 
  </vlayout>
+
+ </zk> 
  

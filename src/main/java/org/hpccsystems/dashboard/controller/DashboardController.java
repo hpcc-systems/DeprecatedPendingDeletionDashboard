@@ -152,7 +152,7 @@ public class DashboardController extends SelectorComposer<Component>{
 				}
 			} else if(dashboard.getPortletList().isEmpty() && dashboard.isPersisted()) {
 				//Dashboard is persisted but not present in session
-				//Webservices are called to retrive chart data
+				//Webservices are called to retrieve chart data
 				if(LOG.isDebugEnabled()){
 					LOG.debug("Creating Dashboard from DB.");
 				}
