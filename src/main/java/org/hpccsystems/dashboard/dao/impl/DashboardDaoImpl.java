@@ -47,7 +47,7 @@ public class DashboardDaoImpl implements DashboardDao {
 		StringBuilder sqlBuffer = new StringBuilder();
 		sqlBuffer.append(Queries.RETRIEVE_DASHBOARD_DETAILS);
 		if(userId == null && dashboardIdList == null){
-			sqlBuffer.append("'").append(application.getAppId()).append("'");
+			sqlBuffer.append("'").append(application.getAppId()).append("'").append(" order by updateddate desc");
 		}
 		if (userId != null && dashboardIdList == null) {
 			sqlBuffer.append("'").append(application.getAppId());
