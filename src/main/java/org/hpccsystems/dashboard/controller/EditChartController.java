@@ -532,9 +532,9 @@ public class EditChartController extends SelectorComposer<Component> {
 		chartData.setHpccConnection(configuration.getHpccConnection());
 		List<Field> feildList = configuration.getFields();
 		Map<String,String> columnSchemaMap = new HashMap<String,String>();
-		for(Field feild :feildList)
+		for(Field field :feildList)
 		{
-			columnSchemaMap.put(feild.getColumnName(), feild.getDataType());
+			columnSchemaMap.put(field.getColumnName(), field.getDataType());
 		}
 		apiSaveButton.addEventListener(Events.ON_CLICK, saveApiChartSettings);
 		apiCancelButton.addEventListener(Events.ON_CLICK, cancelApiChartSettings);
