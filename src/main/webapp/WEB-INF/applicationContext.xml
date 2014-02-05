@@ -32,14 +32,14 @@
     	 <property name="hpccService"><ref bean="hpccService"/></property>
 	</bean>
 	
-	<bean id="fileConverter" class="org.hpccsystems.dashboard.entity.chart.utils.FileConverter" >
-	</bean>
+	<bean id="fileConverter" class="org.hpccsystems.dashboard.entity.chart.utils.FileConverter" />
 	
-	<bean id="dashboardHelper" class="org.hpccsystems.dashboard.helper.DashboardHelper" >
-	</bean>
+	<bean id="dashboardHelper" class="org.hpccsystems.dashboard.helper.DashboardHelper" />
 	
 	<bean id="tableRenderer" class="org.hpccsystems.dashboard.entity.chart.utils.TableRenderer">
-    	 <property name="fileConverter" ref="fileConverter"/>
+	<!-- 
+    	 <property name="fileConverter"> <ref bean="fileConverter"/> </property>
+	 -->
 	</bean>
 		
 	<bean id="widgetService" class="org.hpccsystems.dashboard.services.impl.WidgetServiceImpl" >

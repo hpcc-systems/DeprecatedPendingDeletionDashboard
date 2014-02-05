@@ -16,6 +16,10 @@ import org.zkoss.zul.Listitem;
 
 public class FileConverter {
 	
+	public FileConverter() {
+		
+	}
+	
 	private static final  Log LOG = LogFactory.getLog(FileConverter.class); 
 	
 	/**
