@@ -320,8 +320,24 @@ public class EditChartController extends SelectorComposer<Component> {
 			
 			//Disabling filter and chart clearance function in Api chart config/edit flow without chart
 			if(apiConfig == null || (apiConfig != null && !apiConfig.isApiConfig())){				
-			filterListBox.setDroppable("false");			
-			Clients.evalJavaScript("clearChart('" + Constants.EDIT_WINDOW_CHART_DIV +  "')");
+				filterListBox.setDroppable("false");	
+				
+				// Only clear the existing chart when no columns are present otherwise recreate the chart
+				if(chartData.getYColumnNames().size() < 1) {
+					Clients.evalJavaScript("clearChart('" + Constants.EDIT_WINDOW_CHART_DIV +  "')");
+				} else {
+					try {
+						chartRenderer.constructChartJSON(chartData, portlet, true);
+						chartRenderer.drawChart(chartData,	Constants.EDIT_WINDOW_CHART_DIV, portlet);
+						return;
+					} catch (Exception ex) {
+						Clients.showNotification(
+								"Unable to fetch column data from Hpcc", "error",
+								EditChartController.this.getSelf(), "middle_center", 3000, true);
+						LOG.error("Exception while fetching column data from Hpcc",ex);
+					}			
+				}
+				
 			}
 			//Disabling done button in API Chart Config flow
 			if(apiConfig == null || (apiConfig != null && (!apiConfig.isApiChartConfig()

@@ -5,10 +5,14 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.hpccsystems.dashboard.controller.EditChartController;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
+import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Hbox;
 import org.zkoss.zul.Listbox;
@@ -24,12 +28,10 @@ import org.zkoss.zul.Vbox;
  */
 public class TableRenderer {
 		
-		FileConverter fileConverter;
+		private static final Log LOG = LogFactory.getLog(TableRenderer.class); 
+	
+		FileConverter fileConverter = new FileConverter();
 		
-		@Autowired
-		public void setFileConverter(FileConverter fileConverter) {
-			this.fileConverter = fileConverter;
-		}
 		
 		/**
 		 * Constructs a table widget
@@ -103,7 +105,7 @@ public class TableRenderer {
 			button.setLabel("CSV");
 			button.addEventListener(Events.ON_CLICK, new EventListener<Event>() {
 				public void onEvent(Event event) throws Exception {
-					fileConverter.exportListboxToCsv(listBox,chartTitle);
+					TableRenderer.this.fileConverter.exportListboxToCsv(listBox,chartTitle);
 				}
 			});
 			hbox.appendChild(button);
