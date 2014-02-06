@@ -18,20 +18,22 @@
 					zclass="btn btn-sm btn-danger" label=" Cancel " />
 			</hbox>
 		</div>
-		<div if="${sessionScope.apiConfiguration.apiChartConfig}"> 		
+		<div if="${sessionScope.apiConfiguration.apiChartConfig}"> 
+		<hbox hflex="1" pack="end">		
 		 <button id="apiConfigSaveButton" tooltip="Save Chart " iconSclass="glyphicon glyphicon-floppy-disk" zclass="btn btn-sm btn-success" label=" Save " />
-	</div>
+		</hbox>
+		</div>
 		<hlayout id="editLayout">
 			<vbox spacing="0em">
 				<vbox height="270px">
-					<listbox width="200px" vflex="1" id="measureListBox" droppable="true">
+					<listbox width="200px" height="270px" id="measureListBox" droppable="true">
 						<listhead>
 							<listheader label="${labels.measures}" />
 						</listhead>
 					</listbox>
 				</vbox>
 				<vbox height="270px">
-					<listbox width="200px" vflex="1" id="attributeListBox" droppable="true">
+					<listbox width="200px" height="270px" id="attributeListBox" droppable="true">
 						<listhead>
 							<listheader label="${labels.attributes}" />
 						</listhead>
