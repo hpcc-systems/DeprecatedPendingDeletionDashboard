@@ -585,8 +585,7 @@ public class EditChartController extends SelectorComposer<Component> {
 		chartData.setHpccConnection(configuration.getHpccConnection());
 		List<Field> feildList = configuration.getFields();
 		Map<String,String> columnSchemaMap = new HashMap<String,String>();
-		for(Field field :feildList)
-		{
+		for(Field field :feildList) {
 			columnSchemaMap.put(field.getColumnName(), field.getDataType());
 		}
 		apiSaveButton.addEventListener(Events.ON_CLICK, saveApiChartSettings);
@@ -697,7 +696,9 @@ public class EditChartController extends SelectorComposer<Component> {
 					chartData = chartRenderer.parseXML(portlet.getChartDataXML());					
 				}
 			}
-			portlet.setChartType(Integer.valueOf(chartType));
+			if(chartType != null){
+				portlet.setChartType(Integer.valueOf(chartType));
+			}
 		}else{
 			Clients.showNotification(
 					"The requested Dashboard doesn't have any Chart.Input valid Dashboard Id", true);

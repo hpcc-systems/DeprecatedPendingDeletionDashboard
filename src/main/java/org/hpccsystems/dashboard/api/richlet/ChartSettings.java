@@ -50,8 +50,10 @@ public class ChartSettings extends GenericRichlet{
 				} else if (args.containsKey(Constants.CHART_TYPE)) {
 					//Setting the role to user to view Chart
 					credential.addRole(Constants.CIRCUIT_ROLE_VIEW_CHART);
-					
 					chartType = args.get(Constants.CHART_TYPE)[0];
+					dashboardId = args.get(Constants.DB_DASHBOARD_ID)[0];
+				} else {
+					credential.addRole(Constants.CIRCUIT_ROLE_VIEW_CHART);
 					dashboardId = args.get(Constants.DB_DASHBOARD_ID)[0];
 				}
 			}catch(Exception ex){
@@ -69,7 +71,7 @@ public class ChartSettings extends GenericRichlet{
 			
 			if(config != null){
 				//constructing url for edit window without chart
-					url.append("format").append("=").append(format).append("&")
+				url.append("format").append("=").append(format).append("&")
 					.append("config").append("=").append(config);			
 			}else{
 				//constructing url for edit window with chart
