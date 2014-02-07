@@ -206,18 +206,13 @@ public class DashboardController extends SelectorComposer<Component>{
 			
 		} else {
 			dashboardWin.setBorder("none");
-			if(authenticationService.getUserCredential().getApplicationId().equals(Constants.CIRCUIT_APPLICATION_ID)){
-				configureDashboard.setVisible(false);
-				deleteDashboard.setVisible(false);
-				addWidget.setVisible(false);
-			}
 			return;
 		}
 		
 		dashboardWin.addEventListener("onPortalClose", onPanelClose);
 		dashboardWin.addEventListener("onLayoutChange", onLayoutChange);
 		
-		if(authenticationService.getUserCredential().getApplicationId().equals(Constants.CIRCUIT_APPLICATION_ID)){
+		if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD)){
 			saveApiView.addEventListener(Events.ON_CLICK, saveApiChanges); 
 		}
 		if(LOG.isDebugEnabled()){

@@ -11,7 +11,7 @@
 		<hbox pack="stretch" width="100%" style="font-size:12px">
 			<label zclass="h1" vflex="1" id="nameLabel" maxlength="40"></label>
 			<toolbar align="end" style="float:right; border-style: none; margin-right:25px;" height="46px" zclass="btn-group"
-				 if="${sessionScope.userCredential.hasRole('viewDashboard')}">
+				 if="${not sessionScope.userCredential.hasRole('viewDashboard')}">
 				<button id="addWidget" iconSclass="glyphicon glyphicon-plus" zclass="btn btn-sm btn-primary" label=" Add Widget"></button>
 				<button id="configureDashboard" iconSclass="glyphicon glyphicon-cog" zclass="btn btn-sm btn-primary" label=" Configure Dashboard"></button>
 				<button id="deleteDashboard" iconSclass="glyphicon glyphicon-trash" zclass="btn btn-sm btn-danger" label=" Delete Dashboard"></button>
