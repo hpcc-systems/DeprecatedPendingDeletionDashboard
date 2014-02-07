@@ -129,51 +129,56 @@ public class EditChartController extends SelectorComposer<Component> {
 			filterListBox.setStyle("backgroundr:gray;");
 			filterListBox.invalidate();			
 		}
+		
+		//API chart config flow with chart
+		if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_CHART)) {
+			configureDashboardPortlet();
+		} else if (!authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_CONFIG_CHART)) {
+			//Other flows:Dashboard chart edit flow & API Dashboard View flow
+			portlet = (Portlet) Executions.getCurrent().getAttribute(Constants.PORTLET);
+			chartData = (XYChartData) Executions.getCurrent().getAttribute(Constants.CHART_DATA);
+			doneButton = (Button) Executions.getCurrent().getAttribute(Constants.EDIT_WINDOW_DONE_BUTTON);
+		}
+		
+		if(!authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_CONFIG_CHART)){
+			// When live chart is present in ChartPanel
+			if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())){
+				for (String colName : chartData.getXColumnNames()) {
+					createXListChild(colName);
+				}
+				for (String colName : chartData.getYColumnNames()) {
+					createYListChild(colName);
+				}
+				xAxisDropped = true;
+				yAxisDropped = true;
+				filterListBox.setDroppable("true");
+				XAxisListBox.setDroppable("false");
+				validateYAxisDrops();
+				try	{
+					chartRenderer.constructChartJSON(chartData, portlet, true);
+					chartRenderer.drawChart(chartData,Constants.EDIT_WINDOW_CHART_DIV, portlet);
+				} catch(Exception ex) {
+					Clients.showNotification("Unable to fetch column data from Hpcc", "error", comp, "middle_center", 3000, true);
+					LOG.error("Exception while fetching column data from Hpcc", ex);
+				}
+				
+				if(chartData.getIsFiltered()) {
+					createFilterListItem(chartData.getFilter().getColumn());
+					filterListBox.setDroppable("false");
+				}
+			} 		
+			try	{
+				columnSchemaMap = hpccService.getColumnSchema(chartData.getFileName(), chartData.getHpccConnection());
+			} catch(Exception e) {
+				Clients.showNotification("Unable to fetch columns from HPCC", "error", comp, "middle_center", 3000, true);
+				LOG.error(Constants.ERROR_RETRIEVE_COLUMNS, e);
+			}
+		}
+		
 		//Dashboard chart edit flow and API Dashboard View flow,API chart config flow with chart
 		if( !authenticationService.getUserCredential().getApplicationId().equals(Constants.CIRCUIT_APPLICATION_ID)
-				||authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_CHART)) {			
-			//API chart config flow with chart
-			if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_CHART))
-			{
-				configureDashboardPortlet();
-			} else {
-				//Other flows:Dashboard chart edit flow & API Dashboard View flow
-				portlet = (Portlet) Executions.getCurrent().getAttribute(Constants.PORTLET);
-				chartData = (XYChartData) Executions.getCurrent().getAttribute(Constants.CHART_DATA);
-				doneButton = (Button) Executions.getCurrent().getAttribute(Constants.EDIT_WINDOW_DONE_BUTTON);
-			}
-		// When live chart is present in ChartPanel
-		if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())){
-			for (String colName : chartData.getXColumnNames()) {
-				createXListChild(colName);
-			}
-			for (String colName : chartData.getYColumnNames()) {
-				createYListChild(colName);
-			}
-			xAxisDropped = true;
-			yAxisDropped = true;
-			filterListBox.setDroppable("true");
-			XAxisListBox.setDroppable("false");
-			validateYAxisDrops();
-			try	{
-				chartRenderer.constructChartJSON(chartData, portlet, true);
-				chartRenderer.drawChart(chartData,Constants.EDIT_WINDOW_CHART_DIV, portlet);
-			} catch(Exception ex) {
-				Clients.showNotification("Unable to fetch column data from Hpcc", "error", comp, "middle_center", 3000, true);
-				LOG.error("Exception while fetching column data from Hpcc", ex);
-			}
+				||authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_CHART)) {
 			
-			if(chartData.getIsFiltered()) {
-				createFilterListItem(chartData.getFilter().getColumn());
-				filterListBox.setDroppable("false");
-			}
-		} 		
-		try	{
-			columnSchemaMap = hpccService.getColumnSchema(chartData.getFileName(), chartData.getHpccConnection());
-		} catch(Exception e) {
-			Clients.showNotification("Unable to fetch columns from HPCC", "error", comp, "middle_center", 3000, true);
-			LOG.error(Constants.ERROR_RETRIEVE_COLUMNS, e);
-		}
 		}
 		Listitem listItem;
 		if(columnSchemaMap != null){
@@ -606,10 +611,14 @@ public class EditChartController extends SelectorComposer<Component> {
 				newPortlets.add(widget);
 			}
 			widgetService.addWidgetDetails(dashboard.getDashboardId(), newPortlets);
-			Messagebox.show("The Chart Settings data are Saved.You can close the window","",1,Messagebox.ON_OK);			
-			authenticationService.logout(null);	
-			editWindowLayout.detach();
-			Clients.evalJavaScript("window.open('','_self'); window.close();");
+			Messagebox.show("The Chart Settings data are Saved.Your window will be closed","",1,Messagebox.ON_OK, new EventListener<Event>() {
+				@Override
+				public void onEvent(Event arg0) throws Exception {
+					authenticationService.logout(null);	
+					editWindowLayout.detach();
+					Clients.evalJavaScript("window.open('','_self'); window.close();");
+				}
+			});			
 		}
 	};
 	
@@ -618,10 +627,14 @@ public class EditChartController extends SelectorComposer<Component> {
 	 */
 	EventListener<Event> cancelApiChartSettings = new EventListener<Event>() {
 		public void onEvent(Event event) throws Exception {
-			Messagebox.show("The Chart Settings data are not Saved.You can close the window","",1,Messagebox.ON_OK);			
-			authenticationService.logout(null);	
-			editWindowLayout.detach();
-			Clients.evalJavaScript("window.open('','_self'); window.close();");
+			Messagebox.show("The Chart Settings data are not Saved.You can close the window","",1,Messagebox.ON_OK, new EventListener<Event>() {
+				@Override
+				public void onEvent(Event arg0) throws Exception {
+					authenticationService.logout(null);	
+					editWindowLayout.detach();
+					Clients.evalJavaScript("window.open('','_self'); window.close();");
+				}
+			});			
 		}
 	};
 	
@@ -716,9 +729,13 @@ public class EditChartController extends SelectorComposer<Component> {
 			dashBoardIdList.add(dashboard);
 			try	{
 				dashboardHelper.updateDashboardWidgetDetails(dashBoardIdList);
-				Messagebox.show("Your Chart details are Saved. This tab will now be closed","",1,Messagebox.ON_OK);
-				authenticationService.logout(null);
-				Clients.evalJavaScript("window.open('','_self'); window.close();");
+				Messagebox.show("Your Chart details are Saved. This tab will now be closed","",1,Messagebox.ON_OK, new EventListener<Event>() {
+					@Override
+					public void onEvent(Event arg0) throws Exception {
+						authenticationService.logout(null);
+						Clients.evalJavaScript("window.open('','_self'); window.close();");
+					}
+				});
 			} catch(Exception ex) {
 				Clients.showNotification("Unable to update Chart details into DB", true);
 	        	LOG.error("Exception saveApiChartConfigData Listener in DashboardController", ex);

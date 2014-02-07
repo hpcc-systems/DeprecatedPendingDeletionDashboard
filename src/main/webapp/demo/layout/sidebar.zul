@@ -20,6 +20,6 @@
 		}); 
 	}
 	</script>
-<button zclass="btn sidebar-button" id="addDash" label="${labels.plusAddDashboard}"  if="${not sessionScope.apiConfiguration.apiEnabled}"></button>
+<button zclass="btn sidebar-button" id="addDash" label="${labels.plusAddDashboard}"  if="${not sessionScope.userCredential.hasRole('viewDashboard')}"></button>
 </div>
 </div>
