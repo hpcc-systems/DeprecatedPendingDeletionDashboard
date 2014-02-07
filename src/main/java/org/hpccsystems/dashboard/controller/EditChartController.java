@@ -138,14 +138,9 @@ public class EditChartController extends SelectorComposer<Component> {
 				configureDashboardPortlet();
 			} else {
 				//Other flows:Dashboard chart edit flow & API Dashboard View flow
-				portlet = (Portlet) Executions.getCurrent().getAttribute(
-						Constants.PORTLET);
-
-				chartData = (XYChartData) Executions.getCurrent().getAttribute(
-						Constants.CHART_DATA);
-
-				doneButton = (Button) Executions.getCurrent().getAttribute(
-						Constants.EDIT_WINDOW_DONE_BUTTON);
+				portlet = (Portlet) Executions.getCurrent().getAttribute(Constants.PORTLET);
+				chartData = (XYChartData) Executions.getCurrent().getAttribute(Constants.CHART_DATA);
+				doneButton = (Button) Executions.getCurrent().getAttribute(Constants.EDIT_WINDOW_DONE_BUTTON);
 			}
 		// When live chart is present in ChartPanel
 		if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())){
@@ -551,7 +546,6 @@ public class EditChartController extends SelectorComposer<Component> {
 	private Map<String,String> configureChartSettingData()
 	{
 		Execution exe = Executions.getCurrent();
-		String source = exe.getParameter("source");
 		String sourceId = exe.getParameter("source_id");
 		String format = exe.getParameter("format");
 		String config = exe.getParameter("config");

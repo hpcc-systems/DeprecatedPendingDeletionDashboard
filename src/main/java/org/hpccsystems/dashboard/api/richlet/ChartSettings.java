@@ -23,38 +23,33 @@ public class ChartSettings extends GenericRichlet{
 		if(LOG.isDebugEnabled()) {
 			LOG.debug("Inside Richlet.. ");
 		}
-		
-		
-		String source;
-		String sourceId;
-		String format = null;
-		String config = null;
-		String chartType = null;
-		String dashboardId = null;
-		
+	
 		UserCredential credential = new UserCredential("2", "admin", Constants.CIRCUIT_APPLICATION_ID);
 		Sessions.getCurrent().setAttribute("userCredential", credential);
 		
+		StringBuilder url = new StringBuilder("/demo/?");			
 		try {
 			try{			
 			Map<String, String[]> args = Executions.getCurrent().getParameterMap();
-			source = args.get(Constants.SOURCE)[0];
-			sourceId = args.get(Constants.SOURCE_ID)[0];
-			
+			url.append("source").append("=").append(args.get(Constants.SOURCE)[0]);
 				if (args.containsKey(Constants.CIRCUIT_CONFIG)) {
 					//Setting the role to user to Configure chart
 					credential.addRole(Constants.CIRCUIT_ROLE_CONFIG_CHART);
 					
-					format = args.get(Constants.CHARTLIST_FORMAT)[0];
-					config = args.get(Constants.CIRCUIT_CONFIG)[0];
-				} else if (args.containsKey(Constants.CHART_TYPE)) {
+					url.append("&").append("source_id").append("=").append(args.get(Constants.SOURCE_ID)[0]);
+					url.append("&").append("format").append("=").append(args.get(Constants.CHARTLIST_FORMAT)[0]);
+					url.append("&").append("config").append("=").append(args.get(Constants.CIRCUIT_CONFIG)[0]);
+				} else if (args.containsKey(Constants.CHART_TYPE) && args.containsKey(Constants.SOURCE_ID)) {
 					//Setting the role to user to view Chart
 					credential.addRole(Constants.CIRCUIT_ROLE_VIEW_CHART);
-					chartType = args.get(Constants.CHART_TYPE)[0];
-					dashboardId = args.get(Constants.DB_DASHBOARD_ID)[0];
+					
+					url.append("&").append("source_id").append("=").append(args.get(Constants.SOURCE_ID)[0]);
+					url.append("&").append("chartType").append("=").append(args.get(Constants.CHART_TYPE)[0]);
+					url.append("&").append("dashboardId").append("=").append(args.get(Constants.DB_DASHBOARD_ID)[0]);
 				} else {
 					credential.addRole(Constants.CIRCUIT_ROLE_VIEW_CHART);
-					dashboardId = args.get(Constants.DB_DASHBOARD_ID)[0];
+					
+					url.append("&").append("dashboardId").append("=").append(args.get(Constants.DB_DASHBOARD_ID)[0]);
 				}
 			}catch(Exception ex){
 				Clients.showNotification("Malformated URL string", false);
@@ -65,19 +60,7 @@ public class ChartSettings extends GenericRichlet{
 			if(LOG.isDebugEnabled()) {
 				LOG.debug("Creating API edit portlet screen...");
 			}
-			StringBuilder url = new StringBuilder("/demo/?");			
-			url.append("source").append("=").append(source).append("&")
-					.append("source_id").append("=").append(sourceId).append("&");
 			
-			if(config != null){
-				//constructing url for edit window without chart
-				url.append("format").append("=").append(format).append("&")
-					.append("config").append("=").append(config);			
-			}else{
-				//constructing url for edit window with chart
-				url.append("chartType").append("=").append(chartType).append("&")
-				.append("dashboardId").append("=").append(dashboardId);	
-			}
 			Executions.sendRedirect(url.toString());		
 		} catch (Exception e) {
 			Clients.showNotification("Unable to configure chart.Please input valid data", false);
