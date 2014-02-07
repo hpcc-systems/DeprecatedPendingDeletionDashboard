@@ -609,6 +609,7 @@ public class EditChartController extends SelectorComposer<Component> {
 			Messagebox.show("The Chart Settings data are Saved.You can close the window","",1,Messagebox.ON_OK);			
 			authenticationService.logout(null);	
 			editWindowLayout.detach();
+			Clients.evalJavaScript("window.open('','_self'); window.close();");
 		}
 	};
 	
@@ -620,6 +621,7 @@ public class EditChartController extends SelectorComposer<Component> {
 			Messagebox.show("The Chart Settings data are not Saved.You can close the window","",1,Messagebox.ON_OK);			
 			authenticationService.logout(null);	
 			editWindowLayout.detach();
+			Clients.evalJavaScript("window.open('','_self'); window.close();");
 		}
 	};
 	
@@ -714,8 +716,9 @@ public class EditChartController extends SelectorComposer<Component> {
 			dashBoardIdList.add(dashboard);
 			try	{
 				dashboardHelper.updateDashboardWidgetDetails(dashBoardIdList);
-				Messagebox.show("Your Chart details are Saved.You can close the window","",1,Messagebox.ON_OK);
+				Messagebox.show("Your Chart details are Saved. This tab will now be closed","",1,Messagebox.ON_OK);
 				authenticationService.logout(null);
+				Clients.evalJavaScript("window.open('','_self'); window.close();");
 			} catch(Exception ex) {
 				Clients.showNotification("Unable to update Chart details into DB", true);
 	        	LOG.error("Exception saveApiChartConfigData Listener in DashboardController", ex);
