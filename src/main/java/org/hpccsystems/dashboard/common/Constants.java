@@ -83,7 +83,7 @@ public class Constants {
 	public static final String STATUS_SUCCESS = "success";
 	public static final String STATUS_FAIL = "failed";
 	public static final String STATUS_MESSAGE = "message";
-	public static final String DASHBOARD_NOT_EXIST = "Dashboard 123 does not exist";
+	public static final String DASHBOARD_NOT_EXIST = "Dashboard does not exist";
 	public static final String RES_TEXT_TYPE_JSON = "application/json";
 	public static final String CHAR_CODE = "UTF-8";
 	public static final String CHARTLIST_FORMAT = "format";
