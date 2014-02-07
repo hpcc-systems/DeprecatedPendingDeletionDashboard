@@ -9,7 +9,11 @@
 <script  defer="true" src="js/piechart.js"></script>
 
 	<!-- create only when the currentUser is not an anonymous  -->
-	<borderlayout if="${(not sessionScope.userCredential.anonymous) or (sessionScope.userCredential.getApplicationId().equals('circuit') and sessionScope.userCredential.hasRole('viewDashboard'))}" >
+	<borderlayout if="${not (sessionScope.userCredential.hasRole('viewChart') or sessionScope.userCredential.hasRole('configureChart')) 
+							and (
+									(not sessionScope.userCredential.anonymous) or 
+									(sessionScope.userCredential.getApplicationId().equals('circuit') and sessionScope.userCredential.hasRole('viewDashboard'))
+								)}" >
 		<north height="70px" style="background-color: #292929;" border="none" zclass="banner" >		
 			<include src="/demo/layout/banner.zul" />
 		</north>
