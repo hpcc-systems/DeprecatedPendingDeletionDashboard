@@ -2,8 +2,14 @@
 <style src="css/bootstrap/css/bootstrap.min.css"/>
 <style src="css/flat.css"></style>
 
+<style src="css/dashboard.css"></style>
+<style src="css/c3.css"></style>
+
+<script  defer="true" src="js/barchart.js"></script>
+<script  defer="true" src="js/piechart.js"></script>
+
 	<!-- create only when the currentUser is not an anonymous  -->
-	<borderlayout hflex="1" vflex="1" if="${sessionScope.user.validUser}" >
+	<borderlayout if="${(not sessionScope.userCredential.anonymous) or (sessionScope.userCredential.getApplicationId().equals('circuit') and sessionScope.userCredential.hasRole('viewDashboard'))}" >
 		<north height="70px" style="background-color: #292929;" border="none" zclass="banner" >		
 			<include src="/demo/layout/banner.zul" />
 		</north>
@@ -17,7 +23,11 @@
 			<include src="/demo/layout/footer.zul"/>
 		</south>
 	</borderlayout>
-	<div if="${not sessionScope.user.validUser}">
+	
+	<div if="${(sessionScope.userCredential.hasRole('viewChart') or sessionScope.userCredential.hasRole('configureChart'))}">
+		<include src="/demo/layout/edit_chart.zul"></include>
+	</div>
+	<div if="${sessionScope.userCredential.anonymous}">
 		Redirect to login page.....
 	</div>
 </zk>

@@ -13,6 +13,7 @@ import org.hpccsystems.dashboard.controller.LogoutController;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.entity.User;
+import org.hpccsystems.dashboard.services.AuthenticationService;
 import org.hpccsystems.dashboard.services.DashboardService;
 import org.hpccsystems.dashboard.services.WidgetService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,14 @@ public class DashboardHelper {
 	public void setWidgetService(WidgetService widgetService) {
 		this.widgetService = widgetService;
 	}
+	
+	private AuthenticationService authenticationService;
+	
+	@Autowired
+	public void setAuthenticationService(AuthenticationService authenticationService) {
+		this.authenticationService = authenticationService;
+	}
+
 
 	/**
 	 * Method to get Dashboards list from session with updated name
@@ -88,7 +97,7 @@ public class DashboardHelper {
 	 */
 	public void updateDashboardWidgetDetails(List<Dashboard> dashBoardIdList) throws Exception
 	{
-		final String userId =((User) Sessions.getCurrent().getAttribute("user")).getUserId();
+		final String userId = authenticationService.getUserCredential().getUserId();
 			if (dashBoardIdList != null && !dashBoardIdList.isEmpty()) {
 				for (int count = 1; count <= dashBoardIdList.size(); count++) {
 					Dashboard dashboard = dashBoardIdList.get(count - 1);
@@ -181,6 +190,5 @@ public class DashboardHelper {
 			}
 		
 	}
-
 
 }

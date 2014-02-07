@@ -5,24 +5,19 @@
 	zclass="dashboard-container"
 	contentStyle="overflow:hidden"
 	vflex="1">
-<style src="css/dashboard.css"></style>
-<style src="css/c3.css"></style>
-
-<script  defer="true" src="js/barchart.js"></script>
-<script  defer="true" src="js/piechart.js"></script>
 
 <caption sclass="panel-heading" zclass="dashboard-header">
 	<div style="padding:0">
 		<hbox pack="stretch" width="100%" style="font-size:12px">
 			<label zclass="h1" vflex="1" id="nameLabel" maxlength="40"></label>
 			<toolbar align="end" style="float:right; border-style: none; margin-right:25px;" height="46px" zclass="btn-group"
-				 if="${not sessionScope.apiConfiguration.apiEnabled}">
+				 if="${sessionScope.userCredential.hasRole('viewDashboard')}">
 				<button id="addWidget" iconSclass="glyphicon glyphicon-plus" zclass="btn btn-sm btn-primary" label=" Add Widget"></button>
 				<button id="configureDashboard" iconSclass="glyphicon glyphicon-cog" zclass="btn btn-sm btn-primary" label=" Configure Dashboard"></button>
 				<button id="deleteDashboard" iconSclass="glyphicon glyphicon-trash" zclass="btn btn-sm btn-danger" label=" Delete Dashboard"></button>
 			</toolbar>
 			<toolbar align="end" style="float:right; border-style: none; margin-right:25px;" height="46px" zclass="btn-group"
-				 if="${sessionScope.apiConfiguration.apiEnabled}">
+				 if="${sessionScope.userCredential.hasRole('viewDashboard')}">
 				<button id="saveApiView" iconSclass="glyphicon glyphicon-floppy-disk" zclass="btn btn-sm btn-success" label=" Save"></button>
 			</toolbar>
 		</hbox>

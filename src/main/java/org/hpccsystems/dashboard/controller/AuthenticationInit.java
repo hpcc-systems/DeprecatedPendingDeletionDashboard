@@ -23,8 +23,8 @@ public class AuthenticationInit implements Initiator {
             	if(LOG.isDebugEnabled()){
             		LOG.debug("User Authentication failed.." );
             		LOG.debug("Annonimity of user.." + cre.isAnonymous());
-            		LOG.debug("Credentials - Account ->" + cre.getAccount() );
-            		LOG.debug("Credentials - Name ->" + cre.getName() );
+            		LOG.debug("Credentials - Account ->" + cre.getUserId() );
+            		LOG.debug("Credentials - Name ->" + cre.getUserName() );
             	}
                 Executions.sendRedirect("/login.zhtml");
                 return;

@@ -10,7 +10,7 @@ dash_app_name VARCHAR(50) NOT NULL
 ) ENGINE=InnoDB;
 
 LOCK TABLES `dash_application` WRITE;
-INSERT INTO dash_application(dash_app_id,dash_app_name) VALUES ('A001','Demo'),('A002','Telematics'),('A003','Insurance');
+INSERT INTO dash_application(dash_app_id,dash_app_name) VALUES ('A001','Demo'),('A002','Telematics'),('A003','Insurance'),('circuit','Circuit');
 UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `user_details`;
@@ -36,8 +36,8 @@ USER_ID INT(20) ,
 DASHBOARD_STATE  CHAR(1),
 COLUMN_COUNT TINYINT(7),
 SEQUENCE INT(40) ,
-SOURCETYPE INT(20),
-SOURCEID VARCHAR(50),
+SOURCE_ID VARCHAR(50),
+APPLICATION_ID VARCHAR(50),
 UPDATEDDATE DATE,
 PRIMARY KEY(DASHBOARD_ID)
 ) ENGINE=InnoDB;

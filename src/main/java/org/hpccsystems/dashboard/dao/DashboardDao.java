@@ -21,15 +21,23 @@ public interface DashboardDao {
 	 * @param layout
 	 * @throws SQLException
 	 */
-	 int addDashboardDetails(Dashboard dashboard,Application application,String userId) throws DataAccessException ;
+	 int addDashboardDetails(Dashboard dashboard, String applicationId, String sourceId,String userId) throws DataAccessException ;
 	
-	 /**
-	  * Fetching DashboardMenuPages details from dashboard_details table.
-	 * @param viewModel
-	 * @return List<DashboardMenu>
+	/**
+	 * Fetching DashboardMenuPages details from dashboard_details table.
+	 * @param applicationId
+	 * 	Must be specified always
+	 * @param userId
+	 * 	Can be null, while specifying sourceId
+	 * @param dashboardIdList
+	 *  Can be null when both applicationId and userId are specified
+	 * @param sourceId
+	 *  Can be null.
+	 * @return
+	 *  A list of dahboards based on the arguments passed.
 	 * @throws DataAccessException
 	 */
-	List<Dashboard> fetchDashboardDetails(Application application,String userId,List<String> dashboardIdList) throws DataAccessException;	
+	List<Dashboard> fetchDashboardDetails(String applicationId,String userId,List<String> dashboardIdList, String sourceId) throws DataAccessException;	
 	
 	/**
 	 * method to delete dashboard

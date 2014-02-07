@@ -1,28 +1,26 @@
 package org.hpccsystems.dashboard.services;
 
-import org.hpccsystems.dashboard.entity.User;
-
-
 /**
  * AuthenticationService is used to authenticate the Dashboard user's.
  *
  */
 public interface AuthenticationService  {
 
-/**login with account and password**/
-	 boolean login(final String account, final String password);	
+	
+	 /**
+	  * Authenticates, and on successful authentication, sets UserCredential object to session
+	  * 
+	 * @param account
+	 * @param password
+	 * @param applicationId
+	 * @return
+	 * 	true on successful login
+	 */
+	boolean login(final String account, final String password, final String applicationId);	
 	
 	/**get current user credential**/
 	 UserCredential getUserCredential();
-	 
-	/**
-	 * Method to authendicate user based on DB values
-	 * @param userName
-	 * @param Password
-	 * @return boolean
-	 */
-	User  authendicateUser(String userName,String Password)throws Exception;
-	
+
 	/**
 	 * service call to logout an user by resetting the active flag
 	 * @param object

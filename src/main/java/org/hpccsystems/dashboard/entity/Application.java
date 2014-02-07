@@ -11,7 +11,6 @@ public class Application {
 		StringBuilder builder = new StringBuilder();
 		builder.append("Application [appId=").append(appId)
 				.append(", appName=").append(appName)
-				.append(", appTypeId=").append(appTypeId)
 				.append("]");
 		return  builder.toString() ;	}
 
@@ -19,25 +18,15 @@ public class Application {
 		super();
 	}
 
-	public Application(String appId, String appName, Integer appTypeId) {
+	public Application(String appId, String appName) {
 		super();
 		this.appId = appId;
 		this.appName = appName;
-		this.appTypeId = appTypeId;
 	}
 
 	String appId;
 	
 	String appName;
-	Integer appTypeId;
-
-	public Integer getAppTypeId() {
-		return appTypeId;
-	}
-
-	public void setAppTypeId(Integer appTypeId) {
-		this.appTypeId = appTypeId;
-	}
 
 	/**
 	 * @return the appId

@@ -10,10 +10,9 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.common.Constants;
-import org.hpccsystems.dashboard.entity.ApiConfiguration;
 import org.hpccsystems.dashboard.entity.Application;
 import org.hpccsystems.dashboard.entity.Dashboard;
-import org.hpccsystems.dashboard.entity.User;
+import org.hpccsystems.dashboard.services.AuthenticationService;
 import org.hpccsystems.dashboard.services.DashboardService;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
@@ -59,10 +58,11 @@ public class SidebarController extends GenericForwardComposer<Component>{
 	@Wire
 	Button addDash;
 	
-	private ApiConfiguration apiConfig;
-	
 	@WireVariable
 	private DashboardService dashboardService;
+	
+	@WireVariable
+	AuthenticationService  authenticationService;
 	
 	@Override
 	public void doAfterCompose(final Component comp) throws Exception{
@@ -75,22 +75,26 @@ public class SidebarController extends GenericForwardComposer<Component>{
 		// Wire Spring Bean
 		Selectors.wireVariables(navBar, this, Selectors.newVariableResolvers(getClass(), null));
 		final Application viewModel = new Application();
-		User user = (User)session.getAttribute("user");
-		apiConfig = (ApiConfiguration) session.getAttribute("apiConfiguration");
 		
 		List<Dashboard> sideBarPageList = null;
 		try	{
 			//Circuit/External Source Flow	
-			if(apiConfig != null && apiConfig.isApiEnabled()){
-				sideBarPageList = getApiViewDashboardList(user,viewModel);				
-			}
-			else
-			{//Dashboard Flow
+			if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD)){
+				sideBarPageList = getApiViewDashboardList(
+						authenticationService.getUserCredential().getUserId(),
+						authenticationService.getUserCredential().getApplicationId()
+					);				
+			} else {
+				//Dashboard Flow
 				//Add dashboard				
-				viewModel.setAppId((String) session.getAttribute("sourceid"));
-				viewModel.setAppName((String) session.getAttribute("source"));
 				addDash.addEventListener(Events.ON_CLICK, addDashboardBtnLisnr);				
-				sideBarPageList =new ArrayList<Dashboard>(dashboardService.retrieveDashboardMenuPages(viewModel,user.getUserId(),null));		
+				sideBarPageList =new ArrayList<Dashboard>(
+						dashboardService.retrieveDashboardMenuPages(
+								authenticationService.getUserCredential().getApplicationId(), 
+								authenticationService.getUserCredential().getUserId(),
+								null, null
+							)
+					);		
 
 			}
 		} catch(Exception ex) {
@@ -145,8 +149,9 @@ public class SidebarController extends GenericForwardComposer<Component>{
 		
 		//Setting dashboard id to be retrived onClick
 		navitem.setAttribute(Constants.DASHBOARD_ID, dashboard.getDashboardId());
-		if(apiConfig != null && apiConfig.isApiEnabled()){
-		navitem.addEventListener(Events.ON_CLICK, apiNavItemSelectLisnr);
+		
+		if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD)){
+			navitem.addEventListener(Events.ON_CLICK, apiNavItemSelectLisnr);
 		}else{
 			navitem.addEventListener(Events.ON_CLICK, navItemSelectLisnr);
 		}
@@ -261,16 +266,16 @@ public class SidebarController extends GenericForwardComposer<Component>{
 		
 		final Dashboard dashboard = (Dashboard) event.getData();
 		
-		String sourceId = "",source="";
-		
 		// Make entry of new dashboard details into DB
 		try {
-			Session session = Sessions.getCurrent();
-			sourceId = (String) session.getAttribute("sourceid");
-			source = (String) session.getAttribute("source");
-			User user = (User)session.getAttribute("user");
-			final Application application = new Application(sourceId,source,Constants.SOURCE_TYPE_ID.get(source));
-			dashboard.setDashboardId(dashboardService.addDashboardDetails(dashboard,application,user.getUserId()));
+			dashboard.setDashboardId(
+				dashboardService.addDashboardDetails(
+					dashboard,
+					authenticationService.getUserCredential().getApplicationId(),
+					null,
+					authenticationService.getUserCredential().getUserId()
+				)
+			);
 		} catch (Exception exception) {
 			Clients.showNotification("Adding new Dashboard failed. Please try again", true);
 			LOG.error("Exception while adding new dashboard to DB", exception);
@@ -304,7 +309,7 @@ public class SidebarController extends GenericForwardComposer<Component>{
 						navBar.insertBefore(dropped, dragged);
 						return;
 					}
-					if(apiConfig != null && apiConfig.isApiEnabled()){
+					if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD)){
 						currentNavitem.addEventListener(Events.ON_CLICK, apiNavItemSelectLisnr);
 					}else{
 						currentNavitem.addEventListener(Events.ON_CLICK, navItemSelectLisnr);
@@ -314,22 +319,14 @@ public class SidebarController extends GenericForwardComposer<Component>{
 		}
 	};
 	
-	private List<Dashboard> getApiViewDashboardList(final User user,final Application viewModel)throws Exception {
-		
+	private List<Dashboard> getApiViewDashboardList(final String userId,final String applicationId)throws Exception {
 		String[] DashboardIdArray = ((String[])Executions.getCurrent().getParameterValues(Constants.DB_DASHBOARD_ID));
 		List<String> dashboardIdList =Arrays.asList(DashboardIdArray);
-		String sourceTypeString =  Executions.getCurrent().getParameter(Constants.SOURCE);
-		String sourceId = Executions.getCurrent().getParameter(Constants.SOURCE_ID);
-		viewModel.setAppId(sourceId);
-		viewModel.setAppName(sourceTypeString);				
-		if(sourceTypeString != null){
-			viewModel.setAppTypeId(Constants.SOURCE_TYPE_ID.get(sourceTypeString.trim()));
-		}
+		
 		if(LOG.isDebugEnabled()){
-			LOG.debug("External Source: "+sourceTypeString);
 			LOG.debug("Requested Dashboard Id : "+dashboardIdList);
 		}
-		List<Dashboard> sideBarPageList =new ArrayList<Dashboard>(dashboardService.retrieveDashboardMenuPages(viewModel,user.getUserId(),dashboardIdList));	
+		List<Dashboard> sideBarPageList =new ArrayList<Dashboard>(dashboardService.retrieveDashboardMenuPages(applicationId,userId,dashboardIdList,null));	
 		if(LOG.isDebugEnabled()){
 			LOG.debug("sideBarPageList: "+sideBarPageList);
 		}

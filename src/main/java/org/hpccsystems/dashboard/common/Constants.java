@@ -71,6 +71,10 @@ public class Constants {
 	public static final String WINDOWS = "Windows";
 	public static final String JAVA_TEMP_DIR = "java.io.tmpdir";
 	
+	public static final String CIRCUIT_APPLICATION_ID = "circuit";
+	public static final String CIRCUIT_ROLE_CONFIG_CHART = "configureChart";
+	public static final String CIRCUIT_ROLE_VIEW_CHART = "viewChart";
+	public static final String CIRCUIT_ROLE_VIEW_DASHBOARD = "viewDashboard";
 	public static final String CIRCUIT_DELETE_REQ = "/delete.do";
 	public static final String CIRCUIT_CHARTLIST_REQ = "/chartList.do";
 	public static final String CIRCUIT_SEARCH_REQ  = "/search.do";	

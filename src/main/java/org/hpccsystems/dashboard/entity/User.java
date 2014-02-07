@@ -17,6 +17,8 @@ public class User  implements Serializable,Cloneable {
 	String country;
 	String bio;
 	String car;		
+	
+	//TODO - Romve fields added for persistance
 	//Added for persistence
 	String userId;
 	String activeFlag;

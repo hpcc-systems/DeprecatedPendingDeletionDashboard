@@ -9,7 +9,7 @@ function createChart(divId, chartData) {
 			 
 			var response = jq.parseJSON(chartData);
 			console.log(response);
-			
+			 
 			var datum = response.chartData;
 			var divElement = jq('$'+divId).empty();
 			

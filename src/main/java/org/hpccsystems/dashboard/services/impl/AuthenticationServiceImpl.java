@@ -43,7 +43,31 @@ public class AuthenticationServiceImpl implements AuthenticationService,Serializ
 		}
 		return cre;
 	}
-	public boolean login(final String name, final String passWord) {
+	
+	public boolean login(final String account, final String passWord,  final String applicationId) {
+		final Session sess = Sessions.getCurrent();
+		UserCredential cre = (UserCredential)sess.getAttribute("userCredential");
+		
+		User user = null;
+		try {
+			user = authendicationDao.authendicateUser(account,passWord);
+		} catch (SQLException e) {
+			LOG.error("Login Authentication error", e);
+			return false;
+		}
+		
+		if(LOG.isDebugEnabled()){
+			LOG.debug("After authenticating.. User Object - " + user);
+		}
+		
+		if(user != null){
+			cre = new UserCredential(user.getUserId(), user.getFullName(), applicationId);
+			sess.setAttribute("userCredential",cre);
+			if(!cre.isAnonymous()) {
+				return true;
+			}
+		}
+		
 		return false;
 	}
 
@@ -58,13 +82,4 @@ public class AuthenticationServiceImpl implements AuthenticationService,Serializ
 		}
 	}
 	
-	public User authendicateUser(String userName, String Password)throws Exception {
-		User user = null;
-		try {
-			user = authendicationDao.authendicateUser(userName,Password);
-		}  catch (final SQLException e) {
-			throw e;
-		}		
-		return user;
-	}
 }

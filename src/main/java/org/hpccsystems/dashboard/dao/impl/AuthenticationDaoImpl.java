@@ -35,6 +35,8 @@ public class AuthenticationDaoImpl implements AuthenticationDao{
 	public void setDataSource(DataSource dataSource) {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
+	
+	//TODO:  Return UserCredential Instead of User
 	public User authendicateUser(String userName, String password) throws SQLException {
 		User user =null;			
 		String sql=Queries.GET_USER_DETAILs;
@@ -64,12 +66,13 @@ public class AuthenticationDaoImpl implements AuthenticationDao{
 			}
 		}
 		}
-		catch(EmptyResultDataAccessException ex)
-		{
+		catch(EmptyResultDataAccessException ex) {
 			LOG.error("authendicateUser failed to execute the query due to invalid user! Return an empty string", ex);
+			return null;
 		}
+		
 		return user;
-		}
+	}
 		
 	
 	public void updateActiveFlag(User user)  throws SQLException{

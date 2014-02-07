@@ -20,7 +20,8 @@ public class Dashboard {
 		.append("]");
 		return buffer.toString();
 	}
-
+	
+	private String sourceId;
 	private String layout;
 	private String name = "Dashboard Name";
 	private Integer columnCount = 0;
@@ -139,6 +140,14 @@ public class Dashboard {
 
 	public void setPersisted(boolean isPersisted) {
 		this.isPersisted = isPersisted;
+	}
+
+	public String getSourceId() {
+		return sourceId;
+	}
+
+	public void setSourceId(String sourceId) {
+		this.sourceId = sourceId;
 	}
 
 }

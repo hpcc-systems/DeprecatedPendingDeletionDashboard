@@ -10,12 +10,12 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.controller.component.ChartPanel;
-import org.hpccsystems.dashboard.entity.ApiConfiguration;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.entity.chart.XYChartData;
 import org.hpccsystems.dashboard.entity.chart.utils.ChartRenderer;
 import org.hpccsystems.dashboard.helper.DashboardHelper;
+import org.hpccsystems.dashboard.services.AuthenticationService;
 import org.hpccsystems.dashboard.services.DashboardService;
 import org.hpccsystems.dashboard.services.HPCCService;
 import org.hpccsystems.dashboard.services.WidgetService;
@@ -87,6 +87,9 @@ public class DashboardController extends SelectorComposer<Component>{
     private static final String PERCENTAGE_SIGN = "%";
     
     @WireVariable
+    private AuthenticationService authenticationService;
+    
+    @WireVariable
 	private DashboardService dashboardService;
     
     @WireVariable
@@ -101,8 +104,6 @@ public class DashboardController extends SelectorComposer<Component>{
     @WireVariable
 	private DashboardHelper dashboardHelper;
     
-    private ApiConfiguration apiConfig;
-    
 	@Override
 	public void doAfterCompose(final Component comp) throws Exception {
 		//TODO Delete dashboard state is not considered right now 
@@ -111,7 +112,6 @@ public class DashboardController extends SelectorComposer<Component>{
 		
 		final Session session = Sessions.getCurrent();
 		dashboardId = (Integer) session.getAttribute(Constants.ACTIVE_DASHBOARD_ID);
-		apiConfig = (ApiConfiguration) session.getAttribute("apiConfiguration");
 		final Map<Integer,Dashboard> dashboardMap = (HashMap<Integer, Dashboard>) session.getAttribute(Constants.DASHBOARD_LIST);
 		
 		if(dashboardId != null && dashboardMap != null){
@@ -206,18 +206,19 @@ public class DashboardController extends SelectorComposer<Component>{
 			
 		} else {
 			dashboardWin.setBorder("none");
-			if(apiConfig == null){
-			configureDashboard.setVisible(false);
-			deleteDashboard.setVisible(false);
-			addWidget.setVisible(false);
+			if(authenticationService.getUserCredential().getApplicationId().equals(Constants.CIRCUIT_APPLICATION_ID)){
+				configureDashboard.setVisible(false);
+				deleteDashboard.setVisible(false);
+				addWidget.setVisible(false);
 			}
 			return;
 		}
 		
 		dashboardWin.addEventListener("onPortalClose", onPanelClose);
 		dashboardWin.addEventListener("onLayoutChange", onLayoutChange);
-		if(apiConfig != null && apiConfig.isApiEnabled()){
-		saveApiView.addEventListener(Events.ON_CLICK, saveApiChanges); 
+		
+		if(authenticationService.getUserCredential().getApplicationId().equals(Constants.CIRCUIT_APPLICATION_ID)){
+			saveApiView.addEventListener(Events.ON_CLICK, saveApiChanges); 
 		}
 		if(LOG.isDebugEnabled()){
 			LOG.debug("Created Dashboard");

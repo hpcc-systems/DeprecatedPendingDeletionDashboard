@@ -21,6 +21,7 @@ import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.entity.chart.XYChartData;
 import org.hpccsystems.dashboard.entity.chart.utils.ChartRenderer;
 import org.hpccsystems.dashboard.services.ApplicationService;
+import org.hpccsystems.dashboard.services.AuthenticationService;
 import org.hpccsystems.dashboard.services.DashboardService;
 import org.hpccsystems.dashboard.services.WidgetService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -44,6 +45,7 @@ public class DashboardApiController {
 	DashboardService dashboardService;
 	WidgetService widgetService;
 	ApplicationService applicationService;
+	AuthenticationService authenticationService;
 	
 	@Autowired
 	public void setDashboardService(DashboardService dashboardService) {
@@ -57,9 +59,16 @@ public class DashboardApiController {
 	public void setApplicationService(ApplicationService applicationService) {
 		this.applicationService = applicationService;
 	}
+	@Autowired
+	public void setAuthenticationService(AuthenticationService authenticationService) {
+		this.authenticationService = authenticationService;
+	}
 	
 /**
  * Method to process delete dashboard request from circuit
+ * 
+ * No authentication set for the process
+ * 
  * @param request
  * @param response
  */
@@ -87,13 +96,11 @@ public void deleteDashboard(HttpServletRequest request, HttpServletResponse resp
 	}
 	response.setContentType(Constants.RES_TEXT_TYPE_JSON);
 	response.setCharacterEncoding(Constants.CHAR_CODE);
-	try
-	{
-	response.getWriter().write(jsObj.toJSONString());
-	}catch(Exception ex)
-	{
+	try	{
+		response.getWriter().write(jsObj.toJSONString());
+	} catch(Exception ex) {
 		LOG.error("Exception while writing JSON response to Circuit",ex);
-		throw new Exception("Unable to process Delete Request");
+		throw new Exception("Your request is processed sucessfully. Error occured while returning the response");
 	}
 	
 }
@@ -130,16 +137,18 @@ public void getChartList(HttpServletRequest request, HttpServletResponse respons
 public void searchDashboard(HttpServletRequest request, HttpServletResponse response)throws Exception
  {
 		try {
-			final Application application = new Application();
-			application.setAppId(request.getParameter(Constants.SOURCE_ID));			
-			application.setAppName(request.getParameter(Constants.SOURCE));
 			List<Dashboard> dashboardList = null;
 			Dashboard dashBoard = null;
 			JSONObject jsonObject = null;
 			JSONObject jsonResposeObj = new JSONObject();
 			JSONArray jsonArray = new JSONArray();
 			try{
-			dashboardList = new ArrayList<Dashboard>(dashboardService.retrieveDashboardMenuPages(application,null,null));
+				dashboardList = new ArrayList<Dashboard>(dashboardService.retrieveDashboardMenuPages(
+						request.getParameter(Constants.SOURCE),
+						null,
+						null,
+						request.getParameter(Constants.SOURCE_ID)
+						));
 			}catch(Exception ex){
 				LOG.error("Exception while fetching dahhboards from DB",ex);
 				jsonResposeObj.put(Constants.STATUS_FAIL,ex.getMessage());
@@ -337,4 +346,5 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
 		}
 		return dataTypeValue;
 	}
+	
 }

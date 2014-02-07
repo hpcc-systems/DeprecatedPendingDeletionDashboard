@@ -1,15 +1,14 @@
 package org.hpccsystems.dashboard.services.impl; 
 
-import java.sql.SQLException;
-import java.util.ArrayList;
 import java.sql.Date;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.dao.DashboardDao;
-import org.hpccsystems.dashboard.entity.Application;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.services.DashboardService;
 import org.springframework.context.annotation.Scope;
@@ -29,14 +28,8 @@ public class DashboardServiceImpl implements DashboardService {
 	
 	private DashboardDao dashboardDao;
 
-	
-	/**
-	 * Retrieving DashboardMenuPages details from dashboard_details table.
-	 * @param viewModel
-	 * @return List<SidebarPage>
-	 */
 
-	public List<Dashboard> retrieveDashboardMenuPages(final Application application,String userId,List<String> dashboardIdList)throws Exception {
+	public List<Dashboard> retrieveDashboardMenuPages(final String applicationId,String userId,List<String> dashboardIdList, String sourceId)throws Exception {
 		
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Handling 'retrieveDashboardMenuPages' in DashboardServiceImpl");
@@ -46,7 +39,7 @@ public class DashboardServiceImpl implements DashboardService {
 		List<Dashboard> menuList = null;
 		try
 		{
-			menuList = dashboardDao.fetchDashboardDetails(application,userId,dashboardIdList);
+			menuList = dashboardDao.fetchDashboardDetails(applicationId,userId,dashboardIdList, sourceId);
 		}
 		catch(final DataAccessException ex)
 		{
@@ -79,20 +72,13 @@ public class DashboardServiceImpl implements DashboardService {
 		this.dashboardDao = dashboardDao;
 	}
 
-	 /**
-		 * Inserts Dashboard details to dashboard_details table.
-		 * @param sourceId
-		 * @param dashBoardName
-		 * @param layout
-		 * @throws SQLException
-	 */
 	
 	public int addDashboardDetails(final Dashboard dashboard,
-			final Application application, final String userId)
+			final String applicationId, final String sourceId, final String userId)
 			throws Exception {
 		try
 		{
-		return dashboardDao.addDashboardDetails(dashboard,application,userId);
+		return dashboardDao.addDashboardDetails(dashboard,applicationId, sourceId,userId);
 		}
 		catch(DataAccessException ex)
 		{

@@ -7,10 +7,11 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.common.Constants;
-import org.hpccsystems.dashboard.entity.ApiConfiguration;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.entity.chart.utils.TableRenderer;
+import org.hpccsystems.dashboard.services.AuthenticationService;
+import org.hpccsystems.dashboard.services.impl.AuthenticationServiceImpl;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Components;
 import org.zkoss.zk.ui.Executions;
@@ -39,10 +40,11 @@ import org.zkoss.zul.Window;
  */
 public class ChartPanel extends Panel {
 
-	private static final  Log LOG = LogFactory.getLog(ChartPanel.class); 
-	
+	private static final  Log LOG = LogFactory.getLog(ChartPanel.class);
 	private static final long serialVersionUID = 1L;
 	
+	AuthenticationService authenticationService = new AuthenticationServiceImpl();
+		
 	private static final String ADD_STYLE = "glyphicon glyphicon-plus btn btn-link img-btn";
 	private static final String EDIT_STYLE = "glyphicon glyphicon-cog btn btn-link img-btn";
 	private static final String RESET_STYLE = "glyphicon glyphicon-repeat btn btn-link img-btn";
@@ -104,10 +106,10 @@ public class ChartPanel extends Panel {
 		deleteBtn.addEventListener(Events.ON_CLICK, deleteListener);
 
 		toolbar.appendChild(addBtn);
-		ApiConfiguration apiConfig = (ApiConfiguration) Sessions.getCurrent().getAttribute("apiConfiguration");
-		if(apiConfig == null){
-		toolbar.appendChild(resetBtn);
-		toolbar.appendChild(deleteBtn);
+		
+		if(!Constants.CIRCUIT_APPLICATION_ID.equals(authenticationService.getUserCredential().getApplicationId())){
+			toolbar.appendChild(resetBtn);
+			toolbar.appendChild(deleteBtn);
 		}
 
 		hbox.appendChild(textbox);

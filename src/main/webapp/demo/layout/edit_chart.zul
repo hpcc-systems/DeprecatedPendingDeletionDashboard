@@ -1,16 +1,8 @@
 <zk xmlns="http://www.zkoss.org/2005/zul"> 
-	<style src="/demo/css/bootstrap/css/bootstrap.min.css" />
-	<style src="/demo/css/flat.css"></style>
-	<style src="/demo/css/dashboard.css"></style>
-	<style src="/demo/css/c3.css"></style>
-	
-	<script  defer="true" src="js/barchart.js"></script>
-	<script  defer="true" src="js/linechart.js"></script>
-	<script  defer="true" src="js/piechart.js"></script>
-		
+
 	<vlayout id="editWindowLayout"
 		apply="org.hpccsystems.dashboard.controller.EditChartController" style="background-color: white;">
-		<div id="apiChartSettingDiv" if="${sessionScope.apiConfiguration.apiConfig}" style="margin: 5px;">
+		<div id="apiChartSettingDiv" if="${sessionScope.userCredential.hasRole('configureChart')}" style="margin: 5px;">
 			<hbox hflex="1" pack="end">
 				<button id="apiSaveButton" tooltip="Save Chart data" iconSclass="glyphicon glyphicon-floppy-disk"
 					zclass="btn btn-sm btn-success" label=" Save " />
@@ -18,9 +10,9 @@
 					zclass="btn btn-sm btn-danger" label=" Cancel " />
 			</hbox>
 		</div>
-		<div if="${sessionScope.apiConfiguration.apiChartConfig}"> 		
-		 <button id="apiConfigSaveButton" tooltip="Save Chart " iconSclass="glyphicon glyphicon-floppy-disk" zclass="btn btn-sm btn-success" label=" Save " />
-	</div>
+		<div if="${sessionScope.userCredential.hasRole('viewChart')}"> 		
+			 <button id="apiConfigSaveButton" tooltip="Save Chart " iconSclass="glyphicon glyphicon-floppy-disk" zclass="btn btn-sm btn-success" label=" Save " />
+		</div>
 		<hlayout id="editLayout">
 			<vbox spacing="0em">
 				<vbox height="270px">

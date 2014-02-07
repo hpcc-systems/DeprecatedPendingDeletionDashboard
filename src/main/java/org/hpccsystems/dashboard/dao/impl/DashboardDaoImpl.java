@@ -1,14 +1,14 @@
 package org.hpccsystems.dashboard.dao.impl; 
 
 import java.sql.Date;
-import java.sql.SQLException;
 import java.util.List;
+
 import javax.sql.DataSource;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.common.Queries;
 import org.hpccsystems.dashboard.dao.DashboardDao;
-import org.hpccsystems.dashboard.entity.Application;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.rowmapper.DashboardRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,22 +34,17 @@ public class DashboardDaoImpl implements DashboardDao {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 	
-	 /**
-	  * Fetching DashboardMenuPages details from dashboard_details table.
-	 * @param application
-	 * @return List<DashboardMenu>
-	 * @throws DataAccessException
-	 */
-	@SuppressWarnings("unchecked")
-	public List<Dashboard> fetchDashboardDetails(final Application application,final String userId,List<String> dashboardIdList)
+	public List<Dashboard> fetchDashboardDetails(final String applicationId,final String userId, List<String> dashboardIdList, final String sourceId)
 			throws DataAccessException {	
 		
 		List<Dashboard> dashboardList = null;
 		StringBuilder sqlBuffer = new StringBuilder();
 		sqlBuffer.append(Queries.RETRIEVE_DASHBOARD_DETAILS).append("'").append(
-				application.getAppId()).append("'");
-		if(userId == null && dashboardIdList == null){
-			sqlBuffer.append(" order by updateddate desc");
+				applicationId).append("'");
+		if(userId == null && dashboardIdList == null && sourceId != null){
+			sqlBuffer.append(" and SOURCE_ID = '")
+				.append(sourceId)
+				.append("' order by updateddate desc");
 		}
 		else if (userId != null && dashboardIdList == null) {
 			sqlBuffer.append(" and user_id='").append(userId)
@@ -72,22 +67,14 @@ public class DashboardDaoImpl implements DashboardDao {
 		return dashboardList;
 	}
 	
-
-	/**
-	 * Inserts Dashboard details to dashboard_details table & returns the ID of Dashboard that is inserted.
-	 * @param sourceId
-	 * @param dashBoardName
-	 * @param layout
-	 * @throws SQLException
-	 */
-	public int addDashboardDetails(final Dashboard dashboard,final Application application,final String userId)
+	public int addDashboardDetails(final Dashboard dashboard,final String applicationId, final String sourceId,final String userId)
 			throws DataAccessException {
 
 		getJdbcTemplate().update(Queries.INSERT_DASHBOARD, new Object[] { 
 				dashboard.getName(),
 				userId,
-				application.getAppTypeId(),
-				application.getAppId(),
+				applicationId,
+				sourceId,
 				dashboard.getUpdatedDate(),
 				dashboard.getColumnCount()
 		});

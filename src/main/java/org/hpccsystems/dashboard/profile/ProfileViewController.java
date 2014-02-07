@@ -61,7 +61,7 @@ public class ProfileViewController extends SelectorComposer<Component>{
 	@Listen("onClick=#saveProfile")
 	public void doSaveProfile(){
 		final UserCredential cre = authService.getUserCredential();
-		final User user = userInfoService.findUser(cre.getAccount());
+		final User user = userInfoService.findUser(cre.getUserId());
 		if(user==null){
 			return;
 		}
@@ -94,7 +94,7 @@ public class ProfileViewController extends SelectorComposer<Component>{
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void refreshProfileView() {
 		final UserCredential cre = authService.getUserCredential();
-		final User user = userInfoService.findUser(cre.getAccount());
+		final User user = userInfoService.findUser(cre.getUserId());
 		if(user==null){
 			return;
 		}

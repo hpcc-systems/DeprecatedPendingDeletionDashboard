@@ -1,8 +1,7 @@
 package org.hpccsystems.dashboard.services;
-import java.sql.SQLException;
 import java.sql.Date;
 import java.util.List;
-import org.hpccsystems.dashboard.entity.Application;
+
 import org.hpccsystems.dashboard.entity.Dashboard;
 
 /**
@@ -11,22 +10,31 @@ import org.hpccsystems.dashboard.entity.Dashboard;
  */
 public interface DashboardService {
 
-	 /**
-		 * Inserts Dashboard details to dashboard_details table.
-		 * @param sourceId
-		 * @param dashBoardName
-		 * @param layout
-		 * @throws SQLException
+	/**
+	 *  Inserts Dashboard details to dashboard_details table.
+	 * @param dashboard
+	 * @param applicationId
+	 * @param sourceId
+	 * @param userId
+	 * @return
+	 * @throws Exception
 	 */
-	int addDashboardDetails(Dashboard dashboard,Application application,String userId) throws Exception ;
-	
+	int addDashboardDetails(Dashboard dashboard,String applicationId, String sourceId,String userId) throws Exception ;
 	
 	/**
-	 * Retrieving DashboardMenuPages details from dashboard_details table.
-	 * @param viewModel
-	 * @return List<SidebarPage>
+	 * @param applicationId
+	 * 	Must be provided always
+	 * @param userId
+	 *  Can only be null when sourceId is specified
+	 * @param dashboardIdList
+	 * 	Can be null
+	 * @param sourceId
+	 *  can be null
+	 * @return
+	 *  A list of dahboard based on the paramenters specified
+	 * @throws Exception
 	 */
-	List<Dashboard> retrieveDashboardMenuPages(Application application,String userId,List<String> dashboardIdList)throws Exception;
+	List<Dashboard> retrieveDashboardMenuPages(String applicationId,String userId,List<String> dashboardIdList, String sourceId)throws Exception;
 	
 	
 	
