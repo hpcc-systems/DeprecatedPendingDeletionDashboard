@@ -11,7 +11,6 @@ import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.api.entity.ChartConfiguration;
 import org.hpccsystems.dashboard.api.entity.Field;
 import org.hpccsystems.dashboard.common.Constants;
-import org.hpccsystems.dashboard.entity.Application;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.entity.chart.Filter;
@@ -26,7 +25,6 @@ import org.hpccsystems.dashboard.services.WidgetService;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
-import org.zkoss.zk.ui.Sessions;
 import org.zkoss.zk.ui.event.DropEvent;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
@@ -119,15 +117,14 @@ public class EditChartController extends SelectorComposer<Component> {
 	List<String> parameterList = new ArrayList<String>();
 	final Map<String, Object> parameters = new HashMap<String, Object>();
 	private Dashboard dashboard;
-	private Application application;
+	
 	@Override
 	public void doAfterCompose(final Component comp) throws Exception {
 		super.doAfterCompose(comp);
 		Map<String,String> columnSchemaMap = null;
 		//API chart config flow without chart
 		if(authenticationService.getUserCredential().getApplicationId().equals(Constants.CIRCUIT_APPLICATION_ID) && 
-				authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_CONFIG_CHART))
-		{
+				authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_CONFIG_CHART)) {
 			columnSchemaMap = configureChartSettingData();
 			filterListBox.setStyle("backgroundr:gray;");
 			filterListBox.invalidate();			
@@ -606,17 +603,19 @@ public class EditChartController extends SelectorComposer<Component> {
 			portlet.setChartDataXML(chartRenderer.convertToXML(chartData));
 			dashboard.getPortletList().add(portlet);
 			dashboard.setDashboardId(
-					dashboardService.addDashboardDetails(dashboard, authenticationService.getUserCredential().getApplicationId(), dashboard.getSourceId() , authenticationService.getUserCredential().getUserId()));
+					dashboardService.addDashboardDetails(
+							dashboard, 
+							authenticationService.getUserCredential().getApplicationId(), 
+							dashboard.getSourceId() , 
+							authenticationService.getUserCredential().getUserId())
+				);
 			List<Portlet> newPortlets = new ArrayList<Portlet>();
-			for(Portlet widget : dashboard.getPortletList())
-			{
+			for(Portlet widget : dashboard.getPortletList()) {
 				newPortlets.add(widget);
 			}
 			widgetService.addWidgetDetails(dashboard.getDashboardId(), newPortlets);
 			Messagebox.show("The Chart Settings data are Saved.You can close the window","",1,Messagebox.ON_OK);			
-			Sessions.getCurrent().removeAttribute("apiConfiguration");
-			Sessions.getCurrent().removeAttribute("user");
-			Sessions.getCurrent().removeAttribute("userCredential");	
+			authenticationService.logout(null);	
 			editWindowLayout.detach();
 		}
 	};
@@ -627,9 +626,7 @@ public class EditChartController extends SelectorComposer<Component> {
 	EventListener<Event> cancelApiChartSettings = new EventListener<Event>() {
 		public void onEvent(Event event) throws Exception {
 			Messagebox.show("The Chart Settings data are not Saved.You can close the window","",1,Messagebox.ON_OK);			
-			Sessions.getCurrent().removeAttribute("apiConfiguration");
-			Sessions.getCurrent().removeAttribute("user");
-			Sessions.getCurrent().removeAttribute("userCredential");	
+			authenticationService.logout(null);	
 			editWindowLayout.detach();
 		}
 	};
@@ -721,19 +718,14 @@ public class EditChartController extends SelectorComposer<Component> {
 			dashboard.setUpdatedDate(new Date(new java.util.Date().getTime()));
 			dashboard.setPersisted(true);
 			dashBoardIdList.add(dashboard);
-			try
-			{
+			try	{
 				dashboardHelper.updateDashboardWidgetDetails(dashBoardIdList);
 				Messagebox.show("Your Chart details are Saved.You can close the window","",1,Messagebox.ON_OK);
-				Sessions.getCurrent().removeAttribute("apiConfiguration");
-				Sessions.getCurrent().removeAttribute("user");
-				Sessions.getCurrent().removeAttribute("userCredential");
-			}catch(Exception ex)
-			{
+				authenticationService.logout(null);
+			} catch(Exception ex) {
 				Clients.showNotification("Unable to update Chart details into DB", true);
 	        	LOG.error("Exception saveApiChartConfigData Listener in DashboardController", ex);
 			}
-		
 		}
 	};
 }

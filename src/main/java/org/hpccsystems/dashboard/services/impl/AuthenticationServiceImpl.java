@@ -72,13 +72,14 @@ public class AuthenticationServiceImpl implements AuthenticationService,Serializ
 	}
 
 	public void logout(Object object)throws Exception {
-		if(object!= null)
-		{				
-		try {
-			authendicationDao.updateActiveFlag((User)object);
-		} catch (final SQLException e) {
-			throw e;
-		}		
+		Sessions.getCurrent().invalidate();
+		
+		if(object!= null) {				
+			try {
+				authendicationDao.updateActiveFlag((User)object);
+			} catch (final SQLException e) {
+				throw e;
+			}		
 		}
 	}
 	

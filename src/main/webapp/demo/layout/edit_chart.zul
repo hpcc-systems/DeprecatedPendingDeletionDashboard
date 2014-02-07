@@ -12,7 +12,7 @@
 		</div>
 
 		<div if="${sessionScope.userCredential.hasRole('viewChart')}"> 		
-			<hbox pack="end" vflex="1">
+			<hbox pack="end" hflex="1">
 				 <button id="apiConfigSaveButton" tooltip="Save Chart " iconSclass="glyphicon glyphicon-floppy-disk" zclass="btn btn-sm btn-success" label=" Save " />
 			</hbox>
 		</div>
