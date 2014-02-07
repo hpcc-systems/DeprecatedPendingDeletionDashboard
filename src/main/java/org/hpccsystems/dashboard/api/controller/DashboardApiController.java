@@ -14,7 +14,6 @@ import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.api.entity.ChartConfiguration;
 import org.hpccsystems.dashboard.api.entity.Field;
 import org.hpccsystems.dashboard.common.Constants;
-import org.hpccsystems.dashboard.entity.Application;
 import org.hpccsystems.dashboard.entity.ChartDetails;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.Portlet;
@@ -30,6 +29,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.zkoss.json.JSONArray;
 import org.zkoss.json.JSONObject;
+
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
@@ -115,6 +115,12 @@ public void getChartList(HttpServletRequest request, HttpServletResponse respons
 				JsonArray jsonArray = new JsonArray();
 				Map<Integer, ChartDetails> chartdetailsMap = Constants.CHART_MAP;
 				for (Map.Entry<Integer, ChartDetails> entry : chartdetailsMap.entrySet()) {
+					
+					//Restricting Table widget from returning
+					if(Constants.TABLE_WIDGET.equals(entry.getValue().getChartId())) {
+						continue;
+					}
+					
 					jsonObject = new JsonObject();
 					jsonObject.addProperty(Constants.VALUE, entry.getValue().getChartId());
 					jsonObject.addProperty(Constants.LABEL, entry.getValue().getChartName());

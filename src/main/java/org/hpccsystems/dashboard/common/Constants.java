@@ -107,28 +107,6 @@ public class Constants {
 		
 	};
 	
-	public static final  Map<String, Integer> SOURCE_TYPE_ID = new HashMap<String, Integer>() {
-		private static final long serialVersionUID = 1L;
-
-		{
-			put("circuit", 100);
-			put("Demo", 101);
-			put("Telematics", 102);
-			put("Insurance", 103);
-		}
-	};
-	
-	public static final  Map<Integer, String> SOURCE_TYPE_TEXT = new HashMap<Integer, String>() {
-		private static final long serialVersionUID = 1L;
-
-		{
-			put(100,"circuit");
-			put(101,"Demo");
-			put(102,"Telematics");
-			put(103,"Insurance");
-		}
-	};
-	
 	public static final String EDIT_WINDOW_CHART_DIV = "chart";
 	
 	

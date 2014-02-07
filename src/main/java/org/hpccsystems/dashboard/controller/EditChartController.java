@@ -581,7 +581,6 @@ public class EditChartController extends SelectorComposer<Component> {
 		portlet.setId(portlet.getWidgetSequence());
 		this.portlet = portlet;		
 		//creating chartData
-		chartData.setSourceType(Constants.SOURCE_TYPE_ID.get(source));
 		chartData.setFileName(configuration.getDatasetName());			
 		chartData.setHpccConnection(configuration.getHpccConnection());
 		List<Field> feildList = configuration.getFields();

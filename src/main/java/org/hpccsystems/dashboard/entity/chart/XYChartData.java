@@ -9,8 +9,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class XYChartData {
 	
-	private Integer sourceType;
-
 	private HpccConnection hpccConnection;
 	
 	private String fileName;
@@ -19,8 +17,7 @@ public class XYChartData {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("XYChartData [sourceType=").append(sourceType)
-				.append(", hpccConnection=").append(hpccConnection).append(", fileName=")
+		builder.append(", hpccConnection=").append(hpccConnection).append(", fileName=")
 				.append(fileName).append(", xColumnNames=").append(xColumnNames)
 				.append(", yColumnNames=" ).append(yColumnNames).append(", tableColumns=")
 				.append(tableColumns).append(", isFiltered=")
@@ -34,15 +31,6 @@ public class XYChartData {
 	
 	private Boolean isFiltered = false;
 	private Filter filter;
-
-	@XmlElement
-	public Integer getSourceType() {
-		return sourceType;
-	}
-	
-	public void setSourceType(Integer sourceType) {
-		this.sourceType = sourceType;
-	}
 
 	@XmlElement
 	public String getFileName() {
