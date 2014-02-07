@@ -611,14 +611,10 @@ public class EditChartController extends SelectorComposer<Component> {
 				newPortlets.add(widget);
 			}
 			widgetService.addWidgetDetails(dashboard.getDashboardId(), newPortlets);
-			Messagebox.show("The Chart Settings data are Saved.Your window will be closed","",1,Messagebox.ON_OK, new EventListener<Event>() {
-				@Override
-				public void onEvent(Event arg0) throws Exception {
-					authenticationService.logout(null);	
-					editWindowLayout.detach();
-					Clients.evalJavaScript("window.open('','_self'); window.close();");
-				}
-			});			
+			Messagebox.show("The Chart Settings data are Saved.Your window will be closed","",1,Messagebox.ON_OK);			
+			authenticationService.logout(null);	
+			editWindowLayout.detach();
+			//Clients.evalJavaScript("window.open('','_self'); window.close();");
 		}
 	};
 	
@@ -627,14 +623,9 @@ public class EditChartController extends SelectorComposer<Component> {
 	 */
 	EventListener<Event> cancelApiChartSettings = new EventListener<Event>() {
 		public void onEvent(Event event) throws Exception {
-			Messagebox.show("The Chart Settings data are not Saved.You can close the window","",1,Messagebox.ON_OK, new EventListener<Event>() {
-				@Override
-				public void onEvent(Event arg0) throws Exception {
-					authenticationService.logout(null);	
-					editWindowLayout.detach();
-					Clients.evalJavaScript("window.open('','_self'); window.close();");
-				}
-			});			
+			Messagebox.show("The Chart Settings data are not Saved.You can close the window","",1,Messagebox.ON_OK);			
+			authenticationService.logout(null);	
+			editWindowLayout.detach();
 		}
 	};
 	
@@ -729,13 +720,8 @@ public class EditChartController extends SelectorComposer<Component> {
 			dashBoardIdList.add(dashboard);
 			try	{
 				dashboardHelper.updateDashboardWidgetDetails(dashBoardIdList);
-				Messagebox.show("Your Chart details are Saved. This tab will now be closed","",1,Messagebox.ON_OK, new EventListener<Event>() {
-					@Override
-					public void onEvent(Event arg0) throws Exception {
-						authenticationService.logout(null);
-						Clients.evalJavaScript("window.open('','_self'); window.close();");
-					}
-				});
+				Messagebox.show("Your Chart details are Saved. This tab will now be closed","",1,Messagebox.ON_OK);
+				authenticationService.logout(null);
 			} catch(Exception ex) {
 				Clients.showNotification("Unable to update Chart details into DB", true);
 	        	LOG.error("Exception saveApiChartConfigData Listener in DashboardController", ex);

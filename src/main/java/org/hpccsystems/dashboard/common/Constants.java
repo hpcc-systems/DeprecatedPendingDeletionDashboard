@@ -109,7 +109,6 @@ public class Constants {
 	
 	public static final String EDIT_WINDOW_CHART_DIV = "chart";
 	
-	
 	public static final Integer FILTER_MINIMUM = 0;
 	public static final Integer FILTER_MAXIMUM = 1;
 	
