@@ -1,8 +1,7 @@
 package org.hpccsystems.dashboard.dao;
 
 import java.sql.SQLException;
-import java.util.List;
-
+import java.util.List; 
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.springframework.dao.DataAccessException;
 
@@ -23,7 +22,7 @@ public interface WidgetDao {
 	 * @throws SQLException
 	 */
 	List<Portlet> retriveWidgetDetails(Integer dashboardId) throws DataAccessException;
-
+	
 	/**
 	 * @param dashboardId
 	 * @param portlets
@@ -42,6 +41,28 @@ public interface WidgetDao {
 	 * @throws SQLException
 	 */
 	void deleteWidgets(Integer dashboardId, List<Portlet> portlets)throws DataAccessException;
+	
+	/**
+	 * Service call to update Widget sequence alone as a batch service
+	 * @param dashboard
+	 * @throws Exception
+	 */
+	void updateWidgetSequence(Integer dashboardId,List<Portlet> portlets)throws DataAccessException;
+	
+	/**
+	 * Service to update widget details.
+	 * This will be invoked when updating chart details in the portlet
+	 * @param portlet
+	 * @throws Exception
+	 */
+	void updateWidget(Portlet portlet)throws DataAccessException;
+
+	/**
+	 * Dao call to update chart title
+	 * @param portlet
+	 * @throws DataAccessException
+	 */
+	void updateWidgetTitle(Portlet portlet)throws DataAccessException;
 	
 	/**
 	 * Deletes Widget from Widget table based on the provided Id

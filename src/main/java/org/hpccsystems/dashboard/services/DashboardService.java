@@ -1,7 +1,6 @@
 package org.hpccsystems.dashboard.services;
 import java.sql.Date;
-import java.util.List;
-
+import java.util.List; 
 import org.hpccsystems.dashboard.entity.Dashboard;
 
 /**
@@ -65,5 +64,13 @@ public interface DashboardService {
 	 * @throws Exception
 	 */
 	void updateSidebarDetails(List<Integer> dashboardIdList)throws Exception;
+	
+
+	/**
+	 * Service to update dashboard details into DB
+	 * @param dashboard
+	 * @throws Exception
+	 */
+	void updateDashboard(Dashboard dashboard)throws Exception;
 	
 }

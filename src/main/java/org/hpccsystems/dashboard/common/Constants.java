@@ -2,7 +2,7 @@ package org.hpccsystems.dashboard.common;
 import java.util.HashMap;
 import java.util.Map;
 import org.hpccsystems.dashboard.entity.ChartDetails;
-
+ 
 /**
  * Constants class is used to maintain the constant's for Dashboard project.
  *
@@ -93,6 +93,7 @@ public class Constants {
 	public static final String CHART_LIST = "chartList";
 	public static final String SOURCE = "source";
 	public static final String SOURCE_ID = "source_id";
+	public static final String SOURCEID="sourceid"; 
 	public static final String NAME_SMALL = "name";
 	public static final String DASHBOARDS =  "dashboards";
 	

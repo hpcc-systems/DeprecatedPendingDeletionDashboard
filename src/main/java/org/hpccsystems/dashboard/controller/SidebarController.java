@@ -6,8 +6,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
-import org.apache.commons.logging.Log;
+import org.apache.commons.logging.Log; 
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.entity.Application;
@@ -17,7 +16,6 @@ import org.hpccsystems.dashboard.services.DashboardService;
 import org.hpccsystems.dashboard.services.WidgetService;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
-import org.zkoss.zk.ui.Session;
 import org.zkoss.zk.ui.Sessions;
 import org.zkoss.zk.ui.event.DropEvent;
 import org.zkoss.zk.ui.event.Event;
@@ -113,7 +111,7 @@ public class SidebarController extends GenericForwardComposer<Component>{
 		if(sideBarPageList != null){
 		for (final Iterator<Dashboard> iter = sideBarPageList.iterator(); iter.hasNext();) {
 			entry = (Dashboard) iter.next();
-			entry.setPersisted(true);
+			//entry.setPersisted(true);
 			navitem  = constructNavItem(entry);
 			navBar.appendChild(navitem);
 
@@ -127,7 +125,6 @@ public class SidebarController extends GenericForwardComposer<Component>{
 		// Displaying first menu item as default page
 		if(firstSet) {
 			//Setting current dashboard in session will load it when page loads
-			Sessions.getCurrent().setAttribute(Constants.ACTIVE_DASHBOARD_ID, firstNavitem.getAttribute(Constants.DASHBOARD_ID));
 			firstNavitem.setSelected(true);
 		}else {
 			Clients.evalJavaScript("showPopUp()");
@@ -140,16 +137,7 @@ public class SidebarController extends GenericForwardComposer<Component>{
 	private Navitem constructNavItem(final Dashboard dashboard) {
 		
 		final Navitem navitem = new Navitem();
-		navitem.setLabel(dashboard.getName());
-				
-		Map<Integer, Dashboard> dashboardMap = new HashMap<Integer, Dashboard>();
-		final Session session = Sessions.getCurrent(); 
-		if(session.getAttribute(Constants.DASHBOARD_LIST) != null){
-			dashboardMap = (HashMap<Integer, Dashboard>) session.getAttribute(Constants.DASHBOARD_LIST);
-		} else {
-			session.setAttribute(Constants.DASHBOARD_LIST, dashboardMap);
-		}		
-		dashboardMap.put(dashboard.getDashboardId(), dashboard);
+		navitem.setLabel(dashboard.getName());			
 		
 		//Setting dashboard id to be retrived onClick
 		navitem.setAttribute(Constants.DASHBOARD_ID, dashboard.getDashboardId());
@@ -184,12 +172,12 @@ public class SidebarController extends GenericForwardComposer<Component>{
 			if(LOG.isDebugEnabled()){
 				LOG.debug("Setting active dashboard to session" + event.getTarget().getAttribute(Constants.DASHBOARD_ID));
 			}
-			Sessions.getCurrent().setAttribute(Constants.ACTIVE_DASHBOARD_ID, event.getTarget().getAttribute(Constants.DASHBOARD_ID));
 			//Detaching the include and Including the page again to trigger reload
 			final Component component = include.getParent();
 			include.detach();
 			final Include newInclude = new Include("/demo/layout/dashboard.zul");
 			newInclude.setId("mainInclude");
+			newInclude.setDynamicProperty(Constants.ACTIVE_DASHBOARD_ID, event.getTarget().getAttribute(Constants.DASHBOARD_ID));
 			component.appendChild(newInclude);
 		}
 	};
@@ -222,6 +210,7 @@ public class SidebarController extends GenericForwardComposer<Component>{
 				centerComp.removeChild(childComp);
 				final Include newInclude = new Include("/demo/layout/dashboard.zul");			
 				newInclude.setId("mainInclude");
+				newInclude.setDynamicProperty(Constants.ACTIVE_DASHBOARD_ID, event.getTarget().getAttribute(Constants.DASHBOARD_ID));
 				centerComp.appendChild(newInclude);
 			}
 		}
@@ -332,8 +321,8 @@ public class SidebarController extends GenericForwardComposer<Component>{
 				}
 			}
 		}
-	};
-	
+	};			
+		
 	private void updateDashboardSequence() throws Exception {
 		Integer dashboard_id = 1;
 		List<Integer> dashboardList = new ArrayList<Integer>();
@@ -349,6 +338,7 @@ public class SidebarController extends GenericForwardComposer<Component>{
 	private List<Dashboard> getApiViewDashboardList(final String userId,final String applicationId)throws Exception {
 		String[] DashboardIdArray = ((String[])Executions.getCurrent().getParameterValues(Constants.DB_DASHBOARD_ID));
 		List<String> dashboardIdList =Arrays.asList(DashboardIdArray);
+
 		
 		if(LOG.isDebugEnabled()){
 			LOG.debug("Requested Dashboard Id : "+dashboardIdList);

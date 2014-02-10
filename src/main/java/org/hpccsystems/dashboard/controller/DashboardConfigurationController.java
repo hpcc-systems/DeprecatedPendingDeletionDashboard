@@ -18,7 +18,8 @@ import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Radio;
 import org.zkoss.zul.Radiogroup;
 import org.zkoss.zul.Textbox;
-import org.zkoss.zul.Window;
+import org.zkoss.zul.Window; 
+
 public class DashboardConfigurationController extends SelectorComposer<Component>{
 
 	private static final long serialVersionUID = 1L;
@@ -62,7 +63,7 @@ public class DashboardConfigurationController extends SelectorComposer<Component
 		
 	}
 	
-	@Listen("onClick = #doneButton")
+	@Listen("onClick = #dashConfigDoneButton")
 	public void done() {
 		if(parent instanceof Window) {
 			dashboard.setName(nameTextbox.getValue());		

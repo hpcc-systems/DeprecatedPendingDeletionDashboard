@@ -1,9 +1,8 @@
 package org.hpccsystems.dashboard.dao;
 
-import java.sql.Date;
+import java.sql.Date; 
 import java.sql.SQLException;
 import java.util.List;
-import org.hpccsystems.dashboard.entity.Application;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.springframework.dao.DataAccessException;
 
@@ -65,6 +64,13 @@ public interface DashboardDao {
 	void updateDashboardDetails(Integer dashboardId,int sequence,String dashboardName,int columnCount, Date updatedDate) throws DataAccessException;
 	
 
+	/**
+	 * Dao call to update dashboard details into DB
+	 * @param dashboard
+	 * @throws Exception
+	 */
+	void updateDashboard(Dashboard dashboard)throws DataAccessException;
+	
 	/**
 	 * updateSidebarDetails() is responsible for update the sidebar details into dashboard_details table.
 	 * @param dashboardIdList

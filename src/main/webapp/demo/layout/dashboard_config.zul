@@ -5,7 +5,7 @@
 	<caption iconSclass="glyphicon glyphicon-cog">
 		<label zclass="h5">Configure Dashboard</label>
 		<toolbar style="position: absolute; right: 40px;">
-			<button id="doneButton" zclass="glyphicon glyphicon-ok btn btn-link img-btn z-button" /> 
+			<button id="dashConfigDoneButton" zclass="glyphicon glyphicon-ok btn btn-link img-btn z-button" /> 
 		</toolbar>
 	</caption>	
 	

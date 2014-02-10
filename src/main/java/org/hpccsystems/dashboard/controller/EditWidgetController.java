@@ -9,6 +9,7 @@ import org.hpccsystems.dashboard.entity.chart.XYChartData;
 import org.hpccsystems.dashboard.entity.chart.utils.ChartRenderer;
 import org.hpccsystems.dashboard.entity.chart.utils.TableRenderer;
 import org.hpccsystems.dashboard.services.HPCCService;
+import org.hpccsystems.dashboard.services.WidgetService;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
@@ -33,6 +34,8 @@ public class EditWidgetController extends SelectorComposer<Component> {
 
 	@WireVariable
 	HPCCService hpccService;
+	@WireVariable
+	WidgetService widgetService;
 	@WireVariable
 	ChartRenderer chartRenderer;
 	@WireVariable
@@ -147,6 +150,12 @@ public class EditWidgetController extends SelectorComposer<Component> {
 			
 			portlet.setChartDataXML(chartRenderer.convertToXML(chartData));
 			editPortletWindow.detach();
+		}
+		//update Live chart data into DB
+		try{
+		widgetService.updateWidget(portlet);
+		}catch(Exception e){
+			LOG.error("Exception in closeEditWindow() while updating Live chart data into DB", e);
 		}
 	}
 }

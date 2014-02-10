@@ -3,16 +3,13 @@ package org.hpccsystems.dashboard.controller.component;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
-
-import org.apache.commons.logging.Log;
+import org.apache.commons.logging.Log; 
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.common.Constants;
-import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.entity.chart.utils.TableRenderer;
 import org.hpccsystems.dashboard.services.AuthenticationService;
 import org.hpccsystems.dashboard.services.WidgetService;
-import org.hpccsystems.dashboard.services.impl.AuthenticationServiceImpl;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Components;
 import org.zkoss.zk.ui.Executions;
@@ -43,10 +40,8 @@ import org.zkoss.zul.Window;
 public class ChartPanel extends Panel {
 
 	private static final  Log LOG = LogFactory.getLog(ChartPanel.class);
-	private static final long serialVersionUID = 1L;
+	private static final long serialVersionUID = 1L;	
 	
-	AuthenticationService authenticationService = new AuthenticationServiceImpl();
-		
 	private static final String ADD_STYLE = "glyphicon glyphicon-plus btn btn-link img-btn";
 	private static final String EDIT_STYLE = "glyphicon glyphicon-cog btn btn-link img-btn";
 	private static final String RESET_STYLE = "glyphicon glyphicon-repeat btn btn-link img-btn";
@@ -108,7 +103,7 @@ public class ChartPanel extends Panel {
 		deleteBtn.addEventListener(Events.ON_CLICK, deleteListener);
 
 		toolbar.appendChild(addBtn);
-		
+		AuthenticationService authenticationService = (AuthenticationService)SpringUtil.getBean("authenticationService");
 		if(!Constants.CIRCUIT_APPLICATION_ID.equals(authenticationService.getUserCredential().getApplicationId())){
 			toolbar.appendChild(resetBtn);
 			toolbar.appendChild(deleteBtn);
@@ -225,6 +220,7 @@ public class ChartPanel extends Panel {
 			// Defining parameters to send to Modal Dialog
 			final Map<String, Object> parameters = new HashMap<String, Object>();
 			parameters.put(Constants.PARENT, ChartPanel.this);
+			parameters.put(Constants.PORTLET, portlet);
 
 			final Window window = (Window) Executions.createComponents(
 					"/demo/add_widget.zul", holderDiv, parameters);
@@ -254,6 +250,8 @@ public class ChartPanel extends Panel {
         	portlet.setWidgetState(Constants.STATE_EMPTY);
         	portlet.setChartDataJSON(null);
         	portlet.setChartDataXML(null);
+        	portlet.setChartType(null);
+        	portlet.setName(null);
         	
         	Components.removeAllChildren(chartDiv);
         	Components.removeAllChildren(imageContainer);
@@ -263,6 +261,11 @@ public class ChartPanel extends Panel {
         	resetBtn.setDisabled(true);
         	addBtn.removeEventListener(Events.ON_CLICK, editListener);
     		addBtn.addEventListener(Events.ON_CLICK, addListener);
+    		
+    		//Clears all chart data from DB
+    		WidgetService widgetService =(WidgetService) SpringUtil.getBean("widgetService");
+    		widgetService.updateWidget(portlet);
+    		
         } 
 	};
 	
@@ -292,7 +295,7 @@ public class ChartPanel extends Panel {
 		final Map<String,Integer> paramMap = (Map<String, Integer>) event.getData();
 		if(paramMap!=null){
 			portlet.setChartType(paramMap.get(Constants.CHART_TYPE));
-			setStaticImage();
+			setStaticImage();	
 			addBtn.removeEventListener(Events.ON_CLICK, addListener);
 			addBtn.setSclass(EDIT_STYLE);
 			resetBtn.setDisabled(false);
@@ -307,6 +310,13 @@ public class ChartPanel extends Panel {
 				LOG.debug("Title is being changed");
 			}
 			portlet.setName(textbox.getValue());
+			//Update Chart Title in DB
+			try{
+			WidgetService widgetService =(WidgetService) SpringUtil.getBean("widgetService");
+    		widgetService.updateWidgetTitle(portlet);
+			}catch(Exception ex){
+				LOG.error("Exception while updating chart title", ex);
+			}
 		}
 	};
 	

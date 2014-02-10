@@ -1,10 +1,10 @@
 package org.hpccsystems.dashboard.services.impl;
 
 import java.util.List;
-
-import org.apache.commons.logging.Log;
+import org.apache.commons.logging.Log; 
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.dao.WidgetDao;
+import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.services.WidgetService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,4 +88,44 @@ public class WidgetServiceImpl implements WidgetService {
 			throw ex;
 		}
 	}
+	
+	@Override
+	public void updateWidgetSequence(Dashboard dashboard) throws Exception {
+		try
+		{
+			widgetDao.updateWidgetSequence(dashboard.getDashboardId(),dashboard.getPortletList());
+		}catch(DataAccessException ex)
+		{
+			LOG.error("DataAccessException in updateWidgetSequence() in WidgetServiceImpl"+ex);
+			throw ex;
+		}
+		
+	}
+
+	@Override
+	public void updateWidget(Portlet portlet) throws Exception {
+		try
+		{
+			widgetDao.updateWidget(portlet);
+		}catch(DataAccessException ex)
+		{
+			LOG.error("DataAccessException in updateWidget() in WidgetServiceImpl"+ex);
+			throw ex;
+		}
+		
+	}
+
+	@Override
+	public void updateWidgetTitle(Portlet portlet)throws Exception {
+		try
+		{
+			widgetDao.updateWidgetTitle(portlet);
+		}catch(DataAccessException ex)
+		{
+			LOG.error("DataAccessException in updateWidgetTitle() in WidgetServiceImpl"+ex);
+			throw ex;
+		}
+		
+	}
+
 }

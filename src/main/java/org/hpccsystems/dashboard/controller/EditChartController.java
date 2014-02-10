@@ -4,8 +4,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-
+import java.util.Map; 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.api.entity.ChartConfiguration;
@@ -129,7 +128,6 @@ public class EditChartController extends SelectorComposer<Component> {
 			filterListBox.setStyle("backgroundr:gray;");
 			filterListBox.invalidate();			
 		}
-		
 		//API chart config flow with chart
 		if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_CHART)) {
 			configureDashboardPortlet();
@@ -142,39 +140,41 @@ public class EditChartController extends SelectorComposer<Component> {
 		
 		if(!authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_CONFIG_CHART)){
 			// When live chart is present in ChartPanel
-			if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())){
-				for (String colName : chartData.getXColumnNames()) {
-					createXListChild(colName);
-				}
-				for (String colName : chartData.getYColumnNames()) {
-					createYListChild(colName);
-				}
-				xAxisDropped = true;
-				yAxisDropped = true;
-				filterListBox.setDroppable("true");
-				XAxisListBox.setDroppable("false");
-				validateYAxisDrops();
-				try	{
-					chartRenderer.constructChartJSON(chartData, portlet, true);
-					chartRenderer.drawChart(chartData,Constants.EDIT_WINDOW_CHART_DIV, portlet);
-				} catch(Exception ex) {
-					Clients.showNotification("Unable to fetch column data from Hpcc", "error", comp, "middle_center", 3000, true);
-					LOG.error("Exception while fetching column data from Hpcc", ex);
-				}
-				
-				if(chartData.getIsFiltered()) {
-					createFilterListItem(chartData.getFilter().getColumn());
-					filterListBox.setDroppable("false");
-				}
-			} 		
-			try	{
-				columnSchemaMap = hpccService.getColumnSchema(chartData.getFileName(), chartData.getHpccConnection());
-			} catch(Exception e) {
-				Clients.showNotification("Unable to fetch columns from HPCC", "error", comp, "middle_center", 3000, true);
-				LOG.error(Constants.ERROR_RETRIEVE_COLUMNS, e);
+		if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())){
+			for (String colName : chartData.getXColumnNames()) {
+				createXListChild(colName);
 			}
+			for (String colName : chartData.getYColumnNames()) {
+				createYListChild(colName);
+			}
+			xAxisDropped = true;
+			yAxisDropped = true;
+			filterListBox.setDroppable("true");
+			XAxisListBox.setDroppable("false");
+			validateYAxisDrops();
+
+			try	{
+				chartRenderer.constructChartJSON(chartData, portlet, true);
+				chartRenderer.drawChart(chartData,Constants.EDIT_WINDOW_CHART_DIV, portlet);
+			} catch(Exception ex) {
+				Clients.showNotification("Unable to fetch column data from Hpcc", "error", comp, "middle_center", 3000, true);
+				LOG.error("Exception while fetching column data from Hpcc", ex);
+			}
+			
+			if(chartData.getIsFiltered()) {
+				createFilterListItem(chartData.getFilter().getColumn());
+				filterListBox.setDroppable("false");
+			}
+		} 		
+
+		try	{
+			columnSchemaMap = hpccService.getColumnSchema(chartData.getFileName(), chartData.getHpccConnection());
+		} catch(Exception e) {
+			Clients.showNotification("Unable to fetch columns from HPCC", "error", comp, "middle_center", 3000, true);
+			LOG.error(Constants.ERROR_RETRIEVE_COLUMNS, e);
 		}
-		
+		}
+
 		//Dashboard chart edit flow and API Dashboard View flow,API chart config flow with chart
 		if( !authenticationService.getUserCredential().getApplicationId().equals(Constants.CIRCUIT_APPLICATION_ID)
 				||authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_CHART)) {
@@ -583,7 +583,7 @@ public class EditChartController extends SelectorComposer<Component> {
 		chartData.setHpccConnection(configuration.getHpccConnection());
 		List<Field> feildList = configuration.getFields();
 		Map<String,String> columnSchemaMap = new HashMap<String,String>();
-		for(Field field :feildList) {
+		for(Field field :feildList)	{
 			columnSchemaMap.put(field.getColumnName(), field.getDataType());
 		}
 		apiSaveButton.addEventListener(Events.ON_CLICK, saveApiChartSettings);
@@ -613,7 +613,6 @@ public class EditChartController extends SelectorComposer<Component> {
 			Messagebox.show("The Chart Settings data are Saved.Your window will be closed","",1,Messagebox.ON_OK);			
 			authenticationService.logout(null);	
 			editWindowLayout.detach();
-			//Clients.evalJavaScript("window.open('','_self'); window.close();");
 		}
 	};
 	

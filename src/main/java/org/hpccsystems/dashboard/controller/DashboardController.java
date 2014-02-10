@@ -1,11 +1,11 @@
 package org.hpccsystems.dashboard.controller;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-
+import java.util.Map; 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.common.Constants;
@@ -21,7 +21,6 @@ import org.hpccsystems.dashboard.services.HPCCService;
 import org.hpccsystems.dashboard.services.WidgetService;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
-import org.zkoss.zk.ui.Session;
 import org.zkoss.zk.ui.Sessions;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
@@ -82,8 +81,6 @@ public class DashboardController extends SelectorComposer<Component>{
 	@Wire("portalchildren")
     List<Portalchildren> portalChildren;
 	
-	
-	
     Integer panelCount = 0;
     
     private static final String PERCENTAGE_SIGN = "%";
@@ -111,19 +108,32 @@ public class DashboardController extends SelectorComposer<Component>{
 		//TODO Delete dashboard state is not considered right now 
 		
 		super.doAfterCompose(comp);
-		
-		final Session session = Sessions.getCurrent();
-		dashboardId = (Integer) session.getAttribute(Constants.ACTIVE_DASHBOARD_ID);
-		final Map<Integer,Dashboard> dashboardMap = (HashMap<Integer, Dashboard>) session.getAttribute(Constants.DASHBOARD_LIST);
-		
-		if(dashboardId != null && dashboardMap != null){
-			dashboard = dashboardMap.get(dashboardId);
+		dashboardId =(Integer) Executions.getCurrent().getAttribute(Constants.ACTIVE_DASHBOARD_ID);
+		if(dashboardId != null ){
+			List<String> dashboardIdList = new ArrayList<String>(); 
+			dashboardIdList.add(String.valueOf(dashboardId));
+			List<Dashboard> dashboardList =null;
+			try{
+				dashboardList = dashboardService.retrieveDashboardMenuPages(
+						authenticationService.getUserCredential().getApplicationId(),
+						authenticationService.getUserCredential().getUserId(),
+						dashboardIdList,null);				
+			}catch(Exception ex){
+				Clients.showNotification(
+						"Unable to retrieve selected Dashboard details from DB ",
+						"error", comp, "middle_center", 3000, true);
+				LOG.error("Exception while fetching widget details from DB", ex);
+			}			
 			
+			if(dashboardList != null && dashboardList.size() > 0){
+				dashboard = dashboardList.get(0);
+				dashboard.setPersisted(true);
+			}
 			if(LOG.isDebugEnabled()){
+				LOG.debug("dashboardList in DashboardController.doAfterCompose()-->"+dashboardList);
 				LOG.debug("Creating dashboard - Dashboard Id " + dashboardId);
 				LOG.debug("Persistance - " + dashboard.isPersisted());
 			}
-			
 			nameLabel.setValue(dashboard.getName());
 			
 			//Preparing the layout
@@ -136,23 +146,7 @@ public class DashboardController extends SelectorComposer<Component>{
 				count ++;
 			}		
 
-			if( !dashboard.getPortletList().isEmpty() ) {
-				//Dashboard is present in session or Newly created dashboard
-				if(LOG.isDebugEnabled()){
-					LOG.debug("Creating Dashboard present in session. \nNumber of columns in Session -- " + dashboard.getColumnCount());
-				}
-				final Iterator<Portlet> iterator = dashboard.getPortletList().iterator();
-				while(iterator.hasNext()){
-					final Portlet portlet = iterator.next();
-					if(!portlet.getWidgetState().equals(Constants.STATE_DELETE)){
-						final ChartPanel panel = new ChartPanel(portlet);
-						portalChildren.get(portlet.getColumn()).appendChild(panel);
-						if(panel.drawD3Graph() != null){
-							Clients.evalJavaScript(panel.drawD3Graph());
-						}
-					}
-				}
-			} else if(dashboard.getPortletList().isEmpty() && dashboard.isPersisted()) {
+			 if(dashboard.getPortletList().isEmpty() && dashboard.isPersisted()) {
 				//Dashboard is persisted but not present in session
 				//Webservices are called to retrieve chart data
 				if(LOG.isDebugEnabled()){
@@ -165,6 +159,9 @@ public class DashboardController extends SelectorComposer<Component>{
 							"Unable to retrieve Widget details from DB for the Dashboard",
 							"error", comp, "middle_center", 3000, true);
 					LOG.error("Exception while fetching widget details from DB", ex);
+				}
+				if(LOG.isDebugEnabled()){
+					LOG.debug("PortletList of selected Dashboard -->"+dashboard.getPortletList());
 				}
 				
 				
@@ -207,7 +204,7 @@ public class DashboardController extends SelectorComposer<Component>{
 			}
 			
 		} else {
-			dashboardWin.setBorder("none");
+			dashboardWin.setBorder("none");			
 			return;
 		}
 		
@@ -254,13 +251,6 @@ public class DashboardController extends SelectorComposer<Component>{
 		ChartPanel chartPanel = new ChartPanel(portlet);
 		portalChildren.get(portlet.getColumn()).appendChild(chartPanel);
 		chartPanel.focus();
-		if(dashboard.getPortletList().size()>0){
-		try {
-			widgetService.addWidgetDetails(dashboard.getDashboardId(), portletList);
-		} catch (Exception e) {
-			LOG.error("Exception while adding widgets into dashboard", e);
-		}
-	  }	
 	}
 	
 	@Listen("onClick = #configureDashboard")
@@ -307,12 +297,11 @@ public class DashboardController extends SelectorComposer<Component>{
 				}while(portletChild<3);
 				
 				// Adding portlets in deleted state to the new list
-				for (Portlet portlet2 : dashboard.getPortletList()) {
+				/*for (Portlet portlet2 : dashboard.getPortletList()) {
 					if(Constants.STATE_DELETE.equals(portlet2.getWidgetState())) {
 						newPortletList.add(portlet2);
 					}
-				}
-				
+				}*/
 				dashboard.setPortletList(newPortletList);
 			break;
 			
@@ -349,7 +338,7 @@ public class DashboardController extends SelectorComposer<Component>{
 
 		@Override
 		public void onEvent(Event event) throws Exception {
-			// Check if any visible panels are hided when layout is changed
+			// Check if any visible panels are hidden when layout is changed
 			if(dashboard.getColumnCount() < oldColumnCount) {
 				//List to capture hidden panels
 				List<Component> hiddenPanels = new ArrayList<Component>();
@@ -376,6 +365,13 @@ public class DashboardController extends SelectorComposer<Component>{
 			
 			manipulatePortletObjects(Constants.ReorderPotletPanels);
 			manipulatePortletObjects(Constants.ResizePotletPanels);
+			
+			//updating Dashboard details
+			dashboard.setUpdatedDate(new Date(new java.util.Date().getTime()));
+			dashboardService.updateDashboard(dashboard);
+			
+			//updating Widget sequence
+			widgetService.updateWidgetSequence(dashboard);
 		}
 		
 	};
@@ -391,9 +387,6 @@ public class DashboardController extends SelectorComposer<Component>{
 			if(LOG.isDebugEnabled()) {
 				LOG.debug("hide portlet event");
 			}
-			Portlet portlet = (Portlet) event.getData();
-			dashboard.getPortletList().remove(portlet);
-			
 			manipulatePortletObjects(Constants.ReorderPotletPanels);
 			manipulatePortletObjects(Constants.ResizePotletPanels);
 			if(LOG.isDebugEnabled()) {
@@ -488,9 +481,8 @@ public class DashboardController extends SelectorComposer<Component>{
 	           			newInclude.setId("mainInclude");
 	           			component2.appendChild(newInclude);
 	           			Clients.evalJavaScript("showPopUp()");
-	           		}
+	           		}	           		
 	           		dashboardService.deleteDashboard(dashboard.getDashboardId(),authenticationService.getUserCredential().getUserId());
-	           		//dashboard.setDashboardState(Constants.STATE_DELETE);
 	             }
 
 	           } 

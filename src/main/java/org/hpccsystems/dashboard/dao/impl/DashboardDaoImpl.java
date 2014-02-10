@@ -4,11 +4,10 @@ import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
-
-import javax.sql.DataSource;
-
+import javax.sql.DataSource; 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.common.Queries;
 import org.hpccsystems.dashboard.dao.DashboardDao;
 import org.hpccsystems.dashboard.entity.Dashboard;
@@ -37,6 +36,12 @@ public class DashboardDaoImpl implements DashboardDao {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
 	
+	 /**
+	  * Fetching DashboardMenuPages details from dashboard_details table.
+	 * @param application
+	 * @return List<DashboardMenu>
+	 * @throws DataAccessException
+	 */
 	public List<Dashboard> fetchDashboardDetails(final String applicationId,final String userId, List<String> dashboardIdList, final String sourceId)
 			throws DataAccessException {	
 		
@@ -44,10 +49,10 @@ public class DashboardDaoImpl implements DashboardDao {
 		StringBuilder sqlBuffer = new StringBuilder();
 		sqlBuffer.append(Queries.RETRIEVE_DASHBOARD_DETAILS).append("'").append(
 				applicationId).append("'");
-		if(userId == null && dashboardIdList == null && sourceId != null){
+		if(userId == null && dashboardIdList == null  && sourceId != null){
 			sqlBuffer.append(" and SOURCE_ID = '")
-				.append(sourceId)
-				.append("' order by updateddate desc");
+			.append(sourceId)
+			.append("' order by updated_date desc");
 		}
 		else if (userId != null && dashboardIdList == null) {
 			sqlBuffer.append(" and user_id='").append(userId)
@@ -77,7 +82,6 @@ public class DashboardDaoImpl implements DashboardDao {
 				dashboard.getName(),
 				userId,
 				applicationId,
-				sourceId,
 				dashboard.getUpdatedDate(),
 				dashboard.getColumnCount(),
 				dashboard.getSequence()
@@ -109,7 +113,7 @@ public class DashboardDaoImpl implements DashboardDao {
 
 	public void updateDashboardState(final Integer dashboardId,final String emptyState,
 			final int sequence,final String dashboardName, Date updatedDate) throws DataAccessException {
-		getJdbcTemplate().update(Queries.UPDATE_DASHBOARD_STATE, new Object[] { 
+		getJdbcTemplate().update(Queries.UPDATE_DASHBOARD_STATEE, new Object[] { 
 				emptyState,
 				sequence,
 				dashboardName,
@@ -144,6 +148,32 @@ public class DashboardDaoImpl implements DashboardDao {
 				return dashboardIds.size();
 				}
 		});
+	}
+	@Override
+	public void updateDashboard(final Dashboard dashboard) throws DataAccessException {
+		
+		if(dashboard.getDashboardState()== null 
+				|| !Constants.STATE_EMPTY.equals(dashboard.getDashboardState())){
+			//updates dashboard Sequence & Column count,Name
+			getJdbcTemplate().update(Queries.UPDATE_DASHBOARD, new Object[] { 
+					dashboard.getName(),
+					dashboard.getColumnCount(),
+					dashboard.getUpdatedDate(),				
+					dashboard.getDashboardId()
+			});
+			
+		}else if(Constants.STATE_EMPTY.equals(dashboard.getDashboardState())){
+			//updates dashboard Sate as Empty
+			getJdbcTemplate().update(Queries.UPDATE_DASHBOARD_STATE, new Object[] { 
+					dashboard.getName(),
+					dashboard.getDashboardState(),
+					dashboard.getColumnCount(),
+					dashboard.getUpdatedDate(),				
+					dashboard.getDashboardId()
+			});
+		}
+		
+		
 	}
 	
 }

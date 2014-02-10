@@ -1,9 +1,11 @@
 package org.hpccsystems.dashboard.services;
 
 import java.sql.SQLException;
-import java.util.List;
+import java.util.List; 
 
+import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.Portlet;
+
 
 /**
  * Service class,has abstract methods for Widget related services
@@ -47,5 +49,25 @@ public interface WidgetService {
 	 * @throws Exception
 	 */
 	void deleteWidget(Integer portletId)throws Exception;
+	
+	/**
+	 * Service call to update Widget sequence alone as a batch service
+	 * @param dashboard
+	 * @throws Exception
+	 */
+	void updateWidgetSequence(Dashboard dashboard)throws Exception;
 
+	 /**
+	 * Service to update widget details.
+	 * This will be invoked when updating chart details in the portlet
+	 * @param portlet
+	 * @throws Exception
+	 */
+	void updateWidget(Portlet portlet)throws Exception;
+
+	/**
+	 * Service to update chart title
+	 * @param portlet
+	 */
+	void updateWidgetTitle(Portlet portlet)throws Exception;
 }

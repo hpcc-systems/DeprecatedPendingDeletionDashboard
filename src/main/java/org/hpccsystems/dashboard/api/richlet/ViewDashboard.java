@@ -1,8 +1,5 @@
 package org.hpccsystems.dashboard.api.richlet;
 
-import java.util.Arrays;
-import java.util.List;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.common.Constants;
@@ -29,19 +26,16 @@ public class ViewDashboard extends GenericRichlet {
 			Sessions.getCurrent().setAttribute("userCredential", credential);
 			credential.addRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD);
 			
-			List<String> dashIdList =Arrays.asList(dashboardIdArray);
-			StringBuilder url = new StringBuilder("/demo/?");
-			
-			if(LOG.isDebugEnabled()){
-				LOG.debug("URL from External/Circuit source : "+url);				
-			}
-			
+			StringBuilder url = new StringBuilder("/demo/?");			
 			url.append(Constants.SOURCE).append("=").append(source)
 					.append("&").append(Constants.SOURCE_ID).append("=")
 					.append(sourceId);
-			for(String dashId : dashIdList){
+			for(String dashId : dashboardIdArray){
 				url.append("&").append(Constants.DB_DASHBOARD_ID).append("=")
 					.append(dashId);
+			}
+			if(LOG.isDebugEnabled()){
+				LOG.debug("URL from External/Circuit source : "+url);				
 			}
 			Executions.sendRedirect(url.toString());
 		

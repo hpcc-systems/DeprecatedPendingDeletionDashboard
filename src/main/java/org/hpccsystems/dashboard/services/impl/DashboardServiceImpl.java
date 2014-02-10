@@ -4,8 +4,7 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List;
-
+import java.util.List; 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.dao.DashboardDao;
@@ -28,6 +27,12 @@ public class DashboardServiceImpl implements DashboardService {
 	
 	private DashboardDao dashboardDao;
 
+	
+	/**
+	 * Retrieving DashboardMenuPages details from dashboard_details table.
+	 * @param viewModel
+	 * @return List<SidebarPage>
+	 */
 
 	public List<Dashboard> retrieveDashboardMenuPages(final String applicationId,String userId,List<String> dashboardIdList, String sourceId)throws Exception {
 		
@@ -127,12 +132,23 @@ public class DashboardServiceImpl implements DashboardService {
 			throw e;
 		}
 	}
-	
+
 	public void updateSidebarDetails(List<Integer> dashboardIdList)throws Exception{
 		try{
 			dashboardDao.updateSidebarDetails(dashboardIdList);
 		}catch(DataAccessException e) {
 			LOG.error("DataAccessException in updateDashboardDetails()", e);
+			throw e;
+		}
+		
+	}
+	
+	@Override
+	public void updateDashboard(Dashboard dashboard) throws Exception {
+		try {
+			dashboardDao.updateDashboard(dashboard);
+		} catch (DataAccessException e) {
+			LOG.error("DataAccessException in updateDashboard()", e);
 			throw e;
 		}
 		
