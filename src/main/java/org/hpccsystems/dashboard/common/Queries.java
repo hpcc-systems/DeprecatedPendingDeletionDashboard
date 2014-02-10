@@ -14,7 +14,7 @@ public class Queries {
 	public static final String UPDATE_DASHBOARD_STATE = "update dashboard_details set dashboard_state=?,sequence=?,dashboard_name=?,updateddate=? where dashboard_id=?";
 	public static final String UPDATE_DASHBOARD_DETAILS = "update dashboard_details set sequence=?,dashboard_name=?,column_count=?,updateddate=? where dashboard_id=?";
 	public static final String UPDATE_WIDGET_DETAILS = "update widget_details set WIDGET_NAME=?,WIDGET_STATE=?,CHART_TYPE=?,COLUMN_IDENTIFIER=?,WIDGET_SEQUENCE=?,CHART_DATA=? where WIDGET_ID=? and DASHBOARD_ID=?";
-	public static final String UPDATE_WIDGET_SEQUENCE = "update widget_details set COLUMN_IDENTIFIER=?,WIDGET_SEQUENCE=? where WIDGET_ID=?";
+	//public static final String UPDATE_WIDGET_SEQUENCE = "update widget_details set COLUMN_IDENTIFIER=?,WIDGET_SEQUENCE=? where WIDGET_ID=?";
 	public static final String INSERT_WIDGET_DETAILS = "insert into WIDGET_DETAILS(DASHBOARD_ID,WIDGET_NAME,WIDGET_STATE,CHART_TYPE,COLUMN_IDENTIFIER,WIDGET_SEQUENCE,CHART_DATA) values(?,?,?,?,?,?,?)";
 	public static final String GET_USER_DETAILs = "select user_id,password,active_flag,user_name from user_details where user_name=?"; 
 	public static final String GET_APPLICATIONS = "SELECT dash_app_id,dash_app_name FROM dash_application";

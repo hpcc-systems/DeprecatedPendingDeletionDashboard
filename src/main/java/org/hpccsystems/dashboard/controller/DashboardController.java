@@ -254,11 +254,13 @@ public class DashboardController extends SelectorComposer<Component>{
 		ChartPanel chartPanel = new ChartPanel(portlet);
 		portalChildren.get(portlet.getColumn()).appendChild(chartPanel);
 		chartPanel.focus();
+		if(dashboard.getPortletList().size()>0){
 		try {
 			widgetService.addWidgetDetails(dashboard.getDashboardId(), portletList);
 		} catch (Exception e) {
 			LOG.error("Exception while adding widgets into dashboard", e);
 		}
+	  }	
 	}
 	
 	@Listen("onClick = #configureDashboard")
