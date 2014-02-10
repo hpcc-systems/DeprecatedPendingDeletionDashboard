@@ -14,6 +14,7 @@ import org.hpccsystems.dashboard.entity.Application;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.services.AuthenticationService;
 import org.hpccsystems.dashboard.services.DashboardService;
+import org.hpccsystems.dashboard.services.WidgetService;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Session;
@@ -63,6 +64,9 @@ public class SidebarController extends GenericForwardComposer<Component>{
 	
 	@WireVariable
 	AuthenticationService  authenticationService;
+	
+	@WireVariable
+	WidgetService  widgetService;
 	
 	@Override
 	public void doAfterCompose(final Component comp) throws Exception{
@@ -265,6 +269,13 @@ public class SidebarController extends GenericForwardComposer<Component>{
 	public void onCloseDialog(final Event event) {
 		
 		final Dashboard dashboard = (Dashboard) event.getData();
+		//updating dashboard sequence into dashboard_details
+		Integer sequence=1;
+		List<Component> comp = navBar.getChildren();
+		for(Component component : comp){
+			sequence++;
+		}
+		dashboard.setSequence(sequence);
 		
 		// Make entry of new dashboard details into DB
 		try {
@@ -276,6 +287,8 @@ public class SidebarController extends GenericForwardComposer<Component>{
 					authenticationService.getUserCredential().getUserId()
 				)
 			);
+			//adding widget details into db while adding new dashboard.
+			widgetService.addWidgetDetails(dashboard.getDashboardId(), dashboard.getPortletList());
 		} catch (Exception exception) {
 			Clients.showNotification("Adding new Dashboard failed. Please try again", true);
 			LOG.error("Exception while adding new dashboard to DB", exception);
@@ -304,9 +317,11 @@ public class SidebarController extends GenericForwardComposer<Component>{
 					final Navitem currentNavitem = (Navitem) component;
 					if(currentNavitem.equals(dropped)){
 						navBar.insertBefore(dragged, dropped);
+						updateDashboardSequence();
 						return;
 					} else if(currentNavitem.equals(dragged)){
 						navBar.insertBefore(dropped, dragged);
+						updateDashboardSequence();
 						return;
 					}
 					if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD)){
@@ -318,6 +333,18 @@ public class SidebarController extends GenericForwardComposer<Component>{
 			}
 		}
 	};
+	
+	private void updateDashboardSequence() throws Exception {
+		Integer dashboard_id = 1;
+		List<Integer> dashboardList = new ArrayList<Integer>();
+		for(Component navItem : navBar.getChildren()){
+			final Navitem navItems = (Navitem) navItem;
+			dashboard_id = (Integer)navItems.getAttribute(Constants.DASHBOARD_ID);
+			dashboardList.add(dashboard_id);
+			dashboardService.updateSidebarDetails(dashboardList);
+		}
+	}
+
 	
 	private List<Dashboard> getApiViewDashboardList(final String userId,final String applicationId)throws Exception {
 		String[] DashboardIdArray = ((String[])Executions.getCurrent().getParameterValues(Constants.DB_DASHBOARD_ID));

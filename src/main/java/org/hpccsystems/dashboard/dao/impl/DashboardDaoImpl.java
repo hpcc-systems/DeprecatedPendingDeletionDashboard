@@ -1,6 +1,8 @@
 package org.hpccsystems.dashboard.dao.impl; 
 
 import java.sql.Date;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.List;
 
 import javax.sql.DataSource;
@@ -13,6 +15,7 @@ import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.rowmapper.DashboardRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 
@@ -76,7 +79,8 @@ public class DashboardDaoImpl implements DashboardDao {
 				applicationId,
 				sourceId,
 				dashboard.getUpdatedDate(),
-				dashboard.getColumnCount()
+				dashboard.getColumnCount(),
+				dashboard.getSequence()
 		});
 		
 		return getJdbcTemplate().queryForObject(Queries.GET_MAX_DASHBOARD_ID, new Object[] {userId} , Integer.class);
@@ -123,6 +127,22 @@ public class DashboardDaoImpl implements DashboardDao {
 				columnCount,				
 				updatedDate,
 				dashboardId
+		});
+	}
+	
+	public void updateSidebarDetails(final List<Integer> dashboardIds)throws DataAccessException{
+		String sql = Queries.UPDATE_SIDEBAR_DETAILS;
+		getJdbcTemplate().batchUpdate(sql, new BatchPreparedStatementSetter()
+		{
+			public void setValues(PreparedStatement statement, int i)
+					throws SQLException {
+				Integer dashboardId = dashboardIds.get(i);
+				statement.setInt(1, i);
+				statement.setInt(2, dashboardId);
+			}
+			public int getBatchSize() {
+				return dashboardIds.size();
+				}
 		});
 	}
 	

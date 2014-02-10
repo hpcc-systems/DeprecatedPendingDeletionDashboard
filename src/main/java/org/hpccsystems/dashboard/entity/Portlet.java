@@ -36,6 +36,8 @@ public class Portlet {
 	private LinkedHashMap<String, List<String>> tableDataMap;
 	private boolean persisted = true; 
 	
+	private int widgetSequence;
+	
 	/**
 	 * @return boolean
 	 */
@@ -155,5 +157,11 @@ public class Portlet {
 	}
 	public final void setTableDataMap(LinkedHashMap<String, List<String>> tableDataMap) {
 		this.tableDataMap = tableDataMap;
+	}
+	public int getWidgetSequence() {
+		return widgetSequence;
+	}
+	public void setWidgetSequence(int widgetSequence) {
+		this.widgetSequence = widgetSequence;
 	}
 }

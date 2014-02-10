@@ -127,5 +127,15 @@ public class DashboardServiceImpl implements DashboardService {
 			throw e;
 		}
 	}
+	
+	public void updateSidebarDetails(List<Integer> dashboardIdList)throws Exception{
+		try{
+			dashboardDao.updateSidebarDetails(dashboardIdList);
+		}catch(DataAccessException e) {
+			LOG.error("DataAccessException in updateDashboardDetails()", e);
+			throw e;
+		}
+		
+	}
 
 }

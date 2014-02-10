@@ -30,6 +30,7 @@ public class Dashboard {
 	private String applicationId;
 	private String dashboardState;
 	private Date updatedDate;
+	private Integer sequence;
 	
 	public String getDashboardState() {
 		return dashboardState;
@@ -148,6 +149,14 @@ public class Dashboard {
 
 	public void setSourceId(String sourceId) {
 		this.sourceId = sourceId;
+	}
+
+	public Integer getSequence() {
+		return sequence;
+	}
+
+	public void setSequence(Integer sequence) {
+		this.sequence = sequence;
 	}
 
 }

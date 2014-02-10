@@ -63,4 +63,12 @@ public interface DashboardDao {
 	 * @param columnCount
 	 */
 	void updateDashboardDetails(Integer dashboardId,int sequence,String dashboardName,int columnCount, Date updatedDate) throws DataAccessException;
+	
+
+	/**
+	 * updateSidebarDetails() is responsible for update the sidebar details into dashboard_details table.
+	 * @param dashboardIdList
+	 * @throws Exception
+	 */
+	void updateSidebarDetails(List<Integer> dashboardIdList) throws DataAccessException;
 }
