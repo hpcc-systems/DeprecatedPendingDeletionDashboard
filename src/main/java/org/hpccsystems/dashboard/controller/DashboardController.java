@@ -82,6 +82,8 @@ public class DashboardController extends SelectorComposer<Component>{
 	@Wire("portalchildren")
     List<Portalchildren> portalChildren;
 	
+	
+	
     Integer panelCount = 0;
     
     private static final String PERCENTAGE_SIGN = "%";
@@ -229,10 +231,12 @@ public class DashboardController extends SelectorComposer<Component>{
 		//generating portlet id
 		int nextPortletSeq = dashboard.getPortletList().size()+1;
 		portlet.setId(nextPortletSeq);
-		
+		portlet.setWidgetSequence(nextPortletSeq);
 		portlet.setWidgetState(Constants.STATE_EMPTY);
 		portlet.setPersisted(false);
 		dashboard.getPortletList().add(portlet);
+		List<Portlet> portletList = new ArrayList<Portlet>();
+		portletList.add(portlet);
 		
 		// Adding new Widget to the column with lowest number of widgets
 		Integer count = 0, childCount = 0, column = 0;
@@ -250,6 +254,11 @@ public class DashboardController extends SelectorComposer<Component>{
 		ChartPanel chartPanel = new ChartPanel(portlet);
 		portalChildren.get(portlet.getColumn()).appendChild(chartPanel);
 		chartPanel.focus();
+		try {
+			widgetService.addWidgetDetails(dashboard.getDashboardId(), portletList);
+		} catch (Exception e) {
+			LOG.error("Exception while adding widgets into dashboard", e);
+		}
 	}
 	
 	@Listen("onClick = #configureDashboard")
@@ -380,6 +389,9 @@ public class DashboardController extends SelectorComposer<Component>{
 			if(LOG.isDebugEnabled()) {
 				LOG.debug("hide portlet event");
 			}
+			Portlet portlet = (Portlet) event.getData();
+			dashboard.getPortletList().remove(portlet);
+			
 			manipulatePortletObjects(Constants.ReorderPotletPanels);
 			manipulatePortletObjects(Constants.ResizePotletPanels);
 			if(LOG.isDebugEnabled()) {
@@ -475,8 +487,8 @@ public class DashboardController extends SelectorComposer<Component>{
 	           			component2.appendChild(newInclude);
 	           			Clients.evalJavaScript("showPopUp()");
 	           		}
-	           		
-	           		dashboard.setDashboardState(Constants.STATE_DELETE);
+	           		dashboardService.deleteDashboard(dashboard.getDashboardId(),authenticationService.getUserCredential().getUserId());
+	           		//dashboard.setDashboardState(Constants.STATE_DELETE);
 	             }
 
 	           } 
