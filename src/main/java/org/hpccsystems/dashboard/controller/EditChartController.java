@@ -574,10 +574,9 @@ public class EditChartController extends SelectorComposer<Component> {
 		//TODO: when external source creating more than one chart,
 		//have to set portlet column dynamically
 		portlet.setColumn(0);
-		portlet.setWidgetSequence(1);
 		portlet.setName(configuration.getChartTitle());
 		portlet.setPersisted(false);		
-		portlet.setId(portlet.getWidgetSequence());
+		portlet.setId(1);
 		this.portlet = portlet;		
 		//creating chartData
 		chartData.setFileName(configuration.getDatasetName());			

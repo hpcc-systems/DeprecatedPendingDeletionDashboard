@@ -79,4 +79,13 @@ public class WidgetServiceImpl implements WidgetService {
 		}
 	}
 
+	@Override
+	public void deleteWidget(Integer portletId) throws Exception {
+		try	{
+			widgetDao.deleteWidget(portletId);
+		}catch(DataAccessException ex)	{
+			LOG.error("DataAccessException in deleteWidgets() in WidgetServiceImpl"+ex);
+			throw ex;
+		}
+	}
 }

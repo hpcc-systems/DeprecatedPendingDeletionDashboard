@@ -140,7 +140,6 @@ public class DashboardHelper {
 								if(LOG.isDebugEnabled()){
 									LOG.debug("Portlet State ->" + portlet.getWidgetState());
 								}
-								portlet.setWidgetSequence(index);
 								if(portlet.isPersisted() && Constants.STATE_DELETE.equals(portlet.getWidgetState())){
 									deletPortlets.add(portlet);
 								}
@@ -160,8 +159,7 @@ public class DashboardHelper {
 								// insert portlet details into widget table
 								Portlet portlet = portletList.get(index - 1);
 								if(!"D".equals(portlet.getWidgetState())){
-								portlet.setWidgetSequence(index);
-								newPortlets.add(portlet);	
+									newPortlets.add(portlet);	
 								}
 							}
 						}

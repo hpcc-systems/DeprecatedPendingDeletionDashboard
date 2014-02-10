@@ -14,6 +14,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementSetter;
 
 /**
  * Dao class to do widget related DB hits
@@ -44,7 +45,7 @@ public class WidgetDaoImpl implements WidgetDao{
 	public void setDataSource(final DataSource dataSource) {
 		this.dataSource = dataSource;
 	}
-	
+
 	public void updateWidgetDetails(final Integer dashboardId,final List<Portlet> portlets)  throws DataAccessException {
 		
 		String sql = Queries.UPDATE_WIDGET_DETAILS;
@@ -62,7 +63,7 @@ public class WidgetDaoImpl implements WidgetDao{
 					statement.setInt(3, portlet.getChartType());
 				}
 				statement.setInt(4, portlet.getColumn());
-				statement.setInt(5, portlet.getWidgetSequence());
+				statement.setInt(5, i);
 				statement.setString(6, portlet.getChartDataXML());
 				statement.setInt(7,portlet.getId());
 				statement.setInt(8, dashboardId);
@@ -92,7 +93,7 @@ public class WidgetDaoImpl implements WidgetDao{
 					statement.setInt(4, portlet.getChartType());
 				}
 				statement.setInt(5, portlet.getColumn());
-				statement.setInt(6,portlet.getWidgetSequence());
+				statement.setInt(6,i);
 				statement.setString(7, portlet.getChartDataXML());				
 			}
 			
@@ -126,4 +127,15 @@ public class WidgetDaoImpl implements WidgetDao{
 			List<Portlet> portlets = getJdbcTemplate().query(sqlBuffer.toString(),new WidgetRowMapper());
 			return portlets;
 		}
+	
+	@Override
+	public void deleteWidget(final Integer portletId) throws DataAccessException {
+		
+		getJdbcTemplate().update(Queries.DELETE_WIDGETS, new PreparedStatementSetter() {
+			@Override
+			public void setValues(PreparedStatement statement) throws SQLException {
+				statement.setInt(1, portletId);		
+			}
+		});
+	}
 }

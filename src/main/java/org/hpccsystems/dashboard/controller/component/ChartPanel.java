@@ -11,6 +11,7 @@ import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.entity.chart.utils.TableRenderer;
 import org.hpccsystems.dashboard.services.AuthenticationService;
+import org.hpccsystems.dashboard.services.WidgetService;
 import org.hpccsystems.dashboard.services.impl.AuthenticationServiceImpl;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Components;
@@ -21,6 +22,7 @@ import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.select.Selectors;
+import org.zkoss.zkplus.spring.SpringUtil;
 import org.zkoss.zul.Box;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Caption;
@@ -267,27 +269,19 @@ public class ChartPanel extends Panel {
 	//Delete panel listener
 	EventListener<Event> deleteListener = new EventListener<Event>() {
 
-		public void onEvent(final Event event) throws Exception {
-			final Session session = Sessions.getCurrent();
-			final Integer dashboardId = (Integer) session.getAttribute(Constants.ACTIVE_DASHBOARD_ID);
-			final Map<Integer,Dashboard> dashboardMap = (HashMap<Integer, Dashboard>) session.getAttribute(Constants.DASHBOARD_LIST);
-			final Dashboard dashboard = dashboardMap.get(dashboardId);
-			final ArrayList<Portlet> portletList = dashboard.getPortletList();
-			if(LOG.isDebugEnabled()){
-				LOG.debug("Index of the portlet that is being deleted -> " + portletList.indexOf(portlet));
-				LOG.debug("Portlet list size -> " + portletList.size());
-			}
-			
-			//portletList.remove(portletList.indexOf(portlet));
+		public void onEvent(final Event event) throws Exception {			
 			portlet.setWidgetState(Constants.STATE_DELETE);
+			WidgetService widgetService = (WidgetService) SpringUtil.getBean("widgetService");
+			widgetService.deleteWidget(portlet.getId());
 			ChartPanel.this.detach();
 			
 			Window window =  null;
+			Session session = Sessions.getCurrent();
 			final ArrayList<Component> list = (ArrayList<Component>) Selectors.find(((Component)session.getAttribute(Constants.NAVBAR)).getPage(), "window");
 			for (final Component component : list) {
 				if(component instanceof Window){
 					window = (Window) component;
-					Events.sendEvent(new Event("onPortalClose", window));
+					Events.sendEvent(new Event("onPortalClose", window, portlet));
 				}
 			}
 		} 
