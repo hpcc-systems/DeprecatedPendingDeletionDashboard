@@ -23,7 +23,7 @@ public interface WidgetDao {
 	 * @throws SQLException
 	 */
 	List<Portlet> retriveWidgetDetails(Integer dashboardId) throws DataAccessException;
-	
+
 	/**
 	 * @param dashboardId
 	 * @param portlets
@@ -42,4 +42,11 @@ public interface WidgetDao {
 	 * @throws SQLException
 	 */
 	void deleteWidgets(Integer dashboardId, List<Portlet> portlets)throws DataAccessException;
+	
+	/**
+	 * Deletes Widget from Widget table based on the provided Id
+	 * @param portletId
+	 * @throws DataAccessException
+	 */
+	void deleteWidget(Integer portletId)throws DataAccessException;
 }

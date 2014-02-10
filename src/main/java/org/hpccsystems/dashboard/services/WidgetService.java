@@ -12,7 +12,7 @@ import org.hpccsystems.dashboard.entity.Portlet;
 public interface WidgetService {
 	
 	/**
-	 * Retrives Widget list from DB
+	 * Retrieves Widget list from DB
 	 * 
 	 * @param dashboardId
 	 * @return
@@ -40,5 +40,12 @@ public interface WidgetService {
 	 * @throws SQLException
 	 */
 	void deleteWidgets(Integer dashboardId,List<Portlet> portlets)throws Exception;
+	
+	/**
+	 * Deletes widget from DB
+	 * @param portletId
+	 * @throws Exception
+	 */
+	void deleteWidget(Integer portletId)throws Exception;
 
 }

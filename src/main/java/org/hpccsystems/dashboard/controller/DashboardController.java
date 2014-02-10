@@ -380,6 +380,9 @@ public class DashboardController extends SelectorComposer<Component>{
 			if(LOG.isDebugEnabled()) {
 				LOG.debug("hide portlet event");
 			}
+			Portlet portlet = (Portlet) event.getData();
+			dashboard.getPortletList().remove(portlet);
+			
 			manipulatePortletObjects(Constants.ReorderPotletPanels);
 			manipulatePortletObjects(Constants.ResizePotletPanels);
 			if(LOG.isDebugEnabled()) {
