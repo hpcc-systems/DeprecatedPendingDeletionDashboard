@@ -1,4 +1,4 @@
-package org.hpccsystems.dashboard.controller.util;
+package org.hpccsystems.dashboard.util;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

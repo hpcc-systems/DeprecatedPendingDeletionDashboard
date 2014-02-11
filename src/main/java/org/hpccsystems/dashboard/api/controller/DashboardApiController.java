@@ -21,6 +21,7 @@ import org.hpccsystems.dashboard.entity.chart.XYChartData;
 import org.hpccsystems.dashboard.entity.chart.utils.ChartRenderer;
 import org.hpccsystems.dashboard.services.DashboardService;
 import org.hpccsystems.dashboard.services.WidgetService;
+import org.hpccsystems.dashboard.util.DashboardUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -287,7 +288,7 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
 		for (String fieldValue : yColumnList) {
 			for (Field entry : configuration.getFields()) {
 				if (fieldValue.equals(entry.getColumnName().trim())
-						&& Constants.NUMERIC_DATA == checkDataType(entry.getDataType().trim())) {
+						&& DashboardUtil.checkNumeric(entry.getDataType().trim()) ){
 					yAxisValStatus = true;
 					break;
 				}
@@ -313,7 +314,7 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
 		Boolean filterColumnValStatus = false;
 		for (Field entry : configuration.getFields()) {
 			if (filterColumn.equals(entry.getColumnName().trim())
-					&& filterDataType == checkDataType(entry.getDataType().trim())) {
+					&& DashboardUtil.checkNumeric(entry.getDataType().trim())) {
 				filterColumnValStatus = true;
 				break;
 			}
@@ -324,21 +325,6 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
 		}
 	}
 
-	/**
-	 * Checks whether a column is numeric.
-	 * 
-	 * @param column
-	 * @param dataType
-	 * @return
-	 */
-	private Integer checkDataType(final String dataType) {
-		Integer dataTypeValue = 2;
-		if (dataType.contains("integer") || dataType.contains("real")
-				|| dataType.contains("decimal")
-				|| dataType.contains("unsigned")) {
-			dataTypeValue = 1;
-		}
-		return dataTypeValue;
-	}
+	
 	
 }
