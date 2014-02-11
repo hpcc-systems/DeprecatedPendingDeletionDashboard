@@ -249,9 +249,14 @@ public class DashboardController extends SelectorComposer<Component>{
 		
 		try {
 			widgetService.addWidget(dashboardId, portlet, dashboard.getPortletList().indexOf(portlet));
+			
+			//Updating new widget sequence to DB
+			widgetService.updateWidgetSequence(dashboard);
 		} catch (Exception e) {
-			e.printStackTrace();
+			LOG.error("Error while adding new Widget", e);
+			Clients.showNotification("This widget may not have been saved", "error", chartPanel, "middle_center", 5000, true);
 		}
+		
 	}
 	
 	@Listen("onClick = #configureDashboard")
@@ -379,14 +384,22 @@ public class DashboardController extends SelectorComposer<Component>{
 	final EventListener<Event> onPanelClose = new EventListener<Event>() {
 
 		public void onEvent(final Event event) throws Exception {
+			
+			Portlet portlet = (Portlet) event.getData();
+			dashboard.getPortletList().remove(portlet);
+			
 			if(LOG.isDebugEnabled()) {
 				LOG.debug("hide portlet event");
 			}
 			manipulatePortletObjects(Constants.ReorderPotletPanels);
 			manipulatePortletObjects(Constants.ResizePotletPanels);
+			
 			if(LOG.isDebugEnabled()) {
 				LOG.debug("Now the portlet size is -> " + DashboardController.this.dashboard.getPortletList().size());
 			}
+			
+			//Updating new widget sequence to DB
+			widgetService.updateWidgetSequence(dashboard);
 		}
 	};	
 	
@@ -401,6 +414,13 @@ public class DashboardController extends SelectorComposer<Component>{
 		
 		manipulatePortletObjects(Constants.ReorderPotletPanels);
 		manipulatePortletObjects(Constants.ResizePotletPanels);
+		
+		//Updating new widget sequence to DB
+		try {
+			widgetService.updateWidgetSequence(dashboard);
+		} catch (Exception e) {
+			Clients.showNotification("Error occured while updating widget details", "error", this.getSelf(), "middle_center", 3000, true);
+		}
 	}
 	
 	
