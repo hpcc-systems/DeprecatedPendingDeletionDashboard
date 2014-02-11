@@ -19,10 +19,9 @@ import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.entity.chart.XYChartData;
 import org.hpccsystems.dashboard.entity.chart.utils.ChartRenderer;
-import org.hpccsystems.dashboard.services.ApplicationService;
-import org.hpccsystems.dashboard.services.AuthenticationService;
 import org.hpccsystems.dashboard.services.DashboardService;
 import org.hpccsystems.dashboard.services.WidgetService;
+import org.hpccsystems.dashboard.util.DashboardUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -44,8 +43,6 @@ public class DashboardApiController {
 	private static final  Log LOG = LogFactory.getLog(DashboardApiController.class); 
 	DashboardService dashboardService;
 	WidgetService widgetService;
-	ApplicationService applicationService;
-	AuthenticationService authenticationService;
 	
 	@Autowired
 	public void setDashboardService(DashboardService dashboardService) {
@@ -55,15 +52,7 @@ public class DashboardApiController {
 	public void setWidgetService(WidgetService widgetService) {
 		this.widgetService = widgetService;
 	}
-	@Autowired
-	public void setApplicationService(ApplicationService applicationService) {
-		this.applicationService = applicationService;
-	}
-	@Autowired
-	public void setAuthenticationService(AuthenticationService authenticationService) {
-		this.authenticationService = authenticationService;
-	}
-	
+		
 /**
  * Method to process delete dashboard request from circuit
  * 
@@ -149,12 +138,12 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
 			JSONObject jsonResposeObj = new JSONObject();
 			JSONArray jsonArray = new JSONArray();
 			try{
-				dashboardList = new ArrayList<Dashboard>(dashboardService.retrieveDashboardMenuPages(
+				dashboardList = dashboardService.retrieveDashboardMenuPages(
 						request.getParameter(Constants.SOURCE),
 						null,
 						null,
 						request.getParameter(Constants.SOURCE_ID)
-						));
+						);
 			}catch(Exception ex){
 				LOG.error("Exception while fetching dahhboards from DB",ex);
 				jsonResposeObj.put(Constants.STATUS_FAIL,ex.getMessage());
@@ -232,7 +221,7 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
 					jsonObject.addProperty(Constants.STATUS, Constants.STATUS_SUCCESS);
 				} else {
 					jsonObject.addProperty(Constants.STATUS, Constants.STATUS_FAIL);
-					StringBuffer failedStr = new StringBuffer();
+					StringBuilder failedStr = new StringBuilder();
 					int index = 0;
 					for (String failedColumn : failedValColumnList) {
 						if (index != failedValColumnList.size() - 1) {
@@ -242,7 +231,7 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
 						}
 						index++;
 					}
-					jsonObject.addProperty(Constants.STATUS_MESSAGE, failedStr + Constants.FIELD_NOT_EXIST);
+					jsonObject.addProperty(Constants.STATUS_MESSAGE, failedStr.append(Constants.FIELD_NOT_EXIST).toString());
 				}
 
 			} else {
@@ -299,7 +288,7 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
 		for (String fieldValue : yColumnList) {
 			for (Field entry : configuration.getFields()) {
 				if (fieldValue.equals(entry.getColumnName().trim())
-						&& Constants.NUMERIC_DATA == checkDataType(entry.getDataType().trim())) {
+						&& DashboardUtil.checkNumeric(entry.getDataType().trim()) ){
 					yAxisValStatus = true;
 					break;
 				}
@@ -325,7 +314,7 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
 		Boolean filterColumnValStatus = false;
 		for (Field entry : configuration.getFields()) {
 			if (filterColumn.equals(entry.getColumnName().trim())
-					&& filterDataType == checkDataType(entry.getDataType().trim())) {
+					&& DashboardUtil.checkNumeric(entry.getDataType().trim())) {
 				filterColumnValStatus = true;
 				break;
 			}
@@ -336,21 +325,6 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
 		}
 	}
 
-	/**
-	 * Checks whether a column is numeric.
-	 * 
-	 * @param column
-	 * @param dataType
-	 * @return
-	 */
-	private Integer checkDataType(final String dataType) {
-		Integer dataTypeValue = 2;
-		if (dataType.contains("integer") || dataType.contains("real")
-				|| dataType.contains("decimal")
-				|| dataType.contains("unsigned")) {
-			dataTypeValue = 1;
-		}
-		return dataTypeValue;
-	}
+	
 	
 }

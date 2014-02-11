@@ -8,6 +8,7 @@ import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.GenericRichlet;
 import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.Sessions;
+import org.zkoss.zk.ui.util.Clients;
 
 public class ViewDashboard extends GenericRichlet {
 
@@ -39,10 +40,11 @@ public class ViewDashboard extends GenericRichlet {
 			}
 			Executions.sendRedirect(url.toString());
 		
-		} catch (Exception ex) {
-			
-			//TODO: Process exception
-		}
+		} catch (Exception ex) {			
+			Clients.showNotification("Malformated URL string", false);
+			LOG.error("Exception while parsing Request Parameter in ViewDashboard.service()", ex);
+			return;			
+			}
 
 	}
 }

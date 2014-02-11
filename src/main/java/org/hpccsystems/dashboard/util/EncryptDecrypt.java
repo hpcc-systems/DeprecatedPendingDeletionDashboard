@@ -1,4 +1,4 @@
-package org.hpccsystems.dashboard.controller.util;
+package org.hpccsystems.dashboard.util;
 /**
  * EncryptDecrypt class is responsible for encrypting and decrypting the password.
  */

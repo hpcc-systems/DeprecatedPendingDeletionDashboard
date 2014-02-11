@@ -107,7 +107,7 @@ public class DashboardController extends SelectorComposer<Component>{
 	public void doAfterCompose(final Component comp) throws Exception {
 		super.doAfterCompose(comp);
 		dashboardId =(Integer) Executions.getCurrent().getAttribute(Constants.ACTIVE_DASHBOARD_ID);
-		
+		//For the first Dashboard, getting Id from Session
 		if(dashboardId == null ){
 			dashboardId = (Integer) Sessions.getCurrent().getAttribute(Constants.ACTIVE_DASHBOARD_ID);
 		}
@@ -249,7 +249,6 @@ public class DashboardController extends SelectorComposer<Component>{
 		
 		try {
 			widgetService.addWidget(dashboardId, portlet, dashboard.getPortletList().indexOf(portlet));
-			
 			//Updating new widget sequence to DB
 			widgetService.updateWidgetSequence(dashboard);
 		} catch (Exception e) {
@@ -519,13 +518,14 @@ public class DashboardController extends SelectorComposer<Component>{
 			{
 				dashboardHelper.updateDashboardWidgetDetails(dashBoardIdList);
 				Messagebox.show("Your Dahboard details are Saved.You can close the window","",1,Messagebox.ON_OK);
-				Sessions.getCurrent().removeAttribute("apiConfiguration");
-				Sessions.getCurrent().removeAttribute("user");
-				Sessions.getCurrent().removeAttribute("userCredential");
+				
 			}catch(Exception ex)
 			{
 				Clients.showNotification("Unable to update Dahboard details into DB", "error", dashboardWin.getParent(), "middle_center", 3000, true);
 	        	LOG.error("Exception saveApiChanges Listener in DashboardController", ex);
+			}
+			finally{				
+				authenticationService.logout(null);
 			}
 		
 		}

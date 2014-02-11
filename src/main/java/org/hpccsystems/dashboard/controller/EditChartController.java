@@ -21,6 +21,7 @@ import org.hpccsystems.dashboard.services.AuthenticationService;
 import org.hpccsystems.dashboard.services.DashboardService;
 import org.hpccsystems.dashboard.services.HPCCService;
 import org.hpccsystems.dashboard.services.WidgetService;
+import org.hpccsystems.dashboard.util.DashboardUtil;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
@@ -180,7 +181,7 @@ public class EditChartController extends SelectorComposer<Component> {
 		for (Map.Entry<String, String> entry : columnSchemaMap.entrySet()) {
 			listItem = new Listitem(entry.getKey());
 			listItem.setDraggable("true");
-			if(checkNumeric(entry.getKey(), entry.getValue())){
+			if(DashboardUtil.checkNumeric(entry.getValue())){
 				listItem.setAttribute(Constants.COLUMN_DATA_TYPE, Constants.NUMERIC_DATA);
 				listItem.setParent(measureListBox);
 			} else {
@@ -190,23 +191,7 @@ public class EditChartController extends SelectorComposer<Component> {
 		}} 
 	}	
 	
-	/**
-	 * Checks whether a column is numeric
-	 * @param column
-	 * @param dataType
-	 * @return
-	 */
-	private boolean checkNumeric(final String column, final String dataType)
-	{
-		boolean numericColumn = false;
-			if(dataType.contains("integer")	|| 
-					dataType.contains("real") || 
-					dataType.contains("decimal") ||  
-					dataType.contains("unsigned"))	{
-				numericColumn = true;
-			}
-		return numericColumn;
-	}
+	
 
 	/**
 	 * Method to render chart when item dropped in Y Axis
