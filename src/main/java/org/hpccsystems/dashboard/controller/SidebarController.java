@@ -320,14 +320,14 @@ public class SidebarController extends GenericForwardComposer<Component>{
 	};			
 		
 	private void updateDashboardSequence() throws Exception {
-		Integer dashboard_id = 1;
 		List<Integer> dashboardList = new ArrayList<Integer>();
-		for(Component navItem : navBar.getChildren()){
-			final Navitem navItems = (Navitem) navItem;
-			dashboard_id = (Integer)navItems.getAttribute(Constants.DASHBOARD_ID);
-			dashboardList.add(dashboard_id);
-			dashboardService.updateSidebarDetails(dashboardList);
+		for(Component component : navBar.getChildren()){
+			Navitem navItem = (Navitem) component;
+			if(navItem.isVisible()){
+				dashboardList.add((Integer)navItem.getAttribute(Constants.DASHBOARD_ID));
+			}
 		}
+		dashboardService.updateSidebarDetails(dashboardList);
 	}
 
 	

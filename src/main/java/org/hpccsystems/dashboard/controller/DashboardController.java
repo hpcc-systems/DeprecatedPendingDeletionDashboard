@@ -72,8 +72,6 @@ public class DashboardController extends SelectorComposer<Component>{
     Button configureDashboard;
     @Wire
     Button addWidget;    
-    @Wire
-    Button saveApiView;
     
     @Wire("portallayout")
 	Portallayout portalLayout;
@@ -99,9 +97,6 @@ public class DashboardController extends SelectorComposer<Component>{
     
     @WireVariable
 	HPCCService hpccService;
-    
-    @WireVariable
-	private DashboardHelper dashboardHelper;
     
 	@Override
 	public void doAfterCompose(final Component comp) throws Exception {
@@ -211,9 +206,6 @@ public class DashboardController extends SelectorComposer<Component>{
 		dashboardWin.addEventListener("onPortalClose", onPanelClose);
 		dashboardWin.addEventListener("onLayoutChange", onLayoutChange);
 		
-		if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD)){
-			saveApiView.addEventListener(Events.ON_CLICK, saveApiChanges); 
-		}
 		if(LOG.isDebugEnabled()){
 			LOG.debug("Created Dashboard");
 			LOG.debug("Panel Count - " + dashboard.getColumnCount());
@@ -451,41 +443,37 @@ public class DashboardController extends SelectorComposer<Component>{
 		 // ask confirmation before deleting dashboard
 		 EventListener<ClickEvent> clickListener = new EventListener<Messagebox.ClickEvent>() {
 			 public void onEvent(ClickEvent event) throws Exception {
-				 ArrayList<Portlet> portletlist = dashboard.getPortletList();
-	             if(Messagebox.Button.YES.equals(event.getButton())) {
-	               	final Navbar navBar = (Navbar) Sessions.getCurrent().getAttribute(Constants.NAVBAR);
-	           		final List<Component> childNavBars = navBar.getChildren();
+	             
+				 if(Messagebox.Button.YES.equals(event.getButton())) {
+	            	final Navbar navBar  = (Navbar) Selectors.iterable(DashboardController.this.getSelf().getPage(), "navbar").iterator().next();
 	           		
-	           		Integer navDashId = 0;
-	           		Navitem navItem = null;
-	           		Navitem navItemToDelete = null;
-	           		boolean getFirstNavItem = false;
-	           		Navitem firtNavItem = null;
+	            	//TODO: Use detach instead of visible
+	            	navBar.getSelectedItem().setVisible(false);
 	           		
-	           		for (Component component : childNavBars) {
-	           			if(component instanceof Navitem) {
-	           				navItem = (Navitem) component;
-	           				navDashId = (Integer) navItem.getAttribute(Constants.DASHBOARD_ID);
-	           				if(navItem.isVisible() && !getFirstNavItem && !navItem.isSelected()){
-	           					firtNavItem = navItem;
-	           					getFirstNavItem = !getFirstNavItem;
-	           				}
-	           				if (dashboard.getDashboardId().equals(navDashId) && navItem.isSelected()) {
-	           					navItemToDelete = navItem;
-	           	           		portletlist.clear(); 
-	           				}
-	           			}
-	           		}
-	           		final Include include = (Include) Selectors.iterable(navItemToDelete.getPage(), "#mainInclude")
+	           		final Include include = (Include) Selectors.iterable(DashboardController.this.getSelf().getPage(), "#mainInclude")
 	           				.iterator().next();
+	           		List<Integer> dashboardIdList = new ArrayList<Integer>();
 	           		
-	           		navItemToDelete.setVisible(false);
-	           		if(getFirstNavItem) {
+	           		if(navBar.getChildren().size() > 0) {
 	           			if(LOG.isDebugEnabled()){
-	           				LOG.debug("Setting first Nav item as active");
+	           				LOG.debug("Setting first visible Nav item as active");
 	           			}
-	           			firtNavItem.setSelected(true);
-	           			Events.sendEvent(Events.ON_CLICK, firtNavItem, null);
+	           			Navitem navitem;
+	           			Boolean isSelected = false;
+	           			for (Component component : navBar.getChildren()) {
+							navitem = (Navitem) component;
+							if(navitem.isVisible()){
+								//Adding visible items to list
+								dashboardIdList.add((Integer) navitem.getAttribute(Constants.DASHBOARD_ID));
+								
+								//Selecting first visible Item
+								if(!isSelected){
+									navitem.setSelected(true);
+									Events.sendEvent(Events.ON_CLICK, navitem, null);
+									isSelected = !isSelected;
+								}
+							}
+						}
 	           		} else {
 	           			Sessions.getCurrent().setAttribute(Constants.ACTIVE_DASHBOARD_ID, null);
 	           			//Detaching the include and Including the page again to trigger reload
@@ -497,6 +485,7 @@ public class DashboardController extends SelectorComposer<Component>{
 	           			Clients.evalJavaScript("showPopUp()");
 	           		}	           		
 	           		dashboardService.deleteDashboard(dashboard.getDashboardId(),authenticationService.getUserCredential().getUserId());
+	           		dashboardService.updateSidebarDetails(dashboardIdList);
 	             }
 
 	           } 
@@ -506,28 +495,5 @@ public class DashboardController extends SelectorComposer<Component>{
                Messagebox.Button.YES, Messagebox.Button.NO }, Messagebox.QUESTION, clickListener);
    
   }
-	/**
-	 * Event listener to listen to 'ViewDashboard API request changes'
-	 */
-	final EventListener<Event> saveApiChanges = new EventListener<Event>() {
-
-		@Override
-		public void onEvent(Event event) throws Exception {
-			final List<Dashboard> dashBoardIdList = dashboardHelper.getSessionDashboardList();
-			try
-			{
-				dashboardHelper.updateDashboardWidgetDetails(dashBoardIdList);
-				Messagebox.show("Your Dahboard details are Saved.You can close the window","",1,Messagebox.ON_OK);
 				
-			}catch(Exception ex)
-			{
-				Clients.showNotification("Unable to update Dahboard details into DB", "error", dashboardWin.getParent(), "middle_center", 3000, true);
-	        	LOG.error("Exception saveApiChanges Listener in DashboardController", ex);
-			}
-			finally{				
-				authenticationService.logout(null);
-			}
-		
-		}
-	};	
 }
