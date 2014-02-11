@@ -124,7 +124,7 @@ public class SidebarController extends GenericForwardComposer<Component>{
 		
 		// Displaying first menu item as default page
 		if(firstSet) {
-			//Setting current dashboard in session will load it when page loads
+			//Setting current/First dashboard in session will load it when page loads
 			Sessions.getCurrent().setAttribute(Constants.ACTIVE_DASHBOARD_ID, firstNavitem.getAttribute(Constants.DASHBOARD_ID));
 			
 			firstNavitem.setSelected(true);
@@ -194,9 +194,7 @@ public class SidebarController extends GenericForwardComposer<Component>{
 		public void onEvent(final Event event) throws Exception {
 			if(LOG.isDebugEnabled()){
 				LOG.debug("Setting active dashboard to session in Api flow" + event.getTarget().getAttribute(Constants.DASHBOARD_ID));
-			}
-			//Setting currently active Dashboard in session
-			Sessions.getCurrent().setAttribute(Constants.ACTIVE_DASHBOARD_ID, event.getTarget().getAttribute(Constants.DASHBOARD_ID));
+			}			
 			Iterator<Component> iterator = sidebarContainer.getParent().getParent().getFellows().iterator();
 			Component centerComp =null;
 			while(iterator.hasNext())

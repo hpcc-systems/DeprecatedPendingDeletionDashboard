@@ -27,7 +27,6 @@ public class ChartSettings extends GenericRichlet{
 		Sessions.getCurrent().setAttribute("userCredential", credential);
 		
 		StringBuilder url = new StringBuilder("/demo/?");			
-		try {
 			try{			
 			Map<String, String[]> args = Executions.getCurrent().getParameterMap();
 			url.append("source").append("=").append(args.get(Constants.SOURCE)[0]);
@@ -61,12 +60,6 @@ public class ChartSettings extends GenericRichlet{
 			}
 			
 			Executions.sendRedirect(url.toString());		
-		} catch (Exception e) {
-			Clients.showNotification("Unable to configure chart.Please input valid data", false);
-			LOG.error("Exception while parsing Request Parameter in ChartSettings.service()", e);
-			return;
-		}
-		
 	}
 
 }
