@@ -29,6 +29,16 @@ public interface WidgetService {
 	 * @param widgetSequence
 	 */
 	void updateWidgetDetails(Integer dashboardId,List<Portlet> portlets)throws Exception;
+	
+	/**
+	 * Adds the Widget to DB and sets portletId to the portlet Object passed
+	 * @param dashboardId
+	 * @param portlet
+	 * @param sequence
+	 * @throws Exception
+	 */
+	void addWidget(Integer dashboardId, Portlet portlet, Integer sequence)throws Exception;
+	
 	/**
 	 * @param dashboardId
 	 * @param portlets

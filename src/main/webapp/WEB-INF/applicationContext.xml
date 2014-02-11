@@ -28,7 +28,6 @@
 	</bean>
 
     <bean id="chartRenderer" class="org.hpccsystems.dashboard.entity.chart.utils.ChartRenderer">
-    	 <property name="dashboardService"><ref bean="dashboardService"/></property>
     	 <property name="hpccService"><ref bean="hpccService"/></property>
 	</bean>
 	
