@@ -21,7 +21,6 @@ import org.hpccsystems.dashboard.controller.util.EncryptDecrypt;
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.entity.chart.XYChartData;
 import org.hpccsystems.dashboard.entity.chart.XYModel;
-import org.hpccsystems.dashboard.services.DashboardService;
 import org.hpccsystems.dashboard.services.HPCCService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.xml.sax.SAXException;
@@ -38,18 +37,8 @@ public class ChartRenderer {
 	
 	private static final  Log LOG = LogFactory.getLog(ChartRenderer.class);
 	
-	private DashboardService dashboardService;
 	private HPCCService hpccService;
 	
-	public DashboardService getDashboardService() {
-		return dashboardService;
-	}
-
-	@Autowired
-	public void setDashboardService(DashboardService dashboardService) {
-		this.dashboardService = dashboardService;
-	}
-
 	public HPCCService getHpccService() {
 		return hpccService;
 	}

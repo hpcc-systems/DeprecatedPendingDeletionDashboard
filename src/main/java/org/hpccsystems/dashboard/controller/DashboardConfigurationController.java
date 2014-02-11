@@ -90,23 +90,13 @@ public class DashboardConfigurationController extends SelectorComposer<Component
 			}
 			
 			for(int i=1; i <= dashboard.getColumnCount(); i++){
-				for(int j=1; j <= panelCount ; j++){
-					if(j > (panelCount/dashboard.getColumnCount())*(i-1)  && 
-							j <= (panelCount/dashboard.getColumnCount())*i) {
-						if(LOG.isDebugEnabled()){
-							LOG.debug("Adding panel " + j);
-						}
-						final Portlet portlet = new Portlet();
-						
-						//generating portlet id
-						Integer portletId = j ;
-						portlet.setId(portletId);
-						portlet.setColumn(i - 1);
-						portlet.setWidgetState(Constants.STATE_EMPTY);
-						dashboard.getPortletList().add(portlet);
-					} else{
-						continue;
-					}	
+				for(int j=1; j <= panelCount/dashboard.getColumnCount() ; j++){
+					final Portlet portlet = new Portlet();
+					
+					//generating portlet id
+					portlet.setColumn(i - 1);
+					portlet.setWidgetState(Constants.STATE_EMPTY);
+					dashboard.getPortletList().add(portlet);
 				}
 			}
 			
