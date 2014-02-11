@@ -86,8 +86,7 @@ public class DashboardDaoImpl implements DashboardDao {
 				dashboard.getColumnCount(),
 				dashboard.getSequence()
 		});
-		
-		return getJdbcTemplate().queryForObject(Queries.GET_MAX_DASHBOARD_ID, new Object[] {userId} , Integer.class);
+		return jdbcTemplate.queryForInt("select last_insert_id()"); 
 	}
 
 	public int deleteDashboard(final Integer dashboardId, final String userId) throws DataAccessException {
