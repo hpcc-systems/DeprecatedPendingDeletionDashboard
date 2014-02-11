@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map; 
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.common.Constants;
@@ -14,7 +15,6 @@ import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.entity.chart.XYChartData;
 import org.hpccsystems.dashboard.entity.chart.utils.ChartRenderer;
-import org.hpccsystems.dashboard.helper.DashboardHelper;
 import org.hpccsystems.dashboard.services.AuthenticationService;
 import org.hpccsystems.dashboard.services.DashboardService;
 import org.hpccsystems.dashboard.services.HPCCService;
@@ -204,7 +204,7 @@ public class DashboardController extends SelectorComposer<Component>{
 		}
 		
 		dashboardWin.addEventListener("onPortalClose", onPanelClose);
-		dashboardWin.addEventListener("onLayoutChange", onLayoutChange);
+		dashboardWin.addEventListener("onLayoutChange", onLayoutChange);		
 		
 		if(LOG.isDebugEnabled()){
 			LOG.debug("Created Dashboard");
@@ -495,5 +495,4 @@ public class DashboardController extends SelectorComposer<Component>{
                Messagebox.Button.YES, Messagebox.Button.NO }, Messagebox.QUESTION, clickListener);
    
   }
-				
 }

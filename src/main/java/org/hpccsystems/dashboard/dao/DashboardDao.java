@@ -1,8 +1,8 @@
 package org.hpccsystems.dashboard.dao;
 
-import java.sql.Date; 
 import java.sql.SQLException;
 import java.util.List;
+
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.springframework.dao.DataAccessException;
 
@@ -44,25 +44,6 @@ public interface DashboardDao {
 	 * @param deleteStatus
 	 */
 	int deleteDashboard(Integer dashboardId, String userId) throws DataAccessException;
-	
-	/**
-	 * Method to update empty state of dashboard
-	 * @param dashboardId
-	 * @param emptyState
-	 * @param sequence
-	 * @param dashboardName
-	 */
-	void updateDashboardState(Integer dashboardId,String emptyState,int sequence,String dashboardName, Date updatedDate) throws DataAccessException;
-	
-	/**
-	 * Method to update entire dashboard details
-	 * @param dashboardId
-	 * @param sequence
-	 * @param dashboardName
-	 * @param columnCount
-	 */
-	void updateDashboardDetails(Integer dashboardId,int sequence,String dashboardName,int columnCount, Date updatedDate) throws DataAccessException;
-	
 
 	/**
 	 * Dao call to update dashboard details into DB

@@ -1,10 +1,11 @@
 package org.hpccsystems.dashboard.dao.impl; 
 
-import java.sql.Date;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
-import javax.sql.DataSource; 
+
+import javax.sql.DataSource;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.common.Constants;
@@ -86,8 +87,7 @@ public class DashboardDaoImpl implements DashboardDao {
 				dashboard.getColumnCount(),
 				dashboard.getSequence()
 		});
-		
-		return getJdbcTemplate().queryForObject(Queries.GET_MAX_DASHBOARD_ID, new Object[] {userId} , Integer.class);
+		return jdbcTemplate.queryForInt("select last_insert_id()"); 
 	}
 
 	public int deleteDashboard(final Integer dashboardId, final String userId) throws DataAccessException {
@@ -108,30 +108,6 @@ public class DashboardDaoImpl implements DashboardDao {
 		});
 		}
 		return rowsdeleted;
-	}
-
-
-	public void updateDashboardState(final Integer dashboardId,final String emptyState,
-			final int sequence,final String dashboardName, Date updatedDate) throws DataAccessException {
-		getJdbcTemplate().update(Queries.UPDATE_DASHBOARD_STATEE, new Object[] { 
-				emptyState,
-				sequence,
-				dashboardName,
-				updatedDate,
-				dashboardId
-				
-		});
-	}
-
-	public void updateDashboardDetails(Integer dashboardId, int sequence,
-			String dashboardName, int columnCount, Date updatedDate) throws DataAccessException {
-		getJdbcTemplate().update(Queries.UPDATE_DASHBOARD_DETAILS, new Object[] { 
-				sequence,
-				dashboardName,
-				columnCount,				
-				updatedDate,
-				dashboardId
-		});
 	}
 	
 	public void updateSidebarDetails(final List<Integer> dashboardIds)throws DataAccessException{

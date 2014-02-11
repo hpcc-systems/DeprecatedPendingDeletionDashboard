@@ -16,10 +16,7 @@
 				<button id="configureDashboard" iconSclass="glyphicon glyphicon-cog" zclass="btn btn-sm btn-primary" label=" Configure Dashboard"></button>
 				<button id="deleteDashboard" iconSclass="glyphicon glyphicon-trash" zclass="btn btn-sm btn-danger" label=" Delete Dashboard"></button>
 			</toolbar>
-			<toolbar align="end" style="float:right; border-style: none; margin-right:25px;" height="46px" zclass="btn-group"
-				 if="${sessionScope.userCredential.hasRole('viewDashboard')}">
-				<button id="saveApiView" iconSclass="glyphicon glyphicon-floppy-disk" zclass="btn btn-sm btn-success" label=" Save"></button>
-			</toolbar>
+			
 		</hbox>
 	</div>
 </caption>

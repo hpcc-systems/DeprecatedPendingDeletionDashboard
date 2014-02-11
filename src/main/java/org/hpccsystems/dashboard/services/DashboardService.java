@@ -33,30 +33,13 @@ public interface DashboardService {
 	 *  A list of dahboard based on the paramenters specified
 	 * @throws Exception
 	 */
-	List<Dashboard> retrieveDashboardMenuPages(String applicationId,String userId,List<String> dashboardIdList, String sourceId)throws Exception;
-	
-	
+	List<Dashboard> retrieveDashboardMenuPages(String applicationId,String userId,List<String> dashboardIdList, String sourceId)throws Exception;	
 	
 	/**
 	 * @param dashboardId
 	 * @param deleteStatus
 	 */
-	int deleteDashboard(Integer dashboardId,String userId)throws Exception;
-	
-	/**
-	 * @param dashboardId
-	 * @param emptyState
-	 * @param sequence
-	 */
-	void updateDashboardState(Integer dashboardId,String emptyState,int sequence,String dashboardName, Date updatedDate)throws Exception;
-	
-	/**
-	 * @param dashboardId
-	 * @param sequence
-	 * @param dashboardName
-	 * @param columnCount
-	 */
-	void updateDashboardDetails(Integer dashboardId,int sequence,String dashboardName,int columnCount,Date updatedDate)throws Exception;
+	int deleteDashboard(Integer dashboardId,String userId)throws Exception;	
 	
 	/**
 	 * updateSidebarDetails() is responsible for update the sidebar details into dashboard_details table.

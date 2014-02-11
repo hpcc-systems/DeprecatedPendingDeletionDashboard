@@ -4,7 +4,8 @@ import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Map; 
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.api.entity.ChartConfiguration;
@@ -16,7 +17,6 @@ import org.hpccsystems.dashboard.entity.chart.Filter;
 import org.hpccsystems.dashboard.entity.chart.XYChartData;
 import org.hpccsystems.dashboard.entity.chart.XYModel;
 import org.hpccsystems.dashboard.entity.chart.utils.ChartRenderer;
-import org.hpccsystems.dashboard.helper.DashboardHelper;
 import org.hpccsystems.dashboard.services.AuthenticationService;
 import org.hpccsystems.dashboard.services.DashboardService;
 import org.hpccsystems.dashboard.services.HPCCService;
@@ -71,10 +71,7 @@ public class EditChartController extends SelectorComposer<Component> {
 	HPCCService hpccService;
 	
 	@WireVariable
-	private WidgetService widgetService;	
-	
-	@WireVariable
-	private DashboardHelper dashboardHelper;
+	private WidgetService widgetService;
 
 	@Wire
 	Listbox measureListBox;
@@ -573,7 +570,7 @@ public class EditChartController extends SelectorComposer<Component> {
 	}
 	
 	/**
-	 * Listener to Save API chart setting data
+	 * Listener to Save API chart setting data with out chart XML data
 	 */
 	EventListener<Event> saveApiChartSettings = new EventListener<Event>() {
 		public void onEvent(Event event) throws Exception {
@@ -586,7 +583,6 @@ public class EditChartController extends SelectorComposer<Component> {
 							dashboard.getSourceId() , 
 							authenticationService.getUserCredential().getUserId())
 				);
-			
 			widgetService.addWidget(dashboard.getDashboardId(), portlet, 0);
 			Messagebox.show("The Chart Settings data are Saved.Your window will be closed","",1,Messagebox.ON_OK);			
 			authenticationService.logout(null);	
@@ -695,12 +691,18 @@ public class EditChartController extends SelectorComposer<Component> {
 			dashboard.setPersisted(true);
 			dashBoardIdList.add(dashboard);
 			try	{
-				dashboardHelper.updateDashboardWidgetDetails(dashBoardIdList);
-				Messagebox.show("Your Chart details are Saved. This tab will now be closed","",1,Messagebox.ON_OK);
-				authenticationService.logout(null);
+				//update Dashboard updated_date value
+				dashboardService.updateDashboard(dashboard);
+				
+				//update widget Chart Xml data & chart Type
+				widgetService.updateWidget(portlet);
+				
+				Messagebox.show("Your Chart details are Saved. This tab will now be closed","",1,Messagebox.ON_OK);				
 			} catch(Exception ex) {
 				Clients.showNotification("Unable to update Chart details into DB", true);
 	        	LOG.error("Exception saveApiChartConfigData Listener in DashboardController", ex);
+			}finally{
+				authenticationService.logout(null);
 			}
 		}
 	};

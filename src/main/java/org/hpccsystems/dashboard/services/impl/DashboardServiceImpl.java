@@ -92,8 +92,6 @@ public class DashboardServiceImpl implements DashboardService {
 		}
 	}
 	
-	
-	
 	/* 
 	 * service to delete a dashboard
 	 *
@@ -105,34 +103,8 @@ public class DashboardServiceImpl implements DashboardService {
 			LOG.error("DataAccessException in deleteDashboard()", e);
 			throw e;
 		}		
-	}
-	/* 
-	 * service to update sequence,name,state of a dashboard
-	 *
-	 */
-	public void updateDashboardState(Integer dashboardId, String emptyState,
-			int sequence,String dashboardName, Date updatedDate)throws Exception {
-		try {
-			dashboardDao.updateDashboardState(dashboardId,emptyState,sequence,dashboardName,updatedDate);
-		} catch (DataAccessException e) {
-			LOG.error("DataAccessException in updateDashboardSate()", e);
-			throw e;
-		}
-	}
-	/* 
-	 * service to update entire details of a dashboard
-	 *
-	 */
-	public void updateDashboardDetails(Integer dashboardId, int sequence,
-			String dashboardName, int columnCount, Date updatedDate)throws Exception {
-		try {
-			dashboardDao.updateDashboardDetails(dashboardId,sequence,dashboardName,columnCount,updatedDate);
-		} catch (DataAccessException e) {
-			LOG.error("DataAccessException in updateDashboardDetails()", e);
-			throw e;
-		}
-	}
-
+	}	
+	
 	public void updateSidebarDetails(List<Integer> dashboardIdList)throws Exception{
 		try{
 			dashboardDao.updateSidebarDetails(dashboardIdList);
