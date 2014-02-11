@@ -88,7 +88,7 @@ public class DashboardConfigurationController extends SelectorComposer<Component
 			if(LOG.isDebugEnabled()){
 				LOG.debug("Creating A New Dashboard.. and adding panels");
 			}
-			int widgetSequence = 1;
+			
 			for(int i=1; i <= dashboard.getColumnCount(); i++){
 				for(int j=1; j <= panelCount ; j++){
 					if(j > (panelCount/dashboard.getColumnCount())*(i-1)  && 
@@ -103,7 +103,6 @@ public class DashboardConfigurationController extends SelectorComposer<Component
 						portlet.setId(portletId);
 						portlet.setColumn(i - 1);
 						portlet.setWidgetState(Constants.STATE_EMPTY);
-						portlet.setWidgetSequence(widgetSequence++);
 						dashboard.getPortletList().add(portlet);
 					} else{
 						continue;

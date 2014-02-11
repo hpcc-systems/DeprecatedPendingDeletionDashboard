@@ -63,7 +63,7 @@ public class WidgetDaoImpl implements WidgetDao{
 					statement.setInt(3, portlet.getChartType());
 				}
 				statement.setInt(4, portlet.getColumn());
-				statement.setInt(5, portlet.getWidgetSequence());
+				statement.setInt(5, i);
 				statement.setString(6, portlet.getChartDataXML());
 				statement.setInt(7,portlet.getId());
 				statement.setInt(8, dashboardId);
@@ -93,7 +93,7 @@ public class WidgetDaoImpl implements WidgetDao{
 					statement.setInt(4, portlet.getChartType());
 				}
 				statement.setInt(5, portlet.getColumn());
-				statement.setInt(6,portlet.getWidgetSequence());
+				statement.setInt(6, i);
 				statement.setString(7, portlet.getChartDataXML());				
 			}
 			
@@ -198,5 +198,31 @@ public class WidgetDaoImpl implements WidgetDao{
 				portlet.getId()
 		});
 		
+	}
+
+	@Override
+	public void addWidget(final Integer dashboardId, final Portlet portlet, final Integer sequence)	throws Exception {
+
+		getJdbcTemplate().update(Queries.INSERT_WIDGET_DETAILS,
+				new PreparedStatementSetter() {
+					public void setValues(PreparedStatement statement)
+							throws SQLException {
+						statement.setInt(1, dashboardId);
+						statement.setString(2, portlet.getName());
+						statement.setString(3, portlet.getWidgetState());
+						if (Constants.STATE_EMPTY.equals(portlet.getWidgetState())) {
+							statement.setInt(4, 0);
+						} else {
+							statement.setInt(4, portlet.getChartType());
+						}
+						statement.setInt(5, portlet.getColumn());
+						statement.setInt(6, sequence);
+						statement.setString(7, portlet.getChartDataXML());
+					}
+
+				});
+		
+		portlet.setId(jdbcTemplate.queryForInt("select last_insert_id()")); 
+
 	}
 }

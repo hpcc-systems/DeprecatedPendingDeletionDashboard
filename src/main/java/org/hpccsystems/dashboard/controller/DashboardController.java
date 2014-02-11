@@ -224,15 +224,9 @@ public class DashboardController extends SelectorComposer<Component>{
 	public void addWidget() {
 		final Portlet portlet = new Portlet();
 		
-		//generating portlet id
-		int nextPortletSeq = dashboard.getPortletList().size()+1;
-		portlet.setId(nextPortletSeq);
-		portlet.setWidgetSequence(nextPortletSeq);
 		portlet.setWidgetState(Constants.STATE_EMPTY);
 		portlet.setPersisted(false);
 		dashboard.getPortletList().add(portlet);
-		List<Portlet> portletList = new ArrayList<Portlet>();
-		portletList.add(portlet);
 		
 		// Adding new Widget to the column with lowest number of widgets
 		Integer count = 0, childCount = 0, column = 0;
@@ -250,13 +244,14 @@ public class DashboardController extends SelectorComposer<Component>{
 		ChartPanel chartPanel = new ChartPanel(portlet);
 		portalChildren.get(portlet.getColumn()).appendChild(chartPanel);
 		chartPanel.focus();
-		if(dashboard.getPortletList().size()>0){
-			try {
-				widgetService.addWidgetDetails(dashboard.getDashboardId(), portletList);
-			} catch (Exception e) {
-				LOG.error("Exception while adding widgets into dashboard", e);
-			}
-		}		
+		
+		manipulatePortletObjects(Constants.ReorderPotletPanels);
+		
+		try {
+			widgetService.addWidget(dashboardId, portlet, dashboard.getPortletList().indexOf(portlet));
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 	
 	@Listen("onClick = #configureDashboard")
@@ -302,12 +297,6 @@ public class DashboardController extends SelectorComposer<Component>{
 					
 				}while(portletChild<3);
 				
-				// Adding portlets in deleted state to the new list
-				/*for (Portlet portlet2 : dashboard.getPortletList()) {
-					if(Constants.STATE_DELETE.equals(portlet2.getWidgetState())) {
-						newPortletList.add(portlet2);
-					}
-				}*/
 				dashboard.setPortletList(newPortletList);
 			break;
 			

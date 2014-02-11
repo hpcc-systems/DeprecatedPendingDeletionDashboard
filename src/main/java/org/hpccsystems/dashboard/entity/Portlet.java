@@ -22,7 +22,6 @@ public class Portlet {
 				.append(", chartDataJSON=").append(chartDataJSON)
 				.append(", tableDataMap=").append(tableDataMap)
 				.append(", persisted=").append(persisted)
-				.append(", widgetSequence=").append(widgetSequence)
 				.append(", column=").append(column).append("]");
 		return  builder.toString() ;
 	}
@@ -37,21 +36,7 @@ public class Portlet {
 	private String chartDataJSON;
 	private LinkedHashMap<String, List<String>> tableDataMap;
 	private boolean persisted = true; 	
-	private int widgetSequence;
-	
-	
-	/**
-	 * @return int
-	 */
-	public int getWidgetSequence() {
-		return widgetSequence;
-	}
-	/**
-	 * @param widgetSequence
-	 */
-	public void setWidgetSequence(int widgetSequence) {
-		this.widgetSequence = widgetSequence;
-	}
+
 	/**
 	 * @return boolean
 	 */
