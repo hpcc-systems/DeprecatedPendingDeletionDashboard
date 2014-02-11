@@ -30,26 +30,14 @@ public interface WidgetDao {
 	 * @param sequence
 	 * @throws Exception
 	 */
-	void addWidget(Integer dashboardId, Portlet portlet, Integer sequence)throws Exception;
+	void addWidget(Integer dashboardId, Portlet portlet, Integer sequence)throws Exception;	
 	
 	/**
 	 * @param dashboardId
 	 * @param portlets
 	 * @param widgetSequence
 	 */
-	void updateWidgetDetails(Integer dashboardId,List<Portlet> portlets)throws DataAccessException;
-	/**
-	 * @param dashboardId
-	 * @param portlets
-	 * @param widgetSequence
-	 */
-	void addWidgetDetails(Integer dashboardId,final List<Portlet> portlets)throws DataAccessException;
-	/**
-	 * @param dashboardId
-	 * @param portlets
-	 * @throws SQLException
-	 */
-	void deleteWidgets(Integer dashboardId, List<Portlet> portlets)throws DataAccessException;
+	void addWidgetDetails(Integer dashboardId,final List<Portlet> portlets)throws DataAccessException;	
 	
 	/**
 	 * Service call to update Widget sequence alone as a batch service

@@ -5,7 +5,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map; 
+import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.common.Constants;
@@ -14,7 +15,6 @@ import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.entity.chart.XYChartData;
 import org.hpccsystems.dashboard.entity.chart.utils.ChartRenderer;
-import org.hpccsystems.dashboard.helper.DashboardHelper;
 import org.hpccsystems.dashboard.services.AuthenticationService;
 import org.hpccsystems.dashboard.services.DashboardService;
 import org.hpccsystems.dashboard.services.HPCCService;
@@ -71,9 +71,7 @@ public class DashboardController extends SelectorComposer<Component>{
     @Wire
     Button configureDashboard;
     @Wire
-    Button addWidget;    
-    @Wire
-    Button saveApiView;
+    Button addWidget; 
     
     @Wire("portallayout")
 	Portallayout portalLayout;
@@ -98,10 +96,7 @@ public class DashboardController extends SelectorComposer<Component>{
 	private ChartRenderer chartRenderer;
     
     @WireVariable
-	HPCCService hpccService;
-    
-    @WireVariable
-	private DashboardHelper dashboardHelper;
+	HPCCService hpccService;    
     
 	@Override
 	public void doAfterCompose(final Component comp) throws Exception {
@@ -209,11 +204,8 @@ public class DashboardController extends SelectorComposer<Component>{
 		}
 		
 		dashboardWin.addEventListener("onPortalClose", onPanelClose);
-		dashboardWin.addEventListener("onLayoutChange", onLayoutChange);
+		dashboardWin.addEventListener("onLayoutChange", onLayoutChange);		
 		
-		if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD)){
-			saveApiView.addEventListener(Events.ON_CLICK, saveApiChanges); 
-		}
 		if(LOG.isDebugEnabled()){
 			LOG.debug("Created Dashboard");
 			LOG.debug("Panel Count - " + dashboard.getColumnCount());
@@ -506,28 +498,5 @@ public class DashboardController extends SelectorComposer<Component>{
                Messagebox.Button.YES, Messagebox.Button.NO }, Messagebox.QUESTION, clickListener);
    
   }
-	/**
-	 * Event listener to listen to 'ViewDashboard API request changes'
-	 */
-	final EventListener<Event> saveApiChanges = new EventListener<Event>() {
-
-		@Override
-		public void onEvent(Event event) throws Exception {
-			final List<Dashboard> dashBoardIdList = dashboardHelper.getSessionDashboardList();
-			try
-			{
-				dashboardHelper.updateDashboardWidgetDetails(dashBoardIdList);
-				Messagebox.show("Your Dahboard details are Saved.You can close the window","",1,Messagebox.ON_OK);
-				
-			}catch(Exception ex)
-			{
-				Clients.showNotification("Unable to update Dahboard details into DB", "error", dashboardWin.getParent(), "middle_center", 3000, true);
-	        	LOG.error("Exception saveApiChanges Listener in DashboardController", ex);
-			}
-			finally{				
-				authenticationService.logout(null);
-			}
 		
-		}
-	};	
 }

@@ -29,7 +29,7 @@ public class Queries {
 	public static final String UPDATE_WIDGET_SEQUENCE = "update widget_details set COLUMN_IDENTIFIER=?,WIDGET_SEQUENCE=? where WIDGET_ID=? and DASHBOARD_ID=?";
 	public static final String ADD_CHART_DATA = "update widget_details set WIDGET_STATE=?, CHART_TYPE=?  where WIDGET_ID=?";
 	public static final String CLEAR_CHART_DATA = "update widget_details set WIDGET_NAME=?, WIDGET_STATE=?,CHART_TYPE=?,CHART_DATA=?  where WIDGET_ID=?";
-	public static final String UPADET_LIVE_CHART_DATA = "update widget_details set WIDGET_STATE=? , CHART_DATA=?  where WIDGET_ID=?";
+	public static final String UPADET_LIVE_CHART_DATA = "update widget_details set WIDGET_STATE=? , CHART_TYPE=?,CHART_DATA=?  where WIDGET_ID=?";
 	public static final String UPADET_WIDGET_NAME = "update widget_details set WIDGET_NAME=? where WIDGET_ID=?";
 
 

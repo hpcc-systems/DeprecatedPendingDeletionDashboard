@@ -44,38 +44,8 @@ public class WidgetDaoImpl implements WidgetDao{
 
 	public void setDataSource(final DataSource dataSource) {
 		this.dataSource = dataSource;
-	}
+	}	
 	
-	public void updateWidgetDetails(final Integer dashboardId,final List<Portlet> portlets)  throws DataAccessException {
-		
-		String sql = Queries.UPDATE_WIDGET_DETAILS;
-		getJdbcTemplate().batchUpdate(sql, new BatchPreparedStatementSetter()
-		{
-
-			public void setValues(PreparedStatement statement, int i)
-					throws SQLException {
-				Portlet portlet = portlets.get(i);
-				statement.setString(1, portlet.getName());
-				statement.setString(2, portlet.getWidgetState());
-				if (Constants.STATE_EMPTY.equals(portlet.getWidgetState())) {
-					statement.setInt(3, 0);
-				} else {
-					statement.setInt(3, portlet.getChartType());
-				}
-				statement.setInt(4, portlet.getColumn());
-				statement.setInt(5, i);
-				statement.setString(6, portlet.getChartDataXML());
-				statement.setInt(7,portlet.getId());
-				statement.setInt(8, dashboardId);
-				
-			}
-			public int getBatchSize() {
-				return portlets.size();
-				}
-			
-		});
-		
-	}
 	public void addWidgetDetails(final Integer dashboardId,
 			final List<Portlet> portlets) throws DataAccessException {
 
@@ -104,22 +74,7 @@ public class WidgetDaoImpl implements WidgetDao{
 	
 	
 		
-	}
-	public void deleteWidgets(final Integer dashboardId, final List<Portlet> portlets)
-			throws DataAccessException {
-		String sql =Queries.DELETE_WIDGETS;
-		getJdbcTemplate().batchUpdate(sql, new BatchPreparedStatementSetter() {
-			
-			public void setValues(PreparedStatement ps, int i) throws SQLException {
-				Portlet portlet = portlets.get(i);
-				ps.setInt(1, portlet.getId());
-			}
-			
-			public int getBatchSize() {
-				return portlets.size();
-			}
-		});
-	}
+	}	
 	
 	public List<Portlet> retriveWidgetDetails(Integer dashboardId) throws DataAccessException{
 			StringBuilder sqlBuffer = new StringBuilder();
@@ -166,6 +121,7 @@ public class WidgetDaoImpl implements WidgetDao{
 			String updateQuery = Queries.UPADET_LIVE_CHART_DATA;
 			getJdbcTemplate().update(updateQuery, new Object[] { 
 					portlet.getWidgetState(),
+					portlet.getChartType(),
 					portlet.getChartDataXML(),
 					portlet.getId()
 			});

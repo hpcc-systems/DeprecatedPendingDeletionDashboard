@@ -31,18 +31,7 @@ public class WidgetServiceImpl implements WidgetService {
 	public void setWidgetDao(WidgetDao widgetDao) {
 		this.widgetDao = widgetDao;
 	}
-
-	public void updateWidgetDetails(Integer dashboardId,List<Portlet> portlets)throws Exception {
-		try
-		{
-		widgetDao.updateWidgetDetails(dashboardId,portlets);
-		}catch(DataAccessException ex)
-		{
-			LOG.error("DataAccessException in updateWidgetDetails() in WidgetServiceImpl", ex);
-			throw ex;
-		}
-	}
-
+	
 	public void addWidgetDetails(Integer dashboardId,List<Portlet> portlets) throws Exception{
 		try
 		{
@@ -50,19 +39,6 @@ public class WidgetServiceImpl implements WidgetService {
 		}catch(DataAccessException ex)
 		{
 			LOG.error("DataAccessException in addWidgetDetails() in WidgetServiceImpl", ex);
-			throw ex;
-		}
-		
-	}
-
-	public void deleteWidgets(Integer dashboardId, List<Portlet> portlets)
-			throws Exception {
-		try
-		{
-		widgetDao.deleteWidgets(dashboardId,portlets);
-		}catch(DataAccessException ex)
-		{
-			LOG.error("DataAccessException in deleteWidgets() in WidgetServiceImpl", ex);
 			throw ex;
 		}
 		
@@ -124,8 +100,7 @@ public class WidgetServiceImpl implements WidgetService {
 		{
 			LOG.error("DataAccessException in updateWidgetTitle() in WidgetServiceImpl", ex);
 			throw ex;
-		}
-		
+		}		
 	}
 
 	@Override
