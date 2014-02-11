@@ -38,7 +38,7 @@ public class WidgetServiceImpl implements WidgetService {
 		widgetDao.updateWidgetDetails(dashboardId,portlets);
 		}catch(DataAccessException ex)
 		{
-			LOG.error("DataAccessException in updateWidgetDetails() in WidgetServiceImpl"+ex);
+			LOG.error("DataAccessException in updateWidgetDetails() in WidgetServiceImpl", ex);
 			throw ex;
 		}
 	}
@@ -49,7 +49,7 @@ public class WidgetServiceImpl implements WidgetService {
 		widgetDao.addWidgetDetails(dashboardId,portlets);
 		}catch(DataAccessException ex)
 		{
-			LOG.error("DataAccessException in addWidgetDetails() in WidgetServiceImpl"+ex);
+			LOG.error("DataAccessException in addWidgetDetails() in WidgetServiceImpl", ex);
 			throw ex;
 		}
 		
@@ -62,7 +62,7 @@ public class WidgetServiceImpl implements WidgetService {
 		widgetDao.deleteWidgets(dashboardId,portlets);
 		}catch(DataAccessException ex)
 		{
-			LOG.error("DataAccessException in deleteWidgets() in WidgetServiceImpl"+ex);
+			LOG.error("DataAccessException in deleteWidgets() in WidgetServiceImpl", ex);
 			throw ex;
 		}
 		
@@ -74,7 +74,7 @@ public class WidgetServiceImpl implements WidgetService {
 		return widgetDao.retriveWidgetDetails(dashboardId);
 		}catch(DataAccessException ex)
 		{
-			LOG.error("DataAccessException in retriveWidgetDetails() in WidgetServiceImpl"+ex);
+			LOG.error("DataAccessException in retriveWidgetDetails() in WidgetServiceImpl", ex);
 			throw ex;
 		}
 	}
@@ -84,7 +84,7 @@ public class WidgetServiceImpl implements WidgetService {
 		try	{
 			widgetDao.deleteWidget(portletId);
 		}catch(DataAccessException ex)	{
-			LOG.error("DataAccessException in deleteWidgets() in WidgetServiceImpl"+ex);
+			LOG.error("DataAccessException in deleteWidgets() in WidgetServiceImpl", ex);
 			throw ex;
 		}
 	}
@@ -96,7 +96,7 @@ public class WidgetServiceImpl implements WidgetService {
 			widgetDao.updateWidgetSequence(dashboard.getDashboardId(),dashboard.getPortletList());
 		}catch(DataAccessException ex)
 		{
-			LOG.error("DataAccessException in updateWidgetSequence() in WidgetServiceImpl"+ex);
+			LOG.error("DataAccessException in updateWidgetSequence() in WidgetServiceImpl", ex);
 			throw ex;
 		}
 		
@@ -109,7 +109,7 @@ public class WidgetServiceImpl implements WidgetService {
 			widgetDao.updateWidget(portlet);
 		}catch(DataAccessException ex)
 		{
-			LOG.error("DataAccessException in updateWidget() in WidgetServiceImpl"+ex);
+			LOG.error("DataAccessException in updateWidget() in WidgetServiceImpl", ex);
 			throw ex;
 		}
 		
@@ -122,7 +122,7 @@ public class WidgetServiceImpl implements WidgetService {
 			widgetDao.updateWidgetTitle(portlet);
 		}catch(DataAccessException ex)
 		{
-			LOG.error("DataAccessException in updateWidgetTitle() in WidgetServiceImpl"+ex);
+			LOG.error("DataAccessException in updateWidgetTitle() in WidgetServiceImpl", ex);
 			throw ex;
 		}
 		
@@ -134,7 +134,7 @@ public class WidgetServiceImpl implements WidgetService {
 		try {
 			widgetDao.addWidget(dashboardId, portlet, sequence);
 		} catch(DataAccessException ex) {
-			LOG.error("DataAccessException in addWidgetDetails() in WidgetServiceImpl"+ex);
+			LOG.error("DataAccessException in addWidgetDetails() in WidgetServiceImpl", ex);
 			throw ex;
 		}
 	}

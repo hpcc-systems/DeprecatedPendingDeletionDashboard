@@ -499,7 +499,7 @@ public class HPCCServiceImpl implements HPCCService{
 		final Document doc = db.parse(inStream);
 		Node fstNode = null;
 		Element fstElmnt = null, lstNmElmnt = null;
-		NodeList lstNmElmntLst = null, lstNm = null;
+		NodeList lstNmElmntLst = null;
 		List<String> columnListvalue = null;
 		for (String columnName : tableData.getTableColumns()) {
 			columnListvalue = new ArrayList<String>();
@@ -515,7 +515,6 @@ public class HPCCServiceImpl implements HPCCService{
 						lstNmElmntLst = fstElmnt.getElementsByTagName(data);
 						lstNmElmnt = (Element) lstNmElmntLst.item(0);
 						String str = lstNmElmnt.getTextContent();
-						lstNm = lstNmElmnt.getChildNodes();
 						columnListvalue = tableDataMap.get(lstNmElmnt.getNodeName());
 						columnListvalue.add(str);
 					}

@@ -7,12 +7,9 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
-import org.hpccsystems.dashboard.controller.EditChartController;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
-import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Hbox;
 import org.zkoss.zul.Listbox;
@@ -113,6 +110,10 @@ public class TableRenderer {
 			Vbox vbox = new Vbox();
 			vbox.appendChild(listBox);
 			vbox.appendChild(hbox);
+			
+			if(LOG.isDebugEnabled()) {
+				LOG.debug("Created table widget..");
+			}
 			
 			return vbox;
 		}

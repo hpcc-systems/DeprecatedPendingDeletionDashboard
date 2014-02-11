@@ -532,13 +532,14 @@ public class EditChartController extends SelectorComposer<Component> {
 	{
 		Execution exe = Executions.getCurrent();
 		String sourceId = exe.getParameter("source_id");
-		String format = exe.getParameter("format");
+
+		// format is not considered for now
+		//String format = exe.getParameter("format");
 		String config = exe.getParameter("config");
 		ChartConfiguration configuration = null;
-		try{
+		try {
 			configuration = new GsonBuilder().create().fromJson(config,ChartConfiguration.class);
-		}catch(Exception ex)
-		{
+		} catch(Exception ex) {
 			LOG.error("Exception while forming ChartConfiguration data from request using Gson", ex);
 		}
 		//creating chart data
@@ -585,11 +586,8 @@ public class EditChartController extends SelectorComposer<Component> {
 							dashboard.getSourceId() , 
 							authenticationService.getUserCredential().getUserId())
 				);
-			List<Portlet> newPortlets = new ArrayList<Portlet>();
-			for(Portlet widget : dashboard.getPortletList()) {
-				newPortlets.add(widget);
-			}
-			widgetService.addWidgetDetails(dashboard.getDashboardId(), newPortlets);
+			
+			widgetService.addWidget(dashboard.getDashboardId(), portlet, 0);
 			Messagebox.show("The Chart Settings data are Saved.Your window will be closed","",1,Messagebox.ON_OK);			
 			authenticationService.logout(null);	
 			editWindowLayout.detach();

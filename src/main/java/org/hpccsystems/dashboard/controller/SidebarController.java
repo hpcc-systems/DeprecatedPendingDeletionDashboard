@@ -6,10 +6,10 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import org.apache.commons.logging.Log; 
+
+import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.common.Constants;
-import org.hpccsystems.dashboard.entity.Application;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.services.AuthenticationService;
 import org.hpccsystems.dashboard.services.DashboardService;
@@ -76,7 +76,6 @@ public class SidebarController extends GenericForwardComposer<Component>{
 		
 		// Wire Spring Bean
 		Selectors.wireVariables(navBar, this, Selectors.newVariableResolvers(getClass(), null));
-		final Application viewModel = new Application();
 		
 		List<Dashboard> sideBarPageList = null;
 		try	{
@@ -258,13 +257,10 @@ public class SidebarController extends GenericForwardComposer<Component>{
 	public void onCloseDialog(final Event event) {
 		
 		final Dashboard dashboard = (Dashboard) event.getData();
+		
 		//updating dashboard sequence into dashboard_details
-		Integer sequence=1;
 		List<Component> comp = navBar.getChildren();
-		for(Component component : comp){
-			sequence++;
-		}
-		dashboard.setSequence(sequence);
+		dashboard.setSequence(comp.size());
 		
 		// Make entry of new dashboard details into DB
 		try {
