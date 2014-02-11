@@ -63,7 +63,7 @@ public class WidgetDaoImpl implements WidgetDao{
 					statement.setInt(3, portlet.getChartType());
 				}
 				statement.setInt(4, portlet.getColumn());
-				statement.setInt(5, i);
+				statement.setInt(5, portlet.getWidgetSequence());
 				statement.setString(6, portlet.getChartDataXML());
 				statement.setInt(7,portlet.getId());
 				statement.setInt(8, dashboardId);
@@ -93,7 +93,7 @@ public class WidgetDaoImpl implements WidgetDao{
 					statement.setInt(4, portlet.getChartType());
 				}
 				statement.setInt(5, portlet.getColumn());
-				statement.setInt(6,i);
+				statement.setInt(6,portlet.getWidgetSequence());
 				statement.setString(7, portlet.getChartDataXML());				
 			}
 			
