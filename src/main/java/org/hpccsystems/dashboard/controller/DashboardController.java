@@ -105,10 +105,17 @@ public class DashboardController extends SelectorComposer<Component>{
     
 	@Override
 	public void doAfterCompose(final Component comp) throws Exception {
-		//TODO Delete dashboard state is not considered right now 
-		
 		super.doAfterCompose(comp);
 		dashboardId =(Integer) Executions.getCurrent().getAttribute(Constants.ACTIVE_DASHBOARD_ID);
+		
+		if(dashboardId == null ){
+			dashboardId = (Integer) Sessions.getCurrent().getAttribute(Constants.ACTIVE_DASHBOARD_ID);
+		}
+		
+		if(LOG.isDebugEnabled()) {
+			LOG.debug("Dashboard ID - " + dashboardId);
+		}
+						
 		if(dashboardId != null ){
 			List<String> dashboardIdList = new ArrayList<String>(); 
 			dashboardIdList.add(String.valueOf(dashboardId));
@@ -146,59 +153,52 @@ public class DashboardController extends SelectorComposer<Component>{
 				count ++;
 			}		
 
-			 if(dashboard.getPortletList().isEmpty() && dashboard.isPersisted()) {
-				//Dashboard is persisted but not present in session
-				//Webservices are called to retrieve chart data
-				if(LOG.isDebugEnabled()){
-					LOG.debug("Creating Dashboard from DB.");
-				}
-				try	{
+			try	{
 				dashboard.setPortletList((ArrayList<Portlet>) widgetService.retriveWidgetDetails(dashboardId));
-				} catch(Exception ex) {
-					Clients.showNotification(
-							"Unable to retrieve Widget details from DB for the Dashboard",
-							"error", comp, "middle_center", 3000, true);
-					LOG.error("Exception while fetching widget details from DB", ex);
-				}
-				if(LOG.isDebugEnabled()){
-					LOG.debug("PortletList of selected Dashboard -->"+dashboard.getPortletList());
-				}
-				
-				
-				XYChartData chartData = null;
-				ChartPanel panel = null;
-				for (Portlet portlet : dashboard.getPortletList()) {
-					if(!portlet.getWidgetState().equals(Constants.STATE_DELETE)){
-						//Constructing chart data only when live chart is drawn
-						if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())){
-							chartData = chartRenderer.parseXML(portlet.getChartDataXML());
-							if(portlet.getChartType().equals(Constants.TABLE_WIDGET)){
-								//Fetching data and setting into portlet to construct Table Widget
-								try{
-									portlet.setTableDataMap(hpccService.fetchTableData(chartData));
-								}catch(Exception e){
-									Clients.showNotification(
-											"Unable to fetch table data from Hpcc ",
-											"error", comp, "middle_center", 3000,true);
-									LOG.error("Exception while fetching data from Hpcc for table columns", e);
-								}
-							} else {
-								//For chart widgets
-								try	{
-									chartRenderer.constructChartJSON(chartData, portlet, false);
-								}catch(Exception ex) {
-									Clients.showNotification("Unable to fetch column data from Hpcc", 
-											"error", comp, "middle_center", 3000, true);
-									LOG.error("Exception while fetching column data from Hpcc", ex);
-								}
+			} catch(Exception ex) {
+				Clients.showNotification(
+						"Unable to retrieve Widget details from DB for the Dashboard",
+						"error", comp, "middle_center", 3000, true);
+				LOG.error("Exception while fetching widget details from DB", ex);
+			}
+			
+			if(LOG.isDebugEnabled()){
+				LOG.debug("PortletList of selected Dashboard -->"+dashboard.getPortletList());
+			}
+			
+			XYChartData chartData = null;
+			ChartPanel panel = null;
+			for (Portlet portlet : dashboard.getPortletList()) {
+				if(!portlet.getWidgetState().equals(Constants.STATE_DELETE)){
+					//Constructing chart data only when live chart is drawn
+					if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())){
+						chartData = chartRenderer.parseXML(portlet.getChartDataXML());
+						if(portlet.getChartType().equals(Constants.TABLE_WIDGET)){
+							//Fetching data and setting into portlet to construct Table Widget
+							try{
+								portlet.setTableDataMap(hpccService.fetchTableData(chartData));
+							}catch(Exception e){
+								Clients.showNotification(
+										"Unable to fetch table data from Hpcc ",
+										"error", comp, "middle_center", 3000,true);
+								LOG.error("Exception while fetching data from Hpcc for table columns", e);
+							}
+						} else {
+							//For chart widgets
+							try	{
+								chartRenderer.constructChartJSON(chartData, portlet, false);
+							}catch(Exception ex) {
+								Clients.showNotification("Unable to fetch column data from Hpcc", 
+										"error", comp, "middle_center", 3000, true);
+								LOG.error("Exception while fetching column data from Hpcc", ex);
 							}
 						}
-						
-						panel = new ChartPanel(portlet);
-						portalChildren.get(portlet.getColumn()).appendChild(panel);
-						if(panel.drawD3Graph() != null){
-							Clients.evalJavaScript(panel.drawD3Graph());
-						}
+					}
+					
+					panel = new ChartPanel(portlet);
+					portalChildren.get(portlet.getColumn()).appendChild(panel);
+					if(panel.drawD3Graph() != null){
+						Clients.evalJavaScript(panel.drawD3Graph());
 					}
 				}
 			}
@@ -218,7 +218,6 @@ public class DashboardController extends SelectorComposer<Component>{
 			LOG.debug("Created Dashboard");
 			LOG.debug("Panel Count - " + dashboard.getColumnCount());
 		}
-		
 	}	
 	
 	@Listen("onClick = #addWidget")
@@ -251,6 +250,13 @@ public class DashboardController extends SelectorComposer<Component>{
 		ChartPanel chartPanel = new ChartPanel(portlet);
 		portalChildren.get(portlet.getColumn()).appendChild(chartPanel);
 		chartPanel.focus();
+		if(dashboard.getPortletList().size()>0){
+			try {
+				widgetService.addWidgetDetails(dashboard.getDashboardId(), portletList);
+			} catch (Exception e) {
+				LOG.error("Exception while adding widgets into dashboard", e);
+			}
+		}		
 	}
 	
 	@Listen("onClick = #configureDashboard")

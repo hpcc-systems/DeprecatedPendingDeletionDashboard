@@ -125,6 +125,8 @@ public class SidebarController extends GenericForwardComposer<Component>{
 		// Displaying first menu item as default page
 		if(firstSet) {
 			//Setting current dashboard in session will load it when page loads
+			Sessions.getCurrent().setAttribute(Constants.ACTIVE_DASHBOARD_ID, firstNavitem.getAttribute(Constants.DASHBOARD_ID));
+			
 			firstNavitem.setSelected(true);
 		}else {
 			Clients.evalJavaScript("showPopUp()");
