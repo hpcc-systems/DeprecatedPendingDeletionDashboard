@@ -14,7 +14,6 @@ import org.hpccsystems.dashboard.common.Queries;
 import org.hpccsystems.dashboard.dao.WidgetDao;
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.rowmapper.WidgetRowMapper;
-import org.hpccsystems.dashboard.services.impl.WidgetServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
