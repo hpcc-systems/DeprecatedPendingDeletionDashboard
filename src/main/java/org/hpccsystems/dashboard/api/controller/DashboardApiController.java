@@ -180,7 +180,6 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
 	public void validateDashboard(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	JsonObject jsonObject = new JsonObject();
 		try {
-			ChartRenderer chartRenderer = new ChartRenderer();
 			XYChartData chartData = null;
 			List<String> xColumnList = null;
 			List<String> yColumnList = null;
@@ -191,10 +190,10 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
 			String circuitFields = request.getParameter(Constants.CIRCUIT_CONFIG);
 			String dashboard_id = request.getParameter(Constants.CIRCUIT_DASHBOARD_ID);
 			chartConfiguration = new GsonBuilder().create().fromJson(circuitFields, ChartConfiguration.class);
-			List<Portlet> portletList = new ArrayList<Portlet>();
-			portletList = widgetService.retriveWidgetDetails(Integer.valueOf(dashboard_id));
+			List<Portlet> portletList = widgetService.retriveWidgetDetails(Integer.valueOf(dashboard_id));
 			
 			if (portletList != null && portletList.size() > 0) {
+				ChartRenderer chartRenderer = new ChartRenderer();
 				for (Portlet portlet : portletList) {
 					chartData = chartRenderer.parseXML(portlet.getChartDataXML());
 					if (chartData != null) {
@@ -230,7 +229,7 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
 
 			} else {
 				jsonObject.addProperty(Constants.STATUS, Constants.STATUS_FAIL);
-				jsonObject.addProperty(Constants.STATUS_MESSAGE, dashboard_id + Constants.DASHBOARD_NOT_EXISTS);
+				jsonObject.addProperty(Constants.STATUS_MESSAGE, Constants.DASHBOARD_NOT_EXISTS);
 			}
 			response.setContentType(Constants.RES_TEXT_TYPE_JSON);
 			response.setCharacterEncoding(Constants.CHAR_CODE);

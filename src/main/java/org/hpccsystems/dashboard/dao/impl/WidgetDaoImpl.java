@@ -157,7 +157,7 @@ public class WidgetDaoImpl implements WidgetDao{
 	}
 
 	@Override
-	public void addWidget(final Integer dashboardId, final Portlet portlet, final Integer sequence)	throws DataAccessException {
+	public Integer addWidget(final Integer dashboardId, final Portlet portlet, final Integer sequence)	throws DataAccessException {
 
 		getJdbcTemplate().update(Queries.INSERT_WIDGET_DETAILS,
 				new PreparedStatementSetter() {
@@ -178,7 +178,7 @@ public class WidgetDaoImpl implements WidgetDao{
 
 				});
 		
-		portlet.setId(jdbcTemplate.queryForInt("select last_insert_id()")); 
+		return jdbcTemplate.queryForInt("select last_insert_id()"); 
 
 	}
 }

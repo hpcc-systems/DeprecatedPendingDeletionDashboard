@@ -6,15 +6,15 @@
 		
 		<hlayout zclass="form-group">
 			<label zclass="label" value="${labels.userName}"></label>
-			<textbox id="username" constraint="no empty : Please enter valid Username." zclass="form-control"></textbox>
+			<textbox id="username" value="generic_dashboard" constraint="no empty : Please enter valid Username." zclass="form-control"></textbox>
 		</hlayout>
 		<hlayout zclass="form-group">
 			<label zclass="label" value="${labels.password}"></label>
-			<textbox id="password" type="password" constraint="no empty : Please enter valid Password." zclass="form-control"></textbox>
+			<textbox id="password" value="Lexis123!" type="password" constraint="no empty : Please enter valid Password." zclass="form-control"></textbox>
 		</hlayout>
 		<hlayout zclass="form-group" hflex="1">
 			<label zclass="label" value="${labels.jdbcURL}"></label>
-			<textbox id="URL" constraint="no empty : Please enter valid HPCCSystems Url." zclass="form-control"></textbox>
+			<textbox id="URL" value="216.19.105.2" constraint="no empty : Please enter valid HPCCSystems Url." zclass="form-control"></textbox>
 		</hlayout>
 		<hlayout zclass="form-group" hflex="0">
 			<label zclass="label" value="Connection Type"></label>

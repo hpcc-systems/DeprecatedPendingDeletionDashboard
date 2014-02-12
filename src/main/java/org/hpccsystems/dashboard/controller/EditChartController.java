@@ -565,7 +565,7 @@ public class EditChartController extends SelectorComposer<Component> {
 							dashboard.getSourceId() , 
 							authenticationService.getUserCredential().getUserId())
 				);
-			widgetService.addWidget(dashboard.getDashboardId(), portlet, 0);
+			portlet.setId(widgetService.addWidget(dashboard.getDashboardId(), portlet, 0));
 			Messagebox.show("The Chart Settings data are Saved.Your window will be closed","",1,Messagebox.ON_OK);			
 			authenticationService.logout(null);	
 			editWindowLayout.detach();
@@ -599,12 +599,11 @@ public class EditChartController extends SelectorComposer<Component> {
 		dashboardIdList.add(dashboardId);
 		List<Dashboard> sideBarPageList = null;
 		try {
-			sideBarPageList = new ArrayList<Dashboard>(
-					dashboardService.retrieveDashboardMenuPages(
+			sideBarPageList = dashboardService.retrieveDashboardMenuPages(
 							authenticationService.getUserCredential()
 									.getApplicationId(), authenticationService
 									.getUserCredential().getUserId(),
-							dashboardIdList, null));
+							dashboardIdList, null);
 			if (LOG.isDebugEnabled()) {
 				LOG.debug("sideBarPageList in configurePortlet(): "
 						+ sideBarPageList);

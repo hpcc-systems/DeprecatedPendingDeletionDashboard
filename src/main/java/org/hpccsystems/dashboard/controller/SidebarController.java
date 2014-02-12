@@ -90,13 +90,10 @@ public class SidebarController extends GenericForwardComposer<Component>{
 				//Dashboard Flow
 				//Add dashboard				
 				addDash.addEventListener(Events.ON_CLICK, addDashboardBtnLisnr);				
-				sideBarPageList =new ArrayList<Dashboard>(
-						dashboardService.retrieveDashboardMenuPages(
+				sideBarPageList =dashboardService.retrieveDashboardMenuPages(
 								authenticationService.getUserCredential().getApplicationId(), 
 								authenticationService.getUserCredential().getUserId(),
-								null, null
-							)
-					);		
+								null, null);		
 
 			}
 		} catch(DataAccessException ex) {

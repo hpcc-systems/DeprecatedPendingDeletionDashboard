@@ -318,6 +318,7 @@ public class HPCCServiceImpl implements HPCCService{
 		final String resultString = result.getResult();
 		
 		if(LOG.isDebugEnabled()){
+			LOG.debug("queryTxt in fetchFilterMinMax() -->"+queryTxt) ;
 			LOG.debug("Hitting URL for filter - " + locator.getws_sqlServiceSoapAddress());
 			LOG.debug("Result String: " + resultString);
 		}

@@ -85,7 +85,8 @@ public class DashboardDaoImpl implements DashboardDao {
 				applicationId,
 				dashboard.getUpdatedDate(),
 				dashboard.getColumnCount(),
-				dashboard.getSequence()
+				dashboard.getSequence(),
+				dashboard.getSourceId()
 		});
 		return jdbcTemplate.queryForInt("select last_insert_id()"); 
 	}

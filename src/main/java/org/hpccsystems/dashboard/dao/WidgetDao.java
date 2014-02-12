@@ -23,14 +23,16 @@ public interface WidgetDao {
 	 */
 	List<Portlet> retriveWidgetDetails(Integer dashboardId) throws DataAccessException;
 	
+	
 	/**
-	 * Adds the Widget to DB and sets portletId to the portlet Object passed
 	 * @param dashboardId
 	 * @param portlet
 	 * @param sequence
-	 * @throws Exception
+	 * @return 
+	 * Portlet Id
+	 * @throws DataAccessException
 	 */
-	void addWidget(Integer dashboardId, Portlet portlet, Integer sequence)throws DataAccessException;	
+	Integer addWidget(Integer dashboardId, Portlet portlet, Integer sequence)throws DataAccessException;	
 	
 	/**
 	 * @param dashboardId

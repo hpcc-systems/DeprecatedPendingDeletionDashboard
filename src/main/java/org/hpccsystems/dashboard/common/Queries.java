@@ -6,7 +6,7 @@ package org.hpccsystems.dashboard.common;
  */
 public class Queries {
 	
-	public static final String INSERT_DASHBOARD = "INSERT INTO dashboard_details(dashboard_name,user_id,application_Id,updated_date,column_count,sequence) VALUES(?,?,?,?,?,?)";
+	public static final String INSERT_DASHBOARD = "INSERT INTO dashboard_details(dashboard_name,user_id,application_Id,updated_date,column_count,sequence,source_id) VALUES(?,?,?,?,?,?,?)";
 	public static final String UPDATE_DASHBOARD_SEQUENCE = "update dashboard_details set sequence=?, dashboard_name=? where dashboard_id=?";
 	public static final String DELETE_DASHBOARD_WIDGETS = "delete from widget_details where DASHBOARD_ID=?";
 	public static final String DELETE_WIDGETS = "delete from widget_details where WIDGET_ID=?";

@@ -104,10 +104,10 @@ public class WidgetServiceImpl implements WidgetService {
 	}
 
 	@Override
-	public void addWidget(Integer dashboardId, Portlet portlet, Integer sequence)
+	public Integer addWidget(Integer dashboardId, Portlet portlet, Integer sequence)
 			throws DataAccessException {
 		try {
-			widgetDao.addWidget(dashboardId, portlet, sequence);
+			return widgetDao.addWidget(dashboardId, portlet, sequence);
 		} catch(DataAccessException ex) {
 			LOG.error("DataAccessException in addWidgetDetails() in WidgetServiceImpl", ex);
 			throw ex;

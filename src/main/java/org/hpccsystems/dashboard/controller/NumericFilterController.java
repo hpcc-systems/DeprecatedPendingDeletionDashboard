@@ -66,8 +66,14 @@ public class NumericFilterController extends SelectorComposer<Component>{
 		try	{
 			map = hpccService.fetchFilterMinMax(chartData);
 		} catch(Exception e) {
-			Clients.showNotification("Unable to fetch data to Filter for the column dropped", 
-					"error", doneButton.getParent().getParent().getParent(), "middle_center", 3000, true);
+			if(!authenticationService.getUserCredential().getApplicationId().equals(Constants.CIRCUIT_APPLICATION_ID) || 
+					authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD)){
+				Clients.showNotification("Unable to fetch data to Filter for the column dropped", 
+						"error", doneButton.getParent().getParent().getParent(), "middle_center", 3000, true);
+			}else{
+				Clients.showNotification("Unable to fetch column data from HPCC", true);
+			
+			}
 			LOG.error("Exception while fetching data from Hpcc for selected Numeric filter", e);
 			return;
 		}
@@ -116,8 +122,14 @@ public class NumericFilterController extends SelectorComposer<Component>{
 			chartRenderer.constructChartJSON(chartData, portlet, true);
 			chartRenderer.drawChart(chartData, Constants.EDIT_WINDOW_CHART_DIV, portlet);
 		}catch(Exception ex) {
-			Clients.showNotification("Unable to fetch column data from HPCC", "error", 
-					doneButton.getParent().getParent().getParent(), "middle_center", 3000, true);
+			if(!authenticationService.getUserCredential().getApplicationId().equals(Constants.CIRCUIT_APPLICATION_ID) || 
+					authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD)){
+				Clients.showNotification("Unable to fetch column data from HPCC", "error", 
+						doneButton.getParent().getParent().getParent(), "middle_center", 3000, true);			
+			}else{
+			
+			Clients.showNotification("Unable to fetch column data from HPCC", true);
+			}
 			LOG.error("Exception while fetching column data from Hpcc", ex);
 			return;
 		}		

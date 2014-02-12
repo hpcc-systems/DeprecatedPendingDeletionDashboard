@@ -102,12 +102,15 @@ public class DashboardController extends SelectorComposer<Component>{
 	@Override
 	public void doAfterCompose(final Component comp) throws Exception {
 		super.doAfterCompose(comp);
+		
 		dashboardId =(Integer) Executions.getCurrent().getAttribute(Constants.ACTIVE_DASHBOARD_ID);
 		//For the first Dashboard, getting Id from Session
 		if(dashboardId == null ){
 			dashboardId = (Integer) Sessions.getCurrent().getAttribute(Constants.ACTIVE_DASHBOARD_ID);
 		}
-		
+		if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_CHART)) {
+			dashboardId =Integer.valueOf(Executions.getCurrent().getParameter(Constants.DASHBOARD_ID));
+		}
 		if(LOG.isDebugEnabled()) {
 			LOG.debug("Dashboard ID - " + dashboardId);
 		}
@@ -190,7 +193,6 @@ public class DashboardController extends SelectorComposer<Component>{
 							}
 						}
 					}
-					
 					panel = new ChartPanel(portlet);
 					portalChildren.get(portlet.getColumn()).appendChild(panel);
 					if(panel.drawD3Graph() != null){
@@ -242,7 +244,7 @@ public class DashboardController extends SelectorComposer<Component>{
 		
 		manipulatePortletObjects(Constants.ReorderPotletPanels);
 		
-		widgetService.addWidget(dashboardId, portlet, dashboard.getPortletList().indexOf(portlet));
+		portlet.setId(widgetService.addWidget(dashboardId, portlet, dashboard.getPortletList().indexOf(portlet)));
 		//Updating new widget sequence to DB
 		widgetService.updateWidgetSequence(dashboard);
 		}catch (DataAccessException e) {

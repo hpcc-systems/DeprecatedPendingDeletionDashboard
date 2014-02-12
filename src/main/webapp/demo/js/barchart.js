@@ -6,7 +6,6 @@ function clearChart(divId)
 function createChart(divId, chartData) {
 	jq.getScript('js/lib/d3.v3.min.js', function() {
 		jq.getScript('js/lib/c3.js', function() {
-			 
 			var response = jq.parseJSON(chartData);
 			console.log(response);
 			 

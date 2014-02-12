@@ -35,9 +35,7 @@ public class FileConverter {
 		if(chartTitle==null || Constants.CHART_TITLE.equalsIgnoreCase(chartTitle))
 			chartTitle="Excel_Table_Report";
 		AMedia amedia = new AMedia(chartTitle+".xlsx", "xls", "application/file", outputStream.toByteArray());
-		Filedownload.save(amedia);
-		
-		outputStream.close();
+		Filedownload.save(amedia);	
 		}
 		catch(Exception ex)
 		{

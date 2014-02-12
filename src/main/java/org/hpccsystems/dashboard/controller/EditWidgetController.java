@@ -131,7 +131,7 @@ public class EditWidgetController extends SelectorComposer<Component> {
 							)
 						);
 			editPortletWindow.detach();
-			return;
+		
 		} else {
 		//For Chart Widgets
 			final String divToDraw = div.getId(); 
