@@ -157,7 +157,7 @@ public class WidgetDaoImpl implements WidgetDao{
 	}
 
 	@Override
-	public void addWidget(final Integer dashboardId, final Portlet portlet, final Integer sequence)	throws Exception {
+	public void addWidget(final Integer dashboardId, final Portlet portlet, final Integer sequence)	throws DataAccessException {
 
 		getJdbcTemplate().update(Queries.INSERT_WIDGET_DETAILS,
 				new PreparedStatementSetter() {

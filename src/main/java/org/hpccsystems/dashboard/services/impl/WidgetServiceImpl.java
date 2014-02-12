@@ -32,7 +32,7 @@ public class WidgetServiceImpl implements WidgetService {
 		this.widgetDao = widgetDao;
 	}
 	
-	public void addWidgetDetails(Integer dashboardId,List<Portlet> portlets) throws Exception{
+	public void addWidgetDetails(Integer dashboardId,List<Portlet> portlets) throws DataAccessException{
 		try
 		{
 		widgetDao.addWidgetDetails(dashboardId,portlets);
@@ -44,7 +44,7 @@ public class WidgetServiceImpl implements WidgetService {
 		
 	}
 	
-	public List<Portlet> retriveWidgetDetails(Integer dashboardId) throws Exception {
+	public List<Portlet> retriveWidgetDetails(Integer dashboardId) throws DataAccessException {
 		try
 		{
 		return widgetDao.retriveWidgetDetails(dashboardId);
@@ -56,7 +56,7 @@ public class WidgetServiceImpl implements WidgetService {
 	}
 
 	@Override
-	public void deleteWidget(Integer portletId) throws Exception {
+	public void deleteWidget(Integer portletId) throws DataAccessException {
 		try	{
 			widgetDao.deleteWidget(portletId);
 		}catch(DataAccessException ex)	{
@@ -66,7 +66,7 @@ public class WidgetServiceImpl implements WidgetService {
 	}
 	
 	@Override
-	public void updateWidgetSequence(Dashboard dashboard) throws Exception {
+	public void updateWidgetSequence(Dashboard dashboard) throws DataAccessException {
 		try
 		{
 			widgetDao.updateWidgetSequence(dashboard.getDashboardId(),dashboard.getPortletList());
@@ -79,7 +79,7 @@ public class WidgetServiceImpl implements WidgetService {
 	}
 
 	@Override
-	public void updateWidget(Portlet portlet) throws Exception {
+	public void updateWidget(Portlet portlet) throws DataAccessException {
 		try
 		{
 			widgetDao.updateWidget(portlet);
@@ -92,7 +92,7 @@ public class WidgetServiceImpl implements WidgetService {
 	}
 
 	@Override
-	public void updateWidgetTitle(Portlet portlet)throws Exception {
+	public void updateWidgetTitle(Portlet portlet)throws DataAccessException {
 		try
 		{
 			widgetDao.updateWidgetTitle(portlet);
@@ -105,7 +105,7 @@ public class WidgetServiceImpl implements WidgetService {
 
 	@Override
 	public void addWidget(Integer dashboardId, Portlet portlet, Integer sequence)
-			throws Exception {
+			throws DataAccessException {
 		try {
 			widgetDao.addWidget(dashboardId, portlet, sequence);
 		} catch(DataAccessException ex) {

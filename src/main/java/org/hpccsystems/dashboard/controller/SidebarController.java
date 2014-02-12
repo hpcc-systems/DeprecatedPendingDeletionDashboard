@@ -14,6 +14,7 @@ import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.services.AuthenticationService;
 import org.hpccsystems.dashboard.services.DashboardService;
 import org.hpccsystems.dashboard.services.WidgetService;
+import org.springframework.dao.DataAccessException;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Sessions;
@@ -98,7 +99,7 @@ public class SidebarController extends GenericForwardComposer<Component>{
 					);		
 
 			}
-		} catch(Exception ex) {
+		} catch(DataAccessException ex) {
 			Clients.showNotification("Unable to retrieve available Dashboards. Please try reloading the page.", true);
 			LOG.error("Exception while retrieving dashboards from DB", ex);
 		}
@@ -202,6 +203,7 @@ public class SidebarController extends GenericForwardComposer<Component>{
 				if(comp instanceof Center)
 				{
 					centerComp = comp;
+					break;
 				}
 			}	
 			if(centerComp != null){
@@ -256,37 +258,42 @@ public class SidebarController extends GenericForwardComposer<Component>{
 	 */
 	public void onCloseDialog(final Event event) {
 		
-		final Dashboard dashboard = (Dashboard) event.getData();
-		
-		//updating dashboard sequence into dashboard_details
-		List<Component> comp = navBar.getChildren();
-		dashboard.setSequence(comp.size());
-		
-		// Make entry of new dashboard details into DB
-		try {
-			dashboard.setDashboardId(
-				dashboardService.addDashboardDetails(
-					dashboard,
-					authenticationService.getUserCredential().getApplicationId(),
-					null,
-					authenticationService.getUserCredential().getUserId()
-				)
-			);
-			//adding widget details into db while adding new dashboard.
-			widgetService.addWidgetDetails(dashboard.getDashboardId(), dashboard.getPortletList());
-		} catch (Exception exception) {
+		try {			
+			final Dashboard dashboard = (Dashboard) event.getData();		
+			//updating dashboard sequence into dashboard_details
+			List<Component> comp = navBar.getChildren();
+			dashboard.setSequence(comp.size());
+			
+			// Make entry of new dashboard details into DB
+			
+				dashboard.setDashboardId(
+					dashboardService.addDashboardDetails(
+						dashboard,
+						authenticationService.getUserCredential().getApplicationId(),
+						null,
+						authenticationService.getUserCredential().getUserId()
+					)
+				);
+				//adding widget details into db while adding new dashboard.
+				widgetService.addWidgetDetails(dashboard.getDashboardId(), dashboard.getPortletList());			
+			
+			dashboard.setPersisted(false);
+			final Navitem navitem = constructNavItem(dashboard);
+			navBar.appendChild(navitem);
+			
+			// Redirect to the recently added page
+			Events.sendEvent(new Event("onClick", navitem));
+			navitem.setSelected(true);
+		} catch (DataAccessException exception) {
 			Clients.showNotification("Adding new Dashboard failed. Please try again", true);
 			LOG.error("Exception while adding new dashboard to DB", exception);
 			return;
 		}
-		
-		dashboard.setPersisted(false);
-		final Navitem navitem = constructNavItem(dashboard);
-		navBar.appendChild(navitem);
-		
-		// Redirect to the recently added page
-		Events.sendEvent(new Event("onClick", navitem));
-		navitem.setSelected(true);
+		catch (Exception exception) {
+			Clients.showNotification("Adding new Dashboard failed. Please try again", true);
+			LOG.error("Exception while adding new dashboard to DB", exception);
+			return;
+		}
 	}
 	
 	/**
@@ -319,7 +326,8 @@ public class SidebarController extends GenericForwardComposer<Component>{
 		}
 	};			
 		
-	private void updateDashboardSequence() throws Exception {
+	private void updateDashboardSequence() throws Exception{
+		try{
 		List<Integer> dashboardList = new ArrayList<Integer>();
 		for(Component component : navBar.getChildren()){
 			Navitem navItem = (Navitem) component;
@@ -328,10 +336,15 @@ public class SidebarController extends GenericForwardComposer<Component>{
 			}
 		}
 		dashboardService.updateSidebarDetails(dashboardList);
+		}catch(DataAccessException ex){
+			Clients.showNotification("Unable to update order of the Dashboards", true);
+			LOG.error("Exception while updating sequence of Dashboards in updateDashboardSequence()", ex);
+			return;
+		}
 	}
 
 	
-	private List<Dashboard> getApiViewDashboardList(final String userId,final String applicationId)throws Exception {
+	private List<Dashboard> getApiViewDashboardList(final String userId,final String applicationId)throws DataAccessException {
 		String[] DashboardIdArray = ((String[])Executions.getCurrent().getParameterValues(Constants.DB_DASHBOARD_ID));
 		List<String> dashboardIdList =Arrays.asList(DashboardIdArray);
 
@@ -339,7 +352,7 @@ public class SidebarController extends GenericForwardComposer<Component>{
 		if(LOG.isDebugEnabled()){
 			LOG.debug("Requested Dashboard Id : "+dashboardIdList);
 		}
-		List<Dashboard> sideBarPageList =new ArrayList<Dashboard>(dashboardService.retrieveDashboardMenuPages(applicationId,userId,dashboardIdList,null));	
+		List<Dashboard> sideBarPageList =dashboardService.retrieveDashboardMenuPages(applicationId,userId,dashboardIdList,null);	
 		if(LOG.isDebugEnabled()){
 			LOG.debug("sideBarPageList: "+sideBarPageList);
 		}

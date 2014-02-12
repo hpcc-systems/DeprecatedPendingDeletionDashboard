@@ -1,10 +1,10 @@
 package org.hpccsystems.dashboard.services.impl; 
 
-import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
-import java.util.List; 
+import java.util.List;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.dao.DashboardDao;
@@ -34,7 +34,7 @@ public class DashboardServiceImpl implements DashboardService {
 	 * @return List<SidebarPage>
 	 */
 
-	public List<Dashboard> retrieveDashboardMenuPages(final String applicationId,String userId,List<String> dashboardIdList, String sourceId)throws Exception {
+	public List<Dashboard> retrieveDashboardMenuPages(final String applicationId,String userId,List<String> dashboardIdList, String sourceId)throws DataAccessException {
 		
 		if (LOG.isDebugEnabled()) {
 			LOG.debug("Handling 'retrieveDashboardMenuPages' in DashboardServiceImpl");
@@ -80,7 +80,7 @@ public class DashboardServiceImpl implements DashboardService {
 	
 	public int addDashboardDetails(final Dashboard dashboard,
 			final String applicationId, final String sourceId, final String userId)
-			throws Exception {
+			throws DataAccessException {
 		try
 		{
 		return dashboardDao.addDashboardDetails(dashboard,applicationId, sourceId,userId);
@@ -96,7 +96,7 @@ public class DashboardServiceImpl implements DashboardService {
 	 * service to delete a dashboard
 	 *
 	 */
-	public int deleteDashboard(Integer dashboardId, String userId) throws Exception{
+	public int deleteDashboard(Integer dashboardId, String userId) throws DataAccessException{
 		try {
 			return dashboardDao.deleteDashboard(dashboardId,userId);
 		} catch (DataAccessException e) {
@@ -105,7 +105,7 @@ public class DashboardServiceImpl implements DashboardService {
 		}		
 	}	
 	
-	public void updateSidebarDetails(List<Integer> dashboardIdList)throws Exception{
+	public void updateSidebarDetails(List<Integer> dashboardIdList)throws DataAccessException{
 		try{
 			dashboardDao.updateSidebarDetails(dashboardIdList);
 		}catch(DataAccessException e) {
@@ -116,7 +116,7 @@ public class DashboardServiceImpl implements DashboardService {
 	}
 	
 	@Override
-	public void updateDashboard(Dashboard dashboard) throws Exception {
+	public void updateDashboard(Dashboard dashboard) throws DataAccessException {
 		try {
 			dashboardDao.updateDashboard(dashboard);
 		} catch (DataAccessException e) {

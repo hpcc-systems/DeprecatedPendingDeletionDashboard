@@ -10,6 +10,7 @@ import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.entity.chart.utils.TableRenderer;
 import org.hpccsystems.dashboard.services.AuthenticationService;
 import org.hpccsystems.dashboard.services.WidgetService;
+import org.springframework.dao.DataAccessException;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Components;
 import org.zkoss.zk.ui.Executions;
@@ -247,6 +248,7 @@ public class ChartPanel extends Panel {
 	//Reset button listener
 	EventListener<Event> resetListener = new EventListener<Event>() { 
         public void onEvent(final Event event)throws Exception {
+        	try{
         	portlet.setWidgetState(Constants.STATE_EMPTY);
         	portlet.setChartDataJSON(null);
         	portlet.setChartDataXML(null);
@@ -265,14 +267,17 @@ public class ChartPanel extends Panel {
     		//Clears all chart data from DB
     		WidgetService widgetService =(WidgetService) SpringUtil.getBean("widgetService");
     		widgetService.updateWidget(portlet);
-    		
+        	}catch(DataAccessException ex){
+        		LOG.error("Exception in resetListener()", ex);
+        	}
         } 
 	};
 	
 	//Delete panel listener
 	EventListener<Event> deleteListener = new EventListener<Event>() {
 
-		public void onEvent(final Event event) throws Exception {			
+		public void onEvent(final Event event)throws Exception  {
+			try{
 			portlet.setWidgetState(Constants.STATE_DELETE);
 			WidgetService widgetService = (WidgetService) SpringUtil.getBean("widgetService");
 			widgetService.deleteWidget(portlet.getId());
@@ -286,6 +291,9 @@ public class ChartPanel extends Panel {
 					window = (Window) component;
 					Events.sendEvent(new Event("onPortalClose", window, portlet));
 				}
+			}
+			}catch(DataAccessException ex){
+				LOG.error("Exception while deleting widget", ex);
 			}
 		} 
 	};
@@ -314,7 +322,7 @@ public class ChartPanel extends Panel {
 			try{
 			WidgetService widgetService =(WidgetService) SpringUtil.getBean("widgetService");
     		widgetService.updateWidgetTitle(portlet);
-			}catch(Exception ex){
+			}catch(DataAccessException ex){
 				LOG.error("Exception while updating chart title", ex);
 			}
 		}

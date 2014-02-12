@@ -22,6 +22,7 @@ import org.hpccsystems.dashboard.services.DashboardService;
 import org.hpccsystems.dashboard.services.HPCCService;
 import org.hpccsystems.dashboard.services.WidgetService;
 import org.hpccsystems.dashboard.util.DashboardUtil;
+import org.springframework.dao.DataAccessException;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
@@ -137,6 +138,7 @@ public class EditChartController extends SelectorComposer<Component> {
 		}
 		
 		if(!authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_CONFIG_CHART)){
+			try{
 			// When live chart is present in ChartPanel
 			if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())){
 				for (String colName : chartData.getXColumnNames()) {
@@ -161,12 +163,12 @@ public class EditChartController extends SelectorComposer<Component> {
 				
 			} 		
 	
-			try	{
-				columnSchemaMap = hpccService.getColumnSchema(chartData.getFileName(), chartData.getHpccConnection());
-			} catch(Exception e) {
+			columnSchemaMap = hpccService.getColumnSchema(chartData.getFileName(), chartData.getHpccConnection());
+			}catch(Exception e) {
 				Clients.showNotification("Unable to fetch columns from HPCC", "error", comp, "middle_center", 3000, true);
 				LOG.error(Constants.ERROR_RETRIEVE_COLUMNS, e);
-			}
+				return;
+			}			
 		}
 
 		Listitem listItem;
@@ -199,7 +201,7 @@ public class EditChartController extends SelectorComposer<Component> {
 		if(!Constants.NUMERIC_DATA.equals(draggedListitem.getAttribute(Constants.COLUMN_DATA_TYPE))){
 			Clients.showNotification("You can only drop Measures here", "error", YAxisListBox, "end_center", 3000, true);
 			return;
-		} 
+		}
 		if(chartData.getYColumnNames().contains(draggedListitem.getLabel()) || 
 				chartData.getXColumnNames().contains(draggedListitem.getLabel())) {
 			Clients.showNotification("A column can only be used once while plotting the graph", "error", YAxisListBox, "end_center", 3000, true);
@@ -222,21 +224,15 @@ public class EditChartController extends SelectorComposer<Component> {
 	/**
 	 * Method to process with X/Y column data add/clearance function
 	 */
-	private void constructChart() {		
+	private void constructChart() {	
+		try{
 		//Disabling filter and chart clearance function in Api chart config/edit flow without chart
 		if( !authenticationService.getUserCredential().getApplicationId().equals(Constants.CIRCUIT_APPLICATION_ID)||
 				authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_CHART) || 
 					authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD)){				
-			try {
 				chartRenderer.constructChartJSON(chartData, portlet, true);
 				chartRenderer.drawChart(chartData,	Constants.EDIT_WINDOW_CHART_DIV, portlet);
-			} catch (Exception ex) {
-				Clients.showNotification(
-						"Unable to fetch column data from Hpcc", "error",
-						this.getSelf(), "middle_center", 3000, true);
-				LOG.error("Exception while fetching column data from Hpcc",ex);
-				return;
-			}			
+					
 			
 			if(!chartData.getIsFiltered()){
 				filterListBox.setDroppable("true");
@@ -246,7 +242,14 @@ public class EditChartController extends SelectorComposer<Component> {
 		if(!authenticationService.getUserCredential().getApplicationId().equals(Constants.CIRCUIT_APPLICATION_ID) || 
 				authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD)){
 			doneButton.setDisabled(false);				
-		}		
+		}	
+		}catch (Exception ex) {
+			Clients.showNotification(
+					"Unable to fetch column data from Hpcc", "error",
+					this.getSelf(), "middle_center", 3000, true);
+			LOG.error("Exception while fetching column data from Hpcc",ex);
+			return;
+		}	
 
 	}
 
@@ -265,8 +268,8 @@ public class EditChartController extends SelectorComposer<Component> {
 				YAxisListBox.setDroppable("false");
 			} else {
 				YAxisListBox.setDroppable("true");
-			}
 		}
+	}
 		
 		//Attributes
 		//Only one attribute for all charts
@@ -276,6 +279,7 @@ public class EditChartController extends SelectorComposer<Component> {
 			XAxisListBox.setDroppable("true");
 		}
 	}
+	
 	
 	private void createYListChild(String axisName) {
 		final Listitem yAxisItem = new Listitem();
@@ -313,7 +317,7 @@ public class EditChartController extends SelectorComposer<Component> {
 					yAxisDropped = false;
 					Clients.evalJavaScript("clearChart('" + Constants.EDIT_WINDOW_CHART_DIV +  "')");
 				} else {
-					constructChart();
+						constructChart();
 				}
 				
 			}
@@ -550,7 +554,8 @@ public class EditChartController extends SelectorComposer<Component> {
 	 * Listener to Save API chart setting data with out chart XML data
 	 */
 	EventListener<Event> saveApiChartSettings = new EventListener<Event>() {
-		public void onEvent(Event event) throws Exception {
+		public void onEvent(Event event){
+			try{
 			portlet.setChartDataXML(chartRenderer.convertToXML(chartData));
 			dashboard.getPortletList().add(portlet);
 			dashboard.setDashboardId(
@@ -564,6 +569,11 @@ public class EditChartController extends SelectorComposer<Component> {
 			Messagebox.show("The Chart Settings data are Saved.Your window will be closed","",1,Messagebox.ON_OK);			
 			authenticationService.logout(null);	
 			editWindowLayout.detach();
+			}catch(DataAccessException ex){
+				LOG.error("Exception addding widget into DB in saveApiChartSettings()", ex);
+			}catch(Exception ex){
+				LOG.error("Exception addding widget into DB in saveApiChartSettings()", ex);
+			}
 		}
 	};
 	
@@ -588,35 +598,37 @@ public class EditChartController extends SelectorComposer<Component> {
 		List<String> dashboardIdList =new ArrayList<String>();
 		dashboardIdList.add(dashboardId);
 		List<Dashboard> sideBarPageList = null;
-		try{
-			sideBarPageList =new ArrayList<Dashboard>(dashboardService.retrieveDashboardMenuPages(
-					authenticationService.getUserCredential().getApplicationId(), 
-					authenticationService.getUserCredential().getUserId(), 
-					dashboardIdList,
-					null));	
-		} catch (Exception ex) {
+		try {
+			sideBarPageList = new ArrayList<Dashboard>(
+					dashboardService.retrieveDashboardMenuPages(
+							authenticationService.getUserCredential()
+									.getApplicationId(), authenticationService
+									.getUserCredential().getUserId(),
+							dashboardIdList, null));
+			if (LOG.isDebugEnabled()) {
+				LOG.debug("sideBarPageList in configurePortlet(): "
+						+ sideBarPageList);
+			}
+			if (sideBarPageList != null && sideBarPageList.size() > 0) {
+				dashboard = sideBarPageList.get(0);
+			} else {
+				Clients.showNotification("Invalid Dashboard ID.Please input a valid Dashboard ID",true);
+				return;
+			}
+			
+			configurePortlet();
+			 
+			apiConfigSaveButton.addEventListener(Events.ON_CLICK, saveApiChartConfigData);
+		}catch (DataAccessException ex) {
 			Clients.showNotification("Unable to fetch Dashboard from DB.Input valid Dashboard ID",true);
 			LOG.error("Exception while fetching column data from Hpcc", ex);
 			return;
-		}
-		if(LOG.isDebugEnabled()){
-			LOG.debug("sideBarPageList in configurePortlet(): "+sideBarPageList);
-		}
-		if(sideBarPageList != null && sideBarPageList.size() > 0){
-			dashboard = sideBarPageList.get(0);
-		}else
-		{
-			Clients.showNotification("Invalid Dashboard ID.Please input a valid Dashboard ID",true);
-			return;
-		}
-		try{
-			configurePortlet();		
-		}catch(Exception ex){
-			Clients.showNotification("Unable to Configure Portlet in configureDashboardPortlet()", true);
+		}catch (Exception ex) {
+			Clients.showNotification(
+					"Unable to Configure Portlet in configureDashboardPortlet()",true);
 			LOG.error("Exception in configureDashboardPortlet() ", ex);
 			return;
 		}
-		apiConfigSaveButton.addEventListener(Events.ON_CLICK, saveApiChartConfigData);
 	}
 
 	/**
@@ -625,7 +637,7 @@ public class EditChartController extends SelectorComposer<Component> {
 	private void configurePortlet() throws Exception{
 		try	{
 			dashboard.setPortletList((ArrayList<Portlet>) widgetService.retriveWidgetDetails(dashboard.getDashboardId()));
-			} catch(Exception ex) {
+			} catch(DataAccessException ex) {
 				Clients.showNotification(
 						"Unable to retrieve Widget details from DB for the Dashboard", true);
 				LOG.error("Exception while fetching widget details from DB", ex);
@@ -675,7 +687,7 @@ public class EditChartController extends SelectorComposer<Component> {
 				widgetService.updateWidget(portlet);
 				
 				Messagebox.show("Your Chart details are Saved. This tab will now be closed","",1,Messagebox.ON_OK);				
-			} catch(Exception ex) {
+			}catch(DataAccessException ex) {
 				Clients.showNotification("Unable to update Chart details into DB", true);
 	        	LOG.error("Exception saveApiChartConfigData Listener in DashboardController", ex);
 			}finally{

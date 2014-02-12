@@ -1,7 +1,8 @@
 package org.hpccsystems.dashboard.services;
-import java.sql.Date;
-import java.util.List; 
+import java.util.List;
+
 import org.hpccsystems.dashboard.entity.Dashboard;
+import org.springframework.dao.DataAccessException;
 
 /**
  * DashboardService is used to interact with Database for Dashboard project.
@@ -18,7 +19,7 @@ public interface DashboardService {
 	 * @return
 	 * @throws Exception
 	 */
-	int addDashboardDetails(Dashboard dashboard,String applicationId, String sourceId,String userId) throws Exception ;
+	int addDashboardDetails(Dashboard dashboard,String applicationId, String sourceId,String userId) throws DataAccessException ;
 	
 	/**
 	 * @param applicationId
@@ -33,20 +34,20 @@ public interface DashboardService {
 	 *  A list of dahboard based on the paramenters specified
 	 * @throws Exception
 	 */
-	List<Dashboard> retrieveDashboardMenuPages(String applicationId,String userId,List<String> dashboardIdList, String sourceId)throws Exception;	
+	List<Dashboard> retrieveDashboardMenuPages(String applicationId,String userId,List<String> dashboardIdList, String sourceId)throws DataAccessException;	
 	
 	/**
 	 * @param dashboardId
 	 * @param deleteStatus
 	 */
-	int deleteDashboard(Integer dashboardId,String userId)throws Exception;	
+	int deleteDashboard(Integer dashboardId,String userId)throws DataAccessException;	
 	
 	/**
 	 * updateSidebarDetails() is responsible for update the sidebar details into dashboard_details table.
 	 * @param dashboardIdList
 	 * @throws Exception
 	 */
-	void updateSidebarDetails(List<Integer> dashboardIdList)throws Exception;
+	void updateSidebarDetails(List<Integer> dashboardIdList)throws DataAccessException;
 	
 
 	/**
@@ -54,6 +55,6 @@ public interface DashboardService {
 	 * @param dashboard
 	 * @throws Exception
 	 */
-	void updateDashboard(Dashboard dashboard)throws Exception;
+	void updateDashboard(Dashboard dashboard)throws DataAccessException;
 	
 }

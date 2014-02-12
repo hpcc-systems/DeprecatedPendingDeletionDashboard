@@ -23,6 +23,7 @@ import org.hpccsystems.dashboard.services.DashboardService;
 import org.hpccsystems.dashboard.services.WidgetService;
 import org.hpccsystems.dashboard.util.DashboardUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -76,20 +77,19 @@ public void deleteDashboard(HttpServletRequest request, HttpServletResponse resp
 				jsObj.put(Constants.STATUS, Constants.STATUS_FAIL);
 				jsObj.put(Constants.STATUS_MESSAGE, Constants.DASHBOARD_NOT_EXIST);
 			}
-		}
-	catch(Exception ex)
+		
+			response.setContentType(Constants.RES_TEXT_TYPE_JSON);
+			response.setCharacterEncoding(Constants.CHAR_CODE);
+			response.getWriter().write(jsObj.toJSONString());
+	}catch(DataAccessException ex)
 	{
 		LOG.error("Exception while processing 'Delete Dashboard' request from Circuit",ex);
 		jsObj.put(Constants.STATUS, Constants.STATUS_FAIL);
 		jsObj.put(Constants.STATUS_MESSAGE, ex.getMessage());
 	}
-	response.setContentType(Constants.RES_TEXT_TYPE_JSON);
-	response.setCharacterEncoding(Constants.CHAR_CODE);
-	try	{
-		response.getWriter().write(jsObj.toJSONString());
-	} catch(Exception ex) {
-		LOG.error("Exception while writing JSON response to Circuit",ex);
-		throw new Exception("Your request is processed sucessfully. Error occured while returning the response");
+	catch(Exception ex) {
+		LOG.error("Exception while processing 'Delete Dashboard' request from Circui",ex);
+		throw new Exception("Unable to process your 'Delete Dashboard' request.Please try again");
 	}
 	
 }
@@ -131,23 +131,18 @@ public void getChartList(HttpServletRequest request, HttpServletResponse respons
 @RequestMapping(value = Constants.CIRCUIT_SEARCH_REQ , method = RequestMethod.GET)
 public void searchDashboard(HttpServletRequest request, HttpServletResponse response)throws Exception
  {
+	JSONObject jsonResposeObj = new JSONObject();
 		try {
 			List<Dashboard> dashboardList = null;
 			Dashboard dashBoard = null;
-			JSONObject jsonObject = null;
-			JSONObject jsonResposeObj = new JSONObject();
+			JSONObject jsonObject = null;			
 			JSONArray jsonArray = new JSONArray();
-			try{
-				dashboardList = dashboardService.retrieveDashboardMenuPages(
+			dashboardList = dashboardService.retrieveDashboardMenuPages(
 						request.getParameter(Constants.SOURCE),
 						null,
 						null,
 						request.getParameter(Constants.SOURCE_ID)
 						);
-			}catch(Exception ex){
-				LOG.error("Exception while fetching dahhboards from DB",ex);
-				jsonResposeObj.put(Constants.STATUS_FAIL,ex.getMessage());
-			}
 			if (dashboardList != null) {
 				for (final Iterator<Dashboard> iter = dashboardList.iterator(); iter.hasNext();) {
 					dashBoard = (Dashboard) iter.next();
@@ -165,7 +160,11 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
 			}			
 			response.setContentType(Constants.RES_TEXT_TYPE_JSON);
 			response.getWriter().write(jsonResposeObj.toString());
-		} catch (Exception e) {
+		}catch(DataAccessException ex){
+			LOG.error("Exception while fetching dahhboards from DB",ex);
+			jsonResposeObj.put(Constants.STATUS_FAIL,ex.getMessage());
+		}
+		catch (Exception e) {
 			LOG.error("Exception while processing Search dahhboard request from Circuit", e);
 			throw new Exception("Unable to process Search Request");
 		}
@@ -179,6 +178,7 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
  */
 @RequestMapping(value = Constants.CIRCUIT_VALIDATE_REQ, method = RequestMethod.GET)
 	public void validateDashboard(HttpServletRequest request, HttpServletResponse response) throws Exception {
+	JsonObject jsonObject = new JsonObject();
 		try {
 			ChartRenderer chartRenderer = new ChartRenderer();
 			XYChartData chartData = null;
@@ -186,20 +186,14 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
 			List<String> yColumnList = null;
 			String filterColumn = null;
 			Integer filterDataType = 0;
-			ChartConfiguration chartConfiguration = null;
-			JsonObject jsonObject = new JsonObject();
+			ChartConfiguration chartConfiguration = null;			
 			List<String> failedValColumnList = new ArrayList<String>();
 			String circuitFields = request.getParameter(Constants.CIRCUIT_CONFIG);
 			String dashboard_id = request.getParameter(Constants.CIRCUIT_DASHBOARD_ID);
 			chartConfiguration = new GsonBuilder().create().fromJson(circuitFields, ChartConfiguration.class);
 			List<Portlet> portletList = new ArrayList<Portlet>();
-			try {
-				portletList = widgetService.retriveWidgetDetails(Integer.valueOf(dashboard_id));
-			} catch (Exception ex) {
-				LOG.error("Exception while fetching Widgets from DB", ex);
-				jsonObject.addProperty(Constants.STATUS, Constants.STATUS_FAIL);
-				jsonObject.addProperty(Constants.STATUS_MESSAGE, ex.getMessage());
-			}
+			portletList = widgetService.retriveWidgetDetails(Integer.valueOf(dashboard_id));
+			
 			if (portletList != null && portletList.size() > 0) {
 				for (Portlet portlet : portletList) {
 					chartData = chartRenderer.parseXML(portlet.getChartDataXML());
@@ -241,7 +235,11 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
 			response.setContentType(Constants.RES_TEXT_TYPE_JSON);
 			response.setCharacterEncoding(Constants.CHAR_CODE);
 			response.getWriter().write(jsonObject.toString());
-		} catch (Exception e) {
+		} catch (DataAccessException ex) {
+				LOG.error("Exception while fetching Widgets from DB", ex);
+				jsonObject.addProperty(Constants.STATUS, Constants.STATUS_FAIL);
+				jsonObject.addProperty(Constants.STATUS_MESSAGE, ex.getMessage());
+		}catch (Exception e) {
 			LOG.error(
 					"Exception while processing Validate dashboard request from Circuit", e);
 			throw new Exception("Unable to process Validate Request");

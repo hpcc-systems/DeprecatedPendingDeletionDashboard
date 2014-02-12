@@ -30,7 +30,7 @@ public interface WidgetDao {
 	 * @param sequence
 	 * @throws Exception
 	 */
-	void addWidget(Integer dashboardId, Portlet portlet, Integer sequence)throws Exception;	
+	void addWidget(Integer dashboardId, Portlet portlet, Integer sequence)throws DataAccessException;	
 	
 	/**
 	 * @param dashboardId

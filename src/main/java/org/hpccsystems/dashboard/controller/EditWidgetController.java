@@ -10,6 +10,7 @@ import org.hpccsystems.dashboard.entity.chart.utils.ChartRenderer;
 import org.hpccsystems.dashboard.entity.chart.utils.TableRenderer;
 import org.hpccsystems.dashboard.services.HPCCService;
 import org.hpccsystems.dashboard.services.WidgetService;
+import org.springframework.dao.DataAccessException;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
@@ -115,6 +116,7 @@ public class EditWidgetController extends SelectorComposer<Component> {
 	 */
 	@Listen("onClick=#doneButton")
 	public void closeEditWindow(final MouseEvent event) {
+		try{
 		Div div = chartPanel.removeStaticImage();
 		portlet.setWidgetState(Constants.STATE_LIVE_CHART);
 		
@@ -133,15 +135,9 @@ public class EditWidgetController extends SelectorComposer<Component> {
 		} else {
 		//For Chart Widgets
 			final String divToDraw = div.getId(); 
-			try	{
 				//isEdit Window is set to false as we are constructing the JSON to be drawn in the Widget itself
 				chartRenderer.constructChartJSON(chartData, portlet, false); 
-				chartRenderer.drawChart(chartData, divToDraw, portlet);
-			} catch(Exception ex) {
-				Clients.showNotification("Unable to fetch column data from HPCC", "error", this.getSelf(), "middle_center", 3000, true);
-				LOG.error("Exception while fetching column data from Hpcc", ex);
-				return;
-			}
+				chartRenderer.drawChart(chartData, divToDraw, portlet);		 
 			
 			if (LOG.isDebugEnabled()) {
 				LOG.debug("Drawn chart in portlet..");
@@ -152,10 +148,13 @@ public class EditWidgetController extends SelectorComposer<Component> {
 			editPortletWindow.detach();
 		}
 		//update Live chart data into DB
-		try{
 		widgetService.updateWidget(portlet);
-		}catch(Exception e){
+		}catch(DataAccessException e){
 			LOG.error("Exception in closeEditWindow() while updating Live chart data into DB", e);
+		}catch(Exception ex) {
+			Clients.showNotification("Unable to fetch column data from HPCC to draw chart", "error", this.getSelf(), "middle_center", 3000, true);
+			LOG.error("Exception in closeEditWindow()", ex);
+			return;
 		}
 	}
 }

@@ -19,6 +19,7 @@ import org.hpccsystems.dashboard.services.AuthenticationService;
 import org.hpccsystems.dashboard.services.DashboardService;
 import org.hpccsystems.dashboard.services.HPCCService;
 import org.hpccsystems.dashboard.services.WidgetService;
+import org.springframework.dao.DataAccessException;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Sessions;
@@ -150,7 +151,7 @@ public class DashboardController extends SelectorComposer<Component>{
 
 			try	{
 				dashboard.setPortletList((ArrayList<Portlet>) widgetService.retriveWidgetDetails(dashboardId));
-			} catch(Exception ex) {
+			} catch(DataAccessException ex) {
 				Clients.showNotification(
 						"Unable to retrieve Widget details from DB for the Dashboard",
 						"error", comp, "middle_center", 3000, true);
@@ -214,6 +215,8 @@ public class DashboardController extends SelectorComposer<Component>{
 	
 	@Listen("onClick = #addWidget")
 	public void addWidget() {
+		ChartPanel chartPanel=null;
+		try{
 		final Portlet portlet = new Portlet();
 		
 		portlet.setWidgetState(Constants.STATE_EMPTY);
@@ -233,17 +236,20 @@ public class DashboardController extends SelectorComposer<Component>{
 			count ++;
 		}
 		portlet.setColumn(column);
-		ChartPanel chartPanel = new ChartPanel(portlet);
+		chartPanel = new ChartPanel(portlet);
 		portalChildren.get(portlet.getColumn()).appendChild(chartPanel);
 		chartPanel.focus();
 		
 		manipulatePortletObjects(Constants.ReorderPotletPanels);
 		
-		try {
-			widgetService.addWidget(dashboardId, portlet, dashboard.getPortletList().indexOf(portlet));
-			//Updating new widget sequence to DB
-			widgetService.updateWidgetSequence(dashboard);
-		} catch (Exception e) {
+		widgetService.addWidget(dashboardId, portlet, dashboard.getPortletList().indexOf(portlet));
+		//Updating new widget sequence to DB
+		widgetService.updateWidgetSequence(dashboard);
+		}catch (DataAccessException e) {
+			LOG.error("Error while adding new Widget", e);
+			Clients.showNotification("This widget may not have been saved", "error", chartPanel, "middle_center", 5000, true);
+		}
+		catch (Exception e) {
 			LOG.error("Error while adding new Widget", e);
 			Clients.showNotification("This widget may not have been saved", "error", chartPanel, "middle_center", 5000, true);
 		}
@@ -356,14 +362,17 @@ public class DashboardController extends SelectorComposer<Component>{
 			
 			manipulatePortletObjects(Constants.ReorderPotletPanels);
 			manipulatePortletObjects(Constants.ResizePotletPanels);
-			
+			try{
 			//updating Dashboard details
 			dashboard.setUpdatedDate(new Date(new java.util.Date().getTime()));
 			dashboardService.updateDashboard(dashboard);
 			
 			//updating Widget sequence
 			widgetService.updateWidgetSequence(dashboard);
-		}
+			}catch(DataAccessException ex){
+				LOG.error("Exception while configuring Dashboard in onLayoutChange()", ex);
+			}
+			}		
 		
 	};
 
@@ -388,9 +397,13 @@ public class DashboardController extends SelectorComposer<Component>{
 			if(LOG.isDebugEnabled()) {
 				LOG.debug("Now the portlet size is -> " + DashboardController.this.dashboard.getPortletList().size());
 			}
-			
+			try{
 			//Updating new widget sequence to DB
 			widgetService.updateWidgetSequence(dashboard);
+			}catch(DataAccessException e){
+				LOG.error("Exception in onPanelClose()", e);
+			}
+			
 		}
 	};	
 	
@@ -411,6 +424,7 @@ public class DashboardController extends SelectorComposer<Component>{
 			widgetService.updateWidgetSequence(dashboard);
 		} catch (Exception e) {
 			Clients.showNotification("Error occured while updating widget details", "error", this.getSelf(), "middle_center", 3000, true);
+			LOG.error("Exception in onPanelMove()", e);
 		}
 	}
 	
@@ -439,10 +453,10 @@ public class DashboardController extends SelectorComposer<Component>{
 	 */
 	@Listen("onClick = #deleteDashboard")
 	public void deleteDashboard() {
-		
+		try{
 		 // ask confirmation before deleting dashboard
 		 EventListener<ClickEvent> clickListener = new EventListener<Messagebox.ClickEvent>() {
-			 public void onEvent(ClickEvent event) throws Exception {
+			 public void onEvent(ClickEvent event) {
 	             
 				 if(Messagebox.Button.YES.equals(event.getButton())) {
 	            	final Navbar navBar  = (Navbar) Selectors.iterable(DashboardController.this.getSelf().getPage(), "navbar").iterator().next();
@@ -493,6 +507,14 @@ public class DashboardController extends SelectorComposer<Component>{
 	       
        Messagebox.show(Constants.DELETE_DASHBOARD, Constants.DELETE_DASHBOARD_TITLE, new Messagebox.Button[]{
                Messagebox.Button.YES, Messagebox.Button.NO }, Messagebox.QUESTION, clickListener);
-   
+		}catch(DataAccessException ex){
+			Clients.showNotification("Unable to delete the Dashboard.", "error", this.getSelf(), "middle_center", 3000, true);
+			LOG.error("Exception while deleting Dashboard in DashboardController", ex);
+			return;
+		}catch(Exception ex){
+			Clients.showNotification("Unable to delete the Dashboard.", "error", this.getSelf(), "middle_center", 3000, true);
+			LOG.error("Exception while deleting Dashboard in DashboardController", ex);
+			return;			
+		}
   }
 }
