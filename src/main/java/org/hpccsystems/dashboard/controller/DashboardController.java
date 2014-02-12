@@ -38,11 +38,11 @@ import org.zkoss.zkmax.zul.Navbar;
 import org.zkoss.zkmax.zul.Navitem;
 import org.zkoss.zkmax.zul.Portalchildren;
 import org.zkoss.zkmax.zul.Portallayout;
-import org.zkoss.zul.Button;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Messagebox.ClickEvent;
+import org.zkoss.zul.Toolbar;
 import org.zkoss.zul.Window;
 
 /**
@@ -67,12 +67,8 @@ public class DashboardController extends SelectorComposer<Component>{
     @Wire
     Window dashboardWin;
     
-    @Wire 
-    Button deleteDashboard;
     @Wire
-    Button configureDashboard;
-    @Wire
-    Button addWidget;    
+    Toolbar dashboardToolbar;
     
     @Wire("portallayout")
 	Portallayout portalLayout;
@@ -199,6 +195,10 @@ public class DashboardController extends SelectorComposer<Component>{
 						Clients.evalJavaScript(panel.drawD3Graph());
 					}
 				}
+			}
+			
+			if(! authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD)){
+				dashboardToolbar.setVisible(true);
 			}
 			
 		} else {
@@ -470,27 +470,28 @@ public class DashboardController extends SelectorComposer<Component>{
 	           				.iterator().next();
 	           		List<Integer> dashboardIdList = new ArrayList<Integer>();
 	           		
-	           		if(navBar.getChildren().size() > 0) {
-	           			if(LOG.isDebugEnabled()){
-	           				LOG.debug("Setting first visible Nav item as active");
+	           		if(LOG.isDebugEnabled()){
+	           			LOG.debug("Setting first visible Nav item as active");
+	           		}
+	           		
+	           		Navitem navitem;
+	           		Boolean isSelected = false;
+	           		for (Component component : navBar.getChildren()) {
+	           			navitem = (Navitem) component;
+	           			if(navitem.isVisible()){
+	           				//Adding visible items to list
+	           				dashboardIdList.add((Integer) navitem.getAttribute(Constants.DASHBOARD_ID));
+	           				
+	           				//Selecting first visible Item
+	           				if(!isSelected){
+	           					navitem.setSelected(true);
+	           					Events.sendEvent(Events.ON_CLICK, navitem, null);
+	           					isSelected = !isSelected;
+	           				}
 	           			}
-	           			Navitem navitem;
-	           			Boolean isSelected = false;
-	           			for (Component component : navBar.getChildren()) {
-							navitem = (Navitem) component;
-							if(navitem.isVisible()){
-								//Adding visible items to list
-								dashboardIdList.add((Integer) navitem.getAttribute(Constants.DASHBOARD_ID));
-								
-								//Selecting first visible Item
-								if(!isSelected){
-									navitem.setSelected(true);
-									Events.sendEvent(Events.ON_CLICK, navitem, null);
-									isSelected = !isSelected;
-								}
-							}
-						}
-	           		} else {
+	           		}
+	           		
+	           		if( !isSelected ) {
 	           			Sessions.getCurrent().setAttribute(Constants.ACTIVE_DASHBOARD_ID, null);
 	           			//Detaching the include and Including the page again to trigger reload
 	           			final Component component2 = include.getParent();
