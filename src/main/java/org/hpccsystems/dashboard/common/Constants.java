@@ -100,10 +100,10 @@ public class Constants {
 	public static final Map<Integer, ChartDetails> CHART_MAP = new HashMap<Integer, ChartDetails>(){
 		private static final long serialVersionUID = 1L;
 		{
-			put(BAR_CHART, new ChartDetails(BAR_CHART, "chart/Barchart_black.jpg" ,"Bar Chart", "BarChartDescription"));
-			put(LINE_CHART, new ChartDetails(LINE_CHART, "chart/Linechart_black.jpg" ,"Line Chart", "LineChartDescription"));
-			put(PIE_CHART, new ChartDetails(PIE_CHART, "chart/PieChart_black.jpg" ,"Pie Chart", "PieDescription"));
-			put(TABLE_WIDGET, new ChartDetails(TABLE_WIDGET, "chart/table_black.png" ,"Table Widget", "TableWidgetDescription"));
+			put(BAR_CHART, new ChartDetails(BAR_CHART, "chart/Barchart_black.jpg" ,"Bar Chart", "BarChartDescription", 0));
+			put(LINE_CHART, new ChartDetails(LINE_CHART, "chart/Linechart_black.jpg" ,"Line Chart", "LineChartDescription", 0));
+			put(PIE_CHART, new ChartDetails(PIE_CHART, "chart/PieChart_black.jpg" ,"Pie Chart", "PieDescription", 1));
+			put(TABLE_WIDGET, new ChartDetails(TABLE_WIDGET, "chart/table_black.png" ,"Table Widget", "TableWidgetDescription", 0));
 		}
 		
 	};

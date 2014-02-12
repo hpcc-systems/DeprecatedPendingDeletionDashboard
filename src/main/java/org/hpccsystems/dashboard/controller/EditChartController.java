@@ -252,20 +252,14 @@ public class EditChartController extends SelectorComposer<Component> {
 
 
 	/**
-	 * Disables Drops in Y axis list box based on conditions
-	 *  2 Columns for Line & Bar chart
-	 *  1 Column for other type of charts
+	 * Disables Drops in Y axis list box based on conditions from application constants
 	 */
 	private void validateYAxisDrops() {
-		//disabling drops based on chart type
-		// 2 Columns for Bar/Line chart - 1 for others
-		if(Constants.BAR_CHART.equals(portlet.getChartType()) || Constants.LINE_CHART.equals(portlet.getChartType())) {
-			if(chartData.getYColumnNames().size() > 1) {
-				YAxisListBox.setDroppable("false");
-			}
-		} else {
-			if(chartData.getYColumnNames().size() > 0) {
-				YAxisListBox.setDroppable("false");
+		// 0 - is for unlimited drops. So limiting drops only when not equals to 0
+		if( ! (Constants.CHART_MAP.get(portlet.getChartType()).getMaxYColumns() == 0)) {
+			if(chartData.getYColumnNames().size() > 
+				Constants.CHART_MAP.get(portlet.getChartType()).getMaxYColumns() ) {
+					YAxisListBox.setDroppable("false");
 			}
 		}
 	}
