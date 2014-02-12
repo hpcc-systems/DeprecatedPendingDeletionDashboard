@@ -149,20 +149,16 @@ public class EditChartController extends SelectorComposer<Component> {
 				yAxisDropped = true;
 				filterListBox.setDroppable("true");
 				XAxisListBox.setDroppable("false");
-				validateYAxisDrops();
-	
-				try	{
-					chartRenderer.constructChartJSON(chartData, portlet, true);
-					chartRenderer.drawChart(chartData,Constants.EDIT_WINDOW_CHART_DIV, portlet);
-				} catch(Exception ex) {
-					Clients.showNotification("Unable to fetch column data from Hpcc", "error", comp, "middle_center", 3000, true);
-					LOG.error("Exception while fetching column data from Hpcc", ex);
-				}
 				
+				validateDroppable();
+	
 				if(chartData.getIsFiltered()) {
 					createFilterListItem(chartData.getFilter().getColumn());
 					filterListBox.setDroppable("false");
 				}
+				
+				constructChart();
+				
 			} 		
 	
 			try	{
@@ -203,7 +199,8 @@ public class EditChartController extends SelectorComposer<Component> {
 		if(!Constants.NUMERIC_DATA.equals(draggedListitem.getAttribute(Constants.COLUMN_DATA_TYPE))){
 			Clients.showNotification("You can only drop Measures here", "error", YAxisListBox, "end_center", 3000, true);
 			return;
-		} else if(chartData.getYColumnNames().contains(draggedListitem.getLabel()) || 
+		} 
+		if(chartData.getYColumnNames().contains(draggedListitem.getLabel()) || 
 				chartData.getXColumnNames().contains(draggedListitem.getLabel())) {
 			Clients.showNotification("A column can only be used once while plotting the graph", "error", YAxisListBox, "end_center", 3000, true);
 			return;
@@ -216,16 +213,16 @@ public class EditChartController extends SelectorComposer<Component> {
 		chartData.getYColumnNames().add(draggedListitem.getLabel());
 		
 		if (xAxisDropped) {
-			constructChartData();	
+			constructChart();	
 		}
 		
-		validateYAxisDrops();
+		validateDroppable();
 	}
 	
 	/**
 	 * Method to process with X/Y column data add/clearance function
 	 */
-	private void constructChartData() {		
+	private void constructChart() {		
 		//Disabling filter and chart clearance function in Api chart config/edit flow without chart
 		if( !authenticationService.getUserCredential().getApplicationId().equals(Constants.CIRCUIT_APPLICATION_ID)||
 				authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_CHART) || 
@@ -238,8 +235,12 @@ public class EditChartController extends SelectorComposer<Component> {
 						"Unable to fetch column data from Hpcc", "error",
 						this.getSelf(), "middle_center", 3000, true);
 				LOG.error("Exception while fetching column data from Hpcc",ex);
+				return;
 			}			
-			filterListBox.setDroppable("true");
+			
+			if(!chartData.getIsFiltered()){
+				filterListBox.setDroppable("true");
+			}
 		}
 		//Disabling done button in API Chart Config flow with & without chart
 		if(!authenticationService.getUserCredential().getApplicationId().equals(Constants.CIRCUIT_APPLICATION_ID) || 
@@ -252,15 +253,27 @@ public class EditChartController extends SelectorComposer<Component> {
 
 
 	/**
-	 * Disables Drops in Y axis list box based on conditions from application constants
+	 * Enables/Disables Drops in Y & X axis list boxes 
+	 * based on conditions from application constants
 	 */
-	private void validateYAxisDrops() {
+	private void validateDroppable() {
+		//Measures
 		// 0 - is for unlimited drops. So limiting drops only when not equals to 0
 		if( ! (Constants.CHART_MAP.get(portlet.getChartType()).getMaxYColumns() == 0)) {
 			if(chartData.getYColumnNames().size() > 
 				Constants.CHART_MAP.get(portlet.getChartType()).getMaxYColumns() ) {
-					YAxisListBox.setDroppable("false");
+				YAxisListBox.setDroppable("false");
+			} else {
+				YAxisListBox.setDroppable("true");
 			}
+		}
+		
+		//Attributes
+		//Only one attribute for all charts
+		if(chartData.getXColumnNames().size() > 1){
+			XAxisListBox.setDroppable("false");
+		} else {
+			XAxisListBox.setDroppable("true");
 		}
 	}
 	
@@ -287,7 +300,6 @@ public class EditChartController extends SelectorComposer<Component> {
 			Listitem yAxisItem = (Listitem) listcell.getParent();
 			String axisName =listcell.getLabel();
 			yAxisItem.detach();
-			yAxisDropped = false;
 			chartData.getYColumnNames().remove(axisName);
 			
 			//Disabling filter and chart clearance function in Api chart config/edit flow without chart
@@ -298,37 +310,14 @@ public class EditChartController extends SelectorComposer<Component> {
 				
 				// Only clear the existing chart when no columns are present otherwise recreate the chart
 				if(chartData.getYColumnNames().size() < 1) {
+					yAxisDropped = false;
 					Clients.evalJavaScript("clearChart('" + Constants.EDIT_WINDOW_CHART_DIV +  "')");
 				} else {
-					try {
-						chartRenderer.constructChartJSON(chartData, portlet, true);
-						chartRenderer.drawChart(chartData,	Constants.EDIT_WINDOW_CHART_DIV, portlet);
-						return;
-					} catch (Exception ex) {
-						Clients.showNotification(
-								"Unable to fetch column data from Hpcc", "error",
-								EditChartController.this.getSelf(), "middle_center", 3000, true);
-						LOG.error("Exception while fetching column data from Hpcc",ex);
-					}			
+					constructChart();
 				}
 				
 			}
-			//Disabling done button in API Chart Config flow
-			if(!authenticationService.getUserCredential().getApplicationId().equals(Constants.CIRCUIT_APPLICATION_ID) || 
-					authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD)){
-				doneButton.setDisabled(false);				
-			}	
-			//Enabling drops based on chart type
-			// 2 Columns for Bar/Line chart - 1 for others
-			if(Constants.BAR_CHART.equals(portlet.getChartType()) || Constants.LINE_CHART.equals(portlet.getChartType())) {
-				if(chartData.getYColumnNames().size() < 2) {
-					YAxisListBox.setDroppable("true");
-				}
-			} else {
-				if(chartData.getYColumnNames().size() < 1) {
-					YAxisListBox.setDroppable("true");
-				}
-			}
+			validateDroppable();
 		}
 	};
 	
@@ -344,13 +333,14 @@ public class EditChartController extends SelectorComposer<Component> {
 				.getDragged();
 
 		//Validations
-		if(!Constants.STRING_DATA.equals(draggedListitem.getAttribute(Constants.COLUMN_DATA_TYPE))){
-			Clients.showNotification("You have dropped a Measure. It will only be treated as descrete values", "warning", XAxisListBox, "end_center", 5000, true);
-		} else if(chartData.getYColumnNames().contains(draggedListitem.getLabel()) || 
+		if(chartData.getYColumnNames().contains(draggedListitem.getLabel()) || 
 				chartData.getXColumnNames().contains(draggedListitem.getLabel())) {
 			Clients.showNotification("A column can only be used once while plotting the graph", "error", XAxisListBox, "end_center", 3000, true);
 			return;
 		}
+		if(!Constants.STRING_DATA.equals(draggedListitem.getAttribute(Constants.COLUMN_DATA_TYPE))){
+			Clients.showNotification("You have dropped a Measure. It will only be treated as descrete values", "warning", XAxisListBox, "end_center", 5000, true);
+		} 
 		
 		createXListChild(draggedListitem.getLabel());
 					
@@ -359,13 +349,9 @@ public class EditChartController extends SelectorComposer<Component> {
 		chartData.getXColumnNames().add(draggedListitem.getLabel());
 		
 		if(yAxisDropped){
-			constructChartData();
+			constructChart();
 		}
-		
-		//disabling drops if Atleast one column is dropped
-		if(chartData.getXColumnNames().size() > 0) {
-			XAxisListBox.setDroppable("false");
-		}
+		validateDroppable();
 	}		
 	
 	private void createXListChild(String axisName) {
@@ -415,9 +401,7 @@ public class EditChartController extends SelectorComposer<Component> {
 				LOG.debug("Removed item from x Axis box, XColumnNames size  - " + chartData.getXColumnNames().size());
 				LOG.debug("List - " + chartData.getXColumnNames());
 			}
-			if(chartData.getXColumnNames().size() < 1) {
-				XAxisListBox.setDroppable("true");
-			}
+			validateDroppable();
 		}
 	};
 	
@@ -484,7 +468,6 @@ public class EditChartController extends SelectorComposer<Component> {
 		
 		filterList.appendChild(labelCell);
 		filterList.setParent(filterListBox);
-		
 		//Enabling drops to filter list box
 		filterListBox.setDroppable("true");
 	}
