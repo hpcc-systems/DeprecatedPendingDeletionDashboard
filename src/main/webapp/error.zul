@@ -10,7 +10,8 @@
     </vbox>
     
     <zscript>
-    org.zkoss.util.logging.Log.lookup("Fatal").error(
-          requestScope.get("javax.servlet.error.exception"));
+    org.apache.commons.logging.LogFactory.getLog("Pop-up Error").error( 
+			"Error Code: " + requestScope.get("javax.servlet.error.status_code") 
+			+ "\n Message :"  + requestScope.get("javax.servlet.error.message"),  ((java.lang.Exception) requestScope.get("javax.servlet.error.exception")));
     </zscript>
 </window>

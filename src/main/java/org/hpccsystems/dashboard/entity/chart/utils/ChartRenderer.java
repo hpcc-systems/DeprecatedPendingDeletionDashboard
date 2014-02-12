@@ -60,7 +60,7 @@ public class ChartRenderer {
 	 * @return
 	 *  Generates JSON into passed Portlet object	
 	 */
-	public void constructChartJSON(XYChartData chartData, Portlet portlet, Boolean isEditWindow)throws Exception {
+	public void constructChartJSON(XYChartData chartData, Portlet portlet, Boolean isEditWindow) throws Exception {
 
 		final JsonArray array = new JsonArray();
 		
@@ -110,28 +110,91 @@ public class ChartRenderer {
 			title.append(" AND " + chartData.getFilter().getEndValue());
 		}
 		
-				if(LOG.isDebugEnabled()){
+		if(LOG.isDebugEnabled()){
 			LOG.debug("Drawing chart");
 			LOG.debug("Chart Type - " + portlet.getChartType());
 		}	
 		
+		Iterator<XYModel> iterator =null;	
+		try	{
 			ArrayList<XYModel> list = null;
-			Iterator<XYModel> iterator =null;	
-			try
-			{
 			list =(ArrayList<XYModel>) getHpccService().getChartData(chartData);
 			iterator = list.iterator();	
-			}catch(Exception e)
-			{
-				throw e;
-			}
+		}catch(Exception e)	{
+			LOG.error("Error while retriving data", e);
+			throw e;
+		}
+		
+		if(portlet.getChartType().equals(Constants.PIE_CHART)){
 			Integer yLength = 0;
 			Integer xLength = 0;
 			String xVal=null;BigDecimal yVal=null;
 			JsonObject json = null;
 			
-			JsonArray xValues = new JsonArray();
+			if(iterator != null){
+				while(iterator.hasNext()){
+					final XYModel bar = iterator.next();
+					
+					json = new JsonObject();
+					json.addProperty("xData",(String) bar.getxAxisVal());
+					
+					JsonObject yNames = new JsonObject();
+					for (String colName : chartData.getYColumnNames()) {
+						if(Constants.BAR_CHART.equals(portlet.getChartType())){
+							yNames.addProperty(colName, "bar");
+						} else if(Constants.LINE_CHART.equals(portlet.getChartType())){
+							yNames.addProperty(colName, "line");
+						}
+					}
+					header.add("yNames", yNames);
+					
+					//TODO - make this logic dynamic
+					if(Constants.BAR_CHART.equals(portlet.getChartType())){
+						json.addProperty(chartData.getYColumnNames().get(0), (BigDecimal)bar.getyAxisValues().get(0));
+						if(bar.getyAxisValues().size() > 1) {
+							json.addProperty(chartData.getYColumnNames().get(1), (BigDecimal)bar.getyAxisValues().get(1));
+							header.addProperty("secondLine", true);
+						} else {
+							header.addProperty("secondLine", false);
+						}
+					} else {
+						json.addProperty("yData", (BigDecimal)bar.getyAxisValues().get(0));
+						if(bar.getyAxisValues().size() > 1) {
+							json.addProperty("yData2", (BigDecimal)bar.getyAxisValues().get(1));
+							header.addProperty("secondLine", true);
+						} else {
+							header.addProperty("secondLine", false);
+						}
+					}
+					
+					array.add(json);
+	
+					//Finding word count in x Axis Labels
+					xVal=(String) bar.getxAxisVal();
+					yVal=(BigDecimal)bar.getyAxisValues().get(0);
+					if(xVal.split(" ").length > xLength){
+						xLength = xVal.split(" ").length;
+					}	
+					//Finding digit count in y axis values
+					if(String.valueOf(yVal.intValue()).length() > yLength){
+						yLength = String.valueOf(yVal.intValue()).length();
+					}
+				}
+			}
+				
+			//Adding a default pading of 5 and 10px per digit
+			header.addProperty("yWidth", (yLength<2)? yLength*10 + 30:(yLength<3)? yLength*10 + 10: yLength*10);
+			header.addProperty("xWidth", xLength*15 + 5);
+			header.addProperty("title", title.toString());
 			
+			header.add("chartData", array);
+			
+			final String data = header.toString();
+			
+			portlet.setChartDataJSON(data);
+		} else {
+			JsonObject json = null;
+			JsonArray xValues = new JsonArray();
 			JsonArray rows = new JsonArray();
 			JsonArray row = new JsonArray();
 			
@@ -141,65 +204,32 @@ public class ChartRenderer {
 			rows.add(row);
 			
 			if(iterator != null){
-			while(iterator.hasNext()){
-				final XYModel bar = iterator.next();
-				row = new JsonArray();
-				for (Object object: bar.getyAxisValues()) {
-					row.add(new JsonPrimitive((BigDecimal)object));
-				}
-				
-				rows.add(row);
-				xValues.add(new JsonPrimitive(bar.getxAxisVal().toString()));
-				
-				json = new JsonObject();
-				json.addProperty("xData",(String) bar.getxAxisVal());
-				
-				JsonObject yNames = new JsonObject();
-				for (String colName : chartData.getYColumnNames()) {
-					if(Constants.BAR_CHART.equals(portlet.getChartType())){
-						yNames.addProperty(colName, "bar");
-					} else if(Constants.LINE_CHART.equals(portlet.getChartType())){
-						yNames.addProperty(colName, "line");
+				while(iterator.hasNext()){
+					final XYModel bar = iterator.next();
+					row = new JsonArray();
+					for (Object object: bar.getyAxisValues()) {
+						row.add(new JsonPrimitive((BigDecimal)object));
 					}
-				}
-				header.add("yNames", yNames);
-				
-				//TODO - make this logic dynamic
-				if(Constants.BAR_CHART.equals(portlet.getChartType())){
-					json.addProperty(chartData.getYColumnNames().get(0), (BigDecimal)bar.getyAxisValues().get(0));
-					if(bar.getyAxisValues().size() > 1) {
-						json.addProperty(chartData.getYColumnNames().get(1), (BigDecimal)bar.getyAxisValues().get(1));
-						header.addProperty("secondLine", true);
-					} else {
-						header.addProperty("secondLine", false);
+					
+					rows.add(row);
+					xValues.add(new JsonPrimitive(bar.getxAxisVal().toString()));
+					
+					json = new JsonObject();
+					
+					JsonObject yNames = new JsonObject();
+					for (String colName : chartData.getYColumnNames()) {
+						if(Constants.BAR_CHART.equals(portlet.getChartType())){
+							yNames.addProperty(colName, "bar");
+						} else if(Constants.LINE_CHART.equals(portlet.getChartType())){
+							yNames.addProperty(colName, "line");
+						}
 					}
-				} else {
-					json.addProperty("yData", (BigDecimal)bar.getyAxisValues().get(0));
-					if(bar.getyAxisValues().size() > 1) {
-						json.addProperty("yData2", (BigDecimal)bar.getyAxisValues().get(1));
-						header.addProperty("secondLine", true);
-					} else {
-						header.addProperty("secondLine", false);
-					}
+					header.add("yNames", yNames);
+					
+					array.add(json);
 				}
+			}
 				
-				array.add(json);
-
-				//Finding word count in x Axis Labels
-				xVal=(String) bar.getxAxisVal();
-				yVal=(BigDecimal)bar.getyAxisValues().get(0);
-				if(xVal.split(" ").length > xLength){
-					xLength = xVal.split(" ").length;
-				}	
-				//Finding digit count in y axis values
-				if(String.valueOf(yVal.intValue()).length() > yLength){
-					yLength = String.valueOf(yVal.intValue()).length();
-				}
-			}	}
-				
-			//Adding a default pading of 5 and 10px per digit
-			header.addProperty("yWidth", (yLength<2)? yLength*10 + 30:(yLength<3)? yLength*10 + 10: yLength*10);
-			header.addProperty("xWidth", xLength*15 + 5);
 			header.addProperty("title", title.toString());
 			
 			header.add("chartData", array);
@@ -209,7 +239,7 @@ public class ChartRenderer {
 			final String data = header.toString();
 			
 			portlet.setChartDataJSON(data);
-					
+		}
 	}
 	
 	
