@@ -131,9 +131,9 @@ public class EditWidgetController extends SelectorComposer<Component> {
 							)
 						);
 			editPortletWindow.detach();
-			return;
+		
 		} else {
-		//For Chart Widgets
+			//For Chart Widgets
 			final String divToDraw = div.getId(); 
 				//isEdit Window is set to false as we are constructing the JSON to be drawn in the Widget itself
 				chartRenderer.constructChartJSON(chartData, portlet, false); 
@@ -147,6 +147,7 @@ public class EditWidgetController extends SelectorComposer<Component> {
 			portlet.setChartDataXML(chartRenderer.convertToXML(chartData));
 			editPortletWindow.detach();
 		}
+		
 		//update Live chart data into DB
 		widgetService.updateWidget(portlet);
 		}catch(DataAccessException e){
