@@ -180,7 +180,6 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
 	public void validateDashboard(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	JsonObject jsonObject = new JsonObject();
 		try {
-			ChartRenderer chartRenderer = new ChartRenderer();
 			XYChartData chartData = null;
 			List<String> xColumnList = null;
 			List<String> yColumnList = null;
@@ -191,10 +190,10 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
 			String circuitFields = request.getParameter(Constants.CIRCUIT_CONFIG);
 			String dashboard_id = request.getParameter(Constants.CIRCUIT_DASHBOARD_ID);
 			chartConfiguration = new GsonBuilder().create().fromJson(circuitFields, ChartConfiguration.class);
-			List<Portlet> portletList = new ArrayList<Portlet>();
-			portletList = widgetService.retriveWidgetDetails(Integer.valueOf(dashboard_id));
+			List<Portlet> portletList = widgetService.retriveWidgetDetails(Integer.valueOf(dashboard_id));
 			
 			if (portletList != null && portletList.size() > 0) {
+				ChartRenderer chartRenderer = new ChartRenderer();
 				for (Portlet portlet : portletList) {
 					chartData = chartRenderer.parseXML(portlet.getChartDataXML());
 					if (chartData != null) {

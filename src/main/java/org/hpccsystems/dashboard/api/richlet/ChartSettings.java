@@ -59,7 +59,6 @@ public class ChartSettings extends GenericRichlet{
 				LOG.debug("URL formed to view API chart config screen -->"+url.toString());
 				LOG.debug("Creating API edit portlet screen...");
 			}
-			System.out.println(url.toString());
 			Executions.sendRedirect(url.toString());		
 	}
 

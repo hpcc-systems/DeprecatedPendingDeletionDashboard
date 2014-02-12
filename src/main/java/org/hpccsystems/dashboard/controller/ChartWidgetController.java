@@ -52,7 +52,6 @@ public class ChartWidgetController extends GenericForwardComposer<Component> {
 		lineChartButton.setAttribute(Constants.CHART_TYPE, Constants.LINE_CHART);
 		pieChartButton.setAttribute(Constants.CHART_TYPE, Constants.PIE_CHART);
 		tableWidget.setAttribute(Constants.CHART_TYPE, Constants.TABLE_WIDGET);
-		Sessions.getCurrent().setAttribute("TABLE_WIDGET", Constants.CHART_TYPE);
 		final Portlet portlet = (Portlet) Executions.getCurrent().getArg()
 				.get(Constants.PORTLET);
 		if(LOG.isDebugEnabled()){
