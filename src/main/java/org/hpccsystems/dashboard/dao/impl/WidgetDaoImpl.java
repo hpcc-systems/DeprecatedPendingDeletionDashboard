@@ -3,8 +3,12 @@ package org.hpccsystems.dashboard.dao.impl;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.List;
+
 import javax.sql.DataSource;
+
 import org.apache.commons.lang.Validate;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.common.Queries;
 import org.hpccsystems.dashboard.dao.WidgetDao;
@@ -22,6 +26,7 @@ import org.springframework.jdbc.core.PreparedStatementSetter;
  * 
  */ 
 public class WidgetDaoImpl implements WidgetDao{
+	private static final  Log LOG = LogFactory.getLog(WidgetDaoImpl.class);
 	
 	private JdbcTemplate jdbcTemplate;
 	private DataSource dataSource;
@@ -115,8 +120,11 @@ public class WidgetDaoImpl implements WidgetDao{
 	}
 	@Override
 	public void updateWidget(Portlet portlet) throws DataAccessException {
+		if(LOG.isDebugEnabled()){
+			LOG.debug("Updating portlet to DB " + portlet.toString());
+		}
 		
-		if(portlet.getChartDataXML() != null && portlet.getChartDataXML().length() > 0){
+		if(portlet.getWidgetState().equals(Constants.STATE_LIVE_CHART)){
 			//Updates Live chart data with state as 'Live'
 			String updateQuery = Queries.UPADET_LIVE_CHART_DATA;
 			getJdbcTemplate().update(updateQuery, new Object[] { 
