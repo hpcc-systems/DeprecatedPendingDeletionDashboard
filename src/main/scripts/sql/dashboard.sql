@@ -30,29 +30,28 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `dashboard_details`;
 
 create table dashboard_details (
-DASHBOARD_ID  INT(30) NOT NULL auto_increment,  
-DASHBOARD_NAME  VARCHAR(40) ,
-USER_ID INT(20) ,
-DASHBOARD_STATE  CHAR(1),
-COLUMN_COUNT TINYINT(7),
-SEQUENCE INT(40) ,
-SOURCE_ID VARCHAR(50),
-APPLICATION_ID VARCHAR(50),
-UPDATED_DATE DATE,
-PRIMARY KEY(DASHBOARD_ID)
+dashboard_id  INT(30) NOT NULL auto_increment,  
+dashboard_name  VARCHAR(40) ,
+user_id INT(20) ,
+column_count TINYINT(7),
+sequence INT(40) ,
+source_id VARCHAR(50),
+application_id VARCHAR(50),
+updated_date DATE,
+PRIMARY KEY(dashboard_id)
 ) ENGINE=InnoDB;
 
 DROP TABLE IF EXISTS `WIDGET_DETAILS`;
 
 create table WIDGET_DETAILS (
-WIDGET_ID  INT(40) NOT NULL auto_increment,  
-DASHBOARD_ID  INT(30) ,
-WIDGET_NAME VARCHAR(30) ,
-WIDGET_STATE CHAR(1) ,
-CHART_TYPE TINYINT(7) ,
-COLUMN_IDENTIFIER TINYINT(7) ,
-WIDGET_SEQUENCE TINYINT(7) ,
-CHART_DATA TEXT ,
-PRIMARY KEY(WIDGET_ID),
-FOREIGN KEY(DASHBOARD_ID) REFERENCES dashboard_details(DASHBOARD_ID)
+widget_id  INT(40) NOT NULL auto_increment,  
+dashboard_id  INT(30) ,
+widget_name VARCHAR(30) ,
+widget_state CHAR(1) ,
+chart_type TINYINT(7) ,
+column_identifier TINYINT(7) ,
+widget_sequence TINYINT(7) ,
+chart_data TEXT ,
+PRIMARY KEY(widget_id),
+FOREIGN KEY(dashboard_id) REFERENCES dashboard_details(dashboard_id)
 ) ENGINE=InnoDB;

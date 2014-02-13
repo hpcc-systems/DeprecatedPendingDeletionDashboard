@@ -39,7 +39,7 @@ public class AuthenticationDaoImpl implements AuthenticationDao{
 	//TODO:  Return UserCredential Instead of User
 	public User authendicateUser(String userName, String password) throws SQLException {
 		User user =null;			
-		String sql=Queries.GET_USER_DETAILs;
+		String sql=Queries.GET_USER_DETAILS;
 		
 		try
 		{

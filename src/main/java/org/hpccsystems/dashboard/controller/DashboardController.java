@@ -400,8 +400,10 @@ public class DashboardController extends SelectorComposer<Component>{
 				LOG.debug("Now the portlet size is -> " + DashboardController.this.dashboard.getPortletList().size());
 			}
 			try{
-			//Updating new widget sequence to DB
-			widgetService.updateWidgetSequence(dashboard);
+				if(dashboard.getPortletList().size() > 0){
+					//Updating new widget sequence to DB
+					widgetService.updateWidgetSequence(dashboard);
+				}
 			}catch(DataAccessException e){
 				LOG.error("Exception in onPanelClose()", e);
 			}
