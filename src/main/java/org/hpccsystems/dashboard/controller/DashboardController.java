@@ -99,14 +99,15 @@ public class DashboardController extends SelectorComposer<Component>{
 	public void doAfterCompose(final Component comp) throws Exception {
 		super.doAfterCompose(comp);
 		
+		if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_CHART)) {
+			dashboardId =Integer.valueOf(Executions.getCurrent().getParameter(Constants.DASHBOARD_ID));
+		}else{
 		dashboardId =(Integer) Executions.getCurrent().getAttribute(Constants.ACTIVE_DASHBOARD_ID);
 		//For the first Dashboard, getting Id from Session
 		if(dashboardId == null ){
-			dashboardId = (Integer) Sessions.getCurrent().getAttribute(Constants.ACTIVE_DASHBOARD_ID);
+			dashboardId = (Integer) Sessions.getCurrent().getAttribute(Constants.ACTIVE_DASHBOARD_ID);}
 		}
-		if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_CHART)) {
-			dashboardId =Integer.valueOf(Executions.getCurrent().getParameter(Constants.DASHBOARD_ID));
-		}
+		
 		if(LOG.isDebugEnabled()) {
 			LOG.debug("Dashboard ID - " + dashboardId);
 		}

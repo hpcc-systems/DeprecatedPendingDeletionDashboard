@@ -1,13 +1,4 @@
 <zk>
-<style src="css/bootstrap/css/bootstrap.min.css"/>
-<style src="css/flat.css"></style>
-
-<style src="css/dashboard.css"></style>
-<style src="css/c3.css"></style>
-
-<script  defer="true" src="js/barchart.js"></script>
-<script  defer="true" src="js/piechart.js"></script>
-
 	<!-- create only when the currentUser is not an anonymous  -->
 	<borderlayout if="${not (sessionScope.userCredential.hasRole('viewChart') or sessionScope.userCredential.hasRole('configureChart')) 
 							and (
@@ -34,4 +25,4 @@
 	<div if="${sessionScope.userCredential.anonymous}">
 		Redirect to login page.....
 	</div>
-</zk>
+</zk> 
