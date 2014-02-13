@@ -103,7 +103,7 @@ public class DashboardDaoImpl implements DashboardDao {
 				userId
 		});
 		}else{
-			rowsdeleted = getJdbcTemplate().update(Queries.CIRCUIT_DELETE_DASHBOARD, new Object[] { 
+			rowsdeleted = getJdbcTemplate().update(Queries.API_DELETE_DASHBOARD, new Object[] { 
 					dashboardId
 					
 		});
@@ -139,15 +139,6 @@ public class DashboardDaoImpl implements DashboardDao {
 					dashboard.getDashboardId()
 			});
 			
-		}else if(Constants.STATE_EMPTY.equals(dashboard.getDashboardState())){
-			//updates dashboard Sate as Empty
-			getJdbcTemplate().update(Queries.UPDATE_DASHBOARD_STATE, new Object[] { 
-					dashboard.getName(),
-					dashboard.getDashboardState(),
-					dashboard.getColumnCount(),
-					dashboard.getUpdatedDate(),				
-					dashboard.getDashboardId()
-			});
 		}
 		
 		
