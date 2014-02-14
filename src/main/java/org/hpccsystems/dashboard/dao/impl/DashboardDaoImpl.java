@@ -53,7 +53,7 @@ public class DashboardDaoImpl implements DashboardDao {
 		if(userId == null && dashboardIdList == null  && sourceId != null){
 			sqlBuffer.append(" and SOURCE_ID = '")
 			.append(sourceId)
-			.append("' order by last_updated_date desc");
+			.append("' order by updated_date desc");
 		}
 		else if (userId != null && dashboardIdList == null) {
 			sqlBuffer.append(" and user_id='").append(userId)
