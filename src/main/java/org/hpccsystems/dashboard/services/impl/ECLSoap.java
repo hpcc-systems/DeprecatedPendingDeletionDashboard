@@ -22,15 +22,13 @@ import sun.misc.BASE64Encoder;
         
 public class ECLSoap {
 	
-	private static final long serialVersionUID = 1L;	
 	private static final  Log LOG = LogFactory.getLog(ECLSoap.class); 
 	boolean isLogonFail = false;
     private String hostname = "";
     private String user = "";
     private String pass = "";
-	private int port;
 	private String tempDir;
-    
+    private boolean isSSL;
 
     public String getTempDir(String tempDir) {
 		return tempDir;
@@ -64,14 +62,6 @@ public class ECLSoap {
         this.hostname = hostname;
     }
 
-    public int getPort() {
-        return port;
-    }
-
-    public void setPort(int port) {
-        this.port = port;
-    }
-	
     //Static block to get rid of HandShake error
 	static {
 	        HttpsURLConnection.setDefaultHostnameVerifier(new HostnameVerifier()  {
@@ -110,8 +100,16 @@ public class ECLSoap {
 				ECLAuthenticator eclauth = new ECLAuthenticator(user, pass);
 
 				Authenticator.setDefault(eclauth);
-				String host = "https://" + hostname + ":" + port + path;
+				String host;
+				
+				if(isSSL) {
+					host = "https://" + hostname + ":" + 18010 + path;
+				} else {
+					host = "http://" + hostname + ":" + 8010+ path;
+				}
+				
 				URL url = new URL(host);
+				
 				if(LOG.isDebugEnabled())
 				{
 					LOG.debug("HOST: " + host);
@@ -192,7 +190,16 @@ public class ECLSoap {
      * 
      * Handles the http authentication for the soap request
      */
-    static class ECLAuthenticator extends Authenticator {
+    public boolean isSSL() {
+		return isSSL;
+	}
+
+	public void setSSL(boolean isSSL) {
+		this.isSSL = isSSL;
+	}
+
+
+	static class ECLAuthenticator extends Authenticator {
         public String user;
         public String pass;
         String hostname = getRequestingHost();        
