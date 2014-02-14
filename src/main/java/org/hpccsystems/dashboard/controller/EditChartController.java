@@ -1,7 +1,9 @@
 package org.hpccsystems.dashboard.controller;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -525,7 +527,7 @@ public class EditChartController extends SelectorComposer<Component> {
 		dashboard.setSourceId(sourceId);
 		dashboard.setColumnCount(1);
 		dashboard.setName(configuration.getDashboardTitle());
-		dashboard.setUpdatedDate(new Date(new java.util.Date().getTime()));
+		dashboard.setLastupdatedDate(new Timestamp(Calendar.getInstance().getTime().getTime()));
 		//creating portlet
 		Portlet portlet = new Portlet();
 		portlet.setWidgetState(Constants.STATE_LIVE_CHART);
@@ -675,7 +677,7 @@ public class EditChartController extends SelectorComposer<Component> {
 		public void onEvent(Event event) throws Exception {
 			portlet.setChartDataXML(chartRenderer.convertToXML(chartData));
 			final List<Dashboard> dashBoardIdList = new ArrayList<Dashboard>();
-			dashboard.setUpdatedDate(new Date(new java.util.Date().getTime()));
+			dashboard.setLastupdatedDate(new Timestamp(Calendar.getInstance().getTime().getTime()));
 			dashboard.setPersisted(true);
 			dashBoardIdList.add(dashboard);
 			try	{

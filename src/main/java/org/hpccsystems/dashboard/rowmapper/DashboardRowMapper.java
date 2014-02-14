@@ -14,7 +14,7 @@ public class DashboardRowMapper implements RowMapper<Dashboard> {
 		 dashboard.setName(rs.getString("DASHBOARD_NAME"));
 		 dashboard.setDashboardId(rs.getInt("DASHBOARD_ID"));
 		 dashboard.setColumnCount(rs.getInt("COLUMN_COUNT"));
-		 dashboard.setUpdatedDate(rs.getDate("UPDATED_DATE"));
+		 dashboard.setLastupdatedDate(rs.getTimestamp("LAST_UPDATED_DATE"));
 		return dashboard;
 	}
 
