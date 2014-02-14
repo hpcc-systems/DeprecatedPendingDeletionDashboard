@@ -224,7 +224,12 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
 						}
 						index++;
 					}
-					jsonObject.addProperty(Constants.STATUS_MESSAGE, failedStr.append(Constants.FIELD_NOT_EXIST).toString());
+					if(failedValColumnList.size() == 1){
+						failedStr.append(Constants.FIELD_NOT_EXIST);
+					}else if(failedValColumnList.size() > 1){
+						failedStr.append(Constants.FIELDS_NOT_EXIST);
+					}
+					jsonObject.addProperty(Constants.STATUS_MESSAGE, failedStr.toString());
 				}
 
 			} else {
