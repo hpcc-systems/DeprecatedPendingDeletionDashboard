@@ -538,12 +538,8 @@ public class HPCCServiceImpl implements HPCCService{
 		soap.setHostname(hpccConnection.getHostIp());
 		soap.setUser(hpccConnection.getUsername());
 		soap.setPass(hpccConnection.getPassword());
+		soap.setSSL(hpccConnection.getIsSSL());
 		
-		if(hpccConnection.getIsSSL()) {
-			soap.setPort(18010);
-		} else {
-			soap.setPort(8010);
-		}
 		
 		soap.setUser(hpccConnection.getUsername());
 		soap.setPass(hpccConnection.getPassword());		
