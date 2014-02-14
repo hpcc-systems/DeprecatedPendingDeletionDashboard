@@ -37,7 +37,7 @@ column_count TINYINT(7),
 sequence INT(40) ,
 source_id VARCHAR(100),
 application_id VARCHAR(50),
-updated_date TIMESTAMP,
+last_updated_date TIMESTAMP,
 PRIMARY KEY(dashboard_id)
 ) ENGINE=InnoDB;
 

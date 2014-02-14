@@ -133,7 +133,7 @@ public class Constants {
 	public static final String CIRCUIT_CONFIG = "config";
 	public static final String CIRCUIT_DASHBOARD_ID = "dashboard_id";
 	public static final String FIELD_NOT_EXIST = " is missing";
-	public static final String UPDATED_DATE = "updatedDate";
+	public static final String LAST_UPDATED_DATE = "lastUpdatedDate";
 	public static final String CHART_TITLE = "Chart Title";
 	public static final String DASHBOARD_NOT_EXISTS = "The Provided Dashboard doesn't exists";
 	

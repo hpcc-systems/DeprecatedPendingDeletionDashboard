@@ -684,7 +684,7 @@ public class EditChartController extends SelectorComposer<Component> {
 			dashboard.setPersisted(true);
 			dashBoardIdList.add(dashboard);
 			try	{
-				//update Dashboard updated_date value
+				//update Dashboard last_updated_date value
 				dashboardService.updateDashboard(dashboard);
 				
 				//update widget Chart Xml data & chart Type

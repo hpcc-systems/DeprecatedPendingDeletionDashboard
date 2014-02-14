@@ -149,7 +149,7 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
 					jsonObject = new JSONObject();
 					jsonObject.put(Constants.NAME_SMALL, dashBoard.getName());
 					jsonObject.put(Constants.DB_DASHBOARD_ID, dashBoard.getDashboardId());
-					jsonObject.put(Constants.UPDATED_DATE, dashBoard.getLastupdatedDate());
+					jsonObject.put(Constants.LAST_UPDATED_DATE, dashBoard.getLastupdatedDate());
 					jsonArray.add(jsonObject);
 				}
 				if(jsonArray.size() > 0){
