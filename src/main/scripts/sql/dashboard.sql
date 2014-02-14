@@ -31,22 +31,22 @@ DROP TABLE IF EXISTS `dashboard_details`;
 
 create table dashboard_details (
 dashboard_id  INT(30) NOT NULL auto_increment,  
-dashboard_name  VARCHAR(40) ,
+dashboard_name  VARCHAR(200) ,
 user_id INT(20) ,
 column_count TINYINT(7),
 sequence INT(40) ,
-source_id VARCHAR(50),
+source_id VARCHAR(100),
 application_id VARCHAR(50),
 updated_date DATE,
 PRIMARY KEY(dashboard_id)
 ) ENGINE=InnoDB;
 
-DROP TABLE IF EXISTS `WIDGET_DETAILS`;
+DROP TABLE IF EXISTS `widget_details`;
 
-create table WIDGET_DETAILS (
+create table widget_details (
 widget_id  INT(40) NOT NULL auto_increment,  
 dashboard_id  INT(30) ,
-widget_name VARCHAR(30) ,
+widget_name VARCHAR(200) ,
 widget_state CHAR(1) ,
 chart_type TINYINT(7) ,
 column_identifier TINYINT(7) ,
