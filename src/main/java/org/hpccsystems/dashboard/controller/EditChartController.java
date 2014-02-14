@@ -113,6 +113,8 @@ public class EditChartController extends SelectorComposer<Component> {
 	Vlayout editWindowLayout;
 	@Wire
 	Button apiConfigSaveButton;
+	@Wire
+	Button	apiConfigCancelButton;
 	
 	List<String> parameterList = new ArrayList<String>();
 	final Map<String, Object> parameters = new HashMap<String, Object>();

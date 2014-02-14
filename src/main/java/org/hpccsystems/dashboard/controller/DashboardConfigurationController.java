@@ -1,6 +1,7 @@
 package org.hpccsystems.dashboard.controller;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import org.apache.commons.logging.Log;
@@ -73,7 +74,7 @@ public class DashboardConfigurationController extends SelectorComposer<Component
 			Dashboard dashboard = new Dashboard();
 			dashboard.setName(nameTextbox.getValue());
 			dashboard.setColumnCount(Integer.parseInt(layoutRadiogroup.getSelectedItem().getValue().toString()));
-			dashboard.setUpdatedDate(new Date(Calendar.getInstance().getTime().getTime()));
+			dashboard.setLastupdatedDate(new Timestamp(Calendar.getInstance().getTime().getTime()));
 			
 			//Deciding Columns and rows
 			Integer panelCount = null;

@@ -1,7 +1,9 @@
 package org.hpccsystems.dashboard.controller;
 
 import java.sql.Date;
+import java.sql.Timestamp;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -367,7 +369,7 @@ public class DashboardController extends SelectorComposer<Component>{
 			manipulatePortletObjects(Constants.ResizePotletPanels);
 			try{
 			//updating Dashboard details
-			dashboard.setUpdatedDate(new Date(new java.util.Date().getTime()));
+			dashboard.setLastupdatedDate(new Timestamp(Calendar.getInstance().getTime().getTime()));
 			dashboardService.updateDashboard(dashboard);
 			
 			//updating Widget sequence
