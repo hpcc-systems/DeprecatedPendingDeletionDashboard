@@ -2,18 +2,17 @@
 
 	<vlayout id="editWindowLayout"
 		apply="org.hpccsystems.dashboard.controller.EditChartController" style="background-color: white;">
-		<div id="apiChartSettingDiv" if="${sessionScope.userCredential.hasRole('configureChart')}" style="margin: 5px;">
-			<hbox hflex="1" pack="end">
-				<button id="apiSaveButton" tooltip="Save Chart data" iconSclass="glyphicon glyphicon-floppy-disk"
-					zclass="btn btn-sm btn-success" label=" Save " />
-				<button id="apiCancelButton" tooltip="Cancel Chart data" iconSclass="glyphicon glyphicon-remove"
-					zclass="btn btn-sm btn-danger" label=" Cancel " />
+		<div id="apiChartSettingDiv" if="${sessionScope.userCredential.hasRole('configureChart')}" style="margin: 5px;" >
+			<hbox hflex="1" pack="end">				
+				<button id="apiSaveButton"  tooltip="Save Chart data" zclass="glyphicon glyphicon-ok btn btn-link img-btn z-button" /> 
+				<button id="apiCancelButton"  tooltip="Cancel Chart data" zclass="glyphicon glyphicon-remove btn btn-link img-btn z-button" />				
 			</hbox>
 		</div>
 
 		<div if="${sessionScope.userCredential.hasRole('viewChart')}"> 		
 			<hbox pack="end" hflex="1">
-				 <button id="apiConfigSaveButton" tooltip="Save Chart " iconSclass="glyphicon glyphicon-floppy-disk" zclass="btn btn-sm btn-success" label=" Save " />
+				 <button id="apiConfigSaveButton"  tooltip="Save Chart data" zclass="glyphicon glyphicon-ok btn btn-link img-btn z-button" /> 
+				 <button id="apiConfigCancelButton"  tooltip="Cancel Chart data" zclass="glyphicon glyphicon-remove btn btn-link img-btn z-button" />
 			</hbox>
 		</div>
 		<hlayout id="editLayout">

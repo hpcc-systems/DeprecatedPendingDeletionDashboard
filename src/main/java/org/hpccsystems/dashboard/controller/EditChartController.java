@@ -113,6 +113,8 @@ public class EditChartController extends SelectorComposer<Component> {
 	Vlayout editWindowLayout;
 	@Wire
 	Button apiConfigSaveButton;
+	@Wire
+	Button	apiConfigCancelButton;
 	
 	List<String> parameterList = new ArrayList<String>();
 	final Map<String, Object> parameters = new HashMap<String, Object>();
@@ -620,6 +622,7 @@ public class EditChartController extends SelectorComposer<Component> {
 			configurePortlet();
 			 
 			apiConfigSaveButton.addEventListener(Events.ON_CLICK, saveApiChartConfigData);
+			apiConfigCancelButton.addEventListener(Events.ON_CLICK, cancelApiChartConfigData);
 		}catch (DataAccessException ex) {
 			Clients.showNotification("Unable to fetch Dashboard from DB.Input valid Dashboard ID",true);
 			LOG.error("Exception while fetching column data from Hpcc", ex);
@@ -681,7 +684,7 @@ public class EditChartController extends SelectorComposer<Component> {
 			dashboard.setPersisted(true);
 			dashBoardIdList.add(dashboard);
 			try	{
-				//update Dashboard updated_date value
+				//update Dashboard last_updated_date value
 				dashboardService.updateDashboard(dashboard);
 				
 				//update widget Chart Xml data & chart Type
@@ -694,6 +697,17 @@ public class EditChartController extends SelectorComposer<Component> {
 			}finally{
 				authenticationService.logout(null);
 			}
+		}
+	};
+	
+	/**
+	 * Listener to Cancel API chart config data
+	 */
+	EventListener<Event> cancelApiChartConfigData = new EventListener<Event>() {
+		public void onEvent(Event event) throws Exception {
+			Messagebox.show("Widget saved with old Chart data.You can close the window","",1,Messagebox.ON_OK);			
+			authenticationService.logout(null);	
+			editWindowLayout.detach();
 		}
 	};
 }
