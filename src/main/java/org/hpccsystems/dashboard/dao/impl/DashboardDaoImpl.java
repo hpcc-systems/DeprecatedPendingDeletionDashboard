@@ -78,12 +78,11 @@ public class DashboardDaoImpl implements DashboardDao {
 	
 	public int addDashboardDetails(final Dashboard dashboard,final String applicationId, final String sourceId,final String userId)
 			throws DataAccessException {
-
 		getJdbcTemplate().update(Queries.INSERT_DASHBOARD, new Object[] { 
 				dashboard.getName(),
 				userId,
 				applicationId,
-				dashboard.getUpdatedDate(),
+				dashboard.getLastupdatedDate(),
 				dashboard.getColumnCount(),
 				dashboard.getSequence(),
 				dashboard.getSourceId()
@@ -135,7 +134,7 @@ public class DashboardDaoImpl implements DashboardDao {
 			getJdbcTemplate().update(Queries.UPDATE_DASHBOARD, new Object[] { 
 					dashboard.getName(),
 					dashboard.getColumnCount(),
-					dashboard.getUpdatedDate(),				
+					dashboard.getLastupdatedDate(),				
 					dashboard.getDashboardId()
 			});
 			

@@ -6,7 +6,7 @@ package org.hpccsystems.dashboard.common;
  */
 public class Queries {
 	
-	public static final String INSERT_DASHBOARD = "INSERT INTO dashboard_details(dashboard_name,user_id,application_Id,updated_date,column_count,sequence,source_id) VALUES(?,?,?,?,?,?,?)";
+	public static final String INSERT_DASHBOARD = "INSERT INTO dashboard_details(dashboard_name,user_id,application_Id,last_updated_date,column_count,sequence,source_id) VALUES(?,?,?,?,?,?,?)";
 	public static final String DELETE_DASHBOARD_WIDGETS = "delete from widget_details where DASHBOARD_ID=?";
 	public static final String DELETE_WIDGETS = "delete from widget_details where WIDGET_ID=?";
 	public static final String DELETE_DASHBOARD = "delete from dashboard_details where DASHBOARD_ID=? and USER_ID =? ";	
@@ -19,7 +19,7 @@ public class Queries {
 	public static final String RETRIEVE_DASHBOARD_DETAILS = "select * from dashboard_details where APPLICATION_ID = ";
 	public static final String DASHBOARD_IN_CLAUSE = " and DASHBOARD_ID in ";
 	public static final String UPDATE_SIDEBAR_DETAILS = "update dashboard_details set sequence=? where dashboard_id=?";
-	public static final String UPDATE_DASHBOARD =  "update dashboard_details set dashboard_name=?,column_count=?,updated_date=? where dashboard_id=?";
+	public static final String UPDATE_DASHBOARD =  "update dashboard_details set dashboard_name=?,column_count=?,last_updated_date=? where dashboard_id=?";
 	public static final String UPDATE_WIDGET_SEQUENCE = "update widget_details set COLUMN_IDENTIFIER=?,WIDGET_SEQUENCE=? where WIDGET_ID=? and DASHBOARD_ID=?";
 	public static final String ADD_CHART_DATA = "update widget_details set WIDGET_STATE=?, CHART_TYPE=?  where WIDGET_ID=?";
 	public static final String CLEAR_CHART_DATA = "update widget_details set WIDGET_NAME=?, WIDGET_STATE=?,CHART_TYPE=?,CHART_DATA=?  where WIDGET_ID=?";
