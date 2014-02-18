@@ -3,24 +3,24 @@ package org.hpccsystems.dashboard.entity.chart;
 import javax.xml.bind.annotation.XmlElement;
 
 public class HpccConnection {
-	String hostIp; 
-	Integer port;
+	String serverHost; 
+	Integer serverPort;
 	String clusterName;
 	
-	String username;
+	String userName;
 	String password;
-	Boolean isSSL;
+	Boolean isHttps;
 	Boolean allowInvalidCerts;
 	public HpccConnection(String hostIp, Integer port, String clusterName,
 			String username, String password, Boolean isSSL,
 			Boolean allowInvalidCerts) {
 		super();
-		this.hostIp = hostIp;
-		this.port = port;
+		this.serverHost = hostIp;
+		this.serverPort = port;
 		this.clusterName = clusterName;
-		this.username = username;
+		this.userName = username;
 		this.password = password;
-		this.isSSL = isSSL;
+		this.isHttps = isSSL;
 		this.allowInvalidCerts = allowInvalidCerts;
 	}
 	public HpccConnection() {
@@ -29,11 +29,11 @@ public class HpccConnection {
 	@Override
 	public String toString() {
 		StringBuilder builder = new StringBuilder();
-		builder.append("HpccConnection [hostIp=").append(hostIp)
-				.append(", port=").append(port).append(", clusterName=")
-				.append(clusterName).append(", username=").append(username)
+		builder.append("HpccConnection [hostIp=").append(serverHost)
+				.append(", port=").append(serverPort).append(", clusterName=")
+				.append(clusterName).append(", username=").append(userName)
 				.append(", password=").append(password).append(", isSSL=")
-				.append(isSSL).append(", allowInvalidCerts=")
+				.append(isHttps).append(", allowInvalidCerts=")
 				.append(allowInvalidCerts).append("]");
 		return builder.toString() ;
 	}
@@ -41,18 +41,18 @@ public class HpccConnection {
 	
 	@XmlElement
 	public String getHostIp() {
-		return hostIp;
+		return serverHost;
 	}
 	public void setHostIp(String hostIp) {
-		this.hostIp = hostIp;
+		this.serverHost = hostIp;
 	}
 	
 	@XmlElement
 	public Integer getPort() {
-		return port;
+		return serverPort;
 	}
 	public void setPort(Integer port) {
-		this.port = port;
+		this.serverPort = port;
 	}
 	
 	@XmlElement
@@ -65,10 +65,10 @@ public class HpccConnection {
 	
 	@XmlElement
 	public String getUsername() {
-		return username;
+		return userName;
 	}
 	public void setUsername(String username) {
-		this.username = username;
+		this.userName = username;
 	}
 	
 	@XmlElement
@@ -81,10 +81,10 @@ public class HpccConnection {
 	
 	@XmlElement
 	public Boolean getIsSSL() {
-		return isSSL;
+		return isHttps;
 	}
 	public void setIsSSL(Boolean isSSL) {
-		this.isSSL = isSSL;
+		this.isHttps = isSSL;
 	}
 	
 	@XmlElement
