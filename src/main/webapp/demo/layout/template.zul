@@ -20,7 +20,7 @@
 	</borderlayout>
 	
 	<div if="${(sessionScope.userCredential.hasRole('viewChart') or sessionScope.userCredential.hasRole('configureChart'))}">
-		<include src="/demo/layout/edit_chart.zul"></include>
+		<include src="/demo/layout/edit_portlet.zul"></include>
 	</div>
 	<div if="${sessionScope.userCredential.anonymous}">
 		Redirect to login page.....
