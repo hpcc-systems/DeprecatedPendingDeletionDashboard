@@ -80,10 +80,14 @@ public class EditTableController extends SelectorComposer<Component> {
 				} else {
 					listItem.setParent(sourceList);
 				}
-			}			
-			tableHolder.appendChild(
-					tableRenderer.constructTableWidget(portlet.getTableDataMap(), true,portlet.getName())
-				);
+			}
+			
+			//TODO: Add else part
+			if(portlet.getTableDataMap() != null){
+				tableHolder.appendChild(
+						tableRenderer.constructTableWidget(portlet.getTableDataMap(), true,portlet.getName())
+					);
+			}
 		} else {
 			for (Map.Entry<String, String> entry : columnSchemaMap.entrySet()) {
 				listItem = new Listitem(entry.getKey());

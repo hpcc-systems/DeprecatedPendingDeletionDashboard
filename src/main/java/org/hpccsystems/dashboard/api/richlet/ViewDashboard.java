@@ -39,7 +39,7 @@ public class ViewDashboard extends GenericRichlet {
 				LOG.debug("URL from External/Circuit source : "+url);				
 			}
 			Executions.sendRedirect(url.toString());
-		
+			
 		} catch (Exception ex) {			
 			Clients.showNotification("Malformated URL string", false);
 			LOG.error("Exception while parsing Request Parameter in ViewDashboard.service()", ex);

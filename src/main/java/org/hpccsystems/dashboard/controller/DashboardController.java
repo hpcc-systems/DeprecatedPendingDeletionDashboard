@@ -1,6 +1,5 @@
 package org.hpccsystems.dashboard.controller;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -101,13 +100,14 @@ public class DashboardController extends SelectorComposer<Component>{
 	public void doAfterCompose(final Component comp) throws Exception {
 		super.doAfterCompose(comp);
 		
-		if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_CHART)) {
+		if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD)) {
 			dashboardId =Integer.valueOf(Executions.getCurrent().getParameter(Constants.DASHBOARD_ID));
 		}else{
-		dashboardId =(Integer) Executions.getCurrent().getAttribute(Constants.ACTIVE_DASHBOARD_ID);
-		//For the first Dashboard, getting Id from Session
-		if(dashboardId == null ){
-			dashboardId = (Integer) Sessions.getCurrent().getAttribute(Constants.ACTIVE_DASHBOARD_ID);}
+			dashboardId =(Integer) Executions.getCurrent().getAttribute(Constants.ACTIVE_DASHBOARD_ID);
+			//For the first Dashboard, getting Id from Session
+			if(dashboardId == null ){
+				dashboardId = (Integer) Sessions.getCurrent().getAttribute(Constants.ACTIVE_DASHBOARD_ID);
+			}
 		}
 		
 		if(LOG.isDebugEnabled()) {
@@ -192,8 +192,10 @@ public class DashboardController extends SelectorComposer<Component>{
 							}
 						}
 					}
+					
 					panel = new ChartPanel(portlet);
 					portalChildren.get(portlet.getColumn()).appendChild(panel);
+										
 					if(panel.drawD3Graph() != null){
 						Clients.evalJavaScript(panel.drawD3Graph());
 					}
@@ -210,7 +212,7 @@ public class DashboardController extends SelectorComposer<Component>{
 		}
 		
 		dashboardWin.addEventListener("onPortalClose", onPanelClose);
-		dashboardWin.addEventListener("onLayoutChange", onLayoutChange);		
+		dashboardWin.addEventListener("onLayoutChange", onLayoutChange);
 		
 		if(LOG.isDebugEnabled()){
 			LOG.debug("Created Dashboard");

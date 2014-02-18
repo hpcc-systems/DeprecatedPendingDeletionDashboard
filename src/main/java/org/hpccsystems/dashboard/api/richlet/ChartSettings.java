@@ -34,16 +34,16 @@ public class ChartSettings extends GenericRichlet{
 					//Setting the role to user to Configure chart
 					credential.addRole(Constants.CIRCUIT_ROLE_CONFIG_CHART);
 					
-					url.append("&").append("source_id").append("=").append(args.get(Constants.SOURCE_ID)[0]);
+					url.append("&").append(Constants.SOURCE_ID).append("=").append(args.get(Constants.SOURCE_ID)[0]);
 					url.append("&").append("format").append("=").append(args.get(Constants.CHARTLIST_FORMAT)[0]);
-					url.append("&").append("config").append("=").append(args.get(Constants.CIRCUIT_CONFIG)[0]);
+					url.append("&").append(Constants.CIRCUIT_CONFIG).append("=").append(args.get(Constants.CIRCUIT_CONFIG)[0]);
 				} else if (args.containsKey(Constants.CHART_TYPE) && args.containsKey(Constants.SOURCE_ID)) {
 					//Setting the role to user to view Chart
 					credential.addRole(Constants.CIRCUIT_ROLE_VIEW_CHART);
 					
-					url.append("&").append("source_id").append("=").append(args.get(Constants.SOURCE_ID)[0]);
-					url.append("&").append("chartType").append("=").append(args.get(Constants.CHART_TYPE)[0]);
-					url.append("&").append("dashboardId").append("=").append(args.get(Constants.DB_DASHBOARD_ID)[0]);
+					url.append("&").append(Constants.SOURCE_ID).append("=").append(args.get(Constants.SOURCE_ID)[0]);
+					url.append("&").append(Constants.CHART_TYPE).append("=").append(args.get(Constants.CHART_TYPE)[0]);
+					url.append("&").append(Constants.CIRCUIT_DASHBOARD_ID).append("=").append(args.get(Constants.DB_DASHBOARD_ID)[0]);
 				} else {
 					credential.addRole(Constants.CIRCUIT_ROLE_VIEW_CHART);
 					
