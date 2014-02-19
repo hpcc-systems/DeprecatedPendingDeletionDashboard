@@ -3,12 +3,13 @@ package org.hpccsystems.dashboard.entity;
 public class ChartDetails {
 	
 	public ChartDetails(int chartId, String staticImageURL, String chartName,
-			String chartDesc, Integer maxYColumns) {
+			String chartDesc,Integer maxXColumns, Integer maxYColumns) {
 		super();
 		this.chartId = chartId;
 		this.staticImageURL = staticImageURL;
 		this.chartName = chartName;
 		this.chartDesc = chartDesc;
+		this.maxXColumns = maxXColumns;
 		this.maxYColumns = maxYColumns;
 	}
 	
@@ -21,6 +22,12 @@ public class ChartDetails {
 	 * Value 0 indicates unlimited
 	 */
 	private Integer maxYColumns;
+
+	/**
+	 * Indicates maximum number of Columns that can be provided as Attributes
+	 * Value 0 indicates unlimited
+	 */
+	private Integer maxXColumns;
 	
 	public final String getStaticImageURL() {
 		return staticImageURL;
@@ -60,6 +67,14 @@ public class ChartDetails {
 
 	public void setMaxYColumns(Integer maxYColumns) {
 		this.maxYColumns = maxYColumns;
+	}
+
+	public Integer getMaxXColumns() {
+		return maxXColumns;
+	}
+
+	public void setMaxXColumns(Integer maxXColumns) {
+		this.maxXColumns = maxXColumns;
 	}
 
 }
