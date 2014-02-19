@@ -77,7 +77,6 @@ public class DashboardServiceImpl implements DashboardService {
 		this.dashboardDao = dashboardDao;
 	}
 
-	
 	public int addDashboardDetails(final Dashboard dashboard,
 			final String applicationId, final String sourceId, final String userId)
 			throws DataAccessException {

@@ -1,17 +1,26 @@
 package org.hpccsystems.dashboard.controller;
 
-import org.apache.commons.logging.Log; 
+import java.sql.Timestamp;
+import java.util.ArrayList;
+import java.util.Date;
+
+import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hpccsystems.dashboard.api.entity.ChartConfiguration;
 import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.controller.component.ChartPanel;
+import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.entity.chart.XYChartData;
 import org.hpccsystems.dashboard.entity.chart.utils.ChartRenderer;
 import org.hpccsystems.dashboard.entity.chart.utils.TableRenderer;
+import org.hpccsystems.dashboard.services.AuthenticationService;
+import org.hpccsystems.dashboard.services.DashboardService;
 import org.hpccsystems.dashboard.services.HPCCService;
 import org.hpccsystems.dashboard.services.WidgetService;
 import org.springframework.dao.DataAccessException;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
@@ -25,7 +34,10 @@ import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Include;
+import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Window;
+
+import com.google.gson.GsonBuilder;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class EditWidgetController extends SelectorComposer<Component> {
@@ -34,9 +46,14 @@ public class EditWidgetController extends SelectorComposer<Component> {
 	private static final Log LOG = LogFactory.getLog(EditWidgetController.class);
 
 	@WireVariable
-	HPCCService hpccService;
+	AuthenticationService authenticationService;
+	@WireVariable
+	DashboardService dashboardService;
 	@WireVariable
 	WidgetService widgetService;
+	
+	@WireVariable
+	HPCCService hpccService;
 	@WireVariable
 	ChartRenderer chartRenderer;
 	@WireVariable
@@ -50,10 +67,11 @@ public class EditWidgetController extends SelectorComposer<Component> {
 	Button doneButton;
 
 	Portlet portlet;
-	XYChartData chartData = new XYChartData();
+	XYChartData chartData;
 	ChartPanel chartPanel;
 	
-
+	Dashboard dashboard;
+	
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
 		if(LOG.isDebugEnabled()) {
@@ -61,15 +79,66 @@ public class EditWidgetController extends SelectorComposer<Component> {
 		}
 
 		super.doAfterCompose(comp);
-		portlet = (Portlet) Executions.getCurrent().getArg()
-				.get(Constants.PORTLET);
-		chartPanel = (ChartPanel) Executions.getCurrent().getArg()
-				.get(Constants.PARENT);
 		
-		if (Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())) {
-			chartData = chartRenderer.parseXML(portlet.getChartDataXML());
-		}
+		Execution execution = Executions.getCurrent();
+		chartData = new XYChartData();
+		
+		if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_CONFIG_CHART)) {
+			//Configuring chart through API
+			dashboard = new Dashboard();
+			dashboard.setSourceId(execution.getParameter(Constants.SOURCE_ID));
+			dashboard.setColumnCount(1);
+			dashboard.setSequence(0);
+			
+			ChartConfiguration configuration = new GsonBuilder().create().fromJson(
+					execution.getParameter(Constants.CIRCUIT_CONFIG),ChartConfiguration.class);
+			portlet = new Portlet();
+			portlet.setChartType(configuration.getChartType());
+			portlet.setColumn(0);
+			portlet.setName(configuration.getChartTitle());
+			
+			dashboard.setName(configuration.getDashboardTitle());
+			
+			chartData.setFileName(configuration.getDatasetName());
+			chartData.setHpccConnection(configuration.getHpccConnection());
+			
+			holderInclude.setDynamicProperty(Constants.CIRCUIT_CONFIG, configuration);
+		} else if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_CHART)){
+			//Viewing chart through API
+			dashboard = dashboardService.retrieveDashboardMenuPages(
+							Constants.CIRCUIT_APPLICATION_ID, 
+							authenticationService.getUserCredential().getUserId(), 
+							null,
+							execution.getParameter(Constants.SOURCE_ID))
+								.get(0); // Assuming one Dashboard exists for a provided source_id 
+			
+			portlet = widgetService.retriveWidgetDetails(dashboard.getDashboardId())
+						.get(0); //Assuming one Widget exists for the provided dashboard
+			
+			//Overriding chart type
+			if(execution.getParameter(Constants.CHART_TYPE) != null) {
+				portlet.setChartType(Integer.parseInt(execution.getParameter(Constants.CHART_TYPE)));
+			}
+			
+			if (Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())) {
+				chartData = chartRenderer.parseXML(portlet.getChartDataXML());
+			}
+		} else {
+			//General flow
+			portlet = (Portlet) Executions.getCurrent().getArg().get(Constants.PORTLET);
+			chartPanel = (ChartPanel) Executions.getCurrent().getArg().get(Constants.PARENT);
+			holderInclude.setDynamicProperty(Constants.PARENT, editPortletWindow);
 
+			if (Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())) {
+				chartData = chartRenderer.parseXML(portlet.getChartDataXML());
+			}
+		}
+		
+		
+		holderInclude.setDynamicProperty(Constants.CHART_DATA, chartData);
+		holderInclude.setDynamicProperty(Constants.PORTLET, portlet);
+		holderInclude.setDynamicProperty(Constants.EDIT_WINDOW_DONE_BUTTON, doneButton);
+		
 		// Listener to invoke when holderInclude is detached
 		editPortletWindow.addEventListener("onIncludeDetach",
 				new EventListener<Event>() {
@@ -79,8 +148,7 @@ public class EditWidgetController extends SelectorComposer<Component> {
 										.equals(Constants.EDIT_WINDOW_TYPE_DATA_SELECTION)) {
 							if (portlet.getChartType().equals(
 									Constants.TABLE_WIDGET)) {
-								holderInclude
-										.setSrc("layout/edit_table.zul");
+								holderInclude.setSrc("layout/edit_table.zul");
 							} else {
 								holderInclude.setSrc("layout/edit_chart.zul");
 							}
@@ -88,14 +156,14 @@ public class EditWidgetController extends SelectorComposer<Component> {
 					}
 				});
 
-		holderInclude.setDynamicProperty(Constants.CHART_DATA, chartData);
-		holderInclude.setDynamicProperty(Constants.PARENT, editPortletWindow);
-		holderInclude.setDynamicProperty(Constants.PORTLET, portlet);
-		holderInclude.setDynamicProperty(Constants.EDIT_WINDOW_DONE_BUTTON, doneButton);
 		
-		if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())){
-			chartData = chartRenderer.parseXML(portlet.getChartDataXML());
-			holderInclude.setDynamicProperty(Constants.CHART_DATA, chartData);
+		if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState()) ||
+				authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_CONFIG_CHART)){
+			// Not for configuring chart through API
+			if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())) {
+				chartData = chartRenderer.parseXML(portlet.getChartDataXML());
+				holderInclude.setDynamicProperty(Constants.CHART_DATA, chartData);
+			}
 			
 			if(Constants.TABLE_WIDGET.equals(portlet.getChartType())){
 				holderInclude.setSrc("layout/edit_table.zul");
@@ -116,46 +184,87 @@ public class EditWidgetController extends SelectorComposer<Component> {
 	 */
 	@Listen("onClick=#doneButton")
 	public void closeEditWindow(final MouseEvent event) {
-		try{
-		Div div = chartPanel.removeStaticImage();
+		
 		portlet.setWidgetState(Constants.STATE_LIVE_CHART);
 		
-		//For Table Widget
-		if(portlet.getChartType().equals(Constants.TABLE_WIDGET)) {
-			portlet.setChartDataXML(chartRenderer.convertToXML(chartData));
+		if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_CONFIG_CHART)){
+			//Configuring chart through API
+			dashboard.setLastupdatedDate(new Timestamp(new Date().getTime()));
 			
-			div.getChildren().clear();
-			div.appendChild(
-					tableRenderer.constructTableWidget(
-							portlet.getTableDataMap(), false,portlet.getName()
-							)
-						);
-			editPortletWindow.detach();
-		
-		} else {
-			//For Chart Widgets
-			final String divToDraw = div.getId(); 
-				//isEdit Window is set to false as we are constructing the JSON to be drawn in the Widget itself
-				chartRenderer.constructChartJSON(chartData, portlet, false); 
-				chartRenderer.drawChart(chartData, divToDraw, portlet);		 
-			
-			if (LOG.isDebugEnabled()) {
-				LOG.debug("Drawn chart in portlet..");
-				LOG.debug("Portlet - Div ID --> " + divToDraw);
+			try {
+				dashboard.setDashboardId(
+						dashboardService.addDashboardDetails(
+								dashboard, Constants.CIRCUIT_APPLICATION_ID, 
+								dashboard.getSourceId(), 
+								authenticationService.getUserCredential().getUserId()));
+				
+				portlet.setChartDataXML(chartRenderer.convertToXML(chartData));
+				widgetService.addWidget(dashboard.getDashboardId(), portlet, 0);
+			} catch (DataAccessException e) {
+				Clients.showNotification("Error occured while saving your changes");
 			}
 			
-			portlet.setChartDataXML(chartRenderer.convertToXML(chartData));
+			Messagebox.show("Chart details are Saved. You can close this window","",1,Messagebox.ON_OK);
+			
 			editPortletWindow.detach();
-		}
-		
-		//update Live chart data into DB
-		widgetService.updateWidget(portlet);
-		}catch(DataAccessException e){
-			LOG.error("Exception in closeEditWindow() while updating Live chart data into DB", e);
-		}catch(Exception ex) {
-			Clients.showNotification("Unable to fetch column data from HPCC to draw chart", "error", this.getSelf(), "middle_center", 3000, true);
-			LOG.error("Exception in closeEditWindow()", ex);
-			return;
+			try {
+				authenticationService.logout(null);
+			} catch (Exception e) {
+				Clients.showNotification("Error occured while logging out");
+				LOG.error("Logout error", e);
+			}
+		} else if (authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_CHART)) {
+			//Viewing chart through API
+			portlet.setChartDataXML(chartRenderer.convertToXML(chartData));
+			widgetService.updateWidget(portlet);
+			
+			Messagebox.show("Chart details are Updated Successfuly. You can close this window","",1,Messagebox.ON_OK);
+			
+			editPortletWindow.detach();
+			try {
+				authenticationService.logout(null);
+			} catch (Exception e) {
+				Clients.showNotification("Error occured while logging out");
+				LOG.error("Logout error", e);
+			}
+		} else {
+			//General flow
+			try {
+				Div div = chartPanel.removeStaticImage();
+				
+				//For Table Widget
+				if(portlet.getChartType().equals(Constants.TABLE_WIDGET)) {
+					div.getChildren().clear();
+					div.appendChild(
+							tableRenderer.constructTableWidget(
+									portlet.getTableDataMap(), false,portlet.getName())
+								);
+				} else {
+					//For Chart Widgets
+					final String divToDraw = div.getId(); 
+						//isEdit Window is set to false as we are constructing the JSON to be drawn in the Widget itself
+						chartRenderer.constructChartJSON(chartData, portlet, false); 
+						chartRenderer.drawChart(chartData, divToDraw, portlet);		 
+					
+					if (LOG.isDebugEnabled()) {
+						LOG.debug("Drawn chart in portlet..");
+						LOG.debug("Portlet - Div ID --> " + divToDraw);
+					}
+				}
+				
+				//update Live chart data into DB
+				portlet.setChartDataXML(chartRenderer.convertToXML(chartData));
+				widgetService.updateWidget(portlet);
+				
+				}catch(DataAccessException e){
+					LOG.error("Exception in closeEditWindow() while updating Live chart data into DB", e);
+				}catch(Exception ex) {
+					Clients.showNotification("Unable to fetch column data from HPCC to draw chart", "error", this.getSelf(), "middle_center", 3000, true);
+					LOG.error("Exception in closeEditWindow()", ex);
+					return;
+			}
+			
+			editPortletWindow.detach();
 		}
 	}
 }

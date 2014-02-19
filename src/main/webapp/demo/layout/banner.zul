@@ -9,7 +9,7 @@
 			apply="org.hpccsystems.dashboard.controller.LogoutController" 
 			hflex="1" vflex="1" pack="end" align="start" style="margin-right:30px">
 			<menubar zclass="user-nav">
-				<menuitem zclass="btn" iconSclass="glyphicon glyphicon-user" id="profile-link" label="${sessionScope.userCredential.userName}" if="${not sessionScope.userCredential.hasRole('viewDashboard')}" />
+				<menuitem zclass="btn" iconSclass="glyphicon glyphicon-user" id="profile-link" label="${sessionScope.userCredential.userName}" if="${not sessionScope.userCredential.getApplicationId().equals('circuit')}" />
 				<menuitem zclass="btn" iconSclass="glyphicon glyphicon-share-alt" id="logout" label="Logout" if="${not sessionScope.userCredential.anonymous}"/>
 			</menubar>
 		</hbox>

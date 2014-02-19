@@ -1,20 +1,8 @@
-<zk xmlns="http://www.zkoss.org/2005/zul"> 
+<zk xmlns="http://www.zkoss.org/2005/zul">
 
 	<vlayout id="editWindowLayout"
-		apply="org.hpccsystems.dashboard.controller.EditChartController" style="background-color: white;">
-		<div id="apiChartSettingDiv" if="${sessionScope.userCredential.hasRole('configureChart')}" style="margin: 5px;" >
-			<hbox hflex="1" pack="end">				
-				<button id="apiSaveButton"  tooltip="Save Chart data" zclass="glyphicon glyphicon-ok btn btn-link img-btn z-button" /> 
-				<button id="apiCancelButton"  tooltip="Cancel Chart data" zclass="glyphicon glyphicon-remove btn btn-link img-btn z-button" />				
-			</hbox>
-		</div>
-
-		<div if="${sessionScope.userCredential.hasRole('viewChart')}"> 		
-			<hbox pack="end" hflex="1">
-				 <button id="apiConfigSaveButton"  tooltip="Save Chart data" zclass="glyphicon glyphicon-ok btn btn-link img-btn z-button" /> 
-				 <button id="apiConfigCancelButton"  tooltip="Cancel Chart data" zclass="glyphicon glyphicon-remove btn btn-link img-btn z-button" />
-			</hbox>
-		</div>
+		apply="org.hpccsystems.dashboard.controller.EditChartController"
+		style="background-color: white;">
 		<hlayout id="editLayout">
 			<vbox spacing="0em">
 				<vbox height="270px">
@@ -32,37 +20,40 @@
 					</listbox>
 				</vbox>
 			</vbox>
- 	
- 	<vbox spacing="0em">
- 		<vbox height="180px">
-	 		<listbox width="200px" vflex="1" id="YAxisListBox" droppable="true">
-	 			<listhead>
-	            	<listheader label="${labels.chartMeasures}"/>
-	            </listhead>
-	 		</listbox>
- 		</vbox>
- 		<vbox height="180px">
-	 		<listbox width="200px" vflex="1" id="XAxisListBox" droppable="true">
-	 			<listhead>
-	            	<listheader label="${labels.chartAttributes}"/>
-	            </listhead>
-	 		</listbox>
- 		</vbox>
- 		<vbox height="180px">
-	 		<listbox width="200px" vflex="1" id="filterListBox" droppable="false">
-	 			<listhead>
-	            	<listheader label="${labels.chartFilters}"/>
-	            </listhead>
-	 		</listbox>
- 		</vbox>
- 	</vbox>
- 	
- 	<div vflex="1" hflex="1" style="border: 1px solid; border-color: rgb(184, 177, 177);" id="chart">
- 		
- 	</div>
- 	
- </hlayout> 
- </vlayout>
 
- </zk> 
+			<vbox spacing="0em">
+				<vbox height="180px">
+					<listbox width="200px" vflex="1" id="YAxisListBox" droppable="true">
+						<listhead>
+							<listheader label="${labels.chartMeasures}" />
+						</listhead>
+					</listbox>
+				</vbox>
+				<vbox height="180px">
+					<listbox width="200px" vflex="1" id="XAxisListBox" droppable="true">
+						<listhead>
+							<listheader
+								label="${labels.chartAttributes}" />
+						</listhead>
+					</listbox>
+				</vbox>
+				<vbox height="180px">
+					<listbox width="200px" vflex="1" id="filterListBox"	droppable="false">
+						<listhead>
+							<listheader label="${labels.chartFilters}" />
+						</listhead>
+					</listbox>
+				</vbox>
+			</vbox>
+
+			<div vflex="1" hflex="1"
+				style="border: 1px solid; border-color: rgb(184, 177, 177);"
+				id="chart">
+
+			</div>
+
+		</hlayout>
+	</vlayout>
+
+</zk>
 

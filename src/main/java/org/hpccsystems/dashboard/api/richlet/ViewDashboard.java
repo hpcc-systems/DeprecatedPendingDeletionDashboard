@@ -19,7 +19,6 @@ public class ViewDashboard extends GenericRichlet {
 		try {
 			
 			String source =Executions.getCurrent().getParameter(Constants.SOURCE);
-			String sourceId = Executions.getCurrent().getParameter(Constants.SOURCE_ID);
 			String[] dashboardIdArray = ((String[])Executions.getCurrent().getParameterValues(Constants.DB_DASHBOARD_ID));
 			
 			//TODO:Have to reset user and User credential values passed from circuit
@@ -28,9 +27,7 @@ public class ViewDashboard extends GenericRichlet {
 			credential.addRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD);
 			
 			StringBuilder url = new StringBuilder("/demo/?");			
-			url.append(Constants.SOURCE).append("=").append(source)
-					.append("&").append(Constants.SOURCE_ID).append("=")
-					.append(sourceId);
+			url.append(Constants.SOURCE).append("=").append(source);
 			for(String dashId : dashboardIdArray){
 				url.append("&").append(Constants.DB_DASHBOARD_ID).append("=")
 					.append(dashId);
@@ -39,7 +36,7 @@ public class ViewDashboard extends GenericRichlet {
 				LOG.debug("URL from External/Circuit source : "+url);				
 			}
 			Executions.sendRedirect(url.toString());
-		
+			
 		} catch (Exception ex) {			
 			Clients.showNotification("Malformated URL string", false);
 			LOG.error("Exception while parsing Request Parameter in ViewDashboard.service()", ex);
