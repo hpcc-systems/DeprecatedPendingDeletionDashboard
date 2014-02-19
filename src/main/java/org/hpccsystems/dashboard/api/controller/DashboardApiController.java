@@ -105,11 +105,6 @@ public void getChartList(HttpServletRequest request, HttpServletResponse respons
 				Map<Integer, ChartDetails> chartdetailsMap = Constants.CHART_MAP;
 				for (Map.Entry<Integer, ChartDetails> entry : chartdetailsMap.entrySet()) {
 					
-					//Restricting Table widget from returning
-					if(Constants.TABLE_WIDGET.equals(entry.getValue().getChartId())) {
-						continue;
-					}
-					
 					jsonObject = new JsonObject();
 					jsonObject.addProperty(Constants.VALUE, entry.getValue().getChartId());
 					jsonObject.addProperty(Constants.LABEL, entry.getValue().getChartName());
@@ -149,7 +144,7 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
 					jsonObject = new JSONObject();
 					jsonObject.put(Constants.NAME_SMALL, dashBoard.getName());
 					jsonObject.put(Constants.DB_DASHBOARD_ID, dashBoard.getDashboardId());
-					jsonObject.put(Constants.LAST_UPDATED_DATE, dashBoard.getLastupdatedDate());
+					jsonObject.put(Constants.LAST_UPDATED_DATE, dashBoard.getLastupdatedDate().toString());
 					jsonArray.add(jsonObject);
 				}
 				if(jsonArray.size() > 0){
