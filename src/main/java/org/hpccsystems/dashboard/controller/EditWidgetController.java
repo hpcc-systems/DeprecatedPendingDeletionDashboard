@@ -3,6 +3,7 @@ package org.hpccsystems.dashboard.controller;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -89,7 +90,6 @@ public class EditWidgetController extends SelectorComposer<Component> {
 			dashboard.setSourceId(execution.getParameter(Constants.SOURCE_ID));
 			dashboard.setColumnCount(1);
 			dashboard.setSequence(0);
-			
 			ChartConfiguration configuration = new GsonBuilder().create().fromJson(
 					execution.getParameter(Constants.CIRCUIT_CONFIG),ChartConfiguration.class);
 			portlet = new Portlet();
@@ -105,16 +105,19 @@ public class EditWidgetController extends SelectorComposer<Component> {
 			holderInclude.setDynamicProperty(Constants.CIRCUIT_CONFIG, configuration);
 		} else if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_CHART)){
 			//Viewing chart through API
+			List<String> dashboardIdList = null;
+			if(execution.getParameter("dashboardId") != null) {
+				dashboardIdList = new ArrayList<String>();
+				dashboardIdList.add(execution.getParameter("dashboardId"));
+			}
 			dashboard = dashboardService.retrieveDashboardMenuPages(
 							Constants.CIRCUIT_APPLICATION_ID, 
 							authenticationService.getUserCredential().getUserId(), 
-							null,
+							dashboardIdList,
 							execution.getParameter(Constants.SOURCE_ID))
 								.get(0); // Assuming one Dashboard exists for a provided source_id 
-			
 			portlet = widgetService.retriveWidgetDetails(dashboard.getDashboardId())
 						.get(0); //Assuming one Widget exists for the provided dashboard
-			
 			//Overriding chart type
 			if(execution.getParameter(Constants.CHART_TYPE) != null) {
 				portlet.setChartType(Integer.parseInt(execution.getParameter(Constants.CHART_TYPE)));

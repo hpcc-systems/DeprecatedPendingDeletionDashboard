@@ -260,7 +260,6 @@ public class SidebarController extends GenericForwardComposer<Component>{
 			//updating dashboard sequence into dashboard_details
 			List<Component> comp = navBar.getChildren();
 			dashboard.setSequence(comp.size());
-			System.out.println("dashboard=======" +dashboard);
 			// Make entry of new dashboard details into DB
 			
 				dashboard.setDashboardId(
