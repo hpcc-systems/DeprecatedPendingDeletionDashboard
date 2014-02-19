@@ -61,14 +61,14 @@ public class StringFilterController extends SelectorComposer<Component>{
 		Listcell listcell;
 		
 		List<String> valueList = null;
-		try
-		{
-			valueList = hpccService.fetchFilterData(chartData);
-		}catch(Exception e){
+		try	{
+			valueList = hpccService.getDistinctValues(chartData.getFileName(), chartData.getFilter().getColumn(), chartData.getHpccConnection());
+		} catch(Exception e) {
 			Clients.showNotification("Unable to fetch data for the Filter column", "error", 
 					doneButton.getParent().getParent().getParent(), "top_left", 3000, true);
 			LOG.error("Exception while fetching data from Hpcc for selected String filter", e);
 		}
+		
 		List<String> filteredList = null;
 		
 		if(chartData.getIsFiltered() && valueList != null){

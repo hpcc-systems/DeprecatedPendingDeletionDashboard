@@ -5,8 +5,12 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -18,6 +22,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.entity.Portlet;
+import org.hpccsystems.dashboard.entity.chart.Group;
 import org.hpccsystems.dashboard.entity.chart.XYChartData;
 import org.hpccsystems.dashboard.entity.chart.XYModel;
 import org.hpccsystems.dashboard.services.HPCCService;
@@ -39,10 +44,6 @@ public class ChartRenderer {
 	
 	private HPCCService hpccService;
 	
-	public HPCCService getHpccService() {
-		return hpccService;
-	}
-
 	@Autowired
 	public void setHpccService(HPCCService hpccService) {
 		this.hpccService = hpccService;
@@ -117,8 +118,12 @@ public class ChartRenderer {
 		
 		Iterator<XYModel> iterator =null;	
 		try	{
-			ArrayList<XYModel> list = null;
-			list =(ArrayList<XYModel>) getHpccService().getChartData(chartData);
+			List<XYModel> list = null;
+			if(chartData.getXColumnNames().size() > 1) {
+				list = refactorResult(hpccService.getChartData(chartData), chartData);
+			}else {
+				list = hpccService.getChartData(chartData);
+			}
 			iterator = list.iterator();	
 		}catch(Exception e)	{
 			LOG.error("Error while retriving data", e);
@@ -136,7 +141,7 @@ public class ChartRenderer {
 					final XYModel bar = iterator.next();
 					
 					json = new JsonObject();
-					json.addProperty("xData",(String) bar.getxAxisVal());
+					json.addProperty("xData",(String) bar.getxAxisValues().get(0));
 					
 					JsonObject yNames = new JsonObject();
 					for (String colName : chartData.getYColumnNames()) {
@@ -170,7 +175,7 @@ public class ChartRenderer {
 					array.add(json);
 	
 					//Finding word count in x Axis Labels
-					xVal=(String) bar.getxAxisVal();
+					xVal=(String) bar.getxAxisValues().get(0);
 					yVal=(BigDecimal)bar.getyAxisValues().get(0);
 					if(xVal.split(" ").length > xLength){
 						xLength = xVal.split(" ").length;
@@ -193,31 +198,46 @@ public class ChartRenderer {
 			
 			portlet.setChartDataJSON(data);
 		} else {
+			//For LINE/BAR Chart
 			JsonObject json = null;
 			JsonArray xValues = new JsonArray();
 			JsonArray rows = new JsonArray();
 			JsonArray row = new JsonArray();
 			
-			for (String colName : chartData.getYColumnNames()) {
-				row.add(new JsonPrimitive(colName));
+			if(chartData.getXColumnNames().size() > 1 ){
+				for (String colName : chartData.getGroup().getyColumnNames()) {
+					row.add(new JsonPrimitive(colName));
+				}
+			} else {
+				for (String colName : chartData.getYColumnNames()) {
+					row.add(new JsonPrimitive(colName));
+				}
 			}
+			
 			rows.add(row);
 			
 			if(iterator != null){
 				while(iterator.hasNext()){
 					final XYModel bar = iterator.next();
 					row = new JsonArray();
+					
 					for (Object object: bar.getyAxisValues()) {
 						row.add(new JsonPrimitive((BigDecimal)object));
 					}
 					
 					rows.add(row);
-					xValues.add(new JsonPrimitive(bar.getxAxisVal().toString()));
 					
-					json = new JsonObject();
+					List<String> yColumnNames;
+					if(chartData.getXColumnNames().size() > 1){
+						yColumnNames = chartData.getGroup().getyColumnNames();
+					} else {
+						yColumnNames = chartData.getYColumnNames();
+					}
+					
+					xValues.add(new JsonPrimitive(bar.getxAxisValues().get(0).toString()));
 					
 					JsonObject yNames = new JsonObject();
-					for (String colName : chartData.getYColumnNames()) {
+					for (String colName : yColumnNames) {
 						if(Constants.BAR_CHART.equals(portlet.getChartType())){
 							yNames.addProperty(colName, "bar");
 						} else if(Constants.LINE_CHART.equals(portlet.getChartType())){
@@ -225,14 +245,11 @@ public class ChartRenderer {
 						}
 					}
 					header.add("yNames", yNames);
-					
-					array.add(json);
 				}
 			}
 				
 			header.addProperty("title", title.toString());
 			
-			header.add("chartData", array);
 			header.add("yValues", rows);
 			header.add("xValues", xValues);
 			
@@ -243,6 +260,65 @@ public class ChartRenderer {
 	}
 	
 	
+	private List<XYModel> refactorResult(List<XYModel> input, XYChartData chartData) throws Exception {
+		List<XYModel> result = new ArrayList<XYModel>();
+		
+		List<String> xLabels = hpccService.getDistinctValues(
+				chartData.getFileName(), 
+				chartData.getXColumnNames().get(0), //First X column is being displayed as labels  
+				chartData.getHpccConnection());
+		
+		List<String> groupedList = hpccService.getDistinctValues(
+				chartData.getFileName(), 
+				chartData.getXColumnNames().get(1), //Second X column is grouped
+				chartData.getHpccConnection()); 
+		
+		//Constructing Group Object
+		Group group = new Group();
+		List<String> newCols = new ArrayList<String>();
+		newCols.add(chartData.getXColumnNames().get(0));
+		group.setxColumnNames(newCols);
+		group.setyColumnNames(groupedList);
+		chartData.setGroup(group);
+		
+		for (String xValue : xLabels) {
+			XYModel newRow = new XYModel();
+			
+			//Setting X Value
+			List<Object> xValues = new ArrayList<Object>();
+			xValues.add(xValue);
+			newRow.setxAxisValues(xValues);
+			
+			List<Object> yValues = new ArrayList<Object>();
+			//Initializing Empty Y Value Map
+			Map<String,Object> yValuesMap = new LinkedHashMap<String, Object>();
+			for (String groupedColumn : groupedList) {
+				yValuesMap.put(groupedColumn, new BigDecimal(0));
+			}
+			
+			// Replacing apt Y Values to the Map
+			for (XYModel xyModel : input) {
+				for (String groupedColumn : groupedList) {
+					if(xyModel.getxAxisValues().get(0).equals(xValue) &&
+							xyModel.getxAxisValues().get(1).equals(groupedColumn)){
+						yValuesMap.put(groupedColumn, new BigDecimal(xyModel.getyAxisValues().get(0).toString()));
+					}
+				}
+			}
+			
+			//Transform Y Map to List
+			for (Entry<String, Object> entry : yValuesMap.entrySet()) {
+				yValues.add(entry.getValue());
+			}
+			
+			newRow.setxAxisValues(xValues);
+			newRow.setyAxisValues(yValues);
+			result.add(newRow);
+		}
+		
+		return result;
+	}
+
 	/**
 	 * Must Construct JSON before invoking this method
 	 * 

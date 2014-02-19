@@ -239,7 +239,6 @@ public class EditChartController extends SelectorComposer<Component> {
 	}
 
 
-
 	/**
 	 * Enables/Disables Drops in Y & X axis list boxes 
 	 * based on conditions from application constants
@@ -248,24 +247,31 @@ public class EditChartController extends SelectorComposer<Component> {
 		if(LOG.isDebugEnabled()){
 			LOG.debug("Portlet object -- " + portlet);
 		}
-		
-		//Measures
 		// 0 - is for unlimited drops. So limiting drops only when not equals to 0
+
+		//Measures
 		if( ! (Constants.CHART_MAP.get(portlet.getChartType()).getMaxYColumns() == 0)) {
 			if(chartData.getYColumnNames().size() > 
 				Constants.CHART_MAP.get(portlet.getChartType()).getMaxYColumns() ) {
 				YAxisListBox.setDroppable("false");
 			} else {
 				YAxisListBox.setDroppable("true");
+			}
 		}
-	}
 		
 		//Attributes
-		//Only one attribute for all charts
-		if(chartData.getXColumnNames().size() > 1){
-			XAxisListBox.setDroppable("false");
-		} else {
-			XAxisListBox.setDroppable("true");
+		if( ! (Constants.CHART_MAP.get(portlet.getChartType()).getMaxXColumns() == 0)) {
+			if(chartData.getXColumnNames().size() > 
+			Constants.CHART_MAP.get(portlet.getChartType()).getMaxXColumns() ) {
+				XAxisListBox.setDroppable("false");
+			} else {
+				XAxisListBox.setDroppable("true");
+			}
+			
+			//Second X Column indicates Grouping
+			if(chartData.getXColumnNames().size() > 1) {
+				chartData.setIsGrouped(true);
+			}
 		}
 	}
 	

@@ -31,7 +31,11 @@ public class XYChartData {
 	
 	private Boolean isFiltered = false;
 	private Filter filter;
-
+	
+	private Boolean isGrouped = false;
+	
+	private Group group;
+	
 	@XmlElement
 	public String getFileName() {
 		return fileName;
@@ -104,6 +108,23 @@ public class XYChartData {
 
 	public void setHpccConnection(HpccConnection hpccConnection) {
 		this.hpccConnection = hpccConnection;
+	}
+
+	public Group getGroup() {
+		return group;
+	}
+
+	public void setGroup(Group group) {
+		this.group = group;
+	}
+
+	@XmlElement
+	public Boolean getIsGrouped() {
+		return isGrouped;
+	}
+
+	public void setIsGrouped(Boolean isGrouped) {
+		this.isGrouped = isGrouped;
 	}
 
 }
