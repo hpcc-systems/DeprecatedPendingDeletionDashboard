@@ -251,21 +251,21 @@ public class EditChartController extends SelectorComposer<Component> {
 
 		//Measures
 		if( ! (Constants.CHART_MAP.get(portlet.getChartType()).getMaxYColumns() == 0)) {
-			if(chartData.getYColumnNames().size() > 
+			if(chartData.getYColumnNames().size() < 
 				Constants.CHART_MAP.get(portlet.getChartType()).getMaxYColumns() ) {
-				YAxisListBox.setDroppable("false");
-			} else {
 				YAxisListBox.setDroppable("true");
+			} else {
+				YAxisListBox.setDroppable("false");
 			}
 		}
 		
 		//Attributes
 		if( ! (Constants.CHART_MAP.get(portlet.getChartType()).getMaxXColumns() == 0)) {
-			if(chartData.getXColumnNames().size() > 
+			if(chartData.getXColumnNames().size() < 
 			Constants.CHART_MAP.get(portlet.getChartType()).getMaxXColumns() ) {
-				XAxisListBox.setDroppable("false");
-			} else {
 				XAxisListBox.setDroppable("true");
+			} else {
+				XAxisListBox.setDroppable("false");
 			}
 			
 			//Second X Column indicates Grouping
