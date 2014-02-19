@@ -83,7 +83,7 @@ public class WidgetDaoImpl implements WidgetDao{
 	
 	public List<Portlet> retriveWidgetDetails(Integer dashboardId) throws DataAccessException{
 			StringBuilder sqlBuffer = new StringBuilder();
-			sqlBuffer.append(Queries.GET_WIDGET_DETAILS).append(dashboardId).append(" order by WIDGET_SEQUENCE");
+			sqlBuffer.append(Queries.GET_WIDGET_DETAILS).append(dashboardId).append(" order by widget_sequence");
 			List<Portlet> portlets = getJdbcTemplate().query(sqlBuffer.toString(),new WidgetRowMapper());
 			return portlets;
 		}
