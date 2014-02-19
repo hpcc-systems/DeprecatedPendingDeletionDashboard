@@ -251,21 +251,21 @@ public class EditChartController extends SelectorComposer<Component> {
 
 		//Measures
 		if( ! (Constants.CHART_MAP.get(portlet.getChartType()).getMaxYColumns() == 0)) {
-			if(chartData.getYColumnNames().size() > 
+			if(chartData.getYColumnNames().size() < 
 				Constants.CHART_MAP.get(portlet.getChartType()).getMaxYColumns() ) {
-				YAxisListBox.setDroppable("false");
-			} else {
 				YAxisListBox.setDroppable("true");
+			} else {
+				YAxisListBox.setDroppable("false");
 			}
 		}
 		
 		//Attributes
 		if( ! (Constants.CHART_MAP.get(portlet.getChartType()).getMaxXColumns() == 0)) {
-			if(chartData.getXColumnNames().size() > 
+			if(chartData.getXColumnNames().size() < 
 			Constants.CHART_MAP.get(portlet.getChartType()).getMaxXColumns() ) {
-				XAxisListBox.setDroppable("false");
-			} else {
 				XAxisListBox.setDroppable("true");
+			} else {
+				XAxisListBox.setDroppable("false");
 			}
 			
 			//Second X Column indicates Grouping
@@ -378,15 +378,8 @@ public class EditChartController extends SelectorComposer<Component> {
 			
 			xAxisItem.detach();
 			
-			xAxisDropped = false;
 			chartData.getXColumnNames().remove(axisName);			
-			
-			//Disabling filter and chart clearance function in Api chart config/edit flow without chart
-			if(! authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_CONFIG_CHART) ) {				
-				filterListBox.setDroppable("false");			
-				Clients.evalJavaScript("clearChart('" + Constants.EDIT_WINDOW_CHART_DIV +  "')");
-			}
-			
+	
 			//Disabling done button
 			doneButton.setDisabled(true);				
 			
@@ -397,6 +390,15 @@ public class EditChartController extends SelectorComposer<Component> {
 				LOG.debug("Removed item from x Axis box, XColumnNames size  - " + chartData.getXColumnNames().size());
 				LOG.debug("List - " + chartData.getXColumnNames());
 			}
+			
+			// Only clear the existing chart when no columns are present otherwise recreate the chart
+			if(chartData.getXColumnNames().size() < 1) {
+				xAxisDropped = false;
+				Clients.evalJavaScript("clearChart('" + Constants.EDIT_WINDOW_CHART_DIV +  "')");
+			} else {
+					constructChart();
+			}
+			
 			validateDroppable();
 		}
 	};
@@ -485,59 +487,6 @@ public class EditChartController extends SelectorComposer<Component> {
 			if(xAxisDropped && yAxisDropped){
 				doneButton.setDisabled(false);
 			}
-		}
-	};
-	
-
-	/**
-	 * Listener to Cancel API chart setting data
-	 */
-	EventListener<Event> cancelApiChartSettings = new EventListener<Event>() {
-		public void onEvent(Event event) throws Exception {
-			Messagebox.show("The Chart Settings data are not Saved.You can close the window","",1,Messagebox.ON_OK);			
-			authenticationService.logout(null);	
-			editWindowLayout.detach();
-		}
-	};
-	
-
-	/**
-	 * Event to Save API chart configuration data to DB
-	 */
-	final EventListener<Event> saveApiChartConfigData = new EventListener<Event>() {
-
-		@Override
-		public void onEvent(Event event) throws Exception {
-			portlet.setChartDataXML(chartRenderer.convertToXML(chartData));
-			final List<Dashboard> dashBoardIdList = new ArrayList<Dashboard>();
-			dashboard.setLastupdatedDate(new Timestamp(Calendar.getInstance().getTime().getTime()));
-			dashboard.setPersisted(true);
-			dashBoardIdList.add(dashboard);
-			try	{
-				//update Dashboard last_updated_date value
-				dashboardService.updateDashboard(dashboard);
-				
-				//update widget Chart Xml data & chart Type
-				widgetService.updateWidget(portlet);
-				
-				Messagebox.show("Your Chart details are Saved. This tab will now be closed","",1,Messagebox.ON_OK);				
-			}catch(DataAccessException ex) {
-				Clients.showNotification("Unable to update Chart details into DB", true);
-	        	LOG.error("Exception saveApiChartConfigData Listener in DashboardController", ex);
-			}finally{
-				authenticationService.logout(null);
-			}
-		}
-	};
-	
-	/**
-	 * Listener to Cancel API chart config data
-	 */
-	EventListener<Event> cancelApiChartConfigData = new EventListener<Event>() {
-		public void onEvent(Event event) throws Exception {
-			Messagebox.show("Widget saved with old Chart data.You can close the window","",1,Messagebox.ON_OK);			
-			authenticationService.logout(null);	
-			editWindowLayout.detach();
 		}
 	};
 }

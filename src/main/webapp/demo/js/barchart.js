@@ -39,11 +39,8 @@ function createChart(divId, chartData) {
 			if(fullWidth < 50 ){ fullWidth = 400; }
 			if(fullHeight < 50 ){ fullHeight = 385; }
 			
+			var legendWidth = fullWidth/Object.keys(response.yNames).length;
 			
-			console.log("Height = " + fullHeight);
-			console.log("Width = " + fullWidth);
-			console.log("Legend = " + showLegend);
-			 
 			var isLargeGraph = false;
 			if(response.xValues.length > 25){
 				isLargeGraph = true;
@@ -73,7 +70,7 @@ function createChart(divId, chartData) {
 				legend: {
 			        show: showLegend,
 			        item: {
-			        	width: 120
+			        	width: legendWidth
 			        }
 			    },
 				subchart: {
