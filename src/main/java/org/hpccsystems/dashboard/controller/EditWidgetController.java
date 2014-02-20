@@ -195,14 +195,17 @@ public class EditWidgetController extends SelectorComposer<Component> {
 			dashboard.setLastupdatedDate(new Timestamp(new Date().getTime()));
 			
 			try {
-				dashboard.setDashboardId(
-						dashboardService.addDashboardDetails(
-								dashboard, Constants.CIRCUIT_APPLICATION_ID, 
-								dashboard.getSourceId(), 
-								authenticationService.getUserCredential().getUserId()));
-				
-				portlet.setChartDataXML(chartRenderer.convertToXML(chartData));
-				widgetService.addWidget(dashboard.getDashboardId(), portlet, 0);
+				List<Dashboard> dashboardList = dashboardService.retrieveDashboardMenuPages(dashboard.getApplicationId(), null, null,
+								dashboard.getSourceId());
+				if (dashboardList.isEmpty()) {
+					dashboard.setDashboardId(dashboardService.addDashboardDetails(dashboard, Constants.CIRCUIT_APPLICATION_ID, dashboard
+											.getSourceId(),	authenticationService.getUserCredential().getUserId()));
+					portlet.setChartDataXML(chartRenderer.convertToXML(chartData));
+					widgetService.addWidget(dashboard.getDashboardId(),	portlet, 0);
+				} else {
+					dashboard.setDashboardId(dashboardList.get(0).getDashboardId());
+					dashboardService.updateDashboard(dashboard);
+				}
 			} catch (DataAccessException e) {
 				Clients.showNotification("Error occured while saving your changes");
 			}

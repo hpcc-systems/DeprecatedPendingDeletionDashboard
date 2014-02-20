@@ -19,7 +19,7 @@ public class Queries {
 	public static final String RETRIEVE_DASHBOARD_DETAILS = "select * from dashboard_details where application_id = ";
 	public static final String DASHBOARD_IN_CLAUSE = " and dashboard_id in ";
 	public static final String UPDATE_SIDEBAR_DETAILS = "update dashboard_details set sequence=? where dashboard_id=?";
-	public static final String UPDATE_DASHBOARD =  "update dashboard_details set dashboard_name=?,column_count=?,last_updated_date=? where dashboard_id=?";
+	public static final String UPDATE_DASHBOARD =  "update dashboard_details set dashboard_name=?,column_count=?,source_id=?,last_updated_date=? where dashboard_id=?";
 	public static final String UPDATE_WIDGET_SEQUENCE = "update widget_details set column_identifier=?,widget_sequence=? where widget_id=? and dashboard_id=?";
 	public static final String ADD_CHART_DATA = "update widget_details set widget_state=?, chart_type=?  where widget_id=?";
 	public static final String CLEAR_CHART_DATA = "update widget_details set widget_name=?, widget_state=?,chart_type=?,chart_data=?  where widget_id=?";
