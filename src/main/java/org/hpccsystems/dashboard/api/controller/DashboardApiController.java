@@ -62,7 +62,7 @@ public class DashboardApiController {
  * @param request
  * @param response
  */
-@RequestMapping(value = Constants.CIRCUIT_DELETE_REQ , method = RequestMethod.GET)
+@RequestMapping(value = Constants.CIRCUIT_DELETE_REQ)
 public void deleteDashboard(HttpServletRequest request, HttpServletResponse response)throws Exception
 {	
 	JSONObject jsObj = new JSONObject();
@@ -94,7 +94,7 @@ public void deleteDashboard(HttpServletRequest request, HttpServletResponse resp
 	
 }
 
-@RequestMapping(value = Constants.CIRCUIT_CHARTLIST_REQ , method = RequestMethod.GET)
+@RequestMapping(value = Constants.CIRCUIT_CHARTLIST_REQ)
 public void getChartList(HttpServletRequest request, HttpServletResponse response)throws Exception
  {
 		try {
@@ -123,7 +123,7 @@ public void getChartList(HttpServletRequest request, HttpServletResponse respons
 
 	}
 
-@RequestMapping(value = Constants.CIRCUIT_SEARCH_REQ , method = RequestMethod.GET)
+@RequestMapping(value = Constants.CIRCUIT_SEARCH_REQ)
 public void searchDashboard(HttpServletRequest request, HttpServletResponse response)throws Exception
  {
 	JSONObject jsonResposeObj = new JSONObject();
@@ -171,7 +171,7 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
  * @param response
  * @throws IOException
  */
-@RequestMapping(value = Constants.CIRCUIT_VALIDATE_REQ, method = RequestMethod.GET)
+@RequestMapping(value = Constants.CIRCUIT_VALIDATE_REQ, method = RequestMethod.POST)
 	public void validateDashboard(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	JsonObject jsonObject = new JsonObject();
 		try {
