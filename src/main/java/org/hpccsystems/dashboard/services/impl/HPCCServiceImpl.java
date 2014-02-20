@@ -192,7 +192,11 @@ public class HPCCServiceImpl implements HPCCService{
 					    	lstNmElmntLst = fstElmnt.getElementsByTagName(xColumnName);
 					    	lstNmElmnt = (Element) lstNmElmntLst.item(0);
 					    	lstNm = lstNmElmnt.getChildNodes();
-					    	nodeValue = ((Node) lstNm.item(0)).getNodeValue();
+					    	if(lstNm.item(0) == null){
+					    		nodeValue = "";
+					    	}else{
+					    		nodeValue = ((Node) lstNm.item(0)).getNodeValue();
+					    	}
 					    	valueList.add(nodeValue);
 					    }
 					    dataObj.setxAxisValues(valueList);
