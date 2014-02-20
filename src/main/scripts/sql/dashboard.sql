@@ -24,7 +24,7 @@ PRIMARY KEY(user_id)
 ) ENGINE=InnoDB;
 
 LOCK TABLES `user_details` WRITE;
-INSERT INTO user_details(USER_NAME,PASSWORD,ACTIVE_FLAG) VALUES ('anonymous','1234','N'),('admin','1234','N'),('zkoss','1234','N');
+INSERT INTO user_details(user_name,password,active_flag) VALUES ('anonymous','1234','N'),('admin','1234','N'),('zkoss','1234','N');
 UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `dashboard_details`;

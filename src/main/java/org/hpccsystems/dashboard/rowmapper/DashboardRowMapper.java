@@ -11,10 +11,10 @@ public class DashboardRowMapper implements RowMapper<Dashboard> {
 	@Override
 	public Dashboard mapRow(ResultSet rs, int rowNum) throws SQLException {
 		 Dashboard dashboard = new Dashboard();
-		 dashboard.setName(rs.getString("DASHBOARD_NAME"));
-		 dashboard.setDashboardId(rs.getInt("DASHBOARD_ID"));
-		 dashboard.setColumnCount(rs.getInt("COLUMN_COUNT"));
-		 dashboard.setLastupdatedDate(rs.getTimestamp("LAST_UPDATED_DATE"));
+		 dashboard.setName(rs.getString("dashboard_name"));
+		 dashboard.setDashboardId(rs.getInt("dashboard_id"));
+		 dashboard.setColumnCount(rs.getInt("column_count"));
+		 dashboard.setLastupdatedDate(rs.getTimestamp("last_updated_date"));
 		return dashboard;
 	}
 

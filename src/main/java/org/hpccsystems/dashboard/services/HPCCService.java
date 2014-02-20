@@ -31,13 +31,16 @@ public interface HPCCService {
 	 */
 	List<XYModel> getChartData(XYChartData data) throws Exception;
 	
-	 
-	 /**
-	  * Fetches list of distinct values from specified column
-	 * @param filterColumn
-	 * @return List<String>
+	/**
+	 * Function to fetch distinct values of a specified field in the logical file specified 
+	 * @param fileName
+	 * @param fieldName
+	 * @param hpccConnection
+	 * @return
+	 * 	List of distinct values as a list
+	 * @throws Exception
 	 */
-	List<String> fetchFilterData(XYChartData data) throws Exception ;
+	List<String> getDistinctValues(String fileName, String fieldName, HpccConnection hpccConnection) throws Exception ;
 	
 	/**
 	 * Fetches maximum and minimum values of the Numeric filter
@@ -65,4 +68,5 @@ public interface HPCCService {
 	 * @throws Exception
 	 */
 	List<FileMeta> getFileList(String scope, HpccConnection hpccConnection) throws Exception;
+
 }
