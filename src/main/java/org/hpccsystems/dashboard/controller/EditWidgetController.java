@@ -36,6 +36,7 @@ import org.zkoss.zul.Button;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.Messagebox;
+import org.zkoss.zul.Messagebox.ClickEvent;
 import org.zkoss.zul.Window;
 
 import com.google.gson.GsonBuilder;
