@@ -45,12 +45,36 @@ public class DashboardDaoImpl implements DashboardDao {
 	 */
 	public List<Dashboard> fetchDashboardDetails(final String applicationId,final String userId, List<String> dashboardIdList, final String sourceId)
 			throws DataAccessException {	
-		
 		List<Dashboard> dashboardList = null;
 		StringBuilder sqlBuffer = new StringBuilder();
-		sqlBuffer.append(Queries.RETRIEVE_DASHBOARD_DETAILS).append("'").append(
-				applicationId).append("'");
-		if(userId == null && dashboardIdList == null  && sourceId != null){
+		
+		sqlBuffer.append(Queries.RETRIEVE_DASHBOARD_DETAILS).append("'")
+				.append(applicationId).append("'").append("and user_id='")
+				.append(userId).append("'");
+		//Regular Dashboard flow
+		if(sourceId == null && dashboardIdList == null){
+			sqlBuffer.append(" order by sequence");
+		}
+		//API flow- for single dashboard
+		else if(sourceId != null && dashboardIdList == null){
+			sqlBuffer.append(" and source_id = '")
+			.append(sourceId).append("'");
+		}
+		//API flow- for list of dashboards
+		else if(dashboardIdList != null){
+			sqlBuffer.append(Queries.DASHBOARD_IN_CLAUSE).append("( '");
+			int count = 1;
+			for (String dashboardId : dashboardIdList) {
+				sqlBuffer.append(dashboardId).append("'");
+				if (count != dashboardIdList.size()) {
+					sqlBuffer.append(",'");
+				}
+				count++;
+			}
+			sqlBuffer.append(")").append((" order by last_updated_date desc"));
+		}
+		
+		/*if(userId == null && dashboardIdList == null  && sourceId != null){
 			sqlBuffer.append(" and source_id = '")
 			.append(sourceId)
 			.append("' order by last_updated_date desc");
@@ -69,7 +93,7 @@ public class DashboardDaoImpl implements DashboardDao {
 				count++;
 			}
 			sqlBuffer.append(")").append((" order by sequence"));
-		}
+		}*/
 		LOG.info("retrieveDashboardDetails() Query -->" + sqlBuffer);
 		dashboardList = getJdbcTemplate().query(sqlBuffer.toString(),
 				new DashboardRowMapper());

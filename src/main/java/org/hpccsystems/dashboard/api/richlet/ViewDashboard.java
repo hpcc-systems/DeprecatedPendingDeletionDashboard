@@ -22,9 +22,11 @@ public class ViewDashboard extends GenericRichlet {
 			String[] dashboardIdArray = ((String[])Executions.getCurrent().getParameterValues(Constants.DB_DASHBOARD_ID));
 			
 			//TODO:Have to reset user and User credential values passed from circuit
-			UserCredential credential = new UserCredential("2", "admin", source);
+			UserCredential credential = new UserCredential("2", "admin",  Constants.CIRCUIT_APPLICATION_ID);
 			Sessions.getCurrent().setAttribute("userCredential", credential);
 			credential.addRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD);
+			
+			
 			
 			StringBuilder url = new StringBuilder("/demo/?");			
 			url.append(Constants.SOURCE).append("=").append(source);

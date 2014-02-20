@@ -107,7 +107,7 @@ public class EditWidgetController extends SelectorComposer<Component> {
 		} else if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_CHART)){
 			//Viewing chart through API
 			List<String> dashboardIdList = null;
-			if(execution.getParameter("dashboardId") != null) {
+			if(execution.getParameter(Constants.DASHBOARD_ID) != null) {
 				dashboardIdList = new ArrayList<String>();
 				dashboardIdList.add(execution.getParameter("dashboardId"));
 			}
@@ -118,15 +118,15 @@ public class EditWidgetController extends SelectorComposer<Component> {
 							execution.getParameter(Constants.SOURCE_ID))
 								.get(0); // Assuming one Dashboard exists for a provided source_id 
 			portlet = widgetService.retriveWidgetDetails(dashboard.getDashboardId())
-						.get(0); //Assuming one Widget exists for the provided dashboard
-			//Overriding chart type
-			if(execution.getParameter(Constants.CHART_TYPE) != null) {
-				portlet.setChartType(Integer.parseInt(execution.getParameter(Constants.CHART_TYPE)));
-			}
-			
-			if (Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())) {
-				chartData = chartRenderer.parseXML(portlet.getChartDataXML());
-			}
+					.get(0); //Assuming one Widget exists for the provided dashboard
+		//Overriding chart type
+		if(execution.getParameter(Constants.CHART_TYPE) != null) {
+			portlet.setChartType(Integer.parseInt(execution.getParameter(Constants.CHART_TYPE)));
+		}
+		
+		if (Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())) {
+			chartData = chartRenderer.parseXML(portlet.getChartDataXML());
+		}
 		} else {
 			//General flow
 			portlet = (Portlet) Executions.getCurrent().getArg().get(Constants.PORTLET);
@@ -196,8 +196,9 @@ public class EditWidgetController extends SelectorComposer<Component> {
 			dashboard.setLastupdatedDate(new Timestamp(new Date().getTime()));
 			
 			try {
-				List<Dashboard> dashboardList = dashboardService.retrieveDashboardMenuPages(dashboard.getApplicationId(), null, null,
-								dashboard.getSourceId());
+				List<Dashboard> dashboardList = dashboardService.retrieveDashboardMenuPages(dashboard.getApplicationId(), 
+						authenticationService.getUserCredential().getUserId(),
+						null,dashboard.getSourceId());
 				if (dashboardList.isEmpty()) {
 					dashboard.setDashboardId(dashboardService.addDashboardDetails(dashboard, Constants.CIRCUIT_APPLICATION_ID, dashboard
 											.getSourceId(),	authenticationService.getUserCredential().getUserId()));
@@ -219,8 +220,8 @@ public class EditWidgetController extends SelectorComposer<Component> {
 				Clients.showNotification("Error occured while saving your changes");
 			}
 			
-			Messagebox.show("Chart details are Saved. You can close this window","",1,Messagebox.ON_OK);
-			
+			Messagebox.show("Chart details are Updated Successfuly. You can close this window","",1,Messagebox.ON_OK);
+			Clients.evalJavaScript("window.open('','_self',''); window.close();");
 			editPortletWindow.detach();
 			try {
 				authenticationService.logout(null);
@@ -234,7 +235,7 @@ public class EditWidgetController extends SelectorComposer<Component> {
 			widgetService.updateWidget(portlet);
 			
 			Messagebox.show("Chart details are Updated Successfuly. You can close this window","",1,Messagebox.ON_OK);
-			
+			Clients.evalJavaScript("window.open('','_self',''); window.close();");
 			editPortletWindow.detach();
 			try {
 				authenticationService.logout(null);
@@ -282,4 +283,22 @@ public class EditWidgetController extends SelectorComposer<Component> {
 			editPortletWindow.detach();
 		}
 	}
+	
+	/**
+	 * method to invalidate session while closing edit window  in the API flow
+	 */
+	@Listen("onClose=#editPortletWindow")
+    public void closeWindow(){
+       if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_CONFIG_CHART )||
+                 authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_CHART)){
+          try {
+                 authenticationService.logout(null);
+                 Clients.evalJavaScript("window.open('','_self',''); window.close();");
+          } catch (Exception e) {
+                 LOG.error("Error while Log out", e);
+          }
+
+       }
+    }
+
 }
