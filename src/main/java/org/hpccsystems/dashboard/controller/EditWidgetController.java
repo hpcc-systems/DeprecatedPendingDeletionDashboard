@@ -88,6 +88,7 @@ public class EditWidgetController extends SelectorComposer<Component> {
 			//Configuring chart through API
 			dashboard = new Dashboard();
 			dashboard.setSourceId(execution.getParameter(Constants.SOURCE_ID));
+			dashboard.setApplicationId(execution.getParameter(Constants.SOURCE));
 			dashboard.setColumnCount(1);
 			dashboard.setSequence(0);
 			ChartConfiguration configuration = new GsonBuilder().create().fromJson(
@@ -203,8 +204,16 @@ public class EditWidgetController extends SelectorComposer<Component> {
 					portlet.setChartDataXML(chartRenderer.convertToXML(chartData));
 					widgetService.addWidget(dashboard.getDashboardId(),	portlet, 0);
 				} else {
+					Integer widgetId = 0;
+					List<Portlet> portletList = widgetService.retriveWidgetDetails(dashboardList.get(0).getDashboardId());
+					for(Portlet portlet : portletList){
+						widgetId = portlet.getId();						
+					}
 					dashboard.setDashboardId(dashboardList.get(0).getDashboardId());
 					dashboardService.updateDashboard(dashboard);
+					portlet.setChartDataXML(chartRenderer.convertToXML(chartData));
+					portlet.setId(widgetId);
+					widgetService.updateWidget(portlet);
 				}
 			} catch (DataAccessException e) {
 				Clients.showNotification("Error occured while saving your changes");
