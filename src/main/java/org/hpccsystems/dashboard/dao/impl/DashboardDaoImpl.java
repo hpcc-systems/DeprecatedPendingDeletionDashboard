@@ -127,20 +127,14 @@ public class DashboardDaoImpl implements DashboardDao {
 	}
 	@Override
 	public void updateDashboard(final Dashboard dashboard) throws DataAccessException {
-		
-		if(dashboard.getDashboardState()== null 
-				|| !Constants.STATE_EMPTY.equals(dashboard.getDashboardState())){
 			//updates dashboard Sequence & Column count,Name
 			getJdbcTemplate().update(Queries.UPDATE_DASHBOARD, new Object[] { 
 					dashboard.getName(),
 					dashboard.getColumnCount(),
+					dashboard.getSourceId(),
 					dashboard.getLastupdatedDate(),				
 					dashboard.getDashboardId()
 			});
-			
-		}
-		
-		
 	}
 	
 }
