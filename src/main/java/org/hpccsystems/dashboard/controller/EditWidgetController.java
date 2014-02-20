@@ -36,6 +36,7 @@ import org.zkoss.zul.Button;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.Messagebox;
+import org.zkoss.zul.Messagebox.ClickEvent;
 import org.zkoss.zul.Window;
 
 import com.google.gson.GsonBuilder;
@@ -219,8 +220,8 @@ public class EditWidgetController extends SelectorComposer<Component> {
 				Clients.showNotification("Error occured while saving your changes");
 			}
 			
-			Messagebox.show("Chart details are Saved. You can close this window","",1,Messagebox.ON_OK);
-			
+			Messagebox.show("Chart details are Updated Successfuly. You can close this window","",1,Messagebox.ON_OK);
+			Clients.evalJavaScript("window.open('','_self',''); window.close();");
 			editPortletWindow.detach();
 			try {
 				authenticationService.logout(null);
@@ -234,7 +235,7 @@ public class EditWidgetController extends SelectorComposer<Component> {
 			widgetService.updateWidget(portlet);
 			
 			Messagebox.show("Chart details are Updated Successfuly. You can close this window","",1,Messagebox.ON_OK);
-			
+			Clients.evalJavaScript("window.open('','_self',''); window.close();");
 			editPortletWindow.detach();
 			try {
 				authenticationService.logout(null);
