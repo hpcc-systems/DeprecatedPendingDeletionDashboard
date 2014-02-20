@@ -5,6 +5,7 @@ import java.sql.SQLException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.dao.AuthenticationDao;
 import org.hpccsystems.dashboard.entity.User;
 import org.hpccsystems.dashboard.services.AuthenticationService;
@@ -15,6 +16,7 @@ import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
 import org.zkoss.zk.ui.Session;
 import org.zkoss.zk.ui.Sessions;
+import org.zkoss.zk.ui.util.Clients;
 
 /**
  * AuthenticationServiceImpl is implementation class for AuthenticationService.
@@ -73,7 +75,9 @@ public class AuthenticationServiceImpl implements AuthenticationService,Serializ
 
 	public void logout(Object object)throws Exception {
 		Sessions.getCurrent().invalidate();
-		
+		if(getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD)){
+			 Clients.evalJavaScript("window.open('','_self',''); window.close();");	
+		}
 		if(object!= null) {				
 			try {
 				authendicationDao.updateActiveFlag((User)object);
