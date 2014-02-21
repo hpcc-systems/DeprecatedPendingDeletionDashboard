@@ -96,6 +96,7 @@ public class StringFilterController extends SelectorComposer<Component>{
 			}
 		}
 		
+		chartData.getFilterList().add(filter);
 	}
 	
 	@Listen("onClick = button#filtersSelectedBtn")

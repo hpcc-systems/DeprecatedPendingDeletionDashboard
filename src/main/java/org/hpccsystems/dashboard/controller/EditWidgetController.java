@@ -306,9 +306,9 @@ public class EditWidgetController extends SelectorComposer<Component> {
 	 */
 	@Listen("onClose=#editPortletWindow")
     public void closeWindow(Event event){
-		event.stopPropagation();
        if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_CONFIG_CHART )||
                  authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_CHART)){
+    	   event.stopPropagation();
     	   Messagebox.show("Chart settings are not saved. Do you still want to close?", 
     			    "Question", Messagebox.YES | Messagebox.NO,
     			    Messagebox.QUESTION,

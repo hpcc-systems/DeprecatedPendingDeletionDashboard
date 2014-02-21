@@ -503,14 +503,6 @@ public class EditChartController extends SelectorComposer<Component> {
 			}
 			
 			listItem.detach();
-			
-			//Refreshing Values for filtering
-			Component header = filterListBox.getFirstChild();
-			filterListBox.getChildren().clear();
-			filterListBox.appendChild(header);
-			for (Filter filter : chartData.getFilterList()) {
-				createFilterListItem(filter);
-			}
 		}
 	};
 }

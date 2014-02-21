@@ -99,6 +99,8 @@ public class NumericFilterController extends SelectorComposer<Component>{
 		
 		maximumSlider.setMaxpos(max);
 		maximumSlider.setCurpos(max);
+		
+		chartData.getFilterList().add(filter);
 	}
 	
 	@Listen("onScroll = #minimumSlider")
