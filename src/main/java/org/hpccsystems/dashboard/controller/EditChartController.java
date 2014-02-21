@@ -1,8 +1,6 @@
 package org.hpccsystems.dashboard.controller;
 
-import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -23,7 +21,6 @@ import org.hpccsystems.dashboard.services.DashboardService;
 import org.hpccsystems.dashboard.services.HPCCService;
 import org.hpccsystems.dashboard.services.WidgetService;
 import org.hpccsystems.dashboard.util.DashboardUtil;
-import org.springframework.dao.DataAccessException;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
@@ -42,7 +39,6 @@ import org.zkoss.zul.Include;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Listitem;
-import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Popup;
 import org.zkoss.zul.Vlayout;
 
@@ -144,8 +140,9 @@ public class EditChartController extends SelectorComposer<Component> {
 					validateDroppable();
 
 					if(chartData.getIsFiltered()) {
-						createFilterListItem(chartData.getFilter().getColumn());
-						filterListBox.setDroppable("false");
+						for (Filter filter : chartData.getFilterList()) {
+							createFilterListItem(filter);
+						}
 					}
 					
 					// Checking to avoid error while on the fly widget type change happens 
@@ -396,7 +393,7 @@ public class EditChartController extends SelectorComposer<Component> {
 				xAxisDropped = false;
 				Clients.evalJavaScript("clearChart('" + Constants.EDIT_WINDOW_CHART_DIV +  "')");
 			} else {
-					constructChart();
+				constructChart();
 			}
 			
 			validateDroppable();
@@ -411,21 +408,23 @@ public class EditChartController extends SelectorComposer<Component> {
 	public void onDropToFilterItem(final DropEvent dropEvent) {
 		final Listitem draggedListitem = (Listitem) ((DropEvent) dropEvent).getDragged();
 		
+		if(chartData.getFilterList().contains(draggedListitem.getLabel())) {
+			Clients.showNotification("This column is already added to filters.", "error", filterListBox, "end_center", 3000, true);
+			return;
+		}
+		
 		Filter filter = new Filter();
-		chartData.setFilter(filter);
+		filter.setColumn(draggedListitem.getLabel());
+		filter.setType((Integer) draggedListitem.getAttribute(Constants.COLUMN_DATA_TYPE));
 		
-		chartData.getFilter().setColumn(draggedListitem.getLabel());
-		chartData.getFilter().setType((Integer) draggedListitem.getAttribute(Constants.COLUMN_DATA_TYPE));
-		
-		createFilterListItem(draggedListitem.getLabel());
-		
-		//Disabling drops
-		filterListBox.setDroppable("false");
+		createFilterListItem(filter);
 	}
 	
-	private void createFilterListItem (String columnName) {
-		Listitem filterList = new Listitem();		
-		Listcell labelCell = new Listcell(columnName);
+	private void createFilterListItem (Filter filter) {
+		Listitem filterList = new Listitem();
+		filterList.setAttribute(Constants.FILTER, filter);
+		
+		Listcell labelCell = new Listcell(filter.getColumn());
 		
 		Button playBtn = new Button();
 		playBtn.setSclass("glyphicon glyphicon-play btn btn-link img-btn");
@@ -433,15 +432,16 @@ public class EditChartController extends SelectorComposer<Component> {
 		
 		Popup popup = new Popup();
 		popup.setZclass("popup");
-		popup.setId("filterPopup");
+		popup.setId( filter.getColumn()+ "_filterPopup");
 		
 		Include include = new Include();
+		include.setDynamicProperty(Constants.FILTER, filter);
 		include.setDynamicProperty(Constants.PORTLET, portlet);
 		include.setDynamicProperty(Constants.CHART_DATA, chartData);
 		
 		include.setDynamicProperty(Constants.EDIT_WINDOW_DONE_BUTTON, doneButton);
 		
-		if(Constants.NUMERIC_DATA.equals(chartData.getFilter().getType())){
+		if(Constants.NUMERIC_DATA.equals(filter.getType())){
 			include.setSrc("layout/numeric_filter_popup.zul");
 		} else {
 			include.setSrc("layout/string_filter_popup.zul");
@@ -449,7 +449,7 @@ public class EditChartController extends SelectorComposer<Component> {
 		
 		labelCell.appendChild(popup);
 		popup.appendChild(include);
-		playBtn.setPopup("filterPopup, position=end_center");
+		playBtn.setPopup(filter.getColumn()+ "_filterPopup, position=end_center");
 		
 		Button closeBtn = new Button();
 		closeBtn.setSclass("glyphicon glyphicon-remove btn btn-link img-btn");
@@ -459,33 +459,51 @@ public class EditChartController extends SelectorComposer<Component> {
 		
 		labelCell.appendChild(playBtn);
 		
-		labelCell.setTooltiptext(chartData.getFilter().getColumn());
+		labelCell.setTooltiptext(filter.getColumn());
 		
 		filterList.appendChild(labelCell);
-		filterList.setParent(filterListBox);
+		
+		filterListBox.appendChild(filterList);
+		//filterList.setParent(filterListBox);
 		//Enabling drops to filter list box
 		filterListBox.setDroppable("true");
 	}
+	
 	//Listener to close filter window
 	EventListener<Event> filterClearListener = new EventListener<Event>() {
 		public void onEvent(final Event event) throws Exception {	
 			Listitem listItem =(Listitem) event.getTarget().getParent().getParent();			
-			listItem.detach();
 			
-			chartData.setIsFiltered(false);
-			chartData.setFilter(null);
+			chartData.getFilterList().remove(
+					chartData.getFilterList().indexOf(
+							listItem.getAttribute(Constants.FILTER)));
+			if(chartData.getFilterList().size() < 1){
+				chartData.setIsFiltered(false);
+			}
+			
 			try {
 				chartRenderer.constructChartJSON(chartData, portlet, true);
 				chartRenderer.drawChart(chartData, Constants.EDIT_WINDOW_CHART_DIV, portlet);
 			} catch(Exception ex) {
 				Clients.showNotification("Unable to fetch column data from HPCC", "error", EditChartController.this.getSelf() , "middle_center", 3000, true);
 				LOG.error("Exception while fetching column data from Hpcc", ex);
-			}			
+			}
+			
 			//Enabling drops to filter list box
 			filterListBox.setDroppable("true");
 			
 			if(xAxisDropped && yAxisDropped){
 				doneButton.setDisabled(false);
+			}
+			
+			listItem.detach();
+			
+			//Refreshing Values for filtering
+			Component header = filterListBox.getFirstChild();
+			filterListBox.getChildren().clear();
+			filterListBox.appendChild(header);
+			for (Filter filter : chartData.getFilterList()) {
+				createFilterListItem(filter);
 			}
 		}
 	};

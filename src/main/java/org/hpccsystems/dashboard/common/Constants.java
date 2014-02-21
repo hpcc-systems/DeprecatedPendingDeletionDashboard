@@ -14,6 +14,7 @@ public class Constants {
 	public static final String ACTIVE_DASHBOARD_NAME = "activeDashboard";
 	
 	public static final String PORTLET = "portlet";
+	public static final String FILTER = "filter";
 	public static final String CHART_DATA = "chartData";
 	public static final String DASHBOARD = "dashboard"; 
 	

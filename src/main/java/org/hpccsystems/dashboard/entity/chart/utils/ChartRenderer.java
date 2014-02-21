@@ -5,7 +5,6 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.math.BigDecimal;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -22,6 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.entity.Portlet;
+import org.hpccsystems.dashboard.entity.chart.Filter;
 import org.hpccsystems.dashboard.entity.chart.Group;
 import org.hpccsystems.dashboard.entity.chart.XYChartData;
 import org.hpccsystems.dashboard.entity.chart.XYModel;
@@ -55,7 +55,7 @@ public class ChartRenderer {
 	 * 	Chart Data that contains details to draw chart
 	 * @param chartType
 	 * @param portlet
-	 * 	Portlet Object for which chartData is generate. 
+	 * 	Portlet Object for which chartData is to be generated. 
 	 * 	The JSON data constructed will be available in this portlet.
 	 * 
 	 * @return
@@ -91,24 +91,27 @@ public class ChartRenderer {
 			LOG.debug("Constructing chart \n Is chart has filters - " + chartData.getIsFiltered());
 		}
 		
-		if(chartData.getIsFiltered() &&
-				Constants.STRING_DATA.equals(chartData.getFilter().getType())) {
-			header.addProperty("filterColumn", chartData.getFilter().getColumn());
-			header.addProperty("stringFilter", 
-					constructFilterTitle(chartData.getFilter().getValues()));
+		Iterator<Filter> filterIterator = chartData.getFilterList().iterator(); 
+		while (filterIterator.hasNext()) {
+			Filter filter = (Filter) filterIterator.next();
+			title.append(" WHERE " + filter.getColumn());
 			
-			title.append(" WHERE " + chartData.getFilter().getColumn());
-			title.append(constructFilterTitle(chartData.getFilter().getValues()));
-		
-		} else if (chartData.getIsFiltered() && 
-				Constants.NUMERIC_DATA.equals(chartData.getFilter().getType())) {
-			header.addProperty("filterColumn", chartData.getFilter().getColumn());
-			header.addProperty("from", chartData.getFilter().getStartValue());
-			header.addProperty("to", chartData.getFilter().getEndValue());
+			if(chartData.getIsFiltered() &&
+					Constants.STRING_DATA.equals(filter.getType())) {
+				title.append(filter.getColumn());
+				title.append(" IS ");
+				title.append(constructFilterTitle(filter.getValues()));
 			
-			title.append(" WHERE " + chartData.getFilter().getColumn());
-			title.append(" BETWEEN " + chartData.getFilter().getStartValue());
-			title.append(" AND " + chartData.getFilter().getEndValue());
+			} else if (chartData.getIsFiltered() && 
+					Constants.NUMERIC_DATA.equals(filter.getType())) {
+				title.append(filter.getColumn());
+				title.append(" BETWEEN " + filter.getStartValue());
+				title.append(" & " + filter.getEndValue());
+			}
+			
+			if(filterIterator.hasNext()){
+				title.append(" AND "); 
+			}
 		}
 		
 		if(LOG.isDebugEnabled()){
@@ -264,14 +267,12 @@ public class ChartRenderer {
 		List<XYModel> result = new ArrayList<XYModel>();
 		
 		List<String> xLabels = hpccService.getDistinctValues(
-				chartData.getFileName(), 
 				chartData.getXColumnNames().get(0), //First X column is being displayed as labels  
-				chartData.getHpccConnection());
+				chartData);
 		
 		List<String> groupedList = hpccService.getDistinctValues(
-				chartData.getFileName(), 
 				chartData.getXColumnNames().get(1), //Second X column is grouped
-				chartData.getHpccConnection()); 
+				chartData); 
 		
 		//Constructing Group Object
 		Group group = new Group();

@@ -134,7 +134,6 @@ public class DashboardController extends SelectorComposer<Component>{
 			if(LOG.isDebugEnabled()){
 				LOG.debug("dashboardList in DashboardController.doAfterCompose()-->"+dashboardList);
 				LOG.debug("Creating dashboard - Dashboard Id " + dashboardId);
-				LOG.debug("Persistance - " + dashboard.isPersisted());
 			}
 			nameLabel.setValue(dashboard.getName());
 			

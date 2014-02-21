@@ -6,6 +6,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.entity.Portlet;
+import org.hpccsystems.dashboard.entity.chart.Filter;
 import org.hpccsystems.dashboard.entity.chart.XYChartData;
 import org.hpccsystems.dashboard.entity.chart.utils.ChartRenderer;
 import org.hpccsystems.dashboard.services.AuthenticationService;
@@ -30,6 +31,7 @@ public class NumericFilterController extends SelectorComposer<Component>{
 	private static final  Log LOG = LogFactory.getLog(NumericFilterController.class);
 	
 	private Portlet portlet;
+	private Filter filter;
 	private XYChartData chartData;
 	private Button doneButton;
 	
@@ -59,28 +61,35 @@ public class NumericFilterController extends SelectorComposer<Component>{
 		super.doAfterCompose(comp);
 		
 		portlet = (Portlet) Executions.getCurrent().getAttribute(Constants.PORTLET);
+		filter = (Filter) Executions.getCurrent().getAttribute(Constants.FILTER);
 		chartData = (XYChartData) Executions.getCurrent().getAttribute(Constants.CHART_DATA);
 		doneButton = (Button) Executions.getCurrent().getAttribute(Constants.EDIT_WINDOW_DONE_BUTTON);
 		
-		Map<Integer, Integer> map = null;
-		try	{
-			map = hpccService.fetchFilterMinMax(chartData);
-		} catch(Exception e) {
-			if(!authenticationService.getUserCredential().getApplicationId().equals(Constants.CIRCUIT_APPLICATION_ID) || 
-					authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD)){
-				Clients.showNotification("Unable to fetch data to Filter for the column dropped", 
-						"error", doneButton.getParent().getParent().getParent(), "middle_center", 3000, true);
-			}else{
-				Clients.showNotification("Unable to fetch column data from HPCC", true);
-			
+		Integer min;
+		Integer max;
+		if(filter.getStartValue() != null && filter.getEndValue() != null ) {
+			min = Integer.parseInt(filter.getStartValue().toString());
+			max = Integer.parseInt(filter.getEndValue().toString());
+		} else {
+			Map<Integer, Integer> map = null;
+			try	{
+				map = hpccService.getMinMax(filter.getColumn(), chartData);
+			} catch(Exception e) {
+				if(!authenticationService.getUserCredential().getApplicationId().equals(Constants.CIRCUIT_APPLICATION_ID) || 
+						authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD)){
+					Clients.showNotification("Unable to fetch data to Filter for the column dropped", 
+							"error", doneButton.getParent().getParent().getParent(), "middle_center", 3000, true);
+				}else{
+					Clients.showNotification("Unable to fetch column data from HPCC", true);
+				}
+				LOG.error("Exception while fetching data from Hpcc for selected Numeric filter", e);
+				return;
 			}
-			LOG.error("Exception while fetching data from Hpcc for selected Numeric filter", e);
-			return;
+			
+			min = map.get(Constants.FILTER_MINIMUM);
+			max = map.get(Constants.FILTER_MAXIMUM);
 		}
-		
-		Integer min = map.get(Constants.FILTER_MINIMUM);
-		Integer max = map.get(Constants.FILTER_MAXIMUM);
-		
+			
 		minimumLabel.setValue(min.toString());
 		maximumLabel.setValue(max.toString());
 		
@@ -115,20 +124,24 @@ public class NumericFilterController extends SelectorComposer<Component>{
 	@Listen("onClick = button#filtersSelectedBtn")
 	public void onfiltersSelected() {
 				
-		chartData.getFilter().setStartValue((double) minimumSlider.getCurpos());
-		chartData.getFilter().setEndValue((double) maximumSlider.getCurpos());
+		filter.setStartValue((double) minimumSlider.getCurpos());
+		filter.setEndValue((double) maximumSlider.getCurpos());
+		
 		chartData.setIsFiltered(true);
+		if(!chartData.getFilterList().contains(filter)){
+			chartData.getFilterList().add(filter);
+		}
+		
 		try	{
 			chartRenderer.constructChartJSON(chartData, portlet, true);
 			chartRenderer.drawChart(chartData, Constants.EDIT_WINDOW_CHART_DIV, portlet);
-		}catch(Exception ex) {
+		} catch(Exception ex) {
 			if(!authenticationService.getUserCredential().getApplicationId().equals(Constants.CIRCUIT_APPLICATION_ID) || 
 					authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD)){
 				Clients.showNotification("Unable to fetch column data from HPCC", "error", 
 						doneButton.getParent().getParent().getParent(), "middle_center", 3000, true);			
 			}else{
-			
-			Clients.showNotification("Unable to fetch column data from HPCC", true);
+				Clients.showNotification("Unable to fetch column data from HPCC", true);
 			}
 			LOG.error("Exception while fetching column data from Hpcc", ex);
 			return;

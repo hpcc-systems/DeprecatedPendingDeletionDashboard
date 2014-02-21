@@ -1,9 +1,9 @@
 package org.hpccsystems.dashboard.controller;
 
-import java.sql.Date;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.common.Constants;
@@ -19,7 +19,7 @@ import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Radio;
 import org.zkoss.zul.Radiogroup;
 import org.zkoss.zul.Textbox;
-import org.zkoss.zul.Window; 
+import org.zkoss.zul.Window;
 
 public class DashboardConfigurationController extends SelectorComposer<Component>{
 

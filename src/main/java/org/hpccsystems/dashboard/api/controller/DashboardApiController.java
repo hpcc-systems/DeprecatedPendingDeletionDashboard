@@ -17,9 +17,12 @@ import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.entity.ChartDetails;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.Portlet;
+import org.hpccsystems.dashboard.entity.chart.Filter;
 import org.hpccsystems.dashboard.entity.chart.XYChartData;
 import org.hpccsystems.dashboard.entity.chart.utils.ChartRenderer;
+import org.hpccsystems.dashboard.services.AuthenticationService;
 import org.hpccsystems.dashboard.services.DashboardService;
+import org.hpccsystems.dashboard.services.UserCredential;
 import org.hpccsystems.dashboard.services.WidgetService;
 import org.hpccsystems.dashboard.util.DashboardUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,6 +32,8 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.zkoss.json.JSONArray;
 import org.zkoss.json.JSONObject;
+import org.zkoss.zk.ui.Sessions;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -42,9 +47,15 @@ import com.google.gson.JsonObject;
 @RequestMapping("*.do")
 public class DashboardApiController {	
 	private static final  Log LOG = LogFactory.getLog(DashboardApiController.class); 
+	
 	DashboardService dashboardService;
 	WidgetService widgetService;
+	AuthenticationService authenticationService;
 	
+	@Autowired
+	public void setAuthenticationService(AuthenticationService authenticationService) {
+		this.authenticationService = authenticationService;
+	}
 	@Autowired
 	public void setDashboardService(DashboardService dashboardService) {
 		this.dashboardService = dashboardService;
@@ -62,12 +73,12 @@ public class DashboardApiController {
  * @param request
  * @param response
  */
-@RequestMapping(value = Constants.CIRCUIT_DELETE_REQ , method = RequestMethod.GET)
+@RequestMapping(value = Constants.CIRCUIT_DELETE_REQ)
 public void deleteDashboard(HttpServletRequest request, HttpServletResponse response)throws Exception
 {	
 	JSONObject jsObj = new JSONObject();
 	int rowsDeleted = 0;
-	try { 
+	try { 		
 			String dashboardId = null;
 			dashboardId = request.getParameter(Constants.DB_DASHBOARD_ID);	
 			rowsDeleted = dashboardService.deleteDashboard(Integer.valueOf(dashboardId),null);	
@@ -94,10 +105,11 @@ public void deleteDashboard(HttpServletRequest request, HttpServletResponse resp
 	
 }
 
-@RequestMapping(value = Constants.CIRCUIT_CHARTLIST_REQ , method = RequestMethod.GET)
+@RequestMapping(value = Constants.CIRCUIT_CHARTLIST_REQ)
 public void getChartList(HttpServletRequest request, HttpServletResponse response)throws Exception
  {
 		try {
+			
 			String paramValue = request.getParameter(Constants.CHARTLIST_FORMAT);			
 			if (paramValue != null &&Constants.JSON .equals(paramValue)) {
 				JsonObject jsonObject;
@@ -123,18 +135,18 @@ public void getChartList(HttpServletRequest request, HttpServletResponse respons
 
 	}
 
-@RequestMapping(value = Constants.CIRCUIT_SEARCH_REQ , method = RequestMethod.GET)
+@RequestMapping(value = Constants.CIRCUIT_SEARCH_REQ)
 public void searchDashboard(HttpServletRequest request, HttpServletResponse response)throws Exception
  {
 	JSONObject jsonResposeObj = new JSONObject();
-		try {
+		try {			
 			List<Dashboard> dashboardList = null;
 			Dashboard dashBoard = null;
 			JSONObject jsonObject = null;			
 			JSONArray jsonArray = new JSONArray();
 			dashboardList = dashboardService.retrieveDashboardMenuPages(
 						request.getParameter(Constants.SOURCE),
-						null,
+						"2",
 						null,
 						request.getParameter(Constants.SOURCE_ID)
 						);
@@ -163,6 +175,7 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
 			LOG.error("Exception while processing Search dahhboard request from Circuit", e);
 			throw new Exception("Unable to process Search Request");
 		}
+		
 	}
 
 /**
@@ -171,10 +184,11 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
  * @param response
  * @throws IOException
  */
-@RequestMapping(value = Constants.CIRCUIT_VALIDATE_REQ, method = RequestMethod.GET)
+@RequestMapping(value = Constants.CIRCUIT_VALIDATE_REQ, method = RequestMethod.POST)
 	public void validateDashboard(HttpServletRequest request, HttpServletResponse response) throws Exception {
 	JsonObject jsonObject = new JsonObject();
 		try {
+			
 			XYChartData chartData = null;
 			List<String> xColumnList = null;
 			List<String> yColumnList = null;
@@ -199,9 +213,11 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
 						yColumnValidation(failedValColumnList, yColumnList,	chartConfiguration);
 						// Filter Column Validation
 						if (chartData.getIsFiltered()) {
-							filterColumn = chartData.getFilter().getColumn();
-							filterDataType = chartData.getFilter().getType();
-							filterColumnValidation(failedValColumnList,	filterColumn, filterDataType, chartConfiguration);
+							for (Filter filter : chartData.getFilterList()) {
+								filterColumn = filter.getColumn();
+								filterDataType = filter.getType();
+								filterColumnValidation(failedValColumnList,	filterColumn, filterDataType, chartConfiguration);
+							}
 						}
 					}
 				}

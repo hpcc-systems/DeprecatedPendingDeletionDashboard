@@ -14,23 +14,12 @@ public class XYChartData {
 	private String fileName;
 	
 	private List<String> xColumnNames;
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append(", hpccConnection=").append(hpccConnection).append(", fileName=")
-				.append(fileName).append(", xColumnNames=").append(xColumnNames)
-				.append(", yColumnNames=" ).append(yColumnNames).append(", tableColumns=")
-				.append(tableColumns).append(", isFiltered=")
-				.append(isFiltered).append(", filter=").append(filter).append("]");
-		return  builder.toString();
-	}
-
 	private List<String> yColumnNames;
 	private List<String> tableColumns;
 	
 	
 	private Boolean isFiltered = false;
-	private Filter filter;
+	private List<Filter> filterList;
 	
 	private Boolean isGrouped = false;
 	
@@ -67,15 +56,6 @@ public class XYChartData {
 
 	public void setYColumnNames(List<String> yColumnNames) {
 		this.yColumnNames = yColumnNames;
-	}
-
-	@XmlElement
-	public Filter getFilter() {
-		return filter;
-	}
-
-	public void setFilter(Filter filter) {
-		this.filter = filter;
 	}
 
 	@XmlElement
@@ -125,6 +105,18 @@ public class XYChartData {
 
 	public void setIsGrouped(Boolean isGrouped) {
 		this.isGrouped = isGrouped;
+	}
+
+	@XmlElement
+	public List<Filter> getFilterList() {
+		if(filterList == null){
+			filterList = new ArrayList<Filter>();
+		}
+		return filterList;
+	}
+
+	public void setFilterList(List<Filter> filterList) {
+		this.filterList = filterList;
 	}
 
 }

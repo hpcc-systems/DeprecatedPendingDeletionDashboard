@@ -32,23 +32,28 @@ public interface HPCCService {
 	List<XYModel> getChartData(XYChartData data) throws Exception;
 	
 	/**
-	 * Function to fetch distinct values of a specified field in the logical file specified 
-	 * @param fileName
+	 * Function to fetch distinct values of a specified String field
+	 * All filter Conditions in ChartData Object are applied while retrieving distinct values  
 	 * @param fieldName
-	 * @param hpccConnection
+	 * 	Must be a STRING Field
+	 * @param chartData
 	 * @return
 	 * 	List of distinct values as a list
 	 * @throws Exception
 	 */
-	List<String> getDistinctValues(String fileName, String fieldName, HpccConnection hpccConnection) throws Exception ;
+	List<String> getDistinctValues(String fieldName, XYChartData chartData) throws Exception ;
 	
 	/**
-	 * Fetches maximum and minimum values of the Numeric filter
+	 * Function to fetch Minimum and Maximum values of specified Numeric field
+	 * All filter Conditions in ChartData Object are applied while retrieving Minimum and Maximum values
+	 * @param fieldName
+	 * 	Must be a NUMERIC field
 	 * @param chartData
 	 * @return
-	 * 	a map with minimum and maximum values
+	 * 	Minimum and Maximum values as values of the Map
+	 * @throws Exception
 	 */
-	Map<Integer,Integer> fetchFilterMinMax(XYChartData chartData) throws Exception ;
+	Map<Integer,Integer> getMinMax(String fieldName, XYChartData chartData) throws Exception ;
 	
 	/**
 	 * fetchTableData() is used to retrieve the Column values from HPCC systems 

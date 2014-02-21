@@ -7,6 +7,7 @@ import java.math.BigDecimal;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.entity.FileMeta;
+import org.hpccsystems.dashboard.entity.chart.Filter;
 import org.hpccsystems.dashboard.entity.chart.HpccConnection;
 import org.hpccsystems.dashboard.entity.chart.XYChartData;
 import org.hpccsystems.dashboard.entity.chart.XYModel;
@@ -145,7 +147,7 @@ public class HPCCServiceImpl implements HPCCService{
 			if(chartData.getHpccConnection().getIsSSL()) {
 				locator.setWs_sqlServiceSoapAddress("https://" + chartData.getHpccConnection().getHostIp()+ ":1" + WS_SQL_ENDPOINT);
 			} else {
-				locator.setWs_sqlServiceSoapAddress("https://" + chartData.getHpccConnection().getHostIp()+ ":" + WS_SQL_ENDPOINT);
+				locator.setWs_sqlServiceSoapAddress("http://" + chartData.getHpccConnection().getHostIp()+ ":" + WS_SQL_ENDPOINT);
 			}
 			
 			if(LOG.isDebugEnabled()){
@@ -184,15 +186,18 @@ public class HPCCServiceImpl implements HPCCService{
 					 fstNode = nodeList.item(s);
 					  if (fstNode.getNodeType() == Node.ELEMENT_NODE) {
 						dataObj=new XYModel();
-						  
-					    fstElmnt = (Element) fstNode;
 					    
+						fstElmnt = (Element) fstNode;
 					    valueList = new ArrayList<Object>();
 					    for(String xColumnName : chartData.getXColumnNames()){
 					    	lstNmElmntLst = fstElmnt.getElementsByTagName(xColumnName);
 					    	lstNmElmnt = (Element) lstNmElmntLst.item(0);
 					    	lstNm = lstNmElmnt.getChildNodes();
-					    	nodeValue = ((Node) lstNm.item(0)).getNodeValue();
+					    	if(lstNm.item(0) == null){
+					    		nodeValue = "";
+					    	}else{
+					    		nodeValue = ((Node) lstNm.item(0)).getNodeValue();
+					    	}
 					    	valueList.add(nodeValue);
 					    }
 					    dataObj.setxAxisValues(valueList);
@@ -223,16 +228,16 @@ public class HPCCServiceImpl implements HPCCService{
 	}
 	
 	@Override
-	public List<String> getDistinctValues(String fileName, String fieldName, HpccConnection hpccConnection) throws Exception{
+	public List<String> getDistinctValues(String fieldName, XYChartData chartData) throws Exception{
 		List<String> filterDataList = new ArrayList<String>();
 		
 		final Ws_sqlLocator locator = new Ws_sqlLocator();
-		locator.setWs_sqlServiceSoap_userName(hpccConnection.getUsername());
-		locator.setWs_sqlServiceSoap_password(hpccConnection.getPassword());
-		if(hpccConnection.getIsSSL()) {
-			locator.setWs_sqlServiceSoapAddress("https://" + hpccConnection.getHostIp()+ ":1" + WS_SQL_ENDPOINT);
+		locator.setWs_sqlServiceSoap_userName(chartData.getHpccConnection().getUsername());
+		locator.setWs_sqlServiceSoap_password(chartData.getHpccConnection().getPassword());
+		if(chartData.getHpccConnection().getIsSSL()) {
+			locator.setWs_sqlServiceSoapAddress("https://" + chartData.getHpccConnection().getHostIp()+ ":1" + WS_SQL_ENDPOINT);
 		} else {
-			locator.setWs_sqlServiceSoapAddress("https://" + hpccConnection.getHostIp()+ ":" + WS_SQL_ENDPOINT);
+			locator.setWs_sqlServiceSoapAddress("http://" + chartData.getHpccConnection().getHostIp()+ ":" + WS_SQL_ENDPOINT);
 		}
 		
 		Ws_sqlServiceSoap soap;
@@ -243,12 +248,18 @@ public class HPCCServiceImpl implements HPCCService{
 		final StringBuilder queryTxt=new StringBuilder("select ");
 		queryTxt.append(fieldName);
 		queryTxt.append(" from ");
-		queryTxt.append(fileName);
+		queryTxt.append(chartData.getFileName());
+		
+		queryTxt.append(constructWhereClause(chartData));
+
 		queryTxt.append(" group by ");
 		queryTxt.append(fieldName);
 		queryTxt.append(" order by ");
 		queryTxt.append(fieldName);
 		
+		if(LOG.isDebugEnabled()){
+			LOG.debug("Query for Distinct values -> " + queryTxt.toString());
+		}
 		
 		req.setSqlText(queryTxt.toString());
 		req.setTargetCluster("thor");
@@ -294,8 +305,8 @@ public class HPCCServiceImpl implements HPCCService{
 		return filterDataList;
 	}
 
-	
-	public Map<Integer, Integer> fetchFilterMinMax(XYChartData chartData) throws Exception {
+	@Override
+	public Map<Integer, Integer> getMinMax(String fieldName, XYChartData chartData) throws Exception {
 		Map<Integer, Integer> resultMap = new HashMap<Integer, Integer>();	
 		
 		final Ws_sqlLocator locator = new Ws_sqlLocator();
@@ -304,7 +315,7 @@ public class HPCCServiceImpl implements HPCCService{
 		if(chartData.getHpccConnection().getIsSSL()) {
 			locator.setWs_sqlServiceSoapAddress("https://" + chartData.getHpccConnection().getHostIp()+ ":1" + WS_SQL_ENDPOINT);
 		} else {
-			locator.setWs_sqlServiceSoapAddress("https://" + chartData.getHpccConnection().getHostIp()+ ":" + WS_SQL_ENDPOINT);
+			locator.setWs_sqlServiceSoapAddress("http://" + chartData.getHpccConnection().getHostIp()+ ":" + WS_SQL_ENDPOINT);
 		}
 		
 		Ws_sqlServiceSoap soap = null;
@@ -313,13 +324,14 @@ public class HPCCServiceImpl implements HPCCService{
 			soap = locator.getws_sqlServiceSoap();
 		final ExecuteSQLRequest req = new ExecuteSQLRequest();
 		
-		//It is required to specify mimimum value first in the query as result XML element names are dependent on the order
+		//It is required to specify minimum value first in the query as result XML element names are dependent on the order
 		final StringBuilder queryTxt=new StringBuilder("select min(")
-			.append(chartData.getFilter().getColumn())
+			.append(fieldName)
 			.append("), max(")
-			.append(chartData.getFilter().getColumn())
+			.append(fieldName)
 			.append(") from ")
-			.append(chartData.getFileName());
+			.append(chartData.getFileName())
+			.append(constructWhereClause(chartData));
 		
 		req.setSqlText(queryTxt.toString());
 		req.setTargetCluster("thor");
@@ -355,38 +367,59 @@ public class HPCCServiceImpl implements HPCCService{
 	}
 	
 	
+	/**
+	 * Constructs a where clause only when ChartData is Filtered
+	 * 
+	 * @param chartData
+	 * @return
+	 */
 	private String constructWhereClause(XYChartData chartData) {
 		StringBuilder queryTxt = new StringBuilder();
 		
-		if( chartData.getIsFiltered() &&
-				Constants.STRING_DATA.equals(chartData.getFilter().getType())) {
+		if(chartData.getIsFiltered()){
 			queryTxt.append(" where ");
-			queryTxt.append(chartData.getFilter().getColumn());
-			queryTxt.append(" in ");
-			queryTxt.append(" (");
 			
-			for(int i=1;i<= chartData.getFilter().getValues().size(); i++){
+			Iterator<Filter> iterator = chartData.getFilterList().iterator();
+			while (iterator.hasNext()) {
+				Filter filter = iterator.next();
 				
-				queryTxt.append(" '").append( chartData.getFilter().getValues().get(i-1)).append("'");
+				if(LOG.isDebugEnabled()){
+					LOG.debug("Contructing where clause " + filter.toString());
+				}
 				
-				if(i<chartData.getFilter().getValues().size()){
-					queryTxt.append(",");
-				}	
+				queryTxt.append("(");
+				
+				if( Constants.STRING_DATA.equals(filter.getType())) {
+					queryTxt.append(filter.getColumn());
+					queryTxt.append(" in ");
+					queryTxt.append(" (");
+					
+					for(int i=1;i<= filter.getValues().size(); i++){
+						
+						queryTxt.append(" '").append( filter.getValues().get(i-1)).append("'");
+						
+						if(i<filter.getValues().size()){
+							queryTxt.append(",");
+						}	
+					}
+					
+					queryTxt.append(" )");
+				} else if(Constants.NUMERIC_DATA.equals(filter.getType())) {
+					queryTxt.append(filter.getColumn());
+					queryTxt.append(" > ");
+					queryTxt.append(filter.getStartValue());
+					queryTxt.append(" and ");
+					queryTxt.append(filter.getColumn());
+					queryTxt.append(" < ");
+					queryTxt.append(filter.getEndValue());
+				}
+				
+				queryTxt.append(")");
+				
+				if(iterator.hasNext()) {
+					queryTxt.append(" AND ");
+				}
 			}
-			
-			queryTxt.append(" )");
-			
-		} else if( chartData.getIsFiltered() &&
-				Constants.NUMERIC_DATA.equals(chartData.getFilter().getType())) {
-			queryTxt.append(chartData.getFileName());
-			queryTxt.append(" where ");
-			queryTxt.append(chartData.getFilter().getColumn());
-			queryTxt.append(" > ");
-			queryTxt.append(chartData.getFilter().getStartValue());
-			queryTxt.append(" and ");
-			queryTxt.append(chartData.getFilter().getColumn());
-			queryTxt.append(" < ");
-			queryTxt.append(chartData.getFilter().getEndValue());
 		}
 		
 		return queryTxt.toString();
@@ -405,9 +438,6 @@ public class HPCCServiceImpl implements HPCCService{
 			if(LOG.isDebugEnabled()) {
 				LOG.debug("Building Query");
 				LOG.debug("isFiltered -> " + chartData.getIsFiltered());
-				if(chartData.getIsFiltered()) {
-					LOG.debug("Filter type -> " + chartData.getFilter().getType());
-				}
 			}
 			
 			for (String columnName : chartData.getXColumnNames()) {
@@ -461,7 +491,7 @@ public class HPCCServiceImpl implements HPCCService{
 		if(tableData.getHpccConnection().getIsSSL()) {
 			locator.setWs_sqlServiceSoapAddress("https://" + tableData.getHpccConnection().getHostIp()+ ":1" + WS_SQL_ENDPOINT);
 		} else {
-			locator.setWs_sqlServiceSoapAddress("https://" + tableData.getHpccConnection().getHostIp()+ ":" + WS_SQL_ENDPOINT);
+			locator.setWs_sqlServiceSoapAddress("http://" + tableData.getHpccConnection().getHostIp()+ ":" + WS_SQL_ENDPOINT);
 		}
 		LinkedHashMap<String, List<String>> tableDataMap = new LinkedHashMap<String, List<String>>();
 		try

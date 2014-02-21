@@ -8,6 +8,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.entity.Portlet;
+import org.hpccsystems.dashboard.entity.chart.Filter;
 import org.hpccsystems.dashboard.entity.chart.XYChartData;
 import org.hpccsystems.dashboard.entity.chart.utils.ChartRenderer;
 import org.hpccsystems.dashboard.services.AuthenticationService;
@@ -34,6 +35,7 @@ public class StringFilterController extends SelectorComposer<Component>{
 	
 	private XYChartData chartData;
 	private Portlet portlet;
+	private Filter filter;
 	private Button doneButton;
 	
 	@WireVariable
@@ -56,13 +58,14 @@ public class StringFilterController extends SelectorComposer<Component>{
 		portlet = (Portlet) Executions.getCurrent().getAttribute(Constants.PORTLET);
 		chartData = (XYChartData) Executions.getCurrent().getAttribute(Constants.CHART_DATA);
 		doneButton =  (Button) Executions.getCurrent().getAttribute(Constants.EDIT_WINDOW_DONE_BUTTON);
+		filter = (Filter) Executions.getCurrent().getAttribute(Constants.FILTER);
 		
 		Listitem listitem;
 		Listcell listcell;
 		
 		List<String> valueList = null;
 		try	{
-			valueList = hpccService.getDistinctValues(chartData.getFileName(), chartData.getFilter().getColumn(), chartData.getHpccConnection());
+			valueList = hpccService.getDistinctValues(filter.getColumn(), chartData);
 		} catch(Exception e) {
 			Clients.showNotification("Unable to fetch data for the Filter column", "error", 
 					doneButton.getParent().getParent().getParent(), "top_left", 3000, true);
@@ -71,8 +74,8 @@ public class StringFilterController extends SelectorComposer<Component>{
 		
 		List<String> filteredList = null;
 		
-		if(chartData.getIsFiltered() && valueList != null){
-			filteredList = chartData.getFilter().getValues();
+		if(filter.getValues() != null && valueList != null){
+			filteredList = filter.getValues();
 			for (String value : valueList) {
 				listitem = new Listitem();
 				listcell = new Listcell(value);
@@ -105,15 +108,26 @@ public class StringFilterController extends SelectorComposer<Component>{
 			selectedValues.add(listitem.getLabel());
 		}
 		
-		chartData.getFilter().setValues(selectedValues);
+		// Check for no values selected
+		if(selectedValues.size() < 1) {
+			Clients.showNotification("No filter values are selected. Please select some Values to filter", "error", 
+					doneButton.getParent().getParent().getParent(), "middle_center", 3000, true);
+			return;
+		}
+		
+		filter.setValues(selectedValues);
+
 		chartData.setIsFiltered(true);
-		try{
-		chartRenderer.constructChartJSON(chartData, portlet, true);
-		chartRenderer.drawChart(chartData, Constants.EDIT_WINDOW_CHART_DIV, portlet);
-		}catch(Exception ex)
-		{
+		if(!chartData.getFilterList().contains(filter)){
+			chartData.getFilterList().add(filter);
+		
+		}
+		try {
+			chartRenderer.constructChartJSON(chartData, portlet, true);
+			chartRenderer.drawChart(chartData, Constants.EDIT_WINDOW_CHART_DIV, portlet);
+		} catch(Exception ex) {
 			Clients.showNotification("Unable to fetch column data from HPCC", "error", 
-					doneButton.getParent().getParent().getParent(), "top_left", 3000, true);
+					doneButton.getParent().getParent().getParent(), "middle_center", 3000, true);
 			LOG.error("Exception while fetching column data from Hpcc", ex);
 			return;
 		}
@@ -125,6 +139,7 @@ public class StringFilterController extends SelectorComposer<Component>{
 		if(LOG.isDebugEnabled()){
 			LOG.debug("Drawn filtered chart");
 		}
+		
 	}
 
 }

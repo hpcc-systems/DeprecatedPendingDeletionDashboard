@@ -25,7 +25,9 @@ import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
+import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.event.MouseEvent;
+import org.zkoss.zk.ui.event.SerializableEventListener;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
@@ -36,6 +38,7 @@ import org.zkoss.zul.Button;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.Messagebox;
+import org.zkoss.zul.Messagebox.ClickEvent;
 import org.zkoss.zul.Window;
 
 import com.google.gson.GsonBuilder;
@@ -88,6 +91,7 @@ public class EditWidgetController extends SelectorComposer<Component> {
 			//Configuring chart through API
 			dashboard = new Dashboard();
 			dashboard.setSourceId(execution.getParameter(Constants.SOURCE_ID));
+			dashboard.setApplicationId(execution.getParameter(Constants.SOURCE));
 			dashboard.setColumnCount(1);
 			dashboard.setSequence(0);
 			ChartConfiguration configuration = new GsonBuilder().create().fromJson(
@@ -103,10 +107,11 @@ public class EditWidgetController extends SelectorComposer<Component> {
 			chartData.setHpccConnection(configuration.getHpccConnection());
 			
 			holderInclude.setDynamicProperty(Constants.CIRCUIT_CONFIG, configuration);
+			
 		} else if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_CHART)){
 			//Viewing chart through API
 			List<String> dashboardIdList = null;
-			if(execution.getParameter("dashboardId") != null) {
+			if(execution.getParameter(Constants.DASHBOARD_ID) != null) {
 				dashboardIdList = new ArrayList<String>();
 				dashboardIdList.add(execution.getParameter("dashboardId"));
 			}
@@ -117,15 +122,15 @@ public class EditWidgetController extends SelectorComposer<Component> {
 							execution.getParameter(Constants.SOURCE_ID))
 								.get(0); // Assuming one Dashboard exists for a provided source_id 
 			portlet = widgetService.retriveWidgetDetails(dashboard.getDashboardId())
-						.get(0); //Assuming one Widget exists for the provided dashboard
-			//Overriding chart type
-			if(execution.getParameter(Constants.CHART_TYPE) != null) {
-				portlet.setChartType(Integer.parseInt(execution.getParameter(Constants.CHART_TYPE)));
-			}
-			
-			if (Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())) {
-				chartData = chartRenderer.parseXML(portlet.getChartDataXML());
-			}
+					.get(0); //Assuming one Widget exists for the provided dashboard
+		//Overriding chart type
+		if(execution.getParameter(Constants.CHART_TYPE) != null) {
+			portlet.setChartType(Integer.parseInt(execution.getParameter(Constants.CHART_TYPE)));
+		}
+		
+		if (Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())) {
+			chartData = chartRenderer.parseXML(portlet.getChartDataXML());
+		}
 		} else {
 			//General flow
 			portlet = (Portlet) Executions.getCurrent().getArg().get(Constants.PORTLET);
@@ -191,24 +196,37 @@ public class EditWidgetController extends SelectorComposer<Component> {
 		portlet.setWidgetState(Constants.STATE_LIVE_CHART);
 		
 		if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_CONFIG_CHART)){
+			
 			//Configuring chart through API
 			dashboard.setLastupdatedDate(new Timestamp(new Date().getTime()));
 			
 			try {
-				dashboard.setDashboardId(
-						dashboardService.addDashboardDetails(
-								dashboard, Constants.CIRCUIT_APPLICATION_ID, 
-								dashboard.getSourceId(), 
-								authenticationService.getUserCredential().getUserId()));
-				
-				portlet.setChartDataXML(chartRenderer.convertToXML(chartData));
-				widgetService.addWidget(dashboard.getDashboardId(), portlet, 0);
+				List<Dashboard> dashboardList = dashboardService.retrieveDashboardMenuPages(dashboard.getApplicationId(), 
+						authenticationService.getUserCredential().getUserId(),
+						null,dashboard.getSourceId());
+				if (dashboardList.isEmpty()) {
+					dashboard.setDashboardId(dashboardService.addDashboardDetails(dashboard, Constants.CIRCUIT_APPLICATION_ID, dashboard
+											.getSourceId(),	authenticationService.getUserCredential().getUserId()));
+					portlet.setChartDataXML(chartRenderer.convertToXML(chartData));
+					widgetService.addWidget(dashboard.getDashboardId(),	portlet, 0);
+				} else {
+					Integer widgetId = 0;
+					List<Portlet> portletList = widgetService.retriveWidgetDetails(dashboardList.get(0).getDashboardId());
+					for(Portlet portlet : portletList){
+						widgetId = portlet.getId();						
+					}
+					dashboard.setDashboardId(dashboardList.get(0).getDashboardId());
+					dashboardService.updateDashboard(dashboard);
+					portlet.setChartDataXML(chartRenderer.convertToXML(chartData));
+					portlet.setId(widgetId);
+					widgetService.updateWidget(portlet);
+				}
 			} catch (DataAccessException e) {
 				Clients.showNotification("Error occured while saving your changes");
 			}
 			
-			Messagebox.show("Chart details are Saved. You can close this window","",1,Messagebox.ON_OK);
-			
+			Messagebox.show("Chart details are Updated Successfuly. You can close this window","",1,Messagebox.ON_OK);
+			Clients.evalJavaScript("window.open('','_self',''); window.close();");
 			editPortletWindow.detach();
 			try {
 				authenticationService.logout(null);
@@ -222,7 +240,7 @@ public class EditWidgetController extends SelectorComposer<Component> {
 			widgetService.updateWidget(portlet);
 			
 			Messagebox.show("Chart details are Updated Successfuly. You can close this window","",1,Messagebox.ON_OK);
-			
+			Clients.evalJavaScript("window.open('','_self',''); window.close();");
 			editPortletWindow.detach();
 			try {
 				authenticationService.logout(null);
@@ -270,4 +288,21 @@ public class EditWidgetController extends SelectorComposer<Component> {
 			editPortletWindow.detach();
 		}
 	}
+	/**
+	 * method to invalidate session while closing edit window  in the API flow
+	 */
+	@Listen("onClose=#editPortletWindow")
+    public void closeWindow(){
+       if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_CONFIG_CHART )||
+                 authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_CHART)){
+          try {
+                 authenticationService.logout(null);
+                 Clients.evalJavaScript("window.open('','_self',''); window.close();");
+          } catch (Exception e) {
+                 LOG.error("Error while Log out", e);
+          }
+
+       }
+    }
+
 }

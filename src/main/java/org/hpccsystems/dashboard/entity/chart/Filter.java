@@ -11,6 +11,13 @@ public class Filter {
 	private Integer type;
 	private String column;
 	
+	@Override
+	public String toString() {
+		return "Filter [type=" + type + ", column=" + column + ", values="
+				+ values + ", StartValue=" + StartValue + ", EndValue="
+				+ EndValue + "]";
+	}
+
 	/**
 	 *  Present only got String Filter
 	 */
@@ -65,5 +72,24 @@ public class Filter {
 	
 	public void setColumn(String column) {
 		this.column = column;
+	}
+	
+	@Override
+	public boolean equals(Object obj) {
+		if(obj instanceof Filter){
+			Filter filter= (Filter) obj;
+			if(this.column.equals(filter.getColumn())){
+				return true;
+			} else {
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+	
+	@Override
+	public int hashCode() {
+		return this.column.hashCode();
 	}
 }
