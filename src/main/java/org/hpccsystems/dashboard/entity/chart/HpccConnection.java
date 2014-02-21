@@ -31,7 +31,7 @@ public class HpccConnection {
 		StringBuilder builder = new StringBuilder();
 		builder.append("HpccConnection [hostIp=").append(serverHost)
 				.append(", port=").append(serverPort).append(", clusterName=")
-				.append(clusterName).append(", username=").append(userName)
+				.append(clusterName).append(", userName=").append(userName)
 				.append(", password=").append(password).append(", isSSL=")
 				.append(isHttps).append(", allowInvalidCerts=")
 				.append(allowInvalidCerts).append("]");

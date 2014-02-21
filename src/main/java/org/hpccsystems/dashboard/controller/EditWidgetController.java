@@ -288,6 +288,7 @@ public class EditWidgetController extends SelectorComposer<Component> {
 			editPortletWindow.detach();
 		}
 	}
+
 	/**
 	 * method to invalidate session while closing edit window  in the API flow
 	 */
