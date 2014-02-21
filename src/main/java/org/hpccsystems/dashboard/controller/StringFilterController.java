@@ -65,7 +65,7 @@ public class StringFilterController extends SelectorComposer<Component>{
 		
 		List<String> valueList = null;
 		try	{
-			valueList = hpccService.getDistinctValues(filter.getColumn(), chartData);
+			valueList = hpccService.getDistinctValues(filter.getColumn(), chartData, false);
 		} catch(Exception e) {
 			Clients.showNotification("Unable to fetch data for the Filter column", "error", 
 					doneButton.getParent().getParent().getParent(), "top_left", 3000, true);

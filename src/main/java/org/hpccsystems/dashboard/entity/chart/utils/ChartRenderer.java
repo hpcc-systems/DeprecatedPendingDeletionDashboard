@@ -268,12 +268,12 @@ public class ChartRenderer {
 		
 		List<String> xLabels = hpccService.getDistinctValues(
 				chartData.getXColumnNames().get(0), //First X column is being displayed as labels  
-				chartData);
+				chartData, true);
 		
 		List<String> groupedList = hpccService.getDistinctValues(
 				chartData.getXColumnNames().get(1), //Second X column is grouped
-				chartData); 
-		
+				chartData, true); 
+				
 		//Constructing Group Object
 		Group group = new Group();
 		List<String> newCols = new ArrayList<String>();

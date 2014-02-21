@@ -228,7 +228,7 @@ public class HPCCServiceImpl implements HPCCService{
 	}
 	
 	@Override
-	public List<String> getDistinctValues(String fieldName, XYChartData chartData) throws Exception{
+	public List<String> getDistinctValues(String fieldName, XYChartData chartData, Boolean applyFilter) throws Exception{
 		List<String> filterDataList = new ArrayList<String>();
 		
 		final Ws_sqlLocator locator = new Ws_sqlLocator();
@@ -250,7 +250,9 @@ public class HPCCServiceImpl implements HPCCService{
 		queryTxt.append(" from ");
 		queryTxt.append(chartData.getFileName());
 		
-		queryTxt.append(constructWhereClause(chartData));
+		if(applyFilter){
+			queryTxt.append(constructWhereClause(chartData));
+		}
 
 		queryTxt.append(" group by ");
 		queryTxt.append(fieldName);

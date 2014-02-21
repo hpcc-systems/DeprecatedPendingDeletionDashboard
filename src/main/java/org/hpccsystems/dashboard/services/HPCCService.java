@@ -37,11 +37,13 @@ public interface HPCCService {
 	 * @param fieldName
 	 * 	Must be a STRING Field
 	 * @param chartData
+	 * @param applyFilter
+	 * 	Decides weather to apply filters present in XYChartData object
 	 * @return
 	 * 	List of distinct values as a list
 	 * @throws Exception
 	 */
-	List<String> getDistinctValues(String fieldName, XYChartData chartData) throws Exception ;
+	List<String> getDistinctValues(String fieldName, XYChartData chartData, Boolean applyFilter) throws Exception ;
 	
 	/**
 	 * Function to fetch Minimum and Maximum values of specified Numeric field

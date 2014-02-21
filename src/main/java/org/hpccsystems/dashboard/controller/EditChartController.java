@@ -10,7 +10,6 @@ import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.api.entity.ChartConfiguration;
 import org.hpccsystems.dashboard.api.entity.Field;
 import org.hpccsystems.dashboard.common.Constants;
-import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.entity.chart.Filter;
 import org.hpccsystems.dashboard.entity.chart.XYChartData;
@@ -101,7 +100,6 @@ public class EditChartController extends SelectorComposer<Component> {
 	
 	List<String> parameterList = new ArrayList<String>();
 	final Map<String, Object> parameters = new HashMap<String, Object>();
-	private Dashboard dashboard;
 	
 	@Override
 	public void doAfterCompose(final Component comp) throws Exception {
@@ -191,7 +189,11 @@ public class EditChartController extends SelectorComposer<Component> {
 		}
 		if(chartData.getYColumnNames().contains(draggedListitem.getLabel()) || 
 				chartData.getXColumnNames().contains(draggedListitem.getLabel())) {
-			Clients.showNotification("A column can only be used once while plotting the graph", "error", YAxisListBox, "end_center", 3000, true);
+			Clients.showNotification("\"" + draggedListitem.getLabel() +  "\" is already used in plotting this Chart. A column can only be used once while plotting a Chart", "error", YAxisListBox, "end_center", 3000, true);
+			return;
+		}
+		if(chartData.getXColumnNames().size() > 1 && chartData.getYColumnNames().size() >0) {
+			Clients.showNotification("The chart is already groped with multiple attributes.\nGrouping is aloowed in only one of Measures and Attributes.", "error", YAxisListBox, "end_center", 3000, true);
 			return;
 		}
 		
@@ -335,8 +337,12 @@ public class EditChartController extends SelectorComposer<Component> {
 			return;
 		}
 		if(!Constants.STRING_DATA.equals(draggedListitem.getAttribute(Constants.COLUMN_DATA_TYPE))){
-			Clients.showNotification("You have dropped a Measure. It will only be treated as descrete values", "warning", XAxisListBox, "end_center", 5000, true);
-		} 
+			Clients.showNotification( "\""+ draggedListitem.getLabel() +"\" is a Measure. It will only be treated as descrete values", "warning", XAxisListBox, "end_center", 5000, true);
+		}
+		if(chartData.getYColumnNames().size() > 1 && chartData.getXColumnNames().size() >0){
+			Clients.showNotification("The chart is already groped with multiple measures.\nGrouping is aloowed in only one of Measures and Attributes.", "error", XAxisListBox, "end_center", 3000, true);
+			return;
+		}
 		
 		createXListChild(draggedListitem.getLabel());
 					
