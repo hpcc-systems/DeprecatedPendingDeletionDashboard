@@ -145,7 +145,7 @@ public class HPCCServiceImpl implements HPCCService{
 			if(chartData.getHpccConnection().getIsSSL()) {
 				locator.setWs_sqlServiceSoapAddress("https://" + chartData.getHpccConnection().getHostIp()+ ":1" + WS_SQL_ENDPOINT);
 			} else {
-				locator.setWs_sqlServiceSoapAddress("https://" + chartData.getHpccConnection().getHostIp()+ ":" + WS_SQL_ENDPOINT);
+				locator.setWs_sqlServiceSoapAddress("http://" + chartData.getHpccConnection().getHostIp()+ ":" + WS_SQL_ENDPOINT);
 			}
 			
 			if(LOG.isDebugEnabled()){
@@ -236,7 +236,7 @@ public class HPCCServiceImpl implements HPCCService{
 		if(hpccConnection.getIsSSL()) {
 			locator.setWs_sqlServiceSoapAddress("https://" + hpccConnection.getHostIp()+ ":1" + WS_SQL_ENDPOINT);
 		} else {
-			locator.setWs_sqlServiceSoapAddress("https://" + hpccConnection.getHostIp()+ ":" + WS_SQL_ENDPOINT);
+			locator.setWs_sqlServiceSoapAddress("http://" + hpccConnection.getHostIp()+ ":" + WS_SQL_ENDPOINT);
 		}
 		
 		Ws_sqlServiceSoap soap;
@@ -308,7 +308,7 @@ public class HPCCServiceImpl implements HPCCService{
 		if(chartData.getHpccConnection().getIsSSL()) {
 			locator.setWs_sqlServiceSoapAddress("https://" + chartData.getHpccConnection().getHostIp()+ ":1" + WS_SQL_ENDPOINT);
 		} else {
-			locator.setWs_sqlServiceSoapAddress("https://" + chartData.getHpccConnection().getHostIp()+ ":" + WS_SQL_ENDPOINT);
+			locator.setWs_sqlServiceSoapAddress("http://" + chartData.getHpccConnection().getHostIp()+ ":" + WS_SQL_ENDPOINT);
 		}
 		
 		Ws_sqlServiceSoap soap = null;
@@ -465,7 +465,7 @@ public class HPCCServiceImpl implements HPCCService{
 		if(tableData.getHpccConnection().getIsSSL()) {
 			locator.setWs_sqlServiceSoapAddress("https://" + tableData.getHpccConnection().getHostIp()+ ":1" + WS_SQL_ENDPOINT);
 		} else {
-			locator.setWs_sqlServiceSoapAddress("https://" + tableData.getHpccConnection().getHostIp()+ ":" + WS_SQL_ENDPOINT);
+			locator.setWs_sqlServiceSoapAddress("http://" + tableData.getHpccConnection().getHostIp()+ ":" + WS_SQL_ENDPOINT);
 		}
 		LinkedHashMap<String, List<String>> tableDataMap = new LinkedHashMap<String, List<String>>();
 		try
