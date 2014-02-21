@@ -20,6 +20,7 @@ import org.hpccsystems.dashboard.services.DashboardService;
 import org.hpccsystems.dashboard.services.HPCCService;
 import org.hpccsystems.dashboard.services.WidgetService;
 import org.springframework.dao.DataAccessException;
+import org.zkoss.lang.Threads;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
@@ -27,7 +28,6 @@ import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.event.MouseEvent;
-import org.zkoss.zk.ui.event.SerializableEventListener;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
@@ -38,7 +38,6 @@ import org.zkoss.zul.Button;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.Messagebox;
-import org.zkoss.zul.Messagebox.ClickEvent;
 import org.zkoss.zul.Window;
 
 import com.google.gson.GsonBuilder;
@@ -182,6 +181,16 @@ public class EditWidgetController extends SelectorComposer<Component> {
 			holderInclude.setDynamicProperty(Constants.CHART_DATA, chartData);
 			holderInclude.setSrc("layout/edit_select_data.zul");
 		}
+		
+		editPortletWindow.addEventListener("onExit", new EventListener<Event>() {
+
+			@Override
+			public void onEvent(Event event) throws Exception {
+				Clients.evalJavaScript("window.open('','_self',''); window.close();");
+				editPortletWindow.detach();
+			}
+		
+		});
 	}
 
 	/**
@@ -225,66 +234,69 @@ public class EditWidgetController extends SelectorComposer<Component> {
 				Clients.showNotification("Error occured while saving your changes");
 			}
 			
-			Messagebox.show("Chart details are Updated Successfuly. You can close this window","",1,Messagebox.ON_OK);
-			Clients.evalJavaScript("window.open('','_self',''); window.close();");
-			editPortletWindow.detach();
 			try {
 				authenticationService.logout(null);
 			} catch (Exception e) {
 				Clients.showNotification("Error occured while logging out");
 				LOG.error("Logout error", e);
 			}
+			
+			Messagebox.show("Chart details are Updated Successfuly. This window will be closed", new Messagebox.Button[0], null);
+			editPortletWindow.detach();
+			Clients.evalJavaScript("window.open('','_self',''); window.close();");
+			
 		} else if (authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_CHART)) {
 			//Viewing chart through API
 			portlet.setChartDataXML(chartRenderer.convertToXML(chartData));
 			widgetService.updateWidget(portlet);
 			
-			Messagebox.show("Chart details are Updated Successfuly. You can close this window","",1,Messagebox.ON_OK);
-			Clients.evalJavaScript("window.open('','_self',''); window.close();");
-			editPortletWindow.detach();
 			try {
 				authenticationService.logout(null);
 			} catch (Exception e) {
 				Clients.showNotification("Error occured while logging out");
 				LOG.error("Logout error", e);
 			}
+			
+			Messagebox.show("Chart details are Updated Successfuly. This window will be closed", new Messagebox.Button[0], null);
+			Clients.evalJavaScript("window.open('','_self',''); window.close();");
+			editPortletWindow.detach();
+			
 		} else {
 			//General flow
 			try {
 				Div div = chartPanel.removeStaticImage();
-				
+
 				//For Table Widget
 				if(portlet.getChartType().equals(Constants.TABLE_WIDGET)) {
 					div.getChildren().clear();
 					div.appendChild(
 							tableRenderer.constructTableWidget(
 									portlet.getTableDataMap(), false,portlet.getName())
-								);
+							);
 				} else {
 					//For Chart Widgets
 					final String divToDraw = div.getId(); 
-						//isEdit Window is set to false as we are constructing the JSON to be drawn in the Widget itself
-						chartRenderer.constructChartJSON(chartData, portlet, false); 
-						chartRenderer.drawChart(chartData, divToDraw, portlet);		 
-					
+					//isEdit Window is set to false as we are constructing the JSON to be drawn in the Widget itself
+					chartRenderer.constructChartJSON(chartData, portlet, false); 
+					chartRenderer.drawChart(chartData, divToDraw, portlet);		 
+
 					if (LOG.isDebugEnabled()) {
 						LOG.debug("Drawn chart in portlet..");
 						LOG.debug("Portlet - Div ID --> " + divToDraw);
 					}
 				}
-				
+
 				//update Live chart data into DB
 				portlet.setChartDataXML(chartRenderer.convertToXML(chartData));
 				widgetService.updateWidget(portlet);
-				
-				}catch(DataAccessException e){
-					LOG.error("Exception in closeEditWindow() while updating Live chart data into DB", e);
-				}catch(Exception ex) {
-					Clients.showNotification("Unable to fetch column data from HPCC to draw chart", "error", this.getSelf(), "middle_center", 3000, true);
-					LOG.error("Exception in closeEditWindow()", ex);
-					return;
+
+			}catch(DataAccessException e){
+				LOG.error("Exception in closeEditWindow() while updating Live chart data into DB", e);
+			}catch(Exception ex) {
+				Clients.showNotification("Unable to fetch column data from HPCC to draw chart", "error", this.getSelf(), "middle_center", 3000, true);
+				LOG.error("Exception in closeEditWindow()", ex);
+				return;
 			}
-			
 			editPortletWindow.detach();
 		}
 	}
@@ -293,16 +305,28 @@ public class EditWidgetController extends SelectorComposer<Component> {
 	 * method to invalidate session while closing edit window  in the API flow
 	 */
 	@Listen("onClose=#editPortletWindow")
-    public void closeWindow(){
+    public void closeWindow(Event event){
+		event.stopPropagation();
        if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_CONFIG_CHART )||
                  authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_CHART)){
-          try {
-                 authenticationService.logout(null);
-                 Clients.evalJavaScript("window.open('','_self',''); window.close();");
-          } catch (Exception e) {
-                 LOG.error("Error while Log out", e);
-          }
-
+    	   Messagebox.show("Chart settings are not saved. Do you still want to close?", 
+    			    "Question", Messagebox.YES | Messagebox.NO,
+    			    Messagebox.QUESTION,
+    			        new EventListener<Event>(){
+    			            public void onEvent(Event event){
+    			                if(Messagebox.ON_YES.equals(event.getName())){
+    			                   try {
+    			              		   authenticationService.logout(null);
+    			              		   editPortletWindow.detach();
+    			              		   Clients.evalJavaScript("window.open('','_self',''); window.close();");
+    			              	   } catch (Exception ex) {
+    			              		   LOG.error("Error while Log out", ex);
+    			              	   }
+    			                }
+    			            }
+    			        }
+    			    );
+    	  
        }
     }
 
