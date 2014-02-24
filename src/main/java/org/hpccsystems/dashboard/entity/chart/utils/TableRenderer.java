@@ -64,6 +64,7 @@ public class TableRenderer {
 			for (Map.Entry<String, List<String>> entry : tableDataMap.entrySet()) {
 				String columnStr = entry.getKey();
 				listheader = new Listheader(columnStr);
+				listheader.setSort("auto");
 				listheader.setParent(listhead);
 				listhead.setParent(listBox);
 				columnList .add(entry.getValue());

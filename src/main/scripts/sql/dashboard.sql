@@ -46,7 +46,7 @@ DROP TABLE IF EXISTS `widget_details`;
 create table widget_details (
 widget_id  INT NOT NULL auto_increment,  
 dashboard_id  INT ,
-widget_name VARCHAR(200) ,
+widget_name VARCHAR(50) ,
 widget_state CHAR(1) ,
 chart_type TINYINT,
 column_identifier TINYINT,

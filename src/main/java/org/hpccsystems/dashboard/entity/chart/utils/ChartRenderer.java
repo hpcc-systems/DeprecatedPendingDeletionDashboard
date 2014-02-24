@@ -90,17 +90,24 @@ public class ChartRenderer {
 		if(LOG.isDebugEnabled()){
 			LOG.debug("Constructing chart \n Is chart has filters - " + chartData.getIsFiltered());
 		}
-		
+		if(chartData.getIsFiltered())
+			title.append(" WHERE ");
 		Iterator<Filter> filterIterator = chartData.getFilterList().iterator(); 
 		while (filterIterator.hasNext()) {
 			Filter filter = (Filter) filterIterator.next();
-			title.append(" WHERE " + filter.getColumn());
+			
 			
 			if(chartData.getIsFiltered() &&
 					Constants.STRING_DATA.equals(filter.getType())) {
 				title.append(filter.getColumn());
 				title.append(" IS ");
-				title.append(constructFilterTitle(filter.getValues()));
+				Iterator<String> iterator = filter.getValues().iterator();
+				while(iterator.hasNext()){
+					title.append(iterator.next());
+					if(iterator.hasNext()){
+						title.append(", ");
+					}
+				}
 			
 			} else if (chartData.getIsFiltered() && 
 					Constants.NUMERIC_DATA.equals(filter.getType())) {
@@ -344,34 +351,6 @@ public class ChartRenderer {
 		else if(Constants.PIE_CHART.equals(portlet.getChartType()))	{
 			Clients.evalJavaScript("createPieChart('" + divToDraw +  "','"+ portlet.getChartDataJSON() +"')" ); 
 		} 
-	}
-	
-	/**
-	 * constructing title for chart for string Filter Values 
-	 * @param filteredValues
-	 * @return String
-	 */
-	private String constructFilterTitle(List<String> filteredValues)
-	{
-		StringBuffer stringFilterValue = new StringBuffer(" IS ");
-		int index=0;
-		for(String filter :filteredValues)
-		{
-			if(index<5 && index != filteredValues.size()-1)
-			{
-			stringFilterValue.append(filter).append(",");
-			}
-			else if(index<5 && index == filteredValues.size()-1)
-			{
-				stringFilterValue.append(filter);
-			}
-			else if(index >= 5)
-			{
-				stringFilterValue.append(", ...").append(filteredValues.size()-5).append(" more");
-			}
-			index++;				
-		}
-		return stringFilterValue.toString();
 	}
 	
 	/**

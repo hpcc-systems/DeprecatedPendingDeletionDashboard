@@ -308,8 +308,8 @@ public class HPCCServiceImpl implements HPCCService{
 	}
 
 	@Override
-	public Map<Integer, Integer> getMinMax(String fieldName, XYChartData chartData, Boolean applyFilter) throws Exception {
-		Map<Integer, Integer> resultMap = new HashMap<Integer, Integer>();	
+	public Map<Integer, BigDecimal> getMinMax(String fieldName, XYChartData chartData, Boolean applyFilter) throws Exception {
+		Map<Integer, BigDecimal> resultMap = new HashMap<Integer, BigDecimal>();	
 		
 		final Ws_sqlLocator locator = new Ws_sqlLocator();
 		locator.setWs_sqlServiceSoap_userName(chartData.getHpccConnection().getUsername());
@@ -360,10 +360,10 @@ public class HPCCServiceImpl implements HPCCService{
 		final NodeList nodeList = doc.getElementsByTagName("Row");
 		
 		resultMap.put(Constants.FILTER_MINIMUM, 
-				(int) Double.parseDouble(nodeList.item(0).getChildNodes().item(0).getTextContent()) );
+				new BigDecimal(nodeList.item(0).getChildNodes().item(0).getTextContent()) );
 		
 		resultMap.put(Constants.FILTER_MAXIMUM, 
-				(int) Double.parseDouble(nodeList.item(0).getChildNodes().item(1).getTextContent()) );
+				new BigDecimal(nodeList.item(0).getChildNodes().item(1).getTextContent()) );
 		}catch (ServiceException | ParserConfigurationException | SAXException | IOException ex) {
 			LOG.error("Exception occurred while fetching Numeric filter data in fetchFilterMinMax()", ex);
 			throw ex;
