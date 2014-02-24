@@ -308,7 +308,7 @@ public class HPCCServiceImpl implements HPCCService{
 	}
 
 	@Override
-	public Map<Integer, Integer> getMinMax(String fieldName, XYChartData chartData) throws Exception {
+	public Map<Integer, Integer> getMinMax(String fieldName, XYChartData chartData, Boolean applyFilter) throws Exception {
 		Map<Integer, Integer> resultMap = new HashMap<Integer, Integer>();	
 		
 		final Ws_sqlLocator locator = new Ws_sqlLocator();
@@ -332,8 +332,11 @@ public class HPCCServiceImpl implements HPCCService{
 			.append("), max(")
 			.append(fieldName)
 			.append(") from ")
-			.append(chartData.getFileName())
-			.append(constructWhereClause(chartData));
+			.append(chartData.getFileName());
+		
+		if(applyFilter){
+			queryTxt.append(constructWhereClause(chartData));
+		}
 		
 		req.setSqlText(queryTxt.toString());
 		req.setTargetCluster("thor");

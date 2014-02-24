@@ -73,7 +73,12 @@ public class NumericFilterController extends SelectorComposer<Component>{
 		} else {
 			Map<Integer, Integer> map = null;
 			try	{
-				map = hpccService.getMinMax(filter.getColumn(), chartData);
+				if(chartData.getXColumnNames().contains(filter.getColumn()) ||
+						chartData.getYColumnNames().contains(filter.getColumn())){
+					map = hpccService.getMinMax(filter.getColumn(), chartData, true);
+				} else {
+					map = hpccService.getMinMax(filter.getColumn(), chartData, false);
+				}
 			} catch(Exception e) {
 				if(!authenticationService.getUserCredential().getApplicationId().equals(Constants.CIRCUIT_APPLICATION_ID) || 
 						authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD)){

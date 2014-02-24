@@ -470,7 +470,7 @@ public class EditChartController extends SelectorComposer<Component> {
 		filterList.appendChild(labelCell);
 		
 		filterListBox.appendChild(filterList);
-		//filterList.setParent(filterListBox);
+		
 		//Enabling drops to filter list box
 		filterListBox.setDroppable("true");
 	}

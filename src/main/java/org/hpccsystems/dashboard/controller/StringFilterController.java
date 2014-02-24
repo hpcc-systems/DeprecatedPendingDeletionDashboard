@@ -65,7 +65,13 @@ public class StringFilterController extends SelectorComposer<Component>{
 		
 		List<String> valueList = null;
 		try	{
-			valueList = hpccService.getDistinctValues(filter.getColumn(), chartData, false);
+			// If filter column is already used to plot graph, then distinct values are filtered as well
+			// String Filters are checked against X Columns only
+			if(chartData.getXColumnNames().contains(filter.getColumn())) {
+				valueList = hpccService.getDistinctValues(filter.getColumn(), chartData, true);
+			} else {
+				valueList = hpccService.getDistinctValues(filter.getColumn(), chartData, false);
+			}
 		} catch(Exception e) {
 			Clients.showNotification("Unable to fetch data for the Filter column", "error", 
 					doneButton.getParent().getParent().getParent(), "top_left", 3000, true);

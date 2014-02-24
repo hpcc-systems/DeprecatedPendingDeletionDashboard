@@ -38,7 +38,7 @@ public interface HPCCService {
 	 * 	Must be a STRING Field
 	 * @param chartData
 	 * @param applyFilter
-	 * 	Decides weather to apply filters present in XYChartData object
+	 * 	Decides whether to apply filters present in XYChartData object
 	 * @return
 	 * 	List of distinct values as a list
 	 * @throws Exception
@@ -51,11 +51,13 @@ public interface HPCCService {
 	 * @param fieldName
 	 * 	Must be a NUMERIC field
 	 * @param chartData
+	 * @param applyFilter
+	 * 	Decides whether to apply existing filters in XYChartdata object while Querying 
 	 * @return
 	 * 	Minimum and Maximum values as values of the Map
 	 * @throws Exception
 	 */
-	Map<Integer,Integer> getMinMax(String fieldName, XYChartData chartData) throws Exception ;
+	Map<Integer,Integer> getMinMax(String fieldName, XYChartData chartData, Boolean applyFilter) throws Exception ;
 	
 	/**
 	 * fetchTableData() is used to retrieve the Column values from HPCC systems 
