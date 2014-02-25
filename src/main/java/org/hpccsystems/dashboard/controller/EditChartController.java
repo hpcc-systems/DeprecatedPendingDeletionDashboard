@@ -122,41 +122,57 @@ public class EditChartController extends SelectorComposer<Component> {
 			filterListBox.setDisabled(true);			
 		} else {
 			try{
-				// When live chart is present in ChartPanel
-				if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())){
-					for (String colName : chartData.getXColumnNames()) {
-						createXListChild(colName);
-					}
-					for (String colName : chartData.getYColumnNames()) {
-						createYListChild(colName);
-					}
-					xAxisDropped = true;
-					yAxisDropped = true;
-					filterListBox.setDroppable("true");
-					XAxisListBox.setDroppable("false");
-
-					validateDroppable();
-
-					if(chartData.getIsFiltered()) {
-						for (Filter filter : chartData.getFilterList()) {
-							createFilterListItem(filter);
-						}
-					}
-					
-					// Checking to avoid error while on the fly widget type change happens 
-					if( (chartData.getXColumnNames().size() > 0) && (chartData.getYColumnNames().size() > 0)){
-						constructChart();
-					}
-				} 		
-
 				columnSchemaMap = hpccService.getColumnSchema(chartData.getFileName(), chartData.getHpccConnection());
-
 			}catch(Exception e) {
 				Clients.showNotification("Unable to fetch columns from HPCC", "error", comp, "middle_center", 3000, true);
 				LOG.error(Constants.ERROR_RETRIEVE_COLUMNS, e);
 				return;
 			}			
 		}
+		
+		// When live chart is present in ChartPanel
+		if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())){
+			List<String> columnList = new ArrayList<String>();
+			
+			for (String colName : chartData.getXColumnNames()) {
+				if(columnSchemaMap.containsKey(colName)){
+					createXListChild(colName);
+					xAxisDropped = true;
+				} else {
+					columnList.add(colName);
+				}
+			}
+			for (String column : columnList) {
+				chartData.getXColumnNames().remove(column);
+			}
+			
+			columnList = new ArrayList<String>();
+			for (String colName : chartData.getYColumnNames()) {
+				if(columnSchemaMap.containsKey(colName)){
+					createYListChild(colName);
+					yAxisDropped = true;
+				} else {
+					columnList.add(colName);
+				}
+			}
+			for (String column : columnList) {
+				chartData.getYColumnNames().remove(column);
+			}
+			
+			validateDroppable();
+
+			if(chartData.getIsFiltered()) {
+				for (Filter filter : chartData.getFilterList()) {
+					createFilterListItem(filter);
+				}
+			}
+			
+			// Checking to avoid error while on the fly widget type change happens 
+			if( (chartData.getXColumnNames().size() > 0) && (chartData.getYColumnNames().size() > 0)){
+				constructChart();
+			}
+		} 		
+
 
 		Listitem listItem;
 		if(columnSchemaMap != null){
@@ -216,14 +232,30 @@ public class EditChartController extends SelectorComposer<Component> {
 	private void constructChart() {	
 		try{
 			//Drawing chart except in API chart configuration flow
-			if(! authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_CONFIG_CHART)){				
-				
+			if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_CONFIG_CHART)){
+				try {
+					Map<String, String> columnSchemaMap = new HashMap<String, String>();
+					columnSchemaMap = hpccService.getColumnSchema(chartData.getFileName(), chartData.getHpccConnection());
+					for (String column : chartData.getXColumnNames()) {
+						if(!columnSchemaMap.containsKey(column)){
+							throw new Exception("X Column " + column + " not present in Dataset");
+						}
+					}
+					for (String column : chartData.getYColumnNames()) {
+						if(!columnSchemaMap.containsKey(column)){
+							throw new Exception("Y Column " + column + " not present in Dataset");
+						}
+					}
+					
+					chartRenderer.constructChartJSON(chartData, portlet, true);
+					chartRenderer.drawChart(chartData,	Constants.EDIT_WINDOW_CHART_DIV, portlet);
+				} catch(Exception e) {
+					Clients.showNotification("Couldn't retrive data to draw chart", "error", this.getSelf(), "middle_center", 3000, true);
+					LOG.error("Chart Rendering failed", e);
+				}
+			} else {
 				chartRenderer.constructChartJSON(chartData, portlet, true);
 				chartRenderer.drawChart(chartData,	Constants.EDIT_WINDOW_CHART_DIV, portlet);
-				
-				if(!chartData.getIsFiltered()){
-					filterListBox.setDroppable("true");
-				}
 			}
 			
 			doneButton.setDisabled(false);				
@@ -304,7 +336,6 @@ public class EditChartController extends SelectorComposer<Component> {
 			if( !authenticationService.getUserCredential().getApplicationId().equals(Constants.CIRCUIT_APPLICATION_ID) || 
 					authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_CHART) || 
 						authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD)){				
-				filterListBox.setDroppable("false");	
 				
 				// Only clear the existing chart when no columns are present otherwise recreate the chart
 				if(chartData.getYColumnNames().size() < 1) {
@@ -470,9 +501,6 @@ public class EditChartController extends SelectorComposer<Component> {
 		filterList.appendChild(labelCell);
 		
 		filterListBox.appendChild(filterList);
-		
-		//Enabling drops to filter list box
-		filterListBox.setDroppable("true");
 	}
 	
 	//Listener to close filter window
@@ -494,10 +522,7 @@ public class EditChartController extends SelectorComposer<Component> {
 				Clients.showNotification("Unable to fetch column data from HPCC", "error", EditChartController.this.getSelf() , "middle_center", 3000, true);
 				LOG.error("Exception while fetching column data from Hpcc", ex);
 			}
-			
-			//Enabling drops to filter list box
-			filterListBox.setDroppable("true");
-			
+						
 			if(xAxisDropped && yAxisDropped){
 				doneButton.setDisabled(false);
 			}

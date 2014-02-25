@@ -87,17 +87,36 @@ public class EditWidgetController extends SelectorComposer<Component> {
 		chartData = new XYChartData();
 		
 		if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_CONFIG_CHART)) {
-			//Configuring chart through API
-			dashboard = new Dashboard();
-			dashboard.setSourceId(execution.getParameter(Constants.SOURCE_ID));
-			dashboard.setApplicationId(execution.getParameter(Constants.SOURCE));
-			dashboard.setColumnCount(1);
-			dashboard.setSequence(0);
+			if(execution.getParameter(Constants.CIRCUIT_DASHBOARD_ID) != null){
+				List<String> dashboardIdList = null;
+				if(execution.getParameter(Constants.CIRCUIT_DASHBOARD_ID) != null) {
+					dashboardIdList = new ArrayList<String>();
+					dashboardIdList.add(execution.getParameter(Constants.CIRCUIT_DASHBOARD_ID));
+				}
+				
+				dashboard = dashboardService.retrieveDashboardMenuPages(
+						Constants.CIRCUIT_APPLICATION_ID, 
+						authenticationService.getUserCredential().getUserId(), 
+						dashboardIdList,
+						execution.getParameter(Constants.SOURCE_ID))
+							.get(0); // Assuming one Dashboard exists for a provided source_id 
+				portlet = widgetService.retriveWidgetDetails(dashboard.getDashboardId())
+						.get(0); //Assuming one Widget exists for the provided dashboard
+				
+			} else {
+				//Configuring chart through API
+				dashboard = new Dashboard();
+				dashboard.setSourceId(execution.getParameter(Constants.SOURCE_ID));
+				dashboard.setApplicationId(execution.getParameter(Constants.SOURCE));
+				dashboard.setColumnCount(1);
+				dashboard.setSequence(0);
+				portlet = new Portlet();
+				portlet.setColumn(0);
+			}
+			
 			ChartConfiguration configuration = new GsonBuilder().create().fromJson(
 					execution.getParameter(Constants.CIRCUIT_CONFIG),ChartConfiguration.class);
-			portlet = new Portlet();
 			portlet.setChartType(configuration.getChartType());
-			portlet.setColumn(0);
 			portlet.setName(configuration.getChartTitle());
 			
 			dashboard.setName(configuration.getDashboardTitle());
@@ -106,14 +125,14 @@ public class EditWidgetController extends SelectorComposer<Component> {
 			chartData.setHpccConnection(configuration.getHpccConnection());
 			
 			holderInclude.setDynamicProperty(Constants.CIRCUIT_CONFIG, configuration);
-			
 		} else if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_CHART)){
 			//Viewing chart through API
 			List<String> dashboardIdList = null;
-			if(execution.getParameter(Constants.DASHBOARD_ID) != null) {
+			if(execution.getParameter(Constants.CIRCUIT_DASHBOARD_ID) != null) {
 				dashboardIdList = new ArrayList<String>();
-				dashboardIdList.add(execution.getParameter("dashboardId"));
+				dashboardIdList.add(execution.getParameter(Constants.CIRCUIT_DASHBOARD_ID));
 			}
+			
 			dashboard = dashboardService.retrieveDashboardMenuPages(
 							Constants.CIRCUIT_APPLICATION_ID, 
 							authenticationService.getUserCredential().getUserId(), 
@@ -122,14 +141,15 @@ public class EditWidgetController extends SelectorComposer<Component> {
 								.get(0); // Assuming one Dashboard exists for a provided source_id 
 			portlet = widgetService.retriveWidgetDetails(dashboard.getDashboardId())
 					.get(0); //Assuming one Widget exists for the provided dashboard
-		//Overriding chart type
-		if(execution.getParameter(Constants.CHART_TYPE) != null) {
-			portlet.setChartType(Integer.parseInt(execution.getParameter(Constants.CHART_TYPE)));
-		}
-		
-		if (Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())) {
-			chartData = chartRenderer.parseXML(portlet.getChartDataXML());
-		}
+			
+			//Overriding chart type
+			if(execution.getParameter(Constants.CHART_TYPE) != null) {
+				portlet.setChartType(Integer.parseInt(execution.getParameter(Constants.CHART_TYPE)));
+			}
+			
+			if (Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())) {
+				chartData = chartRenderer.parseXML(portlet.getChartDataXML());
+			}
 		} else {
 			//General flow
 			portlet = (Portlet) Executions.getCurrent().getArg().get(Constants.PORTLET);

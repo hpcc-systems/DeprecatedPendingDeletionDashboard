@@ -30,24 +30,35 @@ public class ChartSettings extends GenericRichlet{
 			try{			
 			Map<String, String[]> args = Executions.getCurrent().getParameterMap();
 			url.append("source").append("=").append(args.get(Constants.SOURCE)[0]);
-				if (args.containsKey(Constants.CIRCUIT_CONFIG)) {
+				if (args.containsKey(Constants.SOURCE_ID) && args.containsKey(Constants.CIRCUIT_CONFIG)) {
 					//Setting the role to user to Configure chart
 					credential.addRole(Constants.CIRCUIT_ROLE_CONFIG_CHART);
 					
 					url.append("&").append(Constants.SOURCE_ID).append("=").append(args.get(Constants.SOURCE_ID)[0]);
 					url.append("&").append("format").append("=").append(args.get(Constants.CHARTLIST_FORMAT)[0]);
 					url.append("&").append(Constants.CIRCUIT_CONFIG).append("=").append(args.get(Constants.CIRCUIT_CONFIG)[0]);
-				} else if (args.containsKey(Constants.CHART_TYPE) && args.containsKey(Constants.SOURCE_ID)) {
+					
+				} else if (args.containsKey(Constants.CHART_TYPE) && args.containsKey(Constants.SOURCE_ID) && args.containsKey(Constants.CIRCUIT_DASHBOARD_ID)) {
 					//Setting the role to user to view Chart
 					credential.addRole(Constants.CIRCUIT_ROLE_VIEW_CHART);
 					
 					url.append("&").append(Constants.SOURCE_ID).append("=").append(args.get(Constants.SOURCE_ID)[0]);
 					url.append("&").append(Constants.CHART_TYPE).append("=").append(args.get(Constants.CHART_TYPE)[0]);
 					url.append("&").append(Constants.CIRCUIT_DASHBOARD_ID).append("=").append(args.get(Constants.DB_DASHBOARD_ID)[0]);
-				} else {
-					credential.addRole(Constants.CIRCUIT_ROLE_VIEW_CHART);
 					
-					url.append("&").append("dashboardId").append("=").append(args.get(Constants.DB_DASHBOARD_ID)[0]);
+				} else if(args.containsKey(Constants.CIRCUIT_DASHBOARD_ID)){
+					if(args.containsKey(Constants.CIRCUIT_CONFIG)){
+						credential.addRole(Constants.CIRCUIT_ROLE_CONFIG_CHART);
+						url.append("&").append(Constants.CIRCUIT_CONFIG).append("=").append(args.get(Constants.CIRCUIT_CONFIG)[0]);
+					} else {
+						credential.addRole(Constants.CIRCUIT_ROLE_VIEW_CHART);
+					}
+					
+					url.append("&").append(Constants.CIRCUIT_DASHBOARD_ID).append("=").append(args.get(Constants.DB_DASHBOARD_ID)[0]);
+					
+				} else {
+					// When none of above conditions are satisfied, URL is incorrect
+					throw new Exception();
 				}
 			}catch(Exception ex){
 				Clients.showNotification("Malformated URL string", false);

@@ -38,7 +38,7 @@
 					</listbox>
 				</vbox>
 				<vbox height="180px">
-					<listbox width="200px" vflex="1" id="filterListBox"	droppable="false">
+					<listbox width="200px" vflex="1" id="filterListBox"	droppable="true">
 						<listhead>
 							<listheader label="${labels.chartFilters}" />
 						</listhead>
