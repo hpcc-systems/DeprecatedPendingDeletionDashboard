@@ -119,4 +119,14 @@ public class XYChartData {
 		this.filterList = filterList;
 	}
 
+	@Override
+	public String toString() {
+		return "XYChartData [hpccConnection=" + hpccConnection + ", fileName="
+				+ fileName + ", xColumnNames=" + xColumnNames
+				+ ", yColumnNames=" + yColumnNames + ", tableColumns="
+				+ tableColumns + ", isFiltered=" + isFiltered + ", filterList="
+				+ filterList + ", isGrouped=" + isGrouped + ", group=" + group
+				+ "]";
+	}
+
 }

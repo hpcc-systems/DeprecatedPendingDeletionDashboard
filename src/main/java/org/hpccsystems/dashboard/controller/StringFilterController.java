@@ -94,6 +94,9 @@ public class StringFilterController extends SelectorComposer<Component>{
 				filterListBox.appendChild(listitem);
 			}
 		} else if(valueList != null) {
+			// Initializing empty list to avoid null pointers
+			filter.setValues(new ArrayList<String>());
+			
 			for (String value : valueList) {
 				listitem = new Listitem();
 				listcell = new Listcell(value);
