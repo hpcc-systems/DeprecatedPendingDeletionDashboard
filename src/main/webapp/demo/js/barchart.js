@@ -25,7 +25,7 @@ function createChart(divId, chartData) {
 			var filter_desc = "";
 			if(response.isFiltered){
 				filter_desc = "<span class='btn-link btn-sm' style='float: right;' id='"+ response.portletId +"_title'> Filters Values </span>" +
-						"<div id='"+ response.portletId +"_filter_content' style='position: absolute;padding: 2px;border: 1px solid black;margin: 5px;background-color: rgb(99, 99, 99);font-size: small;color: white;z-index: 2; display: none'>"+ response.filterDescription +"</div>" +
+						"<div id='"+ response.portletId +"_filter_content' style='line-height: initial;position: absolute;padding: 2px;border: 1px solid black;margin: 5px;background-color: rgb(99, 99, 99);font-size: small;color: white;z-index: 2; display: none'>"+ response.filterDescription +"</div>" +
 						"<script type='text/javascript'>" +
 							"jq('#"+ response.portletId +"_title').mouseenter(function() {" +
 									"jq('#"+ response.portletId +"_filter_content').show();" +
@@ -35,7 +35,7 @@ function createChart(divId, chartData) {
 						"</script>";
 			}
 			
-			container.append(jq("<div style='margin-left: 3px; height: 15px;'>"+ response.title + filter_desc + " </div>" ));
+			container.append(jq("<div style='margin-top: 3px; margin-left: 5px; height: 15px;'>"+ response.title + filter_desc + " </div>" ));
 			
 			container.append(
 						jq( "<table> <tr>" +
