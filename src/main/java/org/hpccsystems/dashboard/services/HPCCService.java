@@ -1,5 +1,6 @@
 package org.hpccsystems.dashboard.services;
 
+import java.math.BigDecimal;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,7 +58,7 @@ public interface HPCCService {
 	 * 	Minimum and Maximum values as values of the Map
 	 * @throws Exception
 	 */
-	Map<Integer,Integer> getMinMax(String fieldName, XYChartData chartData, Boolean applyFilter) throws Exception ;
+	Map<Integer, BigDecimal> getMinMax(String fieldName, XYChartData chartData, Boolean applyFilter) throws Exception ;
 	
 	/**
 	 * fetchTableData() is used to retrieve the Column values from HPCC systems 

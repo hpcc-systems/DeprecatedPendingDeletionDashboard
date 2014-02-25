@@ -95,11 +95,11 @@ public class ChartRenderer {
 		}
 		if(chartData.getIsFiltered())
 			filterDescription.append(" WHERE ");
+		
 		Iterator<Filter> filterIterator = chartData.getFilterList().iterator(); 
 		while (filterIterator.hasNext()) {
 			Filter filter = (Filter) filterIterator.next();
 			header.addProperty("isFiltered", true);
-			
 			if(chartData.getIsFiltered() &&
 					Constants.STRING_DATA.equals(filter.getType())) {
 				filterDescription.append(filter.getColumn());
@@ -112,6 +112,7 @@ public class ChartRenderer {
 						filterDescription.append(", ");
 					}
 				}
+
 			} else if (chartData.getIsFiltered() && 
 					Constants.NUMERIC_DATA.equals(filter.getType())) {
 				filterDescription.append(filter.getColumn());

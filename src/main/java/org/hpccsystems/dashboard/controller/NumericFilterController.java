@@ -1,5 +1,6 @@
 package org.hpccsystems.dashboard.controller;
 
+import java.math.BigDecimal;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
@@ -65,13 +66,13 @@ public class NumericFilterController extends SelectorComposer<Component>{
 		chartData = (XYChartData) Executions.getCurrent().getAttribute(Constants.CHART_DATA);
 		doneButton = (Button) Executions.getCurrent().getAttribute(Constants.EDIT_WINDOW_DONE_BUTTON);
 		
-		Integer min;
-		Integer max;
+		BigDecimal min;
+		BigDecimal max;
 		if(filter.getStartValue() != null && filter.getEndValue() != null ) {
-			min = Integer.parseInt(filter.getStartValue().toString());
-			max = Integer.parseInt(filter.getEndValue().toString());
+			min = new BigDecimal(filter.getStartValue().toString());
+			max = new BigDecimal(filter.getEndValue().toString());
 		} else {
-			Map<Integer, Integer> map = null;
+			Map<Integer, BigDecimal> map = null;
 			try	{
 				if(chartData.getXColumnNames().contains(filter.getColumn()) ||
 						chartData.getYColumnNames().contains(filter.getColumn())){
@@ -99,11 +100,11 @@ public class NumericFilterController extends SelectorComposer<Component>{
 		maximumLabel.setValue(max.toString());
 		
 		//TODO Add minimum positions after upgrading to zk 7.0.1 
-		minimumSlider.setMaxpos(max);
-		minimumSlider.setCurpos(min);
+		minimumSlider.setMaxpos(max.intValue());
+		minimumSlider.setCurpos(min.intValue());
 		
-		maximumSlider.setMaxpos(max);
-		maximumSlider.setCurpos(max);
+		maximumSlider.setMaxpos(max.intValue());
+		maximumSlider.setCurpos(max.intValue());
 		
 		chartData.getFilterList().add(filter);
 	}
