@@ -89,17 +89,15 @@ public class EditWidgetController extends SelectorComposer<Component> {
 		if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_CONFIG_CHART)) {
 			if(execution.getParameter(Constants.CIRCUIT_DASHBOARD_ID) != null){
 				List<String> dashboardIdList = null;
-				if(execution.getParameter(Constants.CIRCUIT_DASHBOARD_ID) != null) {
-					dashboardIdList = new ArrayList<String>();
-					dashboardIdList.add(execution.getParameter(Constants.CIRCUIT_DASHBOARD_ID));
-				}
+				dashboardIdList = new ArrayList<String>();
+				dashboardIdList.add(execution.getParameter(Constants.CIRCUIT_DASHBOARD_ID));
 				
 				dashboard = dashboardService.retrieveDashboardMenuPages(
 						Constants.CIRCUIT_APPLICATION_ID, 
 						authenticationService.getUserCredential().getUserId(), 
 						dashboardIdList,
-						execution.getParameter(Constants.SOURCE_ID))
-							.get(0); // Assuming one Dashboard exists for a provided source_id 
+						null).get(0); // Assuming one Dashboard exists for a provided source_id
+				
 				portlet = widgetService.retriveWidgetDetails(dashboard.getDashboardId())
 						.get(0); //Assuming one Widget exists for the provided dashboard
 				
@@ -230,7 +228,7 @@ public class EditWidgetController extends SelectorComposer<Component> {
 			dashboard.setLastupdatedDate(new Timestamp(new Date().getTime()));
 			
 			try {
-				List<Dashboard> dashboardList = dashboardService.retrieveDashboardMenuPages(dashboard.getApplicationId(), 
+				List<Dashboard> dashboardList = dashboardService.retrieveDashboardMenuPages(Constants.CIRCUIT_APPLICATION_ID, 
 						authenticationService.getUserCredential().getUserId(),
 						null,dashboard.getSourceId());
 				if (dashboardList.isEmpty()) {
