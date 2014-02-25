@@ -68,6 +68,9 @@ public class ChartRenderer {
 		final JsonObject header = new JsonObject();
 		StringBuilder yName = new StringBuilder();
 		StringBuilder title = new StringBuilder();
+		StringBuilder filterDescription = new StringBuilder();
+		
+		
 		if(chartData.getYColumnNames().size() > 0 && 
 				chartData.getXColumnNames().size() > 0) {
 			header.addProperty("xName", chartData.getXColumnNames().get(0));
@@ -90,27 +93,34 @@ public class ChartRenderer {
 		if(LOG.isDebugEnabled()){
 			LOG.debug("Constructing chart \n Is chart has filters - " + chartData.getIsFiltered());
 		}
-		
+		if(chartData.getIsFiltered())
+			filterDescription.append(" WHERE ");
 		Iterator<Filter> filterIterator = chartData.getFilterList().iterator(); 
 		while (filterIterator.hasNext()) {
 			Filter filter = (Filter) filterIterator.next();
-			title.append(" WHERE " + filter.getColumn());
+			header.addProperty("isFiltered", true);
 			
 			if(chartData.getIsFiltered() &&
 					Constants.STRING_DATA.equals(filter.getType())) {
-				title.append(filter.getColumn());
-				title.append(" IS ");
-				title.append(constructFilterTitle(filter.getValues()));
-			
+				filterDescription.append(filter.getColumn());
+				filterDescription.append(" IS ");
+				
+				Iterator<String> iterator = filter.getValues().iterator();
+				while(iterator.hasNext()){
+					filterDescription.append(iterator.next());
+					if(iterator.hasNext()){
+						filterDescription.append(", ");
+					}
+				}
 			} else if (chartData.getIsFiltered() && 
 					Constants.NUMERIC_DATA.equals(filter.getType())) {
-				title.append(filter.getColumn());
-				title.append(" BETWEEN " + filter.getStartValue());
-				title.append(" & " + filter.getEndValue());
+				filterDescription.append(filter.getColumn());
+				filterDescription.append(" BETWEEN " + filter.getStartValue());
+				filterDescription.append(" & " + filter.getEndValue());
 			}
 			
 			if(filterIterator.hasNext()){
-				title.append(" AND "); 
+				filterDescription.append(" AND "); 
 			}
 		}
 		
@@ -194,6 +204,7 @@ public class ChartRenderer {
 			header.addProperty("yWidth", (yLength<2)? yLength*10 + 30:(yLength<3)? yLength*10 + 10: yLength*10);
 			header.addProperty("xWidth", xLength*15 + 5);
 			header.addProperty("title", title.toString());
+			header.addProperty("filterDescription", filterDescription.toString());
 			
 			header.add("chartData", array);
 			
@@ -252,6 +263,7 @@ public class ChartRenderer {
 			}
 				
 			header.addProperty("title", title.toString());
+			header.addProperty("filterDescription", filterDescription.toString());
 			
 			header.add("yValues", rows);
 			header.add("xValues", xValues);
@@ -344,34 +356,6 @@ public class ChartRenderer {
 		else if(Constants.PIE_CHART.equals(portlet.getChartType()))	{
 			Clients.evalJavaScript("createPieChart('" + divToDraw +  "','"+ portlet.getChartDataJSON() +"')" ); 
 		} 
-	}
-	
-	/**
-	 * constructing title for chart for string Filter Values 
-	 * @param filteredValues
-	 * @return String
-	 */
-	private String constructFilterTitle(List<String> filteredValues)
-	{
-		StringBuffer stringFilterValue = new StringBuffer(" IS ");
-		int index=0;
-		for(String filter :filteredValues)
-		{
-			if(index<5 && index != filteredValues.size()-1)
-			{
-			stringFilterValue.append(filter).append(",");
-			}
-			else if(index<5 && index == filteredValues.size()-1)
-			{
-				stringFilterValue.append(filter);
-			}
-			else if(index >= 5)
-			{
-				stringFilterValue.append(", ...").append(filteredValues.size()-5).append(" more");
-			}
-			index++;				
-		}
-		return stringFilterValue.toString();
 	}
 	
 	/**

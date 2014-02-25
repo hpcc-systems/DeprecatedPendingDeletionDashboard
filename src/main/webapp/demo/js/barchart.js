@@ -20,9 +20,24 @@ function createChart(divId, chartData) {
 			var yColumnMargin = 20;
 			if(showLegend){yColumnMargin = 60}
 			
-			jq("#" + divElement.attr("id"))
-				.append(
-						jq("<div style='margin-left: 3px; height: 15px;'>" + response.title +" </div>" ), 
+			var container = jq("#" + divElement.attr("id"));
+			
+			var filter_desc = "";
+			if(response.isFiltered){
+				filter_desc = "<span class='btn-link btn-sm' style='float: right;' id='"+ response.portletId +"_title'> Filters Values </span>" +
+						"<div id='"+ response.portletId +"_filter_content' style='position: absolute;padding: 2px;border: 1px solid black;margin: 5px;background-color: rgb(99, 99, 99);font-size: small;color: white;z-index: 2; display: none'>"+ response.filterDescription +"</div>" +
+						"<script type='text/javascript'>" +
+							"jq('#"+ response.portletId +"_title').mouseenter(function() {" +
+									"jq('#"+ response.portletId +"_filter_content').show();" +
+											"})" +
+							".mouseleave(function() { " +
+									"jq('#"+ response.portletId +"_filter_content').hide();});" +
+						"</script>";
+			}
+			
+			container.append(jq("<div style='margin-left: 3px; height: 15px;'>"+ response.title + filter_desc + " </div>" ));
+			
+			container.append(
 						jq( "<table> <tr>" +
 								"<td> " +
 									"<div style='margin-top:" + yColumnMargin +"px; margin-left: 3px; font-size: 10px; width: 15px; height: 15px; writing-mode:tb-rl; -webkit-transform:rotate(-90deg); -moz-transform:rotate(-90deg); -o-transform: rotate(-90deg); white-space:nowrap; display:block;'>" +
