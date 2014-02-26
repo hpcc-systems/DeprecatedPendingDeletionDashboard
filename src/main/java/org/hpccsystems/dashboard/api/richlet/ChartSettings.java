@@ -1,7 +1,8 @@
 package org.hpccsystems.dashboard.api.richlet;
 
 import java.util.Map;
-import org.apache.commons.logging.Log; 
+
+import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.services.UserCredential;
@@ -28,37 +29,32 @@ public class ChartSettings extends GenericRichlet{
 		
 		StringBuilder url = new StringBuilder("/demo/?");			
 			try{			
-			Map<String, String[]> args = Executions.getCurrent().getParameterMap();
-			url.append("source").append("=").append(args.get(Constants.SOURCE)[0]);
-				if (args.containsKey(Constants.SOURCE_ID) && args.containsKey(Constants.CIRCUIT_CONFIG)) {
-					//Setting the role to user to Configure chart
-					credential.addRole(Constants.CIRCUIT_ROLE_CONFIG_CHART);
-					
-					url.append("&").append(Constants.SOURCE_ID).append("=").append(args.get(Constants.SOURCE_ID)[0]);
+				Map<String, String[]> args = Executions.getCurrent().getParameterMap();
+				url.append("source").append("=").append(args.get(Constants.SOURCE)[0]);
+				
+				if(args.containsKey(Constants.SOURCE_ID) || args.containsKey(Constants.CIRCUIT_DASHBOARD_ID)){
+					if(args.containsKey(Constants.SOURCE_ID))
+						url.append("&").append(Constants.SOURCE_ID).append("=").append(args.get(Constants.SOURCE_ID)[0]);
+					if(args.containsKey(Constants.CIRCUIT_DASHBOARD_ID))
+						url.append("&").append(Constants.CIRCUIT_DASHBOARD_ID).append("=").append(args.get(Constants.DB_DASHBOARD_ID)[0]);
+				} else {
+					throw new Exception("Either source_id or dashboard_id must be passed to configure chart");
+				}
+				
+				if(args.containsKey(Constants.CIRCUIT_CONFIG)){
 					url.append("&").append("format").append("=").append(args.get(Constants.CHARTLIST_FORMAT)[0]);
 					url.append("&").append(Constants.CIRCUIT_CONFIG).append("=").append(args.get(Constants.CIRCUIT_CONFIG)[0]);
 					
-				} else if (args.containsKey(Constants.CHART_TYPE) && args.containsKey(Constants.SOURCE_ID) && args.containsKey(Constants.CIRCUIT_DASHBOARD_ID)) {
-					//Setting the role to user to view Chart
-					credential.addRole(Constants.CIRCUIT_ROLE_VIEW_CHART);
-					
-					url.append("&").append(Constants.SOURCE_ID).append("=").append(args.get(Constants.SOURCE_ID)[0]);
-					url.append("&").append(Constants.CHART_TYPE).append("=").append(args.get(Constants.CHART_TYPE)[0]);
-					url.append("&").append(Constants.CIRCUIT_DASHBOARD_ID).append("=").append(args.get(Constants.DB_DASHBOARD_ID)[0]);
-					
-				} else if(args.containsKey(Constants.CIRCUIT_DASHBOARD_ID)){
-					if(args.containsKey(Constants.CIRCUIT_CONFIG)){
-						credential.addRole(Constants.CIRCUIT_ROLE_CONFIG_CHART);
-						url.append("&").append(Constants.CIRCUIT_CONFIG).append("=").append(args.get(Constants.CIRCUIT_CONFIG)[0]);
-					} else {
-						credential.addRole(Constants.CIRCUIT_ROLE_VIEW_CHART);
+					//Setting the role to user to Configure chart
+					credential.addRole(Constants.CIRCUIT_ROLE_CONFIG_CHART);
+				} else {
+					// Chart type Should only be passed when not configuring
+					if(args.containsKey(Constants.CHART_TYPE)) {
+						url.append("&").append(Constants.CHART_TYPE).append("=").append(args.get(Constants.CHART_TYPE)[0]);
 					}
 					
-					url.append("&").append(Constants.CIRCUIT_DASHBOARD_ID).append("=").append(args.get(Constants.DB_DASHBOARD_ID)[0]);
-					
-				} else {
-					// When none of above conditions are satisfied, URL is incorrect
-					throw new Exception();
+					//Setting the role to user to View chart
+					credential.addRole(Constants.CIRCUIT_ROLE_VIEW_CHART);
 				}
 			}catch(Exception ex){
 				Clients.showNotification("Malformated URL string", false);

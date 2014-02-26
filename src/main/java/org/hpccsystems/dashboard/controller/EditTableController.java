@@ -1,15 +1,19 @@
 package org.hpccsystems.dashboard.controller;
 
+import java.util.HashMap;
 import java.util.LinkedHashMap; 
 import java.util.List;
 import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hpccsystems.dashboard.api.entity.ChartConfiguration;
+import org.hpccsystems.dashboard.api.entity.Field;
 import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.entity.chart.XYChartData;
 import org.hpccsystems.dashboard.entity.chart.utils.TableRenderer;
+import org.hpccsystems.dashboard.services.AuthenticationService;
 import org.hpccsystems.dashboard.services.DashboardService;
 import org.hpccsystems.dashboard.services.HPCCService;
 import org.zkoss.zk.ui.Component;
@@ -41,6 +45,9 @@ public class EditTableController extends SelectorComposer<Component> {
 	Div tableHolder;
 	
 	@WireVariable
+	AuthenticationService  authenticationService;
+	
+	@WireVariable
 	private DashboardService dashboardService;
 	
 	@WireVariable
@@ -64,8 +71,16 @@ public class EditTableController extends SelectorComposer<Component> {
 		sourceList.addEventListener(Events.ON_DROP, dropListener);
 		targetList.addEventListener(Events.ON_DROP, dropListener);
 		
-		Map<String,String> columnSchemaMap = hpccService.getColumnSchema(tableData.getFileName(), tableData.getHpccConnection());
-		
+		Map<String,String> columnSchemaMap;
+		if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_CONFIG_CHART)) {
+			ChartConfiguration configuration = (ChartConfiguration) Executions.getCurrent().getAttribute(Constants.CIRCUIT_CONFIG);
+			columnSchemaMap = new HashMap<String, String>();
+			for (Field field : configuration.getFields()) {
+				columnSchemaMap.put(field.getColumnName(), field.getDataType());
+			}
+		} else {
+			columnSchemaMap = hpccService.getColumnSchema(tableData.getFileName(), tableData.getHpccConnection());
+		}
 		
 		Listitem listItem;
 		if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())) {

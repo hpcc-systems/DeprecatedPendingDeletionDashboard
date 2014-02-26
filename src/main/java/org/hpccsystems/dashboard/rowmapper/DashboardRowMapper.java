@@ -11,6 +11,7 @@ public class DashboardRowMapper implements RowMapper<Dashboard> {
 	@Override
 	public Dashboard mapRow(ResultSet rs, int rowNum) throws SQLException {
 		 Dashboard dashboard = new Dashboard();
+		 dashboard.setApplicationId("application_id");
 		 dashboard.setName(rs.getString("dashboard_name"));
 		 dashboard.setDashboardId(rs.getInt("dashboard_id"));
 		 dashboard.setColumnCount(rs.getInt("column_count"));

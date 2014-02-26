@@ -96,20 +96,33 @@ public class EditWidgetController extends SelectorComposer<Component> {
 						Constants.CIRCUIT_APPLICATION_ID, 
 						authenticationService.getUserCredential().getUserId(), 
 						dashboardIdList,
-						null).get(0); // Assuming one Dashboard exists for a provided source_id
+						null).get(0);
 				
 				portlet = widgetService.retriveWidgetDetails(dashboard.getDashboardId())
 						.get(0); //Assuming one Widget exists for the provided dashboard
 				
 			} else {
-				//Configuring chart through API
-				dashboard = new Dashboard();
-				dashboard.setSourceId(execution.getParameter(Constants.SOURCE_ID));
-				dashboard.setApplicationId(execution.getParameter(Constants.SOURCE));
-				dashboard.setColumnCount(1);
-				dashboard.setSequence(0);
-				portlet = new Portlet();
-				portlet.setColumn(0);
+				List<Dashboard> dashboards;
+				dashboards = dashboardService.retrieveDashboardMenuPages(
+						Constants.CIRCUIT_APPLICATION_ID, 
+						authenticationService.getUserCredential().getUserId(), 
+						null,
+						execution.getParameter(Constants.SOURCE_ID));
+				if(dashboards.size() > 0){
+					// Provided source id is already saved
+					dashboard = dashboards.get(0);
+					
+					portlet = widgetService.retriveWidgetDetails(dashboard.getDashboardId())
+							.get(0); //Assuming one Widget exists for the provided dashboard
+				} else {
+					dashboard = new Dashboard();
+					dashboard.setSourceId(execution.getParameter(Constants.SOURCE_ID));
+					dashboard.setApplicationId(execution.getParameter(Constants.SOURCE));
+					dashboard.setColumnCount(1);
+					dashboard.setSequence(0);
+					portlet = new Portlet();
+					portlet.setColumn(0);
+				}
 			}
 			
 			ChartConfiguration configuration = new GsonBuilder().create().fromJson(
@@ -237,15 +250,8 @@ public class EditWidgetController extends SelectorComposer<Component> {
 					portlet.setChartDataXML(chartRenderer.convertToXML(chartData));
 					widgetService.addWidget(dashboard.getDashboardId(),	portlet, 0);
 				} else {
-					Integer widgetId = 0;
-					List<Portlet> portletList = widgetService.retriveWidgetDetails(dashboardList.get(0).getDashboardId());
-					for(Portlet portlet : portletList){
-						widgetId = portlet.getId();						
-					}
-					dashboard.setDashboardId(dashboardList.get(0).getDashboardId());
 					dashboardService.updateDashboard(dashboard);
 					portlet.setChartDataXML(chartRenderer.convertToXML(chartData));
-					portlet.setId(widgetId);
 					widgetService.updateWidget(portlet);
 				}
 			} catch (DataAccessException e) {
