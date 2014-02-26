@@ -119,7 +119,7 @@ public class EditChartController extends SelectorComposer<Component> {
 				columnSchemaMap.put(field.getColumnName(), field.getDataType());
 			}
 			
-			filterListBox.setDisabled(true);			
+			filterListBox.setDroppable("false");			
 		} else {
 			try{
 				columnSchemaMap = hpccService.getColumnSchema(chartData.getFileName(), chartData.getHpccConnection());
