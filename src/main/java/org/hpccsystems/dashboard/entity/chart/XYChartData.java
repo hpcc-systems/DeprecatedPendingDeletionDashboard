@@ -14,7 +14,7 @@ public class XYChartData {
 	private String fileName;
 	
 	private List<String> xColumnNames;
-	private List<String> yColumnNames;
+	private List<Measure> yColumns;
 	private List<String> tableColumns;
 	
 	
@@ -47,15 +47,15 @@ public class XYChartData {
 	}
 
 	@XmlElement
-	public List<String> getYColumnNames() {
-		if(yColumnNames == null) {
-			yColumnNames = new ArrayList<String>();
+	public List<Measure> getYColumns() {
+		if(yColumns == null) {
+			yColumns = new ArrayList<Measure>();
 		} 
-		return yColumnNames;
+		return yColumns;
 	}
 
-	public void setYColumnNames(List<String> yColumnNames) {
-		this.yColumnNames = yColumnNames;
+	public void setYColumns(List<Measure> yColumnNames) {
+		this.yColumns = yColumnNames;
 	}
 
 	@XmlElement
@@ -123,7 +123,7 @@ public class XYChartData {
 	public String toString() {
 		return "XYChartData [hpccConnection=" + hpccConnection + ", fileName="
 				+ fileName + ", xColumnNames=" + xColumnNames
-				+ ", yColumnNames=" + yColumnNames + ", tableColumns="
+				+ ", yColumnNames=" + yColumns + ", tableColumns="
 				+ tableColumns + ", isFiltered=" + isFiltered + ", filterList="
 				+ filterList + ", isGrouped=" + isGrouped + ", group=" + group
 				+ "]";

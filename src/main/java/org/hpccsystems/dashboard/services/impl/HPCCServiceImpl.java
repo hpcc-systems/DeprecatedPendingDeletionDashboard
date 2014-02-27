@@ -23,6 +23,7 @@ import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.entity.FileMeta;
 import org.hpccsystems.dashboard.entity.chart.Filter;
 import org.hpccsystems.dashboard.entity.chart.HpccConnection;
+import org.hpccsystems.dashboard.entity.chart.Measure;
 import org.hpccsystems.dashboard.entity.chart.XYChartData;
 import org.hpccsystems.dashboard.entity.chart.XYModel;
 import org.hpccsystems.dashboard.services.HPCCService;
@@ -153,7 +154,7 @@ public class HPCCServiceImpl implements HPCCService{
 			if(LOG.isDebugEnabled()){
 				LOG.debug("Inside getChartData");
 				if(chartData.getXColumnNames() != null && chartData.getXColumnNames().size() > 0)				{
-				LOG.debug("Column names --> " + chartData.getXColumnNames().get(0) + chartData.getYColumnNames().get(0));
+				LOG.debug("Column names --> " + chartData.getXColumnNames().get(0) + chartData.getYColumns().get(0));
 				}
 			}
 			
@@ -204,8 +205,8 @@ public class HPCCServiceImpl implements HPCCService{
 					    
 					    valueList = new ArrayList<Object>();
 					    int outCount = chartData.getXColumnNames().size() + 1;
-					    for (String yColumnName : chartData.getYColumnNames()) {
-					    	lstNmElmntLst = fstElmnt.getElementsByTagName("sumout" + outCount);
+					    for (Measure measure : chartData.getYColumns()) {
+					    	lstNmElmntLst = fstElmnt.getElementsByTagName( measure.getAggregateFunction() + "out" + outCount);
 					    	lstNmElmnt = (Element) lstNmElmntLst.item(0);
 					    	lstNm = lstNmElmnt.getChildNodes();
 					    	nodeValue = ((Node) lstNm.item(0)).getNodeValue();
@@ -450,9 +451,10 @@ public class HPCCServiceImpl implements HPCCService{
 				queryTxt.append(", ");
 			}
 			
-			for (String columnName : chartData.getYColumnNames()) {
-				queryTxt.append("SUM(");
-				queryTxt.append(columnName);
+			for (Measure measure : chartData.getYColumns()) {
+				queryTxt.append(measure.getAggregateFunction());
+				queryTxt.append("(");
+				queryTxt.append(measure.getColumn());
 				queryTxt.append("),");
 			}
 			//Deleting last comma

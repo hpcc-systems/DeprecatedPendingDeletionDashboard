@@ -18,11 +18,11 @@ import org.hpccsystems.dashboard.entity.ChartDetails;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.entity.chart.Filter;
+import org.hpccsystems.dashboard.entity.chart.Measure;
 import org.hpccsystems.dashboard.entity.chart.XYChartData;
 import org.hpccsystems.dashboard.entity.chart.utils.ChartRenderer;
 import org.hpccsystems.dashboard.services.AuthenticationService;
 import org.hpccsystems.dashboard.services.DashboardService;
-import org.hpccsystems.dashboard.services.UserCredential;
 import org.hpccsystems.dashboard.services.WidgetService;
 import org.hpccsystems.dashboard.util.DashboardUtil;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +32,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.zkoss.json.JSONArray;
 import org.zkoss.json.JSONObject;
-import org.zkoss.zk.ui.Sessions;
-import org.zkoss.zk.ui.select.annotation.WireVariable;
 
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonArray;
@@ -191,7 +189,7 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
 			
 			XYChartData chartData = null;
 			List<String> xColumnList = null;
-			List<String> yColumnList = null;
+			List<Measure> yColumnList = null;
 			String filterColumn = null;
 			Integer filterDataType = 0;
 			ChartConfiguration chartConfiguration = null;			
@@ -207,7 +205,7 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
 					chartData = chartRenderer.parseXML(portlet.getChartDataXML());
 					if (chartData != null) {
 						xColumnList = chartData.getXColumnNames();
-						yColumnList = chartData.getYColumnNames();
+						yColumnList = chartData.getYColumns();
 						// For XAxis & YAxis Validation
 						xColumnValidation(failedValColumnList, xColumnList,	chartConfiguration);
 						yColumnValidation(failedValColumnList, yColumnList,	chartConfiguration);
@@ -295,19 +293,19 @@ public void searchDashboard(HttpServletRequest request, HttpServletResponse resp
 	 * @return
 	 */
 	private void yColumnValidation(List<String> failedColumnList, 
-			List<String> yColumnList, ChartConfiguration configuration) {
+			List<Measure> yColumnList, ChartConfiguration configuration) {
 		Boolean yAxisValStatus = false;
 		if(yColumnList != null){
-		for (String fieldValue : yColumnList) {
+		for (Measure measure : yColumnList) {
 			for (Field entry : configuration.getFields()) {
-				if (fieldValue.equals(entry.getColumnName().trim())
+				if (measure.equals(entry.getColumnName().trim())
 						&& DashboardUtil.checkNumeric(entry.getDataType().trim()) ){
 					yAxisValStatus = true;
 					break;
 				}
 			}
-			if (!yAxisValStatus && !failedColumnList.contains(fieldValue.trim())) {
-				failedColumnList.add(fieldValue.trim());
+			if (!yAxisValStatus && !failedColumnList.contains(measure.getColumn().trim())) {
+				failedColumnList.add(measure.getColumn().trim());
 			}
 			yAxisValStatus = false;
 		  }

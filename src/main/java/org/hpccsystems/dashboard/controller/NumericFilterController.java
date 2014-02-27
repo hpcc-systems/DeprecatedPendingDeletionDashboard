@@ -75,7 +75,7 @@ public class NumericFilterController extends SelectorComposer<Component>{
 			Map<Integer, BigDecimal> map = null;
 			try	{
 				if(chartData.getXColumnNames().contains(filter.getColumn()) ||
-						chartData.getYColumnNames().contains(filter.getColumn())){
+						chartData.getYColumns().contains(filter.getColumn())){
 					map = hpccService.getMinMax(filter.getColumn(), chartData, true);
 				} else {
 					map = hpccService.getMinMax(filter.getColumn(), chartData, false);

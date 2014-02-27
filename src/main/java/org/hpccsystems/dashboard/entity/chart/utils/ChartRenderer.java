@@ -23,6 +23,7 @@ import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.entity.chart.Filter;
 import org.hpccsystems.dashboard.entity.chart.Group;
+import org.hpccsystems.dashboard.entity.chart.Measure;
 import org.hpccsystems.dashboard.entity.chart.XYChartData;
 import org.hpccsystems.dashboard.entity.chart.XYModel;
 import org.hpccsystems.dashboard.services.HPCCService;
@@ -71,12 +72,12 @@ public class ChartRenderer {
 		StringBuilder filterDescription = new StringBuilder();
 		
 		
-		if(chartData.getYColumnNames().size() > 0 && 
+		if(chartData.getYColumns().size() > 0 && 
 				chartData.getXColumnNames().size() > 0) {
 			header.addProperty("xName", chartData.getXColumnNames().get(0));
 			
-			for (String colName : chartData.getYColumnNames()) {
-				yName.append(colName);
+			for (Measure measure : chartData.getYColumns()) {
+				yName.append(measure.getColumn() +  "_"  + measure.getAggregateFunction());
 				yName.append(" & ");
 			}
 			yName.replace(yName.lastIndexOf("&"), yName.length(), "");
@@ -158,20 +159,20 @@ public class ChartRenderer {
 					json.addProperty("xData",(String) bar.getxAxisValues().get(0));
 					
 					JsonObject yNames = new JsonObject();
-					for (String colName : chartData.getYColumnNames()) {
+					for (Measure measure : chartData.getYColumns()) {
 						if(Constants.BAR_CHART.equals(portlet.getChartType())){
-							yNames.addProperty(colName, "bar");
+							yNames.addProperty(measure.getColumn() +  "_"  + measure.getAggregateFunction(), "bar");
 						} else if(Constants.LINE_CHART.equals(portlet.getChartType())){
-							yNames.addProperty(colName, "line");
+							yNames.addProperty(measure.getColumn() +  "_"  + measure.getAggregateFunction(), "line");
 						}
 					}
 					header.add("yNames", yNames);
 					
 					//TODO - make this logic dynamic
 					if(Constants.BAR_CHART.equals(portlet.getChartType())){
-						json.addProperty(chartData.getYColumnNames().get(0), (BigDecimal)bar.getyAxisValues().get(0));
+						json.addProperty(chartData.getYColumns().get(0).getColumn(), (BigDecimal)bar.getyAxisValues().get(0));
 						if(bar.getyAxisValues().size() > 1) {
-							json.addProperty(chartData.getYColumnNames().get(1), (BigDecimal)bar.getyAxisValues().get(1));
+							json.addProperty(chartData.getYColumns().get(1).getColumn(), (BigDecimal)bar.getyAxisValues().get(1));
 							header.addProperty("secondLine", true);
 						} else {
 							header.addProperty("secondLine", false);
@@ -213,8 +214,6 @@ public class ChartRenderer {
 			
 			portlet.setChartDataJSON(data);
 		} else {
-			//For LINE/BAR Chart
-			JsonObject json = null;
 			JsonArray xValues = new JsonArray();
 			JsonArray rows = new JsonArray();
 			JsonArray row = new JsonArray();
@@ -224,8 +223,8 @@ public class ChartRenderer {
 					row.add(new JsonPrimitive(colName));
 				}
 			} else {
-				for (String colName : chartData.getYColumnNames()) {
-					row.add(new JsonPrimitive(colName));
+				for (Measure measure : chartData.getYColumns()) {
+					row.add(new JsonPrimitive(measure.getColumn() +  "_"  + measure.getAggregateFunction()));
 				}
 			}
 			
@@ -246,7 +245,10 @@ public class ChartRenderer {
 					if(chartData.getXColumnNames().size() > 1){
 						yColumnNames = chartData.getGroup().getyColumnNames();
 					} else {
-						yColumnNames = chartData.getYColumnNames();
+						yColumnNames = new ArrayList<String>();
+						for (Measure measure : chartData.getYColumns()) {
+							yColumnNames.add(measure.getColumn() + "_" + measure.getAggregateFunction());
+						}
 					}
 					
 					xValues.add(new JsonPrimitive(bar.getxAxisValues().get(0).toString()));

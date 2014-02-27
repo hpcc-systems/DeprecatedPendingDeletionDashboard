@@ -12,6 +12,7 @@ import org.hpccsystems.dashboard.api.entity.Field;
 import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.entity.chart.Filter;
+import org.hpccsystems.dashboard.entity.chart.Measure;
 import org.hpccsystems.dashboard.entity.chart.XYChartData;
 import org.hpccsystems.dashboard.entity.chart.XYModel;
 import org.hpccsystems.dashboard.entity.chart.utils.ChartRenderer;
@@ -27,6 +28,7 @@ import org.zkoss.zk.ui.event.DropEvent;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
+import org.zkoss.zk.ui.event.SelectEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
@@ -119,7 +121,7 @@ public class EditChartController extends SelectorComposer<Component> {
 				columnSchemaMap.put(field.getColumnName(), field.getDataType());
 			}
 			
-			filterListBox.setDisabled(true);			
+			filterListBox.setDroppable("false");			
 		} else {
 			try{
 				columnSchemaMap = hpccService.getColumnSchema(chartData.getFileName(), chartData.getHpccConnection());
@@ -147,16 +149,16 @@ public class EditChartController extends SelectorComposer<Component> {
 			}
 			
 			columnList = new ArrayList<String>();
-			for (String colName : chartData.getYColumnNames()) {
-				if(columnSchemaMap.containsKey(colName)){
-					createYListChild(colName);
+			for (Measure measure : chartData.getYColumns()) {
+				if(columnSchemaMap.containsKey(measure.getColumn())){
+					createYListChild(measure);
 					yAxisDropped = true;
 				} else {
-					columnList.add(colName);
+					columnList.add(measure.getColumn());
 				}
 			}
 			for (String column : columnList) {
-				chartData.getYColumnNames().remove(column);
+				chartData.getYColumns().remove(column);
 			}
 			
 			validateDroppable();
@@ -168,19 +170,55 @@ public class EditChartController extends SelectorComposer<Component> {
 			}
 			
 			// Checking to avoid error while on the fly widget type change happens 
-			if( (chartData.getXColumnNames().size() > 0) && (chartData.getYColumnNames().size() > 0)){
+			if( (chartData.getXColumnNames().size() > 0) && (chartData.getYColumns().size() > 0)){
 				constructChart();
 			}
 		} 		
 
 
 		Listitem listItem;
+		Listcell listcell;
 		if(columnSchemaMap != null){
 		for (Map.Entry<String, String> entry : columnSchemaMap.entrySet()) {
-			listItem = new Listitem(entry.getKey());
+			listItem = new Listitem();
+			listcell = new Listcell(entry.getKey());
+			listItem.appendChild(listcell);
 			listItem.setDraggable("true");
 			if(DashboardUtil.checkNumeric(entry.getValue())){
 				listItem.setAttribute(Constants.COLUMN_DATA_TYPE, Constants.NUMERIC_DATA);
+				final Measure measure = new Measure(entry.getKey(), "sum");
+				listItem.setAttribute(Constants.MEASURE, measure);
+				
+				final Popup popup = new Popup();
+				popup.setWidth("100px");
+				popup.setZclass("popup");
+				final Button button = new Button("Sum");
+				button.setZclass("btn btn-xs");
+				button.setStyle("font-size: 10px; float: right;");
+				button.setPopup(popup);
+				
+				Listbox listbox = new Listbox();
+				listbox.setMultiple(false);
+				listbox.appendItem("Average", "avg");
+				listbox.appendItem("Sum", "sum");
+				listbox.appendItem("Minimum", "min");
+				listbox.appendItem("Maximum", "max");
+				
+				listbox.addEventListener(Events.ON_SELECT, new EventListener<SelectEvent<Component, Object>>() {
+
+					@Override
+					public void onEvent(SelectEvent<Component, Object> event) throws Exception {
+						Listitem selectedItem = (Listitem) event.getSelectedItems().iterator().next();
+						measure.setAggregateFunction(selectedItem.getValue().toString());
+						button.setLabel(selectedItem.getLabel());
+						popup.close();
+					}
+				});
+				
+				popup.appendChild(listbox);
+				listcell.appendChild(popup);
+				listcell.appendChild(button);
+				
 				listItem.setParent(measureListBox);
 			} else {
 				listItem.setAttribute(Constants.COLUMN_DATA_TYPE, Constants.STRING_DATA);
@@ -203,21 +241,27 @@ public class EditChartController extends SelectorComposer<Component> {
 			Clients.showNotification("You can only drop Measures here", "error", YAxisListBox, "end_center", 3000, true);
 			return;
 		}
-		if(chartData.getYColumnNames().contains(draggedListitem.getLabel()) || 
-				chartData.getXColumnNames().contains(draggedListitem.getLabel())) {
-			Clients.showNotification("\"" + draggedListitem.getLabel() +  "\" is already used in plotting this Chart. A column can only be used once while plotting a Chart", "error", YAxisListBox, "end_center", 3000, true);
+		
+		//Creating new instance purposefully
+		Measure measure = (Measure) draggedListitem.getAttribute(Constants.MEASURE);
+		Measure newMeasure = new Measure(measure.getColumn(), measure.getAggregateFunction());
+
+		//Validations
+		if(chartData.getYColumns().contains(newMeasure) || 
+				chartData.getXColumnNames().contains(newMeasure.getColumn())) {
+			Clients.showNotification("Dropped column is already used in plotting this Chart. Please drop another Column", "error", YAxisListBox, "end_center", 3000, true);
 			return;
 		}
-		if(chartData.getXColumnNames().size() > 1 && chartData.getYColumnNames().size() >0) {
+		if(chartData.getXColumnNames().size() > 1 && chartData.getYColumns().size() >0) {
 			Clients.showNotification("The chart is already groped with multiple attributes.\nGrouping is aloowed in only one of Measures and Attributes.", "error", YAxisListBox, "end_center", 3000, true);
 			return;
 		}
 		
-		createYListChild(draggedListitem.getLabel());
+		createYListChild(newMeasure);
 		
 		// passing X,Y axis values to draw the chart
 		yAxisDropped = true;
-		chartData.getYColumnNames().add(draggedListitem.getLabel());
+		chartData.getYColumns().add(newMeasure);
 		
 		if (xAxisDropped) {
 			constructChart();	
@@ -241,9 +285,9 @@ public class EditChartController extends SelectorComposer<Component> {
 							throw new Exception("X Column " + column + " not present in Dataset");
 						}
 					}
-					for (String column : chartData.getYColumnNames()) {
-						if(!columnSchemaMap.containsKey(column)){
-							throw new Exception("Y Column " + column + " not present in Dataset");
+					for (Measure measure : chartData.getYColumns()) {
+						if(!columnSchemaMap.containsKey(measure.getColumn())){
+							throw new Exception("Y Column " + measure.getColumn() + " not present in Dataset");
 						}
 					}
 					
@@ -282,7 +326,7 @@ public class EditChartController extends SelectorComposer<Component> {
 
 		//Measures
 		if( ! (Constants.CHART_MAP.get(portlet.getChartType()).getMaxYColumns() == 0)) {
-			if(chartData.getYColumnNames().size() < 
+			if(chartData.getYColumns().size() < 
 				Constants.CHART_MAP.get(portlet.getChartType()).getMaxYColumns() ) {
 				YAxisListBox.setDroppable("true");
 			} else {
@@ -307,10 +351,11 @@ public class EditChartController extends SelectorComposer<Component> {
 	}
 	
 	
-	private void createYListChild(String axisName) {
-		final Listitem yAxisItem = new Listitem();
+	private void createYListChild(Measure measure) {
+		Listitem yAxisItem = new Listitem();
+		yAxisItem.setAttribute(Constants.MEASURE, measure);
 		Listcell listcell = new Listcell();
-		listcell.setLabel(axisName);
+		listcell.setLabel(measure.getColumn() + "_" + measure.getAggregateFunction());
 		
 		Button closeBtn = new Button();
 		closeBtn.setSclass("glyphicon glyphicon-remove btn btn-link img-btn");
@@ -326,26 +371,19 @@ public class EditChartController extends SelectorComposer<Component> {
 	
 	private EventListener<Event> yAxisItemDetachListener = new EventListener<Event>() {
 		public void onEvent(final Event event) throws Exception {
-			Listcell listcell = (Listcell) event.getTarget().getParent();
-			Listitem yAxisItem = (Listitem) listcell.getParent();
-			String axisName =listcell.getLabel();
+			Listitem yAxisItem = (Listitem) event.getTarget().getParent().getParent();
+			Measure measure = (Measure) yAxisItem.getAttribute(Constants.MEASURE);
 			yAxisItem.detach();
-			chartData.getYColumnNames().remove(axisName);
+			chartData.getYColumns().remove(measure);
 			
-			//Disabling filter and chart clearance function in Api chart config/edit flow without chart
-			if( !authenticationService.getUserCredential().getApplicationId().equals(Constants.CIRCUIT_APPLICATION_ID) || 
-					authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_CHART) || 
-						authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD)){				
-				
-				// Only clear the existing chart when no columns are present otherwise recreate the chart
-				if(chartData.getYColumnNames().size() < 1) {
-					yAxisDropped = false;
-					Clients.evalJavaScript("clearChart('" + Constants.EDIT_WINDOW_CHART_DIV +  "')");
-				} else {
-						constructChart();
-				}
-				
+			// Only clear the existing chart when no columns are present otherwise recreate the chart
+			if(chartData.getYColumns().size() < 1) {
+				yAxisDropped = false;
+				Clients.evalJavaScript("clearChart('" + Constants.EDIT_WINDOW_CHART_DIV +  "')");
+			} else {
+				constructChart();
 			}
+				
 			validateDroppable();
 		}
 	};
@@ -362,7 +400,7 @@ public class EditChartController extends SelectorComposer<Component> {
 				.getDragged();
 
 		//Validations
-		if(chartData.getYColumnNames().contains(draggedListitem.getLabel()) || 
+		if(chartData.getYColumns().contains(draggedListitem.getLabel()) || 
 				chartData.getXColumnNames().contains(draggedListitem.getLabel())) {
 			Clients.showNotification("A column can only be used once while plotting the graph", "error", XAxisListBox, "end_center", 3000, true);
 			return;
@@ -370,7 +408,7 @@ public class EditChartController extends SelectorComposer<Component> {
 		if(!Constants.STRING_DATA.equals(draggedListitem.getAttribute(Constants.COLUMN_DATA_TYPE))){
 			Clients.showNotification( "\""+ draggedListitem.getLabel() +"\" is a Measure. It will only be treated as descrete values", "warning", XAxisListBox, "end_center", 5000, true);
 		}
-		if(chartData.getYColumnNames().size() > 1 && chartData.getXColumnNames().size() >0){
+		if(chartData.getYColumns().size() > 1 && chartData.getXColumnNames().size() >0){
 			Clients.showNotification("The chart is already groped with multiple measures.\nGrouping is aloowed in only one of Measures and Attributes.", "error", XAxisListBox, "end_center", 3000, true);
 			return;
 		}
@@ -508,9 +546,7 @@ public class EditChartController extends SelectorComposer<Component> {
 		public void onEvent(final Event event) throws Exception {	
 			Listitem listItem =(Listitem) event.getTarget().getParent().getParent();			
 			
-			chartData.getFilterList().remove(
-					chartData.getFilterList().indexOf(
-							listItem.getAttribute(Constants.FILTER)));
+			chartData.getFilterList().remove(listItem.getAttribute(Constants.FILTER));
 			if(chartData.getFilterList().size() < 1){
 				chartData.setIsFiltered(false);
 			}
