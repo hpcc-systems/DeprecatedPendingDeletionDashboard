@@ -200,9 +200,10 @@ public class EditChartController extends SelectorComposer<Component> {
 				Listbox listbox = new Listbox();
 				listbox.setMultiple(false);
 				listbox.appendItem("Average", "avg");
-				listbox.appendItem("Sum", "sum");
+				listbox.appendItem("Count", "count");
 				listbox.appendItem("Minimum", "min");
 				listbox.appendItem("Maximum", "max");
+				listbox.appendItem("Sum", "sum");
 				
 				listbox.addEventListener(Events.ON_SELECT, new EventListener<SelectEvent<Component, Object>>() {
 
@@ -221,6 +222,99 @@ public class EditChartController extends SelectorComposer<Component> {
 				
 				listItem.setParent(measureListBox);
 			} else {
+				final String columnName = entry.getKey();
+				final Popup popup1 = new Popup();
+				popup1.setWidth("200px");
+				popup1.setZclass("popup");
+				
+				final Button btn = new Button();
+				btn.setSclass("glyphicon glyphicon-cog btn btn-link img-btn");
+				btn.setStyle("float:right");
+				btn.setVisible(false);
+				btn.setPopup(popup1);
+				
+				Listbox listbox = new Listbox();
+				listbox.setMultiple(false);
+				listbox.appendItem("Create Measure", "count");
+				listbox.addEventListener(Events.ON_SELECT, new EventListener<SelectEvent<Component, Object>>() {
+
+					@Override
+					public void onEvent(SelectEvent<Component, Object> event) throws Exception {
+						Listitem selectedItem = (Listitem) event.getSelectedItems().iterator().next();
+						
+						if(!selectedItem.getValue().equals("count"))
+							return;
+						
+						// Create Measure
+						Listitem listItem = new Listitem();
+						Listcell listcell = new Listcell(columnName);
+						listItem.appendChild(listcell);
+						listItem.setDraggable("true");
+						listItem.setAttribute(Constants.COLUMN_DATA_TYPE, Constants.NUMERIC_DATA);
+						final Measure measure = new Measure(columnName, "count");
+						listItem.setAttribute(Constants.MEASURE, measure);
+						
+						final Popup popup = new Popup();
+						popup.setWidth("100px");
+						popup.setZclass("popup");
+						final Button button = new Button("Count");
+						button.setZclass("btn btn-xs");
+						button.setStyle("font-size: 10px; float: right;");
+						button.setPopup(popup);
+						
+						Listbox listbox = new Listbox();
+						listbox.setMultiple(false);
+						listbox.appendItem("Count", "count");
+						
+						listbox.addEventListener(Events.ON_SELECT, new EventListener<SelectEvent<Component, Object>>() {
+
+							@Override
+							public void onEvent(SelectEvent<Component, Object> event) throws Exception {
+								Listitem selectedItem = (Listitem) event.getSelectedItems().iterator().next();
+								measure.setAggregateFunction(selectedItem.getValue().toString());
+								button.setLabel(selectedItem.getLabel());
+								popup.close();
+							}
+						});
+						
+						popup.appendChild(listbox);
+						listcell.appendChild(popup);
+						listcell.appendChild(button);
+						
+						listItem.setParent(measureListBox);
+						
+						btn.setVisible(false);
+						btn.setDisabled(true);
+						popup1.close();
+					}
+				});
+				
+				popup1.appendChild(listbox);
+				listcell.appendChild(btn);
+				listcell.appendChild(popup1);
+				
+				listcell.addEventListener(Events.ON_MOUSE_OVER, new EventListener<Event>() {
+
+					@Override
+					public void onEvent(Event arg0) throws Exception {
+						if(!btn.isDisabled()){
+							btn.setVisible(true);
+						}
+					}
+					
+				});
+				
+				listcell.addEventListener(Events.ON_MOUSE_OUT, new EventListener<Event>() {
+
+					@Override
+					public void onEvent(Event arg0) throws Exception {
+						if(!popup1.isVisible()){
+							btn.setVisible(false);
+						}
+					}
+					
+				});
+				
 				listItem.setAttribute(Constants.COLUMN_DATA_TYPE, Constants.STRING_DATA);
 				listItem.setParent(attributeListBox);
 			}
