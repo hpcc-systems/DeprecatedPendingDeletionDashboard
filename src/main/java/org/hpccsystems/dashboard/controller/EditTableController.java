@@ -82,6 +82,21 @@ public class EditTableController extends SelectorComposer<Component> {
 			columnSchemaMap = hpccService.getColumnSchema(tableData.getFileName(), tableData.getHpccConnection());
 		}
 		
+		if(Constants.CIRCUIT_APPLICATION_ID.equals(authenticationService.getUserCredential().getApplicationId())) {
+			try {
+				Map<String,String> schemaMap = hpccService.getColumnSchema(tableData.getFileName(), tableData.getHpccConnection());
+				for (String column : tableData.getTableColumns()) {
+					if(!schemaMap.containsKey(column)){
+						throw new Exception("Column doesn't exist");
+					}
+				}
+				tableHolder.appendChild(tableRenderer.constructTableWidget(hpccService.fetchTableData(tableData), true, portlet.getName()));
+			} catch (Exception e) {
+				LOG.error(e.getMessage());
+			}
+			
+		}
+		
 		Listitem listItem;
 		if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())) {
 			for (Map.Entry<String, String> entry : columnSchemaMap.entrySet()) {
@@ -128,6 +143,22 @@ public class EditTableController extends SelectorComposer<Component> {
 			} else {
 				//When dropped in list box
 				dropped.appendChild(dragged);
+			}
+			if(Constants.CIRCUIT_APPLICATION_ID.equals(authenticationService.getUserCredential().getApplicationId()) && targetList.getChildren().size() > 1)
+				doneButton.setDisabled(false);
+			else
+				doneButton.setDisabled(true);
+			//Code to update the selected columns since the draw table is not applicaple for circuit config flow
+			List<String> selectedTableColumns=tableData.getTableColumns();
+			Listitem listitem;
+			selectedTableColumns.clear();
+			for (Component component : targetList.getChildren()) {
+				if(component instanceof Listitem){
+					listitem = (Listitem) component;
+					selectedTableColumns.add(
+								listitem.getLabel()
+							);
+				}
 			}
 		}
 		
