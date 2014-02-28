@@ -24,7 +24,7 @@ function createChart(divId, chartData) {
 			
 			var filter_desc = "";
 			if(response.isFiltered){
-				filter_desc = "<span class='btn-link btn-sm' style='float: right;' id='"+ response.portletId +"_title'> Filters </span>" +
+				filter_desc = "<span class='btn-link btn-sm' style='float: right; padding: 0px 10px;' id='"+ response.portletId +"_title'> Filters </span>" +
 						"<div id='"+ response.portletId +"_filter_content' style='line-height: initial;position: absolute;padding: 2px;border: 1px solid rgb(124, 124, 124);margin: 5px;background-color: rgb(177, 177, 177);font-size: small;color: white;z-index: 2; display: none'>"+ response.filterDescription +"</div>" +
 						"<script type='text/javascript'>" +
 							"jq('#"+ response.portletId +"_title').mouseenter(function() {" +
@@ -69,7 +69,7 @@ function createChart(divId, chartData) {
 				bindto: "#" + response.portletId + "holderDiv",
 				size: { 
 					width:fullWidth - 15 - 5,
-					height:fullHeight - 15 - 20
+					height:fullHeight - 15 - 25
 				},
 				axis: {
 					y: {

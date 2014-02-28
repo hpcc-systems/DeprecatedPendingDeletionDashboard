@@ -36,6 +36,7 @@ import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
+import org.zkoss.zul.Div;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listcell;
@@ -88,6 +89,9 @@ public class EditChartController extends SelectorComposer<Component> {
 	@Wire
 	Button fectchFiles;	
 	
+	@Wire
+	Div chart;
+	
 	Boolean xAxisDropped = false;
 	Boolean yAxisDropped = false;
 	
@@ -112,6 +116,8 @@ public class EditChartController extends SelectorComposer<Component> {
 		chartData = (XYChartData) execution.getAttribute(Constants.CHART_DATA);
 		portlet = (Portlet) execution.getAttribute(Constants.PORTLET);
 		doneButton = (Button) execution.getAttribute(Constants.EDIT_WINDOW_DONE_BUTTON);
+		
+		this.getSelf().addEventListener("onDrawChart", drawChart);
 		
 		//API chart config flow without chart
 		if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_CONFIG_CHART)) {
@@ -205,16 +211,7 @@ public class EditChartController extends SelectorComposer<Component> {
 				listbox.appendItem("Maximum", "max");
 				listbox.appendItem("Sum", "sum");
 				
-				listbox.addEventListener(Events.ON_SELECT, new EventListener<SelectEvent<Component, Object>>() {
-
-					@Override
-					public void onEvent(SelectEvent<Component, Object> event) throws Exception {
-						Listitem selectedItem = (Listitem) event.getSelectedItems().iterator().next();
-						measure.setAggregateFunction(selectedItem.getValue().toString());
-						button.setLabel(selectedItem.getLabel());
-						popup.close();
-					}
-				});
+				listbox.addEventListener(Events.ON_SELECT, selectAggregateFunctionListener);
 				
 				popup.appendChild(listbox);
 				listcell.appendChild(popup);
@@ -266,16 +263,7 @@ public class EditChartController extends SelectorComposer<Component> {
 						listbox.setMultiple(false);
 						listbox.appendItem("Count", "count");
 						
-						listbox.addEventListener(Events.ON_SELECT, new EventListener<SelectEvent<Component, Object>>() {
-
-							@Override
-							public void onEvent(SelectEvent<Component, Object> event) throws Exception {
-								Listitem selectedItem = (Listitem) event.getSelectedItems().iterator().next();
-								measure.setAggregateFunction(selectedItem.getValue().toString());
-								button.setLabel(selectedItem.getLabel());
-								popup.close();
-							}
-						});
+						listbox.addEventListener(Events.ON_SELECT, selectAggregateFunctionListener);
 						
 						popup.appendChild(listbox);
 						listcell.appendChild(popup);
@@ -322,6 +310,30 @@ public class EditChartController extends SelectorComposer<Component> {
 	}	
 
 	/**
+	 * Aggregate Function selection listener
+	 */
+	EventListener<SelectEvent<Component, Object>> selectAggregateFunctionListener = new EventListener<SelectEvent<Component, Object>>() {
+
+		@Override
+		public void onEvent(SelectEvent<Component, Object> event) throws Exception {
+			Listitem selectedItem = (Listitem) event.getSelectedItems().iterator().next();
+			Popup popup = (Popup) selectedItem.getParent().getParent();
+			Listcell listcell = (Listcell) popup.getParent();
+			Measure measure = (Measure) listcell.getParent().getAttribute(Constants.MEASURE);
+			measure.setAggregateFunction(selectedItem.getValue().toString());
+			Button button = null;
+			for (Component component : listcell.getChildren()) {
+				if(component instanceof Button) {
+					button = (Button) component;
+				}
+			}
+			button.setLabel(selectedItem.getLabel());
+			popup.close();
+		}
+	};
+	
+	
+	/**
 	 * Method to render chart when item dropped in Y Axis
 	 * @param dropEvent
 	 */
@@ -365,6 +377,19 @@ public class EditChartController extends SelectorComposer<Component> {
 	}
 	
 	/**
+	 * Event listener to fetch data from HPCC and draw the chart
+	 */
+	EventListener<Event> drawChart = new EventListener<Event>() {
+		
+		@Override
+		public void onEvent(Event event) throws Exception {
+			chartRenderer.constructChartJSON(chartData, portlet, true);
+			chartRenderer.drawChart(chartData,	Constants.EDIT_WINDOW_CHART_DIV, portlet);
+			Clients.clearBusy(chart);
+		}
+	};
+	
+	/**
 	 * Method to process with X/Y column data add/clearance function
 	 */
 	private void constructChart() {	
@@ -392,8 +417,8 @@ public class EditChartController extends SelectorComposer<Component> {
 					LOG.error("Chart Rendering failed", e);
 				}
 			} else {
-				chartRenderer.constructChartJSON(chartData, portlet, true);
-				chartRenderer.drawChart(chartData,	Constants.EDIT_WINDOW_CHART_DIV, portlet);
+				Clients.showBusy(chart, "Retriving data");
+				Events.echoEvent(new Event("onDrawChart", this.getSelf()));
 			}
 			
 			doneButton.setDisabled(false);				
