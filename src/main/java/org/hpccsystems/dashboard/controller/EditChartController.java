@@ -1,30 +1,34 @@
 package org.hpccsystems.dashboard.controller;
+
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hpccsystems.dashboard.api.entity.ChartConfiguration;
+import org.hpccsystems.dashboard.api.entity.Field;
 import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.entity.chart.Filter;
+import org.hpccsystems.dashboard.entity.chart.Measure;
 import org.hpccsystems.dashboard.entity.chart.XYChartData;
 import org.hpccsystems.dashboard.entity.chart.XYModel;
 import org.hpccsystems.dashboard.entity.chart.utils.ChartRenderer;
+import org.hpccsystems.dashboard.services.AuthenticationService;
 import org.hpccsystems.dashboard.services.DashboardService;
 import org.hpccsystems.dashboard.services.HPCCService;
+import org.hpccsystems.dashboard.services.WidgetService;
+import org.hpccsystems.dashboard.util.DashboardUtil;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
-import org.zkoss.zk.ui.Session;
-import org.zkoss.zk.ui.Sessions;
 import org.zkoss.zk.ui.event.DropEvent;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
-import org.zkoss.zk.ui.event.MouseEvent;
+import org.zkoss.zk.ui.event.SelectEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
@@ -32,14 +36,13 @@ import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
-import org.zkoss.zul.Hbox;
-import org.zkoss.zul.Hlayout;
-import org.zkoss.zul.Image;
+import org.zkoss.zul.Div;
+import org.zkoss.zul.Include;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Listitem;
-import org.zkoss.zul.Textbox;
-import org.zkoss.zul.Window;
+import org.zkoss.zul.Popup;
+import org.zkoss.zul.Vlayout;
 
 /**
  * EditChartController class is used to handle the edit page of the Dashboard
@@ -53,6 +56,8 @@ public class EditChartController extends SelectorComposer<Component> {
 	
 	private static final  Log LOG = LogFactory.getLog(EditChartController.class); 
 	
+	@WireVariable
+	AuthenticationService  authenticationService;
 	
 	@WireVariable
 	private DashboardService dashboardService;
@@ -63,50 +68,9 @@ public class EditChartController extends SelectorComposer<Component> {
 	@WireVariable
 	HPCCService hpccService;
 	
-	/**
-	 * The map which will hold web services output as column details
-	 */
-	Map<String, String> wsdlOuputputMap = new HashMap<String, String>();
-	
-	@Wire
-	Window editPortletWindow;
-	
-	@Wire
-	Hbox editPortletGrid;
-	
-	@Wire
-	Hlayout editLayout;
-	
-	@Wire
-	Listbox columnListBox;
-	
-	@Wire
-	Listbox yAxisBox;
-	
-	@Wire
-	Listbox xAxisBox;
-	
-	@Wire
-	Button doneButton;
-	
-	@Wire
-	Listitem yDefaultItem;
-	
-	@Wire
-	Listitem xDefaultItem;
-	
-	@Wire
-	Textbox wsdlTxt;
-	
-	@Wire
-	Textbox editUserTxt;
-	
-	@Wire
-	Textbox editPwdTxt;
-	
-	@Wire
-	Textbox editJDBCUrlTxt;		
-	
+	@WireVariable
+	private WidgetService widgetService;
+
 	@Wire
 	Listbox measureListBox;
 	
@@ -122,144 +86,253 @@ public class EditChartController extends SelectorComposer<Component> {
 	@Wire
 	Listbox filterListBox;	
 	
+	@Wire
+	Button fectchFiles;	
+	
+	@Wire
+	Div chart;
+	
 	Boolean xAxisDropped = false;
 	Boolean yAxisDropped = false;
 	
 	XYChartData chartData = new XYChartData();
+	private Button doneButton;
 	
-	boolean isBarLinePieChart;	
-
 	XYModel xyModal;
 	Portlet portlet;
+
+	@Wire
+	Vlayout editWindowLayout;
 	
-	Map<Integer,String> portletIdWsdlMap;
-	List<String> filterDataList;
+	List<String> parameterList = new ArrayList<String>();
+	final Map<String, Object> parameters = new HashMap<String, Object>();
 	
 	@Override
 	public void doAfterCompose(final Component comp) throws Exception {
 		super.doAfterCompose(comp);
-		portlet = (Portlet) Sessions.getCurrent().getAttribute(Constants.ACTIVE_PORTLET);
+		Execution execution = Executions.getCurrent();
+		Map<String,String> columnSchemaMap = null;
 		
-		//gets map which has portlet's Wsdl details
-		Object mapObj =Sessions.getCurrent().getAttribute("portletIdWsdlMap");		
-		if(mapObj != null)	{
-			portletIdWsdlMap = (Map<Integer,String>)(mapObj);
+		chartData = (XYChartData) execution.getAttribute(Constants.CHART_DATA);
+		portlet = (Portlet) execution.getAttribute(Constants.PORTLET);
+		doneButton = (Button) execution.getAttribute(Constants.EDIT_WINDOW_DONE_BUTTON);
+		
+		this.getSelf().addEventListener("onDrawChart", drawChart);
+		
+		//API chart config flow without chart
+		if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_CONFIG_CHART)) {
+			ChartConfiguration configuration = (ChartConfiguration) execution.getAttribute(Constants.CIRCUIT_CONFIG);
+			columnSchemaMap = new HashMap<String, String>();
+			for (Field field : configuration.getFields()) {
+				columnSchemaMap.put(field.getColumnName(), field.getDataType());
+			}
+			
+			filterListBox.setDroppable("false");			
 		} else {
-			portletIdWsdlMap = new HashMap<Integer,String>();
-		}	
-		
-		if(portlet == null)
-		{
-			LOG.error("Current portlet is not in session");
+			try{
+				columnSchemaMap = hpccService.getColumnSchema(chartData.getFileName(), chartData.getHpccConnection());
+			}catch(Exception e) {
+				Clients.showNotification("Unable to fetch columns from HPCC", "error", comp, "middle_center", 3000, true);
+				LOG.error(Constants.ERROR_RETRIEVE_COLUMNS, e);
+				return;
+			}			
 		}
-	}
-
-	/**
-	 * Method to be invoked while submitting the edit form 
-	 */
-	@Listen("onClick=#editSubmit")
-	public void editPortlet()
-	{
-		if(wsdlTxt.getValue()!= null && wsdlTxt.getValue().length()>0)
-		{		
-			
-		//persisting enterred Wsdl details in the session for the current portlet
-		portletIdWsdlMap.put(portlet.getId(), wsdlTxt.getValue());	
-		Sessions.getCurrent().setAttribute("portletIdWsdlMap", portletIdWsdlMap);
 		
-		wsdlOuputputMap = hpccService.getColumnSchema(wsdlTxt.getValue(), editUserTxt.getValue(), editPwdTxt.getValue(), editJDBCUrlTxt.getValue());
-		//Adding the web service returned columns to the column's side layout
-		if(wsdlOuputputMap != null && wsdlOuputputMap.size() > 1 && !wsdlOuputputMap.containsKey(Constants.ERROR))
-		{
-			//Removing the submit grid from the window 
-			editPortletGrid.detach();	
-			chartData.setFileName(wsdlTxt.getValue());
-			chartData.setURL(editJDBCUrlTxt.getValue());
-			chartData.setUserName(editUserTxt.getValue());
-			chartData.setPassword(editPwdTxt.getValue());
+		// When live chart is present in ChartPanel
+		if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())){
+			List<String> columnList = new ArrayList<String>();
 			
-			//Making the chart layout visible in the same window
-			editLayout.setVisible(true);
+			for (String colName : chartData.getXColumnNames()) {
+				if(columnSchemaMap.containsKey(colName)){
+					createXListChild(colName);
+					xAxisDropped = true;
+				} else {
+					columnList.add(colName);
+				}
+			}
+			for (String column : columnList) {
+				chartData.getXColumnNames().remove(column);
+			}
 			
-			LOG.debug("wsdlOuputputMap -->"+wsdlOuputputMap);
-			for(Entry<String, String> entry : wsdlOuputputMap.entrySet())
-			{
-				if(entry.getValue().contains("integer") 
-						||entry.getValue().contains("real")
-						||entry.getValue().contains("decimal"))
-				{
+			columnList = new ArrayList<String>();
+			for (Measure measure : chartData.getYColumns()) {
+				if(columnSchemaMap.containsKey(measure.getColumn())){
+					createYListChild(measure);
+					yAxisDropped = true;
+				} else {
+					columnList.add(measure.getColumn());
+				}
+			}
+			for (String column : columnList) {
+				chartData.getYColumns().remove(column);
+			}
+			
+			validateDroppable();
+
+			if(chartData.getIsFiltered()) {
+				for (Filter filter : chartData.getFilterList()) {
+					createFilterListItem(filter);
+				}
+			}
+			
+			// Checking to avoid error while on the fly widget type change happens 
+			if( (chartData.getXColumnNames().size() > 0) && (chartData.getYColumns().size() > 0)){
+				constructChart();
+			}
+		} 		
+
+
+		Listitem listItem;
+		Listcell listcell;
+		if(columnSchemaMap != null){
+		for (Map.Entry<String, String> entry : columnSchemaMap.entrySet()) {
+			listItem = new Listitem();
+			listcell = new Listcell(entry.getKey());
+			listItem.appendChild(listcell);
+			listItem.setDraggable("true");
+			if(DashboardUtil.checkNumeric(entry.getValue())){
+				listItem.setAttribute(Constants.COLUMN_DATA_TYPE, Constants.NUMERIC_DATA);
+				final Measure measure = new Measure(entry.getKey(), "sum");
+				listItem.setAttribute(Constants.MEASURE, measure);
+				
+				final Popup popup = new Popup();
+				popup.setWidth("100px");
+				popup.setZclass("popup");
+				final Button button = new Button("Sum");
+				button.setZclass("btn btn-xs");
+				button.setStyle("font-size: 10px; float: right;");
+				button.setPopup(popup);
+				
+				Listbox listbox = new Listbox();
+				listbox.setMultiple(false);
+				listbox.appendItem("Average", "avg");
+				listbox.appendItem("Count", "count");
+				listbox.appendItem("Minimum", "min");
+				listbox.appendItem("Maximum", "max");
+				listbox.appendItem("Sum", "sum");
+				
+				listbox.addEventListener(Events.ON_SELECT, selectAggregateFunctionListener);
+				
+				popup.appendChild(listbox);
+				listcell.appendChild(popup);
+				listcell.appendChild(button);
+				
+				listItem.setParent(measureListBox);
+			} else {
+				final String columnName = entry.getKey();
+				final Popup popup1 = new Popup();
+				popup1.setWidth("200px");
+				popup1.setZclass("popup");
+				
+				final Button btn = new Button();
+				btn.setSclass("glyphicon glyphicon-cog btn btn-link img-btn");
+				btn.setStyle("float:right");
+				btn.setVisible(false);
+				btn.setPopup(popup1);
+				
+				Listbox listbox = new Listbox();
+				listbox.setMultiple(false);
+				listbox.appendItem("Create Measure", "count");
+				listbox.addEventListener(Events.ON_SELECT, new EventListener<SelectEvent<Component, Object>>() {
+
+					@Override
+					public void onEvent(SelectEvent<Component, Object> event) throws Exception {
+						Listitem selectedItem = (Listitem) event.getSelectedItems().iterator().next();
+						
+						if(!selectedItem.getValue().equals("count"))
+							return;
+						
+						// Create Measure
+						Listitem listItem = new Listitem();
+						Listcell listcell = new Listcell(columnName);
+						listItem.appendChild(listcell);
+						listItem.setDraggable("true");
+						listItem.setAttribute(Constants.COLUMN_DATA_TYPE, Constants.NUMERIC_DATA);
+						final Measure measure = new Measure(columnName, "count");
+						listItem.setAttribute(Constants.MEASURE, measure);
+						
+						final Popup popup = new Popup();
+						popup.setWidth("100px");
+						popup.setZclass("popup");
+						final Button button = new Button("Count");
+						button.setZclass("btn btn-xs");
+						button.setStyle("font-size: 10px; float: right;");
+						button.setPopup(popup);
+						
+						Listbox listbox = new Listbox();
+						listbox.setMultiple(false);
+						listbox.appendItem("Count", "count");
+						
+						listbox.addEventListener(Events.ON_SELECT, selectAggregateFunctionListener);
+						
+						popup.appendChild(listbox);
+						listcell.appendChild(popup);
+						listcell.appendChild(button);
+						
+						listItem.setParent(measureListBox);
+						
+						btn.setVisible(false);
+						btn.setDisabled(true);
+						popup1.close();
+					}
+				});
+				
+				popup1.appendChild(listbox);
+				listcell.appendChild(btn);
+				listcell.appendChild(popup1);
+				
+				listcell.addEventListener(Events.ON_MOUSE_OVER, new EventListener<Event>() {
+
+					@Override
+					public void onEvent(Event arg0) throws Exception {
+						if(!btn.isDisabled()){
+							btn.setVisible(true);
+						}
+					}
 					
-					final Listitem item= new Listitem(entry.getKey().trim());
-					item.setDraggable("true");
-					item.setDroppable("true");
-					item.setAttribute(Constants.COLUMN_DATA_TYPE, Constants.NUMERIC_DATA);
-					measureListBox.appendChild(item);
-				}
-				else
-				{
-					final Listitem item= new Listitem(entry.getKey().trim());
-					item.setDraggable("true");
-					item.setDroppable("true");
-					item.setAttribute(Constants.COLUMN_DATA_TYPE, Constants.STRING_DATA);
-					attributeListBox.appendChild(item);
-				}
-			}
-							
-		}
-		else
-		{
-			Clients.showNotification(wsdlOuputputMap.get(Constants.ERROR), "info", null, "top_center", 3000);
-		}
-		}
-		
-	}
-	
-	
+				});
+				
+				listcell.addEventListener(Events.ON_MOUSE_OUT, new EventListener<Event>() {
 
+					@Override
+					public void onEvent(Event arg0) throws Exception {
+						if(!popup1.isVisible()){
+							btn.setVisible(false);
+						}
+					}
+					
+				});
+				
+				listItem.setAttribute(Constants.COLUMN_DATA_TYPE, Constants.STRING_DATA);
+				listItem.setParent(attributeListBox);
+			}
+		}} 
+	}	
 
 	/**
-	 * Method to check whether the numeric value is dropped in X/Y axis
-	 * @param draggedListitem
-	 * @return boolean
+	 * Aggregate Function selection listener
 	 */
-	private boolean checkNumeric(final Listitem draggedListitem)
-	{
-		boolean numericColumn = false;
-			if(wsdlOuputputMap.get(draggedListitem.getLabel().trim()).contains("integer")
-					|| wsdlOuputputMap.get(draggedListitem.getLabel().trim()).contains("real")
-					|| wsdlOuputputMap.get(draggedListitem.getLabel().trim()).contains("decimal")
-					||  wsdlOuputputMap.get(draggedListitem.getLabel().trim()).contains("unsigned"))
-			{
-				numericColumn = true;
+	EventListener<SelectEvent<Component, Object>> selectAggregateFunctionListener = new EventListener<SelectEvent<Component, Object>>() {
+
+		@Override
+		public void onEvent(SelectEvent<Component, Object> event) throws Exception {
+			Listitem selectedItem = (Listitem) event.getSelectedItems().iterator().next();
+			Popup popup = (Popup) selectedItem.getParent().getParent();
+			Listcell listcell = (Listcell) popup.getParent();
+			Measure measure = (Measure) listcell.getParent().getAttribute(Constants.MEASURE);
+			measure.setAggregateFunction(selectedItem.getValue().toString());
+			Button button = null;
+			for (Component component : listcell.getChildren()) {
+				if(component instanceof Button) {
+					button = (Button) component;
+				}
 			}
-		return numericColumn;
-	}
-	
-	/**
-	 * Draws the chart from edit window to actual layout window 
-	 * and Adds the chart to session
-	 * @param event
-	 */
-	@Listen("onClick=#doneButton")
-	public void closeEditWindow(final MouseEvent event){
-		final Session session = Sessions.getCurrent();
-
-		//Getting the current div to draw the map
-		final String divToDraw = (String) session.getAttribute("currentDiv");
-		
-		final Image img=(Image)session.getAttribute("curStaticImg");
-		if(img != null)		{
-			img.detach();
+			button.setLabel(selectedItem.getLabel());
+			popup.close();
 		}
-		
-		chartRenderer.constructChartJSON(chartData, portlet, true);
-		chartRenderer.drawChart(chartData , divToDraw , portlet);
-		portlet.setChartDataXML(chartRenderer.convertToXML(chartData));
-
-		//Removing Edit window
-		editPortletWindow.detach();
-	}
-
+	};
+	
+	
 	/**
 	 * Method to render chart when item dropped in Y Axis
 	 * @param dropEvent
@@ -268,41 +341,171 @@ public class EditChartController extends SelectorComposer<Component> {
 	public void onDropToYAxisTabBox(final DropEvent dropEvent) {
 
 		final Listitem draggedListitem = (Listitem) ((DropEvent) dropEvent).getDragged();
-		final Listitem yAxisItem = new Listitem();
+		
+		//Validations
+		if(!Constants.NUMERIC_DATA.equals(draggedListitem.getAttribute(Constants.COLUMN_DATA_TYPE))){
+			Clients.showNotification("You can only drop Measures here", "error", YAxisListBox, "end_center", 3000, true);
+			return;
+		}
+		
+		//Creating new instance purposefully
+		Measure measure = (Measure) draggedListitem.getAttribute(Constants.MEASURE);
+		Measure newMeasure = new Measure(measure.getColumn(), measure.getAggregateFunction());
+
+		//Validations
+		if(chartData.getYColumns().contains(newMeasure) || 
+				chartData.getXColumnNames().contains(newMeasure.getColumn())) {
+			Clients.showNotification("Dropped column is already used in plotting this Chart. Please drop another Column", "error", YAxisListBox, "end_center", 3000, true);
+			return;
+		}
+		if(chartData.getXColumnNames().size() > 1 && chartData.getYColumns().size() >0) {
+			Clients.showNotification("The chart is already groped with multiple attributes.\nGrouping is aloowed in only one of Measures and Attributes.", "error", YAxisListBox, "end_center", 3000, true);
+			return;
+		}
+		
+		createYListChild(newMeasure);
+		
+		// passing X,Y axis values to draw the chart
+		yAxisDropped = true;
+		chartData.getYColumns().add(newMeasure);
+		
+		if (xAxisDropped) {
+			constructChart();	
+		}
+		
+		validateDroppable();
+	}
+	
+	/**
+	 * Event listener to fetch data from HPCC and draw the chart
+	 */
+	EventListener<Event> drawChart = new EventListener<Event>() {
+		
+		@Override
+		public void onEvent(Event event) throws Exception {
+			chartRenderer.constructChartJSON(chartData, portlet, true);
+			chartRenderer.drawChart(chartData,	Constants.EDIT_WINDOW_CHART_DIV, portlet);
+			Clients.clearBusy(chart);
+		}
+	};
+	
+	/**
+	 * Method to process with X/Y column data add/clearance function
+	 */
+	private void constructChart() {	
+		try{
+			//Drawing chart except in API chart configuration flow
+			if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_CONFIG_CHART)){
+				try {
+					Map<String, String> columnSchemaMap = new HashMap<String, String>();
+					columnSchemaMap = hpccService.getColumnSchema(chartData.getFileName(), chartData.getHpccConnection());
+					for (String column : chartData.getXColumnNames()) {
+						if(!columnSchemaMap.containsKey(column)){
+							throw new Exception("X Column " + column + " not present in Dataset");
+						}
+					}
+					for (Measure measure : chartData.getYColumns()) {
+						if(!columnSchemaMap.containsKey(measure.getColumn())){
+							throw new Exception("Y Column " + measure.getColumn() + " not present in Dataset");
+						}
+					}
+					
+					chartRenderer.constructChartJSON(chartData, portlet, true);
+					chartRenderer.drawChart(chartData,	Constants.EDIT_WINDOW_CHART_DIV, portlet);
+				} catch(Exception e) {
+					Clients.showNotification("Couldn't retrive data to draw chart", "error", this.getSelf(), "middle_center", 3000, true);
+					LOG.error("Chart Rendering failed", e);
+				}
+			} else {
+				Clients.showBusy(chart, "Retriving data");
+				Events.echoEvent(new Event("onDrawChart", this.getSelf()));
+			}
+			
+			doneButton.setDisabled(false);				
+		}catch (Exception ex) {
+			Clients.showNotification(
+					"Unable to fetch column data from Hpcc", "error",
+					this.getSelf(), "middle_center", 3000, true);
+			LOG.error("Exception while fetching column data from Hpcc",ex);
+			return;
+		}	
+
+	}
+
+
+	/**
+	 * Enables/Disables Drops in Y & X axis list boxes 
+	 * based on conditions from application constants
+	 */
+	private void validateDroppable() {
+		if(LOG.isDebugEnabled()){
+			LOG.debug("Portlet object -- " + portlet);
+		}
+		// 0 - is for unlimited drops. So limiting drops only when not equals to 0
+
+		//Measures
+		if( ! (Constants.CHART_MAP.get(portlet.getChartType()).getMaxYColumns() == 0)) {
+			if(chartData.getYColumns().size() < 
+				Constants.CHART_MAP.get(portlet.getChartType()).getMaxYColumns() ) {
+				YAxisListBox.setDroppable("true");
+			} else {
+				YAxisListBox.setDroppable("false");
+			}
+		}
+		
+		//Attributes
+		if( ! (Constants.CHART_MAP.get(portlet.getChartType()).getMaxXColumns() == 0)) {
+			if(chartData.getXColumnNames().size() < 
+			Constants.CHART_MAP.get(portlet.getChartType()).getMaxXColumns() ) {
+				XAxisListBox.setDroppable("true");
+			} else {
+				XAxisListBox.setDroppable("false");
+			}
+			
+			//Second X Column indicates Grouping
+			if(chartData.getXColumnNames().size() > 1) {
+				chartData.setIsGrouped(true);
+			}
+		}
+	}
+	
+	
+	private void createYListChild(Measure measure) {
+		Listitem yAxisItem = new Listitem();
+		yAxisItem.setAttribute(Constants.MEASURE, measure);
 		Listcell listcell = new Listcell();
-		listcell.setLabel(draggedListitem.getLabel());
+		listcell.setLabel(measure.getColumn() + "_" + measure.getAggregateFunction());
 		
 		Button closeBtn = new Button();
 		closeBtn.setSclass("glyphicon glyphicon-remove btn btn-link img-btn");
 		closeBtn.setStyle("float:right");
 		
-		closeBtn.addEventListener(Events.ON_CLICK, new EventListener<Event>() {
-			public void onEvent(final Event event) throws Exception {						
-				yAxisItem.detach();
-				yAxisDropped = false;
-				chartData.setYColumnName(null);
-				doneButton.setDisabled(true);
-				filterListBox.setDroppable("false");
-			}
-		});
+		closeBtn.addEventListener(Events.ON_CLICK, yAxisItemDetachListener);
 		
 		listcell.appendChild(closeBtn);
 		
 		yAxisItem.appendChild(listcell);
-		yAxisItem.setParent(YAxisListBox);		
-		
-		// passing X,Y axis values to draw the chart
-		yAxisDropped = true;
-		chartData.setYColumnName(yAxisItem.getLabel());
-		
-		
-		if(xAxisDropped){
-			chartRenderer.constructChartJSON(chartData, portlet, true);
-			chartRenderer.drawChart(chartData,Constants.EDIT_WINDOW_CHART_DIV , portlet);
-			doneButton.setDisabled(false);
-			filterListBox.setDroppable("true");
-		}
+		yAxisItem.setParent(YAxisListBox);
 	}
+	
+	private EventListener<Event> yAxisItemDetachListener = new EventListener<Event>() {
+		public void onEvent(final Event event) throws Exception {
+			Listitem yAxisItem = (Listitem) event.getTarget().getParent().getParent();
+			Measure measure = (Measure) yAxisItem.getAttribute(Constants.MEASURE);
+			yAxisItem.detach();
+			chartData.getYColumns().remove(measure);
+			
+			// Only clear the existing chart when no columns are present otherwise recreate the chart
+			if(chartData.getYColumns().size() < 1) {
+				yAxisDropped = false;
+				Clients.evalJavaScript("clearChart('" + Constants.EDIT_WINDOW_CHART_DIV +  "')");
+			} else {
+				constructChart();
+			}
+				
+			validateDroppable();
+		}
+	};
 	
 	/**
 	 * Method to render chart when item dropped in X Axis
@@ -314,40 +517,82 @@ public class EditChartController extends SelectorComposer<Component> {
 
 		final Listitem draggedListitem = (Listitem) ((DropEvent) dropEvent)
 				.getDragged();
+
+		//Validations
+		if(chartData.getYColumns().contains(draggedListitem.getLabel()) || 
+				chartData.getXColumnNames().contains(draggedListitem.getLabel())) {
+			Clients.showNotification("A column can only be used once while plotting the graph", "error", XAxisListBox, "end_center", 3000, true);
+			return;
+		}
+		if(!Constants.STRING_DATA.equals(draggedListitem.getAttribute(Constants.COLUMN_DATA_TYPE))){
+			Clients.showNotification( "\""+ draggedListitem.getLabel() +"\" is a Measure. It will only be treated as descrete values", "warning", XAxisListBox, "end_center", 5000, true);
+		}
+		if(chartData.getYColumns().size() > 1 && chartData.getXColumnNames().size() >0){
+			Clients.showNotification("The chart is already groped with multiple measures.\nGrouping is aloowed in only one of Measures and Attributes.", "error", XAxisListBox, "end_center", 3000, true);
+			return;
+		}
+		
+		createXListChild(draggedListitem.getLabel());
+					
+		//passing X,Y axis values to draw the chart
+		xAxisDropped = true;
+		chartData.getXColumnNames().add(draggedListitem.getLabel());
+		
+		if(yAxisDropped){
+			constructChart();
+		}
+		validateDroppable();
+	}		
+	
+	private void createXListChild(String axisName) {
 		final Listitem xAxisItem = new Listitem();
 		Listcell listcell = new Listcell();
-		listcell.setLabel(draggedListitem.getLabel());
+		listcell.setLabel(axisName);
 		
 		Button closeBtn = new Button();
 		closeBtn.setSclass("glyphicon glyphicon-remove btn btn-link img-btn");
 		closeBtn.setStyle("float:right");
 		
-		closeBtn.addEventListener(Events.ON_CLICK, new EventListener<Event>() {
-			public void onEvent(final Event event) throws Exception {						
-				xAxisItem.detach();
-				xAxisDropped = false;
-				chartData.setXColumnName(null);
-				doneButton.setDisabled(true);
-				filterListBox.setDroppable("false");
-			}
-		});
+		closeBtn.addEventListener(Events.ON_CLICK, xAxisItemDetachListener);
 		
 		listcell.appendChild(closeBtn);
 		
 		xAxisItem.appendChild(listcell);
 		xAxisItem.setParent(XAxisListBox);		
+	}
+	
+	private EventListener<Event> xAxisItemDetachListener = new EventListener<Event>() {
+		public void onEvent(final Event event) throws Exception {
+			Listcell listcell = (Listcell) event.getTarget().getParent();
+			Listitem xAxisItem = (Listitem) listcell.getParent();
+			String axisName =listcell.getLabel();
 			
-		//passing X,Y axis values to draw the chart
-		xAxisDropped = true;
-		chartData.setXColumnName(xAxisItem.getLabel());
-		
-		if(yAxisDropped){
-			chartRenderer.constructChartJSON(chartData, portlet, true);
-			chartRenderer.drawChart(chartData, Constants.EDIT_WINDOW_CHART_DIV, portlet);
-			doneButton.setDisabled(false);
-			filterListBox.setDroppable("true");
+			xAxisItem.detach();
+			
+			chartData.getXColumnNames().remove(axisName);			
+	
+			//Disabling done button
+			doneButton.setDisabled(true);				
+			
+			//Enabling drops if no column is dropped
+			if(LOG.isDebugEnabled()){
+				LOG.debug("axisName" + axisName);
+				LOG.debug("Removing" + chartData.getXColumnNames().remove(axisName));
+				LOG.debug("Removed item from x Axis box, XColumnNames size  - " + chartData.getXColumnNames().size());
+				LOG.debug("List - " + chartData.getXColumnNames());
+			}
+			
+			// Only clear the existing chart when no columns are present otherwise recreate the chart
+			if(chartData.getXColumnNames().size() < 1) {
+				xAxisDropped = false;
+				Clients.evalJavaScript("clearChart('" + Constants.EDIT_WINDOW_CHART_DIV +  "')");
+			} else {
+				constructChart();
+			}
+			
+			validateDroppable();
 		}
-	}		
+	};
 	
 	/**
 	 * Method to handle filters in Edit window
@@ -357,120 +602,87 @@ public class EditChartController extends SelectorComposer<Component> {
 	public void onDropToFilterItem(final DropEvent dropEvent) {
 		final Listitem draggedListitem = (Listitem) ((DropEvent) dropEvent).getDragged();
 		
-		chartData.setIsFiltered(true);
+		if(chartData.getFilterList().contains(draggedListitem.getLabel())) {
+			Clients.showNotification("This column is already added to filters.", "error", filterListBox, "end_center", 3000, true);
+			return;
+		}
+		
 		Filter filter = new Filter();
-		chartData.setFilter(filter);
+		filter.setColumn(draggedListitem.getLabel());
+		filter.setType((Integer) draggedListitem.getAttribute(Constants.COLUMN_DATA_TYPE));
 		
-		chartData.getFilter().setColumn(draggedListitem.getLabel());
-		chartData.getFilter().setType((Integer) draggedListitem.getAttribute(Constants.COLUMN_DATA_TYPE));
+		createFilterListItem(filter);
+	}
+	
+	private void createFilterListItem (Filter filter) {
+		Listitem filterList = new Listitem();
+		filterList.setAttribute(Constants.FILTER, filter);
 		
-		Listitem filterList = new Listitem();		
-		Listcell labelCell = new Listcell(draggedListitem.getLabel());
+		Listcell labelCell = new Listcell(filter.getColumn());
 		
 		Button playBtn = new Button();
 		playBtn.setSclass("glyphicon glyphicon-play btn btn-link img-btn");
 		playBtn.setStyle("float:right");
-		playBtn.addEventListener(Events.ON_CLICK, openFilterListener);
+		
+		Popup popup = new Popup();
+		popup.setZclass("popup");
+		popup.setId( filter.getColumn()+ "_filterPopup");
+		
+		Include include = new Include();
+		include.setDynamicProperty(Constants.FILTER, filter);
+		include.setDynamicProperty(Constants.PORTLET, portlet);
+		include.setDynamicProperty(Constants.CHART_DATA, chartData);
+		
+		include.setDynamicProperty(Constants.EDIT_WINDOW_DONE_BUTTON, doneButton);
+		
+		if(Constants.NUMERIC_DATA.equals(filter.getType())){
+			include.setSrc("layout/numeric_filter_popup.zul");
+		} else {
+			include.setSrc("layout/string_filter_popup.zul");
+		}
+		
+		labelCell.appendChild(popup);
+		popup.appendChild(include);
+		playBtn.setPopup(filter.getColumn()+ "_filterPopup, position=end_center");
 		
 		Button closeBtn = new Button();
 		closeBtn.setSclass("glyphicon glyphicon-remove btn btn-link img-btn");
 		closeBtn.setStyle("float:right");
-		closeBtn.addEventListener(Events.ON_CLICK, clearListener);
+		closeBtn.addEventListener(Events.ON_CLICK, filterClearListener);
 		labelCell.appendChild(closeBtn);
 		
 		labelCell.appendChild(playBtn);
 		
-		labelCell.setTooltiptext(chartData.getFilter().getColumn());
+		labelCell.setTooltiptext(filter.getColumn());
 		
 		filterList.appendChild(labelCell);
-		filterList.setParent(filterListBox);
 		
-		try	{
-			filterDataList = hpccService.fetchFilterData(chartData);			
-		}
-		catch(Exception e) {
-			LOG.error("Error while fetching filter data from Hpcc..."+e.getMessage());
-		}
-		
+		filterListBox.appendChild(filterList);
 	}
 	
-	//Listener to Open Filter Screen
-	EventListener<Event> openFilterListener = new EventListener<Event>() {
-
-		public void onEvent(final Event event) throws Exception {
-			final Map<String, Object> parameters = new HashMap<String, Object>();
-			parameters.put("portlet", portlet);
-			parameters.put("chartData", chartData);
-			
-			// Handling String dataType filters.Collections.sort() used to sort the numeric data 
-			//to display the data in ascending order in filter window
-			if (chartData.getFilter().getType().equals(Constants.STRING_DATA)) {
-				
-				chartData.getFilter().setValues(filterDataList);
-				
-				Collections.sort(chartData.getFilter().getValues());
-				parameters.put("filterDataList", filterDataList);
-				
-				final Window window = (Window) Executions.createComponents(
-						"/demo/filter_string_popup.zul", editPortletWindow,
-						parameters);
-				window.doModal();
-			}
-			// Handling Numeric dataType filters.Sorting 
-			else if (chartData.getFilter().getType().equals(Constants.NUMERIC_DATA)){
-				try {
-					List<Integer> numericDataList = null;
-					List<Double> doubleDataList = null;
-					List<Float> realDataList = null;
-					String filterDataType = wsdlOuputputMap.get(chartData.getFilter().getColumn());
-					
-					if (filterDataType.contains("integer")
-							|| filterDataType.contains("unsigned")) {
-						numericDataList = new ArrayList<Integer>();
-						for (String filterData : filterDataList) {
-							numericDataList.add(Integer.valueOf(filterData));
-						}
-						Collections.sort(numericDataList);
-						parameters.put("filterDataList", numericDataList);
-					}
-					else if (filterDataType.contains("decimal")
-							|| filterDataType.contains("real")) {
-						doubleDataList = new ArrayList<Double>();
-						for (String filterData : filterDataList) {
-							doubleDataList.add(Double.valueOf(filterData));
-						}
-						Collections.sort(doubleDataList);
-						parameters.put("filterDataList", doubleDataList);
-					} else {
-						Collections.sort(filterDataList);
-						parameters.put("filterDataList", filterDataList);
-					}
-					if(LOG.isDebugEnabled())
-					{
-					LOG.debug("numericDataList -->" + numericDataList);
-					LOG.debug("doubleDataList -->" + doubleDataList);
-					LOG.debug("realDataList -->" + realDataList);
-					}
-				} catch (NumberFormatException exception) {
-					LOG.error("Exception while type casting data in Filter ..."
-							+ exception.getMessage());
-				}
-				final Window window = (Window) Executions.createComponents(
-						"/demo/filter_numeric_popup.zul", editPortletWindow,
-						parameters);
-				window.doModal();
-			}
-		}
-
-	};
-	
 	//Listener to close filter window
-	EventListener<Event> clearListener = new EventListener<Event>() {
-
-		public void onEvent(final Event event) throws Exception {			
+	EventListener<Event> filterClearListener = new EventListener<Event>() {
+		public void onEvent(final Event event) throws Exception {	
 			Listitem listItem =(Listitem) event.getTarget().getParent().getParent();			
+			
+			chartData.getFilterList().remove(listItem.getAttribute(Constants.FILTER));
+			if(chartData.getFilterList().size() < 1){
+				chartData.setIsFiltered(false);
+			}
+			
+			try {
+				chartRenderer.constructChartJSON(chartData, portlet, true);
+				chartRenderer.drawChart(chartData, Constants.EDIT_WINDOW_CHART_DIV, portlet);
+			} catch(Exception ex) {
+				Clients.showNotification("Unable to fetch column data from HPCC", "error", EditChartController.this.getSelf() , "middle_center", 3000, true);
+				LOG.error("Exception while fetching column data from Hpcc", ex);
+			}
+						
+			if(xAxisDropped && yAxisDropped){
+				doneButton.setDisabled(false);
+			}
+			
 			listItem.detach();
 		}
 	};
-	
 }

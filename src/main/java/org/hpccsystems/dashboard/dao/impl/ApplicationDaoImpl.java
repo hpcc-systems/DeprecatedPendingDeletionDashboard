@@ -12,6 +12,7 @@ import org.hpccsystems.dashboard.common.Queries;
 import org.hpccsystems.dashboard.dao.ApplicationDao;
 import org.hpccsystems.dashboard.entity.Application;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 
 /**
@@ -37,7 +38,7 @@ public class ApplicationDaoImpl implements ApplicationDao {
 	 * Method to get Applications from DB
 	 * @return Application
 	 */
-	public List<Application> retrieveApplicationIds(){
+	public List<Application> retrieveApplicationIds()  throws DataAccessException{
 		
 		String sql = Queries.GET_APPLICATIONS; 
 	 

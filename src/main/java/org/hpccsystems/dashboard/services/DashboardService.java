@@ -1,10 +1,8 @@
 package org.hpccsystems.dashboard.services;
-import java.sql.SQLException;
 import java.util.List;
 
-import org.hpccsystems.dashboard.entity.Application;
 import org.hpccsystems.dashboard.entity.Dashboard;
-import org.hpccsystems.dashboard.entity.Portlet;
+import org.springframework.dao.DataAccessException;
 
 /**
  * DashboardService is used to interact with Database for Dashboard project.
@@ -12,47 +10,52 @@ import org.hpccsystems.dashboard.entity.Portlet;
  */
 public interface DashboardService {
 
-	 /**
-		 * Inserts Dashboard details to dashboard_details table.
-		 * @param applnId
-		 * @param dashBoardName
-		 * @param layout
-		 * @throws SQLException
+	/**
+	 *  Inserts Dashboard details to dashboard_details table.
+	 * @param dashboard
+	 * @param applicationId
+	 * @param sourceId
+	 * @param userId
+	 * @return
+	 * 	Dashboard ID
+	 * @throws Exception
 	 */
-	int addDashboardDetails(String applnId,String dashBoardName,String userId) throws SQLException ;
-	
+	int addDashboardDetails(Dashboard dashboard,String applicationId, String sourceId,String userId) throws DataAccessException ;
 	
 	/**
-	 * Retrieving DashboardMenuPages details from dashboard_details table.
-	 * @param viewModel
-	 * @return List<SidebarPage>
+	 * @param applicationId
+	 * 	Must be provided always
+	 * @param userId
+	 *  Can only be null when sourceId is specified
+	 * @param dashboardIdList
+	 * 	Can be null
+	 * @param sourceId
+	 *  can be null
+	 * @return
+	 *  A list of dahboard based on the paramenters specified
+	 * @throws Exception
 	 */
-	List<Dashboard> retrieveDashboardMenuPages(Application application,String userId);
-	
-	/**service to update sequence of a dashboard
-	 * @param dashboard
-	 */
-	void updateSequence(Integer dashboardId,int sequence,String dashboardName);
+	List<Dashboard> retrieveDashboardMenuPages(String applicationId,String userId,List<String> dashboardIdList, String sourceId)throws DataAccessException;	
 	
 	/**
 	 * @param dashboardId
 	 * @param deleteStatus
 	 */
-	void deleteDashboard(Integer dashboardId,String userId);
+	int deleteDashboard(Integer dashboardId,String userId)throws DataAccessException;	
 	
 	/**
-	 * @param dashboardId
-	 * @param emptyState
-	 * @param sequence
+	 * updateSidebarDetails() is responsible for update the sidebar details into dashboard_details table.
+	 * @param dashboardIdList
+	 * @throws Exception
 	 */
-	void updateDashboardSate(Integer dashboardId,String emptyState,int sequence,String dashboardName);
+	void updateSidebarDetails(List<Integer> dashboardIdList)throws DataAccessException;
 	
-	/**
-	 * @param dashboardId
-	 * @param sequence
-	 * @param dashboardName
-	 * @param columnCount
-	 */
-	void updateDashboardDetails(Integer dashboardId,int sequence,String dashboardName,int columnCount);
 
+	/**
+	 * Service to update dashboard details into DB
+	 * @param dashboard
+	 * @throws Exception
+	 */
+	void updateDashboard(Dashboard dashboard)throws DataAccessException;
+	
 }

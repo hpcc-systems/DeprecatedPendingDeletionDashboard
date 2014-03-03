@@ -6,6 +6,24 @@ package org.hpccsystems.dashboard.entity;
  */
 public class Application {
 
+	@Override
+	public String toString() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("Application [appId=").append(appId)
+				.append(", appName=").append(appName)
+				.append("]");
+		return  builder.toString() ;	}
+
+	public Application() {
+		super();
+	}
+
+	public Application(String appId, String appName) {
+		super();
+		this.appId = appId;
+		this.appName = appName;
+	}
+
 	String appId;
 	
 	String appName;

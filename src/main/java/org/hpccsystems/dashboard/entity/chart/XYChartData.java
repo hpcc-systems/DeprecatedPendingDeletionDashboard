@@ -1,59 +1,30 @@
 package org.hpccsystems.dashboard.entity.chart;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
 public class XYChartData {
 	
-	private Integer sourceType;
-	private String URL;
-	private String userName;
-	private String password;
+	private HpccConnection hpccConnection;
+	
 	private String fileName;
 	
-	private String xColumnName;
-	private String yColumnName;
+	private List<String> xColumnNames;
+	private List<Measure> yColumns;
+	private List<String> tableColumns;
+	
 	
 	private Boolean isFiltered = false;
-	private Filter filter;
-
-	@XmlElement
-	public Integer getSourceType() {
-		return sourceType;
-	}
+	private List<Filter> filterList;
 	
-	public void setSourceType(Integer sourceType) {
-		this.sourceType = sourceType;
-	}
-
-	@XmlElement
-	public String getURL() {
-		return URL;
-	}
-
-	public void setURL(String uRL) {
-		URL = uRL;
-	}
-
-	@XmlElement
-	public String getUserName() {
-		return userName;
-	}
+	private Boolean isGrouped = false;
 	
-	public void setUserName(String userName) {
-		this.userName = userName;
-	}
-
-	@XmlElement
-	public String getPassword() {
-		return password;
-	}
-
-	public void setPassword(String password) {
-		this.password = password;
-	}
-
+	private Group group;
+	
 	@XmlElement
 	public String getFileName() {
 		return fileName;
@@ -64,30 +35,27 @@ public class XYChartData {
 	}
 
 	@XmlElement
-	public String getXColumnName() {
-		return xColumnName;
+	public List<String> getXColumnNames() {
+		if(xColumnNames == null) {
+			xColumnNames = new ArrayList<String>();
+		}
+		return xColumnNames;
 	}
 
-	public void setXColumnName(String xColumnName) {
-		this.xColumnName = xColumnName;
-	}
-
-	@XmlElement
-	public String getYColumnName() {
-		return yColumnName;
-	}
-
-	public void setYColumnName(String yColumnName) {
-		this.yColumnName = yColumnName;
+	public void setXColumnNames(List<String> xColumnNames) {
+		this.xColumnNames = xColumnNames;
 	}
 
 	@XmlElement
-	public Filter getFilter() {
-		return filter;
+	public List<Measure> getYColumns() {
+		if(yColumns == null) {
+			yColumns = new ArrayList<Measure>();
+		} 
+		return yColumns;
 	}
 
-	public void setFilter(Filter filter) {
-		this.filter = filter;
+	public void setYColumns(List<Measure> yColumnNames) {
+		this.yColumns = yColumnNames;
 	}
 
 	@XmlElement
@@ -98,4 +66,67 @@ public class XYChartData {
 	public void setIsFiltered(Boolean isFiltered) {
 		this.isFiltered = isFiltered;
 	}
+
+	@XmlElement
+	public final List<String> getTableColumns() {
+		if(tableColumns == null) {
+			tableColumns = new ArrayList<String>();
+		}
+		return tableColumns;
+	}
+
+	public final void setTableColumns(List<String> tableColumnName) {
+		this.tableColumns = tableColumnName;
+	}
+
+	@XmlElement
+	public HpccConnection getHpccConnection() {
+		if(this.hpccConnection == null)
+			this.hpccConnection = new HpccConnection();
+		return hpccConnection;
+	}
+
+	public void setHpccConnection(HpccConnection hpccConnection) {
+		this.hpccConnection = hpccConnection;
+	}
+
+	public Group getGroup() {
+		return group;
+	}
+
+	public void setGroup(Group group) {
+		this.group = group;
+	}
+
+	@XmlElement
+	public Boolean getIsGrouped() {
+		return isGrouped;
+	}
+
+	public void setIsGrouped(Boolean isGrouped) {
+		this.isGrouped = isGrouped;
+	}
+
+	@XmlElement
+	public List<Filter> getFilterList() {
+		if(filterList == null){
+			filterList = new ArrayList<Filter>();
+		}
+		return filterList;
+	}
+
+	public void setFilterList(List<Filter> filterList) {
+		this.filterList = filterList;
+	}
+
+	@Override
+	public String toString() {
+		return "XYChartData [hpccConnection=" + hpccConnection + ", fileName="
+				+ fileName + ", xColumnNames=" + xColumnNames
+				+ ", yColumnNames=" + yColumns + ", tableColumns="
+				+ tableColumns + ", isFiltered=" + isFiltered + ", filterList="
+				+ filterList + ", isGrouped=" + isGrouped + ", group=" + group
+				+ "]";
+	}
+
 }

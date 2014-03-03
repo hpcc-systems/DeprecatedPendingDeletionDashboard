@@ -3,12 +3,16 @@ package org.hpccsystems.dashboard.dao.impl;
 import java.sql.SQLException;
 
 import javax.sql.DataSource;
+
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.common.Queries;
 import org.hpccsystems.dashboard.dao.AuthenticationDao;
 import org.hpccsystems.dashboard.entity.User;
 import org.hpccsystems.dashboard.rowmapper.UserRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 
@@ -21,6 +25,7 @@ public class AuthenticationDaoImpl implements AuthenticationDao{
 	
 	public static final long serialVersionUID = 1L;
 	
+	private static final  Log LOG = LogFactory.getLog(AuthenticationDaoImpl.class); 
 	private JdbcTemplate jdbcTemplate;
 	
 	public JdbcTemplate getJdbcTemplate() {
@@ -30,9 +35,14 @@ public class AuthenticationDaoImpl implements AuthenticationDao{
 	public void setDataSource(DataSource dataSource) {
 		this.jdbcTemplate = new JdbcTemplate(dataSource);
 	}
+	
+	//TODO:  Return UserCredential Instead of User
 	public User authendicateUser(String userName, String password) throws SQLException {
 		User user =null;			
-		String sql=Queries.GET_USER_DETAILs;
+		String sql=Queries.GET_USER_DETAILS;
+		
+		try
+		{
 		user = getJdbcTemplate().queryForObject(sql, new Object[]{userName}, new UserRowMapper());
 		if(user != null)
 		{
@@ -55,8 +65,14 @@ public class AuthenticationDaoImpl implements AuthenticationDao{
 				
 			}
 		}
-		return user;
 		}
+		catch(EmptyResultDataAccessException ex) {
+			LOG.error("authendicateUser failed to execute the query due to invalid user! Return an empty string", ex);
+			return null;
+		}
+		
+		return user;
+	}
 		
 	
 	public void updateActiveFlag(User user)  throws SQLException{

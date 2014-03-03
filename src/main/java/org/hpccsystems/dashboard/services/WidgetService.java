@@ -3,7 +3,10 @@ package org.hpccsystems.dashboard.services;
 import java.sql.SQLException;
 import java.util.List;
 
+import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.Portlet;
+import org.springframework.dao.DataAccessException;
+
 
 /**
  * Service class,has abstract methods for Widget related services
@@ -12,33 +15,58 @@ import org.hpccsystems.dashboard.entity.Portlet;
 public interface WidgetService {
 	
 	/**
-	 * Retrives Widget list from DB
+	 * Retrieves Widget list from DB
 	 * 
 	 * @param dashboardId
 	 * @return
 	 * 	A list of Portlet objects corresponding to the provided Dashboard Id
 	 * @throws SQLException
 	 */
-	List<Portlet> retriveWidgetDetails(Integer dashboardId) throws SQLException;
+	List<Portlet> retriveWidgetDetails(Integer dashboardId) throws DataAccessException;	
+	
+	
+	/**
+	 * @param dashboardId
+	 * @param portlet
+	 * @param sequence
+	 * @return 
+	 * 	portlet Id
+	 * @throws DataAccessException
+	 */
+	Integer addWidget(Integer dashboardId, Portlet portlet, Integer sequence)throws DataAccessException;
 	
 	/**
 	 * @param dashboardId
 	 * @param portlets
 	 * @param widgetSequence
 	 */
-	void updateWidgetDetails(Integer dashboardId,List<Portlet> portlets)throws SQLException;
-	/**
-	 * @param dashboardId
-	 * @param portlets
-	 * @param widgetSequence
-	 */
-	void addWidgetDetails(Integer dashboardId,List<Portlet> portlets)throws SQLException;
+	void addWidgetDetails(Integer dashboardId,List<Portlet> portlets)throws DataAccessException;	
 	
 	/**
-	 * @param dashboardId
-	 * @param portlets
-	 * @throws SQLException
+	 * Deletes widget from DB
+	 * @param portletId
+	 * @throws Exception
 	 */
-	void deleteWidgets(Integer dashboardId,List<Portlet> portlets)throws SQLException;
+	void deleteWidget(Integer portletId)throws DataAccessException;
+	
+	/**
+	 * Service call to update Widget sequence alone as a batch service
+	 * @param dashboard
+	 * @throws Exception
+	 */
+	void updateWidgetSequence(Dashboard dashboard)throws DataAccessException;
 
+	 /**
+	 * Service to update widget details.
+	 * This will be invoked when updating chart details in the portlet
+	 * @param portlet
+	 * @throws Exception
+	 */
+	void updateWidget(Portlet portlet)throws DataAccessException;
+
+	/**
+	 * Service to update chart title
+	 * @param portlet
+	 */
+	void updateWidgetTitle(Portlet portlet)throws DataAccessException;
 }

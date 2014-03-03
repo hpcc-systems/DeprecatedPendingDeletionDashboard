@@ -1,6 +1,8 @@
 package org.hpccsystems.dashboard.entity;
 
 import java.util.ArrayList;
+import java.sql.Date;
+import java.sql.Timestamp;
 
 /**
  * This class is model for Dashboard.
@@ -15,10 +17,12 @@ public class Dashboard {
 		.append(", dashboardId=").append(dashboardId).append(", applicationId=" )
 		.append(applicationId).append(", dashboardState=").append(dashboardState)
 		.append(", isPersisted=").append(isPersisted).append(", portletList=").append(portletList)
+		.append(", lastupdatedDate=").append(lastupdatedDate)
 		.append("]");
 		return buffer.toString();
 	}
-
+	
+	private String sourceId;
 	private String layout;
 	private String name = "Dashboard Name";
 	private Integer columnCount = 0;
@@ -26,6 +30,8 @@ public class Dashboard {
 	
 	private String applicationId;
 	private String dashboardState;
+	private Timestamp lastupdatedDate;
+	private Integer sequence;
 	
 	public String getDashboardState() {
 		return dashboardState;
@@ -34,6 +40,8 @@ public class Dashboard {
 	public void setDashboardState(String dashboardState) {
 		this.dashboardState = dashboardState;
 	}
+
+
 
 	public String getApplicationId() {
 		return applicationId;
@@ -122,5 +130,30 @@ public class Dashboard {
 	public void setPersisted(boolean isPersisted) {
 		this.isPersisted = isPersisted;
 	}
+
+	public String getSourceId() {
+		return sourceId;
+	}
+
+	public void setSourceId(String sourceId) {
+		this.sourceId = sourceId;
+	}
+
+	public Integer getSequence() {
+		return sequence;
+	}
+
+	public void setSequence(Integer sequence) {
+		this.sequence = sequence;
+	}
+
+	public Timestamp getLastupdatedDate() {
+		return lastupdatedDate;
+	}
+
+	public void setLastupdatedDate(Timestamp lastupdatedDate) {
+		this.lastupdatedDate = lastupdatedDate;
+	}
+
 
 }

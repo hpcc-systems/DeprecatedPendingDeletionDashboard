@@ -3,10 +3,9 @@ package org.hpccsystems.dashboard.dao;
 import java.sql.SQLException;
 import java.util.List;
 
-import org.hpccsystems.dashboard.entity.Application;
 import org.hpccsystems.dashboard.entity.Dashboard;
-import org.hpccsystems.dashboard.entity.Portlet;
 import org.springframework.dao.DataAccessException;
+
 
 /**
  * DashboardDao class is used for database operations for Dashboard project.
@@ -16,53 +15,47 @@ public interface DashboardDao {
 		
 	/**
 	 * Inserts Dashboard details to dashboard_details table.
-	 * @param applnId
+	 * @param sourceId
 	 * @param dashBoardName
 	 * @param layout
 	 * @throws SQLException
 	 */
-	 int addDashboardDetails(String applnId,String dashBoardName,String userId) throws SQLException ;
-	
-	 /**
-	  * Fetching DashboardMenuPages details from dashboard_details table.
-	 * @param viewModel
-	 * @return List<DashboardMenu>
-	 * @throws DataAccessException
-	 */
-	List<Dashboard> fetchDashboardDetails(Application application,String userId) throws DataAccessException;
-
-
+	 int addDashboardDetails(Dashboard dashboard, String applicationId, String sourceId,String userId) throws DataAccessException ;
 	
 	/**
-	 * method to update sequence of dashboard
-	 * @param dashboardId
-	 * @param sequence
+	 * Fetching DashboardMenuPages details from dashboard_details table.
+	 * @param applicationId
+	 * 	Must be specified always
+	 * @param userId
+	 * 	Can be null, while specifying sourceId
+	 * @param dashboardIdList
+	 *  Can be null when both applicationId and userId are specified
+	 * @param sourceId
+	 *  Can be null.
+	 * @return
+	 *  A list of dahboards based on the arguments passed.
+	 * @throws DataAccessException
 	 */
-	void updateSequence(Integer dashboardId,int sequence,String dashboardName) throws SQLException;
+	List<Dashboard> fetchDashboardDetails(String applicationId,String userId,List<String> dashboardIdList, String sourceId) throws DataAccessException;	
 	
 	/**
 	 * method to delete dashboard
 	 * @param dashboardId
 	 * @param deleteStatus
 	 */
-	void deleteDashboard(Integer dashboardId, String userId) throws SQLException;
-	
-	/**
-	 * Method to update empty state of dashboard
-	 * @param dashboardId
-	 * @param emptyState
-	 * @param sequence
-	 * @param dashboardName
-	 */
-	void updateDashboardState(Integer dashboardId,String emptyState,int sequence,String dashboardName) throws SQLException;
-	
-	/**
-	 * Method to update entire dashboard details
-	 * @param dashboardId
-	 * @param sequence
-	 * @param dashboardName
-	 * @param columnCount
-	 */
-	void updateDashboardDetails(Integer dashboardId,int sequence,String dashboardName,int columnCount) throws SQLException;
+	int deleteDashboard(Integer dashboardId, String userId) throws DataAccessException;
 
+	/**
+	 * Dao call to update dashboard details into DB
+	 * @param dashboard
+	 * @throws Exception
+	 */
+	void updateDashboard(Dashboard dashboard)throws DataAccessException;
+	
+	/**
+	 * updateSidebarDetails() is responsible for update the sidebar details into dashboard_details table.
+	 * @param dashboardIdList
+	 * @throws Exception
+	 */
+	void updateSidebarDetails(List<Integer> dashboardIdList) throws DataAccessException;
 }

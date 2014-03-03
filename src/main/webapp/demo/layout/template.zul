@@ -1,14 +1,12 @@
 <zk>
-<style src="css/bootstrap/css/bootstrap.min.css"/>
-<style src="css/flat.css"></style>
-
-<script  defer="true" src="js/barchart.js"></script>
-<script  defer="true" src="js/linechart.js"></script>
-
 	<!-- create only when the currentUser is not an anonymous  -->
-	<borderlayout hflex="1" vflex="1" if="${sessionScope.user.validUser}" >
-		<north height="70px" style="background-color: #292929;" border="none" zclass="banner">
-			<include src="/demo/layout/banner.zul"  />
+	<borderlayout if="${not (sessionScope.userCredential.hasRole('viewChart') or sessionScope.userCredential.hasRole('configureChart')) 
+							and (
+									(not sessionScope.userCredential.anonymous) or 
+									(sessionScope.userCredential.getApplicationId().equals('circuit') and sessionScope.userCredential.hasRole('viewDashboard'))
+								)}" >
+		<north height="70px" style="background-color: #292929;" border="none" zclass="banner" >		
+			<include src="/demo/layout/banner.zul" />
 		</north>
 		<west width="205px" border="none" minsize="300">
 			<include src="/demo/layout/sidebar.zul"/>
@@ -16,11 +14,15 @@
 		<center id="mainContent" border="none" self="@insert(content)" >
 			<!-- the main content will be insert to here -->
 		</center>
-		<south height="15px" border="none">
+		<south height="25px" border="none">
 			<include src="/demo/layout/footer.zul"/>
 		</south>
 	</borderlayout>
-	<div if="${not sessionScope.user.validUser}">
+	
+	<div if="${(sessionScope.userCredential.hasRole('viewChart') or sessionScope.userCredential.hasRole('configureChart'))}">
+		<include src="/demo/layout/edit_portlet.zul"></include>
+	</div>
+	<div if="${sessionScope.userCredential.anonymous}">
 		Redirect to login page.....
 	</div>
-</zk>
+</zk> 

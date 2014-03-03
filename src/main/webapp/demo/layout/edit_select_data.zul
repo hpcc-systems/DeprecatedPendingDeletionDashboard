@@ -1,0 +1,54 @@
+<vbox apply="org.hpccsystems.dashboard.controller.SelectDataController">
+	<hbox hflex="1" spacing="0px" style="
+		background: rgba(170, 170, 170, 0.45);
+		width: 1000px;"
+		>
+		
+		<hlayout zclass="form-group">
+			<label zclass="label" value="${labels.userName}"></label>
+			<textbox id="username" value="generic_dashboard" zclass="form-control"></textbox>
+		</hlayout>
+		<hlayout zclass="form-group">
+			<label zclass="label" value="${labels.password}"></label>
+			<textbox id="password" type="password" value ="Lexis123!" zclass="form-control"></textbox>
+		</hlayout>
+		<hlayout zclass="form-group" hflex="1">
+			<label zclass="label" value="${labels.jdbcURL}"></label>
+			<textbox id="URL" constraint="no empty : Please enter valid HPCCSystems ip." value="216.19.105.2" zclass="form-control"></textbox>
+		</hlayout>
+		<hlayout zclass="form-group" hflex="0">
+			<label zclass="label" value="Connection Type"></label>
+			<checkbox style="margin-top: 4px; margin-left: 10px;" id="sslCheckbox" label="SSL" checked="true" ></checkbox>
+		</hlayout>
+		<hlayout zclass="form-group" >
+			<button id="submitBtn" label="${labels.fetchFields}" style="margin-top:10px;"	zclass="btn btn-primary" width="135px" />
+		</hlayout>
+		
+	</hbox>
+	
+	<tree id="tree" visible="false" height="462px">
+        <treecols>
+            <treecol label="Choose a file to Visualize"/>
+        </treecols>
+        
+        <template name="model">
+        	<treeitem>
+                <treerow>
+                    <treecell>
+                    	<label value="${each.fileName}" sclass="link-btn"></label>
+                    </treecell>
+                </treerow>
+            </treeitem>
+        </template>
+        <treefoot>
+        	<treefooter>
+				<hbox hflex="1" spacing="0px">
+					<box hflex="1" vflex="1" pack="center" align="center">
+						<label id="selectedFileName"> No file selected </label>
+					</box>
+					<button label="Visualise" zclass="btn btn-success" id="visualizeBtn" ></button>
+				</hbox>        		
+        	</treefooter>
+        </treefoot>        
+    </tree>
+</vbox>

@@ -1,0 +1,9 @@
+<vlayout height="250px" apply="org.hpccsystems.dashboard.controller.StringFilterController">
+	<listbox width="200px" vflex="1" id="filterListBox" droppable="false"  multiple="true" checkmark="true">
+		<listhead>
+	    	<listheader label="Select Values">
+	    		<button sclass="glyphicon glyphicon-new-window btn btn-link img-btn" style="float:right" id="filtersSelectedBtn"></button>
+	    	</listheader>
+	    </listhead>
+	</listbox>
+</vlayout>

@@ -1,0 +1,17 @@
+<window width="400px" border="normal" mode="modal" closable="true">
+	<caption iconSclass="glyphicon glyphicon-warning-sign">
+		<label zclass="h5" value="Error ${requestScope['javax.servlet.error.status_code']}"></label>
+	</caption>
+    <vbox style="margin:10px">
+		<label value="${labels.commonError}"></label>
+        <hbox style="margin-left:auto; margin-right:auto">
+            <button label="OK" onClick="spaceOwner.detach()" zclass="btn btn-danger"/>
+        </hbox>
+    </vbox>
+    
+    <zscript>
+    org.apache.commons.logging.LogFactory.getLog("Pop-up Error").error( 
+			"Error Code: " + requestScope.get("javax.servlet.error.status_code") 
+			+ "\n Message :"  + requestScope.get("javax.servlet.error.message"),  ((java.lang.Exception) requestScope.get("javax.servlet.error.exception")));
+    </zscript>
+</window>

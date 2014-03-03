@@ -1,7 +1,7 @@
 package org.hpccsystems.dashboard.controller;
-
-import java.sql.SQLException;
+ 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
@@ -10,13 +10,13 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.common.Constants;
-import org.hpccsystems.dashboard.entity.Application;
 import org.hpccsystems.dashboard.entity.Dashboard;
-import org.hpccsystems.dashboard.entity.User;
+import org.hpccsystems.dashboard.services.AuthenticationService;
 import org.hpccsystems.dashboard.services.DashboardService;
+import org.hpccsystems.dashboard.services.WidgetService;
+import org.springframework.dao.DataAccessException;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
-import org.zkoss.zk.ui.Session;
 import org.zkoss.zk.ui.Sessions;
 import org.zkoss.zk.ui.event.DropEvent;
 import org.zkoss.zk.ui.event.Event;
@@ -32,6 +32,7 @@ import org.zkoss.zk.ui.util.GenericForwardComposer;
 import org.zkoss.zkmax.zul.Navbar;
 import org.zkoss.zkmax.zul.Navitem;
 import org.zkoss.zul.Button;
+import org.zkoss.zul.Center;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.Window;
@@ -57,9 +58,14 @@ public class SidebarController extends GenericForwardComposer<Component>{
 	@Wire
 	Button addDash;
 	
-	
 	@WireVariable
 	private DashboardService dashboardService;
+	
+	@WireVariable
+	AuthenticationService  authenticationService;
+	
+	@WireVariable
+	WidgetService  widgetService;
 	
 	@Override
 	public void doAfterCompose(final Component comp) throws Exception{
@@ -72,20 +78,38 @@ public class SidebarController extends GenericForwardComposer<Component>{
 		// Wire Spring Bean
 		Selectors.wireVariables(navBar, this, Selectors.newVariableResolvers(getClass(), null));
 		
-		final Application viewModel = new Application();
-		viewModel.setAppId((String) session.getAttribute("applnid"));
-		
-		User user = (User)session.getAttribute("user");
-		final List<Dashboard> sideBarPageList = new ArrayList<Dashboard>(dashboardService.retrieveDashboardMenuPages(viewModel,user.getUserId()));
+		List<Dashboard> sideBarPageList = null;
+		try	{
+			//Circuit/External Source Flow	
+			if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD)){
+				sideBarPageList = getApiViewDashboardList(
+						authenticationService.getUserCredential().getUserId(),
+						authenticationService.getUserCredential().getApplicationId()
+					);				
+			} else {
+				//Dashboard Flow
+				//Add dashboard				
+				addDash.addEventListener(Events.ON_CLICK, addDashboardBtnLisnr);				
+				sideBarPageList =dashboardService.retrieveDashboardMenuPages(
+								authenticationService.getUserCredential().getApplicationId(), 
+								authenticationService.getUserCredential().getUserId(),
+								null, null);		
+
+			}
+		} catch(DataAccessException ex) {
+			Clients.showNotification("Unable to retrieve available Dashboards. Please try reloading the page.", true);
+			LOG.error("Exception while retrieving dashboards from DB", ex);
+		}
 		
 		Navitem firstNavitem = null; 
 		Boolean firstSet = false;
 		Dashboard entry=null;
 		Navitem navitem=null;
-		
+		if(sideBarPageList != null){
 		for (final Iterator<Dashboard> iter = sideBarPageList.iterator(); iter.hasNext();) {
 			entry = (Dashboard) iter.next();
-			navitem  = constructNavItem(entry.getDashboardId(), entry.getName(), entry.getColumnCount(), null);
+			//entry.setPersisted(true);
+			navitem  = constructNavItem(entry);
 			navBar.appendChild(navitem);
 
 			// Retriving first NavItem, to set as default
@@ -93,70 +117,35 @@ public class SidebarController extends GenericForwardComposer<Component>{
 				firstNavitem = navitem;
 				firstSet = !firstSet;
 			}
-		}
+		}}
 		
 		// Displaying first menu item as default page
 		if(firstSet) {
-			//Setting current dashboard in session will load it when page loads
+			//Setting current/First dashboard in session will load it when page loads
 			Sessions.getCurrent().setAttribute(Constants.ACTIVE_DASHBOARD_ID, firstNavitem.getAttribute(Constants.DASHBOARD_ID));
+			
 			firstNavitem.setSelected(true);
 		}else {
 			Clients.evalJavaScript("showPopUp()");
 		}
 		
-		//Add dashboard
-		addDash.addEventListener(Events.ON_CLICK, addDashboardBtnLisnr);
-		
 		//Setting to session for logout controller
 		Sessions.getCurrent().setAttribute(Constants.NAVBAR, navBar);
 	}
 
-	/**
-	 * Creates the side Navbar and its associated Dashboard object
-	 * 
-	 * @param dashboardId
-	 * @param name
-	 * @param columCount - must set null when creating dashboard from preset
-	 * @param layout - must set null when not constructing from a preset
-	 * @return
-	 */
-	private Navitem constructNavItem(final Integer dashboardId, final String name,	final Integer columnCount, final String layout) {
+	private Navitem constructNavItem(final Dashboard dashboard) {
 		
 		final Navitem navitem = new Navitem();
-		navitem.setLabel(name);
+		navitem.setLabel(dashboard.getName());			
 		
-		//Constructing empty dashboards and Add it to session map
-		final Dashboard dashboard = new Dashboard();
-		dashboard.setName(name);
-		
-		//Column count will only be present for persisted Dashboards
-		//Deciding weather the dashboard is persisted
-		if(LOG.isDebugEnabled()) {
-			LOG.debug("Constructing nav Bar");
-			LOG.debug("Layout - " + layout);
-			LOG.debug("Column Count - " + columnCount);
-		}
-		
-		if(columnCount == null) {
-			dashboard.setLayout(layout);
-			dashboard.setPersisted(false);
-		} else if (layout == null) {
-			dashboard.setColumnCount(columnCount);
-			dashboard.setPersisted(true);
-		}
-		dashboard.setDashboardId(dashboardId);
-		
-		Map<Integer, Dashboard> dashboardMap = new HashMap<Integer, Dashboard>();
-		final Session session = Sessions.getCurrent(); 
-		if(session.getAttribute(Constants.DASHBOARD_LIST) != null){
-			dashboardMap = (HashMap<Integer, Dashboard>) session.getAttribute(Constants.DASHBOARD_LIST);
-		} else {
-			session.setAttribute(Constants.DASHBOARD_LIST, dashboardMap);
-		}		
-		dashboardMap.put(dashboardId, dashboard);
 		//Setting dashboard id to be retrived onClick
-		navitem.setAttribute(Constants.DASHBOARD_ID, dashboardId);
-		navitem.addEventListener(Events.ON_CLICK, navItemSelectLisnr);
+		navitem.setAttribute(Constants.DASHBOARD_ID, dashboard.getDashboardId());
+		
+		if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD)){
+			navitem.addEventListener(Events.ON_CLICK, apiNavItemSelectLisnr);
+		}else{
+			navitem.addEventListener(Events.ON_CLICK, navItemSelectLisnr);
+		}
 		navitem.setIconSclass("glyphicon glyphicon-stats");
 		navitem.setZclass("list");
 		
@@ -182,13 +171,46 @@ public class SidebarController extends GenericForwardComposer<Component>{
 			if(LOG.isDebugEnabled()){
 				LOG.debug("Setting active dashboard to session" + event.getTarget().getAttribute(Constants.DASHBOARD_ID));
 			}
-			Sessions.getCurrent().setAttribute(Constants.ACTIVE_DASHBOARD_ID, event.getTarget().getAttribute(Constants.DASHBOARD_ID));
 			//Detaching the include and Including the page again to trigger reload
 			final Component component = include.getParent();
 			include.detach();
 			final Include newInclude = new Include("/demo/layout/dashboard.zul");
 			newInclude.setId("mainInclude");
+			newInclude.setDynamicProperty(Constants.ACTIVE_DASHBOARD_ID, event.getTarget().getAttribute(Constants.DASHBOARD_ID));
 			component.appendChild(newInclude);
+		}
+	};
+	
+	/**
+	 * Listener for onClick of a dashboard when request triggered from Circuit/external Source 
+	 */
+	EventListener<Event> apiNavItemSelectLisnr = new SerializableEventListener<Event>() {
+
+		private static final long serialVersionUID = 1L;
+
+		public void onEvent(final Event event) throws Exception {
+			if(LOG.isDebugEnabled()){
+				LOG.debug("Setting active dashboard to session in Api flow" + event.getTarget().getAttribute(Constants.DASHBOARD_ID));
+			}			
+			Iterator<Component> iterator = sidebarContainer.getParent().getParent().getFellows().iterator();
+			Component centerComp =null;
+			while(iterator.hasNext())
+			{
+				Component comp = iterator.next();
+				if(comp instanceof Center)
+				{
+					centerComp = comp;
+					break;
+				}
+			}	
+			if(centerComp != null){
+				Component childComp = centerComp.getFirstChild();
+				centerComp.removeChild(childComp);
+				final Include newInclude = new Include("/demo/layout/dashboard.zul");			
+				newInclude.setId("mainInclude");
+				newInclude.setDynamicProperty(Constants.ACTIVE_DASHBOARD_ID, event.getTarget().getAttribute(Constants.DASHBOARD_ID));
+				centerComp.appendChild(newInclude);
+			}
 		}
 	};
 	
@@ -218,7 +240,7 @@ public class SidebarController extends GenericForwardComposer<Component>{
 			parameters.put(Constants.PARENT, sidebarContainer);
 
 			final Window window = (Window) Executions.createComponents(
-					"/demo/layout/add_dash_board.zul", sidebarContainer,
+					"/demo/layout/dashboard_config.zul", sidebarContainer,
 					parameters);
 			window.doModal();
 		}
@@ -232,36 +254,42 @@ public class SidebarController extends GenericForwardComposer<Component>{
 	 * @param event
 	 */
 	public void onCloseDialog(final Event event) {
-		final Object mapObj = event.getData();
-		String dashBoardName = "";
-		String layoutType = "";
-		String applnId = "";
-		int dashboardId =0;
-		if (mapObj instanceof Map) {
-			Map<String, String> paramMap = (HashMap<String, String>) event.getData();
-			if (paramMap != null) {
-				dashBoardName = paramMap.get(Constants.DASHBOARD_NAME);
-				layoutType = paramMap.get(Constants.DASHBOARD_LAYOUT);
-				
-			}
+		
+		try {			
+			final Dashboard dashboard = (Dashboard) event.getData();		
+			//updating dashboard sequence into dashboard_details
+			List<Component> comp = navBar.getChildren();
+			dashboard.setSequence(comp.size());
 			// Make entry of new dashboard details into DB
-			try {
-				Session session = Sessions.getCurrent();
-				applnId = (String) session.getAttribute("applnid");
-				User user = (User)session.getAttribute("user");
-				dashboardId = dashboardService.addDashboardDetails(applnId, dashBoardName,
-						user.getUserId());
-			} catch (SQLException exception) {
-				if(LOG.isDebugEnabled()){
-					LOG.debug("Exception In SideBar" +exception);
-				}
-			}
+			
+				dashboard.setDashboardId(
+					dashboardService.addDashboardDetails(
+						dashboard,
+						authenticationService.getUserCredential().getApplicationId(),
+						null,
+						authenticationService.getUserCredential().getUserId()
+					)
+				);
+				//adding widget details into db while adding new dashboard.
+				widgetService.addWidgetDetails(dashboard.getDashboardId(), dashboard.getPortletList());			
+			
+			dashboard.setPersisted(false);
+			final Navitem navitem = constructNavItem(dashboard);
+			navBar.appendChild(navitem);
+			
+			// Redirect to the recently added page
+			Events.sendEvent(new Event("onClick", navitem));
+			navitem.setSelected(true);
+		} catch (DataAccessException exception) {
+			Clients.showNotification("Adding new Dashboard failed. Please try again", true);
+			LOG.error("Exception while adding new dashboard to DB", exception);
+			return;
 		}
-		final Navitem navitem = constructNavItem(dashboardId, dashBoardName, null, layoutType);
-		navBar.appendChild(navitem);
-		// Redirect to the recently added page
-		Events.sendEvent(new Event("onClick", navitem));
-		navitem.setSelected(true);
+		catch (Exception exception) {
+			Clients.showNotification("Adding new Dashboard failed. Please try again", true);
+			LOG.error("Exception while adding new dashboard to DB", exception);
+			return;
+		}
 	}
 	
 	/**
@@ -277,14 +305,54 @@ public class SidebarController extends GenericForwardComposer<Component>{
 					final Navitem currentNavitem = (Navitem) component;
 					if(currentNavitem.equals(dropped)){
 						navBar.insertBefore(dragged, dropped);
+						updateDashboardSequence();
 						return;
 					} else if(currentNavitem.equals(dragged)){
 						navBar.insertBefore(dropped, dragged);
+						updateDashboardSequence();
 						return;
 					}
-				currentNavitem.addEventListener(Events.ON_CLICK, navItemSelectLisnr);
+					if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD)){
+						currentNavitem.addEventListener(Events.ON_CLICK, apiNavItemSelectLisnr);
+					}else{
+						currentNavitem.addEventListener(Events.ON_CLICK, navItemSelectLisnr);
+					}
 				}
 			}
 		}
-	};
+	};			
+		
+	private void updateDashboardSequence() throws Exception{
+		try{
+		List<Integer> dashboardList = new ArrayList<Integer>();
+		for(Component component : navBar.getChildren()){
+			Navitem navItem = (Navitem) component;
+			if(navItem.isVisible()){
+				dashboardList.add((Integer)navItem.getAttribute(Constants.DASHBOARD_ID));
+			}
+		}
+		dashboardService.updateSidebarDetails(dashboardList);
+		}catch(DataAccessException ex){
+			Clients.showNotification("Unable to update order of the Dashboards", true);
+			LOG.error("Exception while updating sequence of Dashboards in updateDashboardSequence()", ex);
+			return;
+		}
+	}
+
+	
+	private List<Dashboard> getApiViewDashboardList(final String userId,final String applicationId)throws DataAccessException {
+		String[] DashboardIdArray = ((String[])Executions.getCurrent().getParameterValues(Constants.DB_DASHBOARD_ID));
+		List<String> dashboardIdList =Arrays.asList(DashboardIdArray);
+
+		
+		if(LOG.isDebugEnabled()){
+			LOG.debug("Requested Dashboard Id : "+dashboardIdList);
+		}
+		List<Dashboard> sideBarPageList =dashboardService.retrieveDashboardMenuPages(applicationId,userId,dashboardIdList,null);	
+		if(LOG.isDebugEnabled()){
+			LOG.debug("sideBarPageList: "+sideBarPageList);
+		}
+		return sideBarPageList;
+		
+	}
 }

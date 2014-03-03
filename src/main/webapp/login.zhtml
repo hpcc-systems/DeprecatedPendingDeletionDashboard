@@ -30,7 +30,7 @@
 	            
 	            <div class="form-group">
 				   <label for="apps">Application</label >
-				   <zul:listbox sclass="form-control" id="apps" mold="select" width="200px">
+				   <zul:listbox sclass="form-control" id="apps" mold="select" width="200px" style="display:inline">
 						<template name="model">
 							<zul:listitem label="${each.appName}" value="${each.appId}" />
 						</template>
@@ -39,12 +39,12 @@
 	            
 	            <div class="form-group">
 				   <label for="account">Username</label >
-				   <zul:textbox type="text" sclass="form-control" id="account" /> 
+				   <zul:textbox type="text" sclass="form-control" id="account" style="display:inline"/> 
 				 </div>
 				 
 				 <div class="form-group">
 				   <label for="password">Password</label >
-				   <zul:textbox type="password" class="form-control" id="password" />
+				   <zul:textbox type="password" class="form-control" id="password" style="display:inline"/>
 				 </div>
                 
                 <div class="footer"> 

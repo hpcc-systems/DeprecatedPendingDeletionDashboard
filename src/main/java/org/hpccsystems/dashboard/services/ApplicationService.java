@@ -14,6 +14,6 @@ public interface ApplicationService {
 	 * Call to get available Apllications
 	 * @return Application
 	 */
-	List<Application> retrieveApplicationIds();
+	List<Application> retrieveApplicationIds() throws Exception;
 
 }

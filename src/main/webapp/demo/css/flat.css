@@ -446,29 +446,6 @@ body{
 	border: 0px;
 	background-color: #f6f6f6;
 }
-/* Btn Group at top */
-.btn-group-content {
-  background-color: transparent;
-  -webkit-box-shadow: none;
-  box-shadow: none;
-}
-.btn-group-content .btn {
-	line-height: 18px;
-	font-size: 18px;
-	padding: 0px;
-	border: 0px;
-	color: rgba(0, 0, 0, 0.5);
-}
-
-.btn-group-content .btn > img {
-	height: 40px;
-	padding: 8px;
-}
-
-.dashboard-body {
-	margin-top: 30px;
-	margin-left: 5px;
-}
 
 /*
  * Panel styling
@@ -510,18 +487,18 @@ body{
 /*
  * Pop up Styling
  */
-.z-window-header-move {
+.z-window-modal > .z-window-header {
  	background: white;
  	padding: 0px;
  }
-.z-window-header-move > .z-caption {
+.z-window-modal > .z-window-header > .z-caption {
  	overflow: hidden;
 	border-bottom: 1px solid;
 	background-image: none;
 	background-color: #fafafa;
 	border-bottom-color: #d9d9d9;
 }
-.z-window-header-move > .z-caption > .h5 {
+.z-window-modal > .z-window-header > .z-caption > .h5 { 
 	color: #666666;
 	text-shadow: 0 1px 0 #ffffff;
 	float: left;
@@ -531,7 +508,7 @@ body{
 	line-height: 12px;
 	margin: 0;
 }
-.z-window-header-move > .z-caption > .z-window-icon {
+.z-window-modal > .z-window-header > .z-caption > .z-window-icon {
 	border: none;
 	background: none;
 	border-left: 1px solid #cdcdcd;
@@ -539,11 +516,11 @@ body{
 	border-radius: 0px;
 	width: 35px;
 }
-.z-window-header-move > .z-caption > .z-window-icon > .z-icon-remove {
+.z-window-modal > .z-window-header > .z-caption > .z-window-icon > .z-icon-remove {
 	position: relative;
 	top: 4px;
 }
-.z-window-header-move > .z-caption > .z-caption-content {
+.z-window-modal > .z-window-header > .z-caption > .z-caption-content {
 	padding: 0px;
 	height: 100%;
 	border-right: 1px solid #cdcdcd;

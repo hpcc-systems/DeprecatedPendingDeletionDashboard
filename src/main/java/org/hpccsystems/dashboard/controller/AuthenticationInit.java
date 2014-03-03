@@ -18,14 +18,13 @@ public class AuthenticationInit implements Initiator {
 	private static final  Log LOG = LogFactory.getLog(AuthenticationInit.class); 
 	
     public void doInit(Page page, Map<String, Object> args) throws Exception {
-            
             UserCredential cre = authService.getUserCredential();
             if(cre==null || cre.isAnonymous()){
             	if(LOG.isDebugEnabled()){
             		LOG.debug("User Authentication failed.." );
             		LOG.debug("Annonimity of user.." + cre.isAnonymous());
-            		LOG.debug("Credentials - Account ->" + cre.getAccount() );
-            		LOG.debug("Credentials - Name ->" + cre.getName() );
+            		LOG.debug("Credentials - Account ->" + cre.getUserId() );
+            		LOG.debug("Credentials - Name ->" + cre.getUserName() );
             	}
                 Executions.sendRedirect("/login.zhtml");
                 return;

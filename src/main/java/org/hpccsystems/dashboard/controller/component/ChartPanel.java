@@ -7,9 +7,13 @@ import java.util.Map;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.common.Constants;
-import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.Portlet;
+import org.hpccsystems.dashboard.entity.chart.utils.TableRenderer;
+import org.hpccsystems.dashboard.services.AuthenticationService;
+import org.hpccsystems.dashboard.services.WidgetService;
+import org.springframework.dao.DataAccessException;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.Components;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Session;
 import org.zkoss.zk.ui.Sessions;
@@ -17,6 +21,8 @@ import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.select.Selectors;
+import org.zkoss.zkplus.spring.SpringUtil;
+import org.zkoss.zul.Box;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Caption;
 import org.zkoss.zul.Div;
@@ -26,6 +32,7 @@ import org.zkoss.zul.Panel;
 import org.zkoss.zul.Panelchildren;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Toolbar;
+import org.zkoss.zul.Vbox;
 import org.zkoss.zul.Window;
 
 /**
@@ -34,9 +41,8 @@ import org.zkoss.zul.Window;
  */
 public class ChartPanel extends Panel {
 
-	private static final  Log LOG = LogFactory.getLog(ChartPanel.class); 
-	
-	private static final long serialVersionUID = 1L;
+	private static final  Log LOG = LogFactory.getLog(ChartPanel.class);
+	private static final long serialVersionUID = 1L;	
 	
 	private static final String ADD_STYLE = "glyphicon glyphicon-plus btn btn-link img-btn";
 	private static final String EDIT_STYLE = "glyphicon glyphicon-cog btn btn-link img-btn";
@@ -50,13 +56,16 @@ public class ChartPanel extends Panel {
 	final Div chartDiv = new Div();
 	final Textbox textbox = new Textbox();
 	
-	final Image image = new Image();
+	final Box imageContainer = new Box();
 	
 	Portlet portlet;
 
 	public ChartPanel(final Portlet argPortlet) {
 		this.setZclass("panel");
-		this.image.setZclass("img");
+		this.imageContainer.setVflex("1");
+		this.imageContainer.setHflex("1");
+		this.imageContainer.setAlign("center");
+		this.imageContainer.setPack("center");
 		
 		this.portlet = argPortlet;
 		
@@ -82,6 +91,8 @@ public class ChartPanel extends Panel {
 		} else {
 			textbox.setValue("Chart Title");
 		}
+		textbox.setWidth("300px");
+		textbox.setMaxlength(30);
 		textbox.addEventListener(Events.ON_CHANGE, titleChangeLisnr);
 
 		final Toolbar toolbar = new Toolbar();
@@ -96,8 +107,11 @@ public class ChartPanel extends Panel {
 		deleteBtn.addEventListener(Events.ON_CLICK, deleteListener);
 
 		toolbar.appendChild(addBtn);
-		toolbar.appendChild(resetBtn);
-		toolbar.appendChild(deleteBtn);
+		AuthenticationService authenticationService = (AuthenticationService)SpringUtil.getBean("authenticationService");
+		if(!Constants.CIRCUIT_APPLICATION_ID.equals(authenticationService.getUserCredential().getApplicationId())){
+			toolbar.appendChild(resetBtn);
+			toolbar.appendChild(deleteBtn);
+		}
 
 		hbox.appendChild(textbox);
 		hbox.appendChild(toolbar);
@@ -108,7 +122,7 @@ public class ChartPanel extends Panel {
 
 		// Creating panel contents
 		final Panelchildren panelchildren = new Panelchildren();
-		holderDiv.setStyle("min-height:385px;");
+		holderDiv.setHeight("385px");
 		panelchildren.appendChild(holderDiv);
 		this.appendChild(panelchildren);
 		
@@ -123,7 +137,13 @@ public class ChartPanel extends Panel {
 			addBtn.addEventListener(Events.ON_CLICK, editListener);
 			resetBtn.setDisabled(false);
 			createChartHolder();
-			drawD3Graph();
+			//To construct Table Widget
+			if(portlet.getChartType().equals(Constants.TABLE_WIDGET)){
+				drawTableWidget();
+			}
+			else{
+				drawD3Graph();
+			}	
 		} else if(portlet.getWidgetState().equals(Constants.STATE_GRAYED_CHART)){
 			//Only Static image is added
 			setStaticImage();
@@ -134,31 +154,41 @@ public class ChartPanel extends Panel {
 		
 		chartDiv.setVflex("1");
 	}
-
+	
 	/**
 	 * Provides the java script to draw the graph
 	 * @return
 	 * Returns null if Chart is not drawn in the panel yet
 	 */
 	public final String drawD3Graph() {
-	
 		if(!portlet.getWidgetState().equals(Constants.STATE_LIVE_CHART)){
 			return null;
 		}	
-		if(portlet.getChartType().equals(Constants.BAR_CHART)){
+		if(portlet.getChartType().equals(Constants.BAR_CHART) || 
+				portlet.getChartType().equals(Constants.LINE_CHART)){
 			return "createChart('" + chartDiv.getId() +  "','"+ portlet.getChartDataJSON() +"')" ;
-		} else if(portlet.getChartType().equals(Constants.LINE_CHART)) {
-			return "createLineChart('" + chartDiv.getId() +  "','"+ portlet.getChartDataJSON() +"')" ;
 		} else {
 			return "createPieChart('" + chartDiv.getId() +  "','"+ portlet.getChartDataJSON() +"')" ;
+		}
+	}
+	
+	//To construct Table Widget
+	public void drawTableWidget(){
+		if(portlet.getTableDataMap()!=null && portlet.getTableDataMap().size()>0){
+			TableRenderer tableRenderer = new TableRenderer();
+			Vbox vbox = tableRenderer.constructTableWidget(portlet.getTableDataMap(), false,portlet.getName());
+			chartDiv.getChildren().clear();
+			chartDiv.appendChild(vbox);
 		}
 	}
 
 	private void setStaticImage() {
 		createChartHolder();
-		image.setSrc(Constants.CHART_URL.get(portlet.getChartType()));
-		image.setSclass("img-responsive chartImage");
-		chartDiv.appendChild(image);
+		Image image = new Image();
+		image.setSrc(Constants.CHART_MAP.get(portlet.getChartType()).getStaticImageURL());
+		image.setSclass("img-responsive");
+		imageContainer.appendChild(image);
+		chartDiv.appendChild(imageContainer);
 		portlet.setWidgetState(Constants.STATE_GRAYED_CHART);
 	}
 	
@@ -194,6 +224,7 @@ public class ChartPanel extends Panel {
 			// Defining parameters to send to Modal Dialog
 			final Map<String, Object> parameters = new HashMap<String, Object>();
 			parameters.put(Constants.PARENT, ChartPanel.this);
+			parameters.put(Constants.PORTLET, portlet);
 
 			final Window window = (Window) Executions.createComponents(
 					"/demo/add_widget.zul", holderDiv, parameters);
@@ -208,20 +239,8 @@ public class ChartPanel extends Panel {
 			// Defining parameters to send to Modal Dialog
 			final Map<String, Object> parameters = new HashMap<String, Object>();
 			parameters.put(Constants.PARENT, ChartPanel.this);
-			Sessions.getCurrent().setAttribute(Constants.ACTIVE_PORTLET, portlet);
-			Sessions.getCurrent().setAttribute("currentDiv", chartDiv.getId());
-			Sessions.getCurrent().setAttribute("curStaticImg",image);
-
-			//Sets the Portlet's Wsdl info into session
-			Integer activeID=portlet.getId();
-		    Map<Integer,String> wsdlMap =(Map<Integer,String>)Sessions.getCurrent().getAttribute("portletIdWsdlMap");
-		    String previousWsdl = null;
-		    if(wsdlMap != null)
-		    {
-		    	previousWsdl = wsdlMap.get(activeID);
-		    }  
-		    Sessions.getCurrent().setAttribute("previousWsdl",previousWsdl);
-		    
+			parameters.put(Constants.PORTLET, portlet);
+			
 			final Window window = (Window) Executions.createComponents(
 					"/demo/layout/edit_portlet.zul", holderDiv, parameters);
 			window.doModal();
@@ -232,43 +251,52 @@ public class ChartPanel extends Panel {
 	//Reset button listener
 	EventListener<Event> resetListener = new EventListener<Event>() { 
         public void onEvent(final Event event)throws Exception {
+        	try{
         	portlet.setWidgetState(Constants.STATE_EMPTY);
         	portlet.setChartDataJSON(null);
         	portlet.setChartDataXML(null);
+        	portlet.setChartType(null);
+        	portlet.setName(null);
         	
+        	Components.removeAllChildren(chartDiv);
+        	Components.removeAllChildren(imageContainer);
         	chartDiv.detach();
+        	
         	addBtn.setSclass(ADD_STYLE);
         	resetBtn.setDisabled(true);
         	addBtn.removeEventListener(Events.ON_CLICK, editListener);
     		addBtn.addEventListener(Events.ON_CLICK, addListener);
+    		
+    		//Clears all chart data from DB
+    		WidgetService widgetService =(WidgetService) SpringUtil.getBean("widgetService");
+    		widgetService.updateWidget(portlet);
+        	}catch(DataAccessException ex){
+        		LOG.error("Exception in resetListener()", ex);
+        	}
         } 
 	};
 	
 	//Delete panel listener
 	EventListener<Event> deleteListener = new EventListener<Event>() {
 
-		public void onEvent(final Event event) throws Exception {
-			final Session session = Sessions.getCurrent();
-			final Integer dashboardId = (Integer) session.getAttribute(Constants.ACTIVE_DASHBOARD_ID);
-			final Map<Integer,Dashboard> dashboardMap = (HashMap<Integer, Dashboard>) session.getAttribute(Constants.DASHBOARD_LIST);
-			final Dashboard dashboard = dashboardMap.get(dashboardId);
-			final ArrayList<Portlet> portletList = dashboard.getPortletList();
-			if(LOG.isDebugEnabled()){
-				LOG.debug("Index of the portlet that is being deleted -> " + portletList.indexOf(portlet));
-				LOG.debug("Portlet list size -> " + portletList.size());
-			}
-			
-			//portletList.remove(portletList.indexOf(portlet));
+		public void onEvent(final Event event)throws Exception  {
+			try{
 			portlet.setWidgetState(Constants.STATE_DELETE);
+			WidgetService widgetService = (WidgetService) SpringUtil.getBean("widgetService");
+			widgetService.deleteWidget(portlet.getId());
 			ChartPanel.this.detach();
 			
 			Window window =  null;
+			Session session = Sessions.getCurrent();
 			final ArrayList<Component> list = (ArrayList<Component>) Selectors.find(((Component)session.getAttribute(Constants.NAVBAR)).getPage(), "window");
 			for (final Component component : list) {
 				if(component instanceof Window){
 					window = (Window) component;
-					Events.sendEvent(new Event("onPortalClose", window));
+					Events.sendEvent(new Event("onPortalClose", window, portlet));
 				}
+			}
+			}catch(DataAccessException ex){
+				LOG.error("Exception while deleting widget", ex);
 			}
 		} 
 	};
@@ -278,7 +306,7 @@ public class ChartPanel extends Panel {
 		final Map<String,Integer> paramMap = (Map<String, Integer>) event.getData();
 		if(paramMap!=null){
 			portlet.setChartType(paramMap.get(Constants.CHART_TYPE));
-			setStaticImage();
+			setStaticImage();	
 			addBtn.removeEventListener(Events.ON_CLICK, addListener);
 			addBtn.setSclass(EDIT_STYLE);
 			resetBtn.setDisabled(false);
@@ -293,6 +321,13 @@ public class ChartPanel extends Panel {
 				LOG.debug("Title is being changed");
 			}
 			portlet.setName(textbox.getValue());
+			//Update Chart Title in DB
+			try{
+			WidgetService widgetService =(WidgetService) SpringUtil.getBean("widgetService");
+    		widgetService.updateWidgetTitle(portlet);
+			}catch(DataAccessException ex){
+				LOG.error("Exception while updating chart title", ex);
+			}
 		}
 	};
 	
@@ -302,5 +337,15 @@ public class ChartPanel extends Panel {
 	 */
 	public Portlet getPortlet() {
 		return portlet;
+	}
+	
+	/**
+	 * Detaches the static image attached to the Chartpanel and returns the chartDiv ID
+	 * @return
+	 * 	The div id to draw chaert on
+	 */
+	public Div removeStaticImage() {
+		imageContainer.detach();
+		return chartDiv;
 	}
 }

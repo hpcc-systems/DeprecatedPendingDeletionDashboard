@@ -11,40 +11,43 @@ import java.util.Set;
 public class UserCredential  implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
-	String account;
-	String name;
+	private String applicationId;
+	
+	private String userId;
+	private String userName;
 	
 	Set<String> roles = new HashSet<String>();
 
-	public UserCredential(final String account, final String name) {
-		this.account = account;
-		this.name = name;
+	public UserCredential(final String userId, final String userName, final String applicationId) {
+		this.userId = userId;
+		this.userName = userName;
+		this.setApplicationId(applicationId);
 	}
-
+	
 	public UserCredential() {
-		this.account = "anonymous";
-		this.name = "Anonymous";
+		this.userId = "anonymous";
+		this.userName = "Anonymous";
 		roles.add("anonymous");
 	}
 
 	public boolean isAnonymous() {
-		return hasRole("anonymous") || "anonymous".equals(account);
+		return hasRole("anonymous") || "anonymous".equals(userId);
 	}
 
-	public String getAccount() {
-		return account;
+	public String getUserId() {
+		return userId;
 	}
 
-	public void setAccount(final String account) {
-		this.account = account;
+	public void setUserId(final String userId) {
+		this.userId = userId;
 	}
 
-	public String getName() {
-		return name;
+	public String getUserName() {
+		return userName;
 	}
 
-	public void setName(final String name) {
-		this.name = name;
+	public void setUserName(final String userName) {
+		this.userName = userName;
 	}
 	
 	public boolean hasRole(final String role){
@@ -53,6 +56,14 @@ public class UserCredential  implements Serializable{
 	
 	public void addRole(final String role){
 		roles.add(role);
+	}
+
+	public String getApplicationId() {
+		return applicationId;
+	}
+
+	public void setApplicationId(String applicationId) {
+		this.applicationId = applicationId;
 	}
 
 }
