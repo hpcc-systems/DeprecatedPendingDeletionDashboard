@@ -1,0 +1,22 @@
+<window id="editPortletWindow" border="normal"
+	apply="org.hpccsystems.dashboard.controller.EditWidgetController" 
+	closable="true" width="1000px" height="575px"
+	sclass="panel z-window-modal">
+	<caption iconSclass="glyphicon glyphicon-cog">
+		<label zclass="h5">Edit Chart</label>
+		<toolbar style="float: left; left: 820px;">
+			<button id="doneButton" disabled="true" tooltip="Add Chart to Dashboard" zclass="glyphicon glyphicon-ok btn btn-link img-btn z-button" /> 
+		</toolbar>	
+	</caption>
+	<style>
+		.popup {
+			border: 1px solid rgb(240, 240, 240);
+			background-color: rgb(235, 235, 235);
+		}
+		.popup-content {
+			padding: 3px;
+		}
+	</style>
+	
+	<include id="holderInclude" height="542px" ></include>
+</window>

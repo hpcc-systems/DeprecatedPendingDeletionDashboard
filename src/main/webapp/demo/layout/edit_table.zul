@@ -1,0 +1,22 @@
+<hbox apply="org.hpccsystems.dashboard.controller.EditTableController" height="542px" hflex="1"> 
+	<vlayout vflex="1">
+		<hlayout vflex="1">
+			<listbox width="200px" id="sourceList" droppable="true" vflex="1">
+				<listhead>
+					<listheader label="Fields in Data source" />
+				</listhead>
+			</listbox>
+			<listbox width="200px" id="targetList" droppable="true" vflex="1">
+				<listhead>
+					<listheader label="Fields for Table" />
+				</listhead>
+			</listbox>
+		</hlayout>
+		<box vflex="0" hflex="1" align="center" pack="center">
+			<button id="drawTable" zclass="btn btn-success" style="margin-bottom: 3px" iconSclass="glyphicon glyphicon-ok">Draw Table</button>
+		</box>
+	</vlayout>	
+	<div vflex="1" id="tableHolder" style="margin-right:2px">
+	
+	</div>
+</hbox>

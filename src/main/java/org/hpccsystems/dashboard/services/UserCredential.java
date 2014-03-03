@@ -1,62 +1,69 @@
-/* 
-	Description:
-		ZK Essentials
-	History:
-		Created by dennis
-
-Copyright (C) 2012 Potix Corporation. All Rights Reserved.
-*/
 package org.hpccsystems.dashboard.services;
 
 import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
-public class UserCredential implements Serializable{
+/**
+ * This class is model for UserCredential.
+ *
+ */
+public class UserCredential  implements Serializable{
 	private static final long serialVersionUID = 1L;
 	
-	String account;
-	String name;
+	private String applicationId;
+	
+	private String userId;
+	private String userName;
 	
 	Set<String> roles = new HashSet<String>();
 
-	public UserCredential(String account, String name) {
-		this.account = account;
-		this.name = name;
+	public UserCredential(final String userId, final String userName, final String applicationId) {
+		this.userId = userId;
+		this.userName = userName;
+		this.setApplicationId(applicationId);
 	}
-
+	
 	public UserCredential() {
-		this.account = "anonymous";
-		this.name = "Anonymous";
+		this.userId = "anonymous";
+		this.userName = "Anonymous";
 		roles.add("anonymous");
 	}
 
 	public boolean isAnonymous() {
-		return hasRole("anonymous") || "anonymous".equals(account);
+		return hasRole("anonymous") || "anonymous".equals(userId);
 	}
 
-	public String getAccount() {
-		return account;
+	public String getUserId() {
+		return userId;
 	}
 
-	public void setAccount(String account) {
-		this.account = account;
+	public void setUserId(final String userId) {
+		this.userId = userId;
 	}
 
-	public String getName() {
-		return name;
+	public String getUserName() {
+		return userName;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setUserName(final String userName) {
+		this.userName = userName;
 	}
 	
-	public boolean hasRole(String role){
+	public boolean hasRole(final String role){
 		return roles.contains(role);
 	}
 	
-	public void addRole(String role){
+	public void addRole(final String role){
 		roles.add(role);
+	}
+
+	public String getApplicationId() {
+		return applicationId;
+	}
+
+	public void setApplicationId(String applicationId) {
+		this.applicationId = applicationId;
 	}
 
 }

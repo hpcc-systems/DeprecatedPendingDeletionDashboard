@@ -1,0 +1,192 @@
+package org.hpccsystems.dashboard.dao.impl;
+
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
+import java.util.List;
+
+import javax.sql.DataSource;
+
+import org.apache.commons.lang.Validate;
+import org.apache.commons.logging.Log;
+import org.apache.commons.logging.LogFactory;
+import org.hpccsystems.dashboard.common.Constants;
+import org.hpccsystems.dashboard.common.Queries;
+import org.hpccsystems.dashboard.dao.WidgetDao;
+import org.hpccsystems.dashboard.entity.Portlet;
+import org.hpccsystems.dashboard.rowmapper.WidgetRowMapper;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataAccessException;
+import org.springframework.jdbc.core.BatchPreparedStatementSetter;
+import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.PreparedStatementSetter;
+ 
+/**
+ * Dao class to do widget related DB hits
+ * @author 
+ * 
+ */ 
+public class WidgetDaoImpl implements WidgetDao{
+	private static final  Log LOG = LogFactory.getLog(WidgetDaoImpl.class);
+	
+	private JdbcTemplate jdbcTemplate;
+	private DataSource dataSource;
+	
+	public JdbcTemplate getJdbcTemplate() {
+		return jdbcTemplate;
+	}
+	@Autowired
+	public void setDataSourceToJdbcTemplate(DataSource dataSource) {
+		this.jdbcTemplate = new JdbcTemplate(dataSource);
+	}
+	
+	public void initialize() {
+		Validate.notNull(dataSource, "'dataSource' must be set!");
+	}
+
+	public DataSource getDataSource() {
+		return dataSource;
+	}
+
+	public void setDataSource(final DataSource dataSource) {
+		this.dataSource = dataSource;
+	}	
+	
+	public void addWidgetDetails(final Integer dashboardId,
+			final List<Portlet> portlets) throws DataAccessException {
+
+		String sql = Queries.INSERT_WIDGET_DETAILS;
+		
+		getJdbcTemplate().batchUpdate(sql, new BatchPreparedStatementSetter() {			
+			public void setValues(PreparedStatement statement, int i) throws SQLException {
+				Portlet portlet = portlets.get(i);
+				statement.setInt(1, dashboardId);
+				statement.setString(2,portlet.getName() );
+				statement.setString(3, portlet.getWidgetState());
+				if (Constants.STATE_EMPTY.equals(portlet.getWidgetState())) {
+					statement.setInt(4, 0);
+				} else {
+					statement.setInt(4, portlet.getChartType());
+				}
+				statement.setInt(5, portlet.getColumn());
+				statement.setInt(6, i);
+				statement.setString(7, portlet.getChartDataXML());				
+			}
+			
+			public int getBatchSize() {
+				return portlets.size();
+			}
+		});
+	
+	
+		
+	}	
+	
+	public List<Portlet> retriveWidgetDetails(Integer dashboardId) throws DataAccessException{
+			StringBuilder sqlBuffer = new StringBuilder();
+			sqlBuffer.append(Queries.GET_WIDGET_DETAILS).append(dashboardId).append(" order by widget_sequence");
+			List<Portlet> portlets = getJdbcTemplate().query(sqlBuffer.toString(),new WidgetRowMapper());
+			return portlets;
+		}
+	
+	@Override
+	public void deleteWidget(final Integer portletId) throws DataAccessException {
+		
+		getJdbcTemplate().update(Queries.DELETE_WIDGETS, new PreparedStatementSetter() {
+			@Override
+			public void setValues(PreparedStatement statement) throws SQLException {
+				statement.setInt(1, portletId);		
+			}
+		});
+	}
+	
+	@Override
+	public void updateWidgetSequence(final Integer dashboardId,final List<Portlet> portlets) throws DataAccessException {
+		String sql = Queries.UPDATE_WIDGET_SEQUENCE;
+		getJdbcTemplate().batchUpdate(sql, new BatchPreparedStatementSetter()
+		{
+			public void setValues(PreparedStatement statement, int i)throws SQLException {
+				Portlet portlet = portlets.get(i);
+				statement.setInt(1, portlet.getColumn());
+				statement.setInt(2, i);
+				statement.setInt(3, portlet.getId());
+				statement.setInt(4,dashboardId);
+				
+			}
+			public int getBatchSize() {
+				return portlets.size();
+				}
+			
+		});
+	}
+	@Override
+	public void updateWidget(Portlet portlet) throws DataAccessException {
+		if(LOG.isDebugEnabled()){
+			LOG.debug("Updating portlet to DB " + portlet.toString());
+		}
+		
+		if(portlet.getWidgetState().equals(Constants.STATE_LIVE_CHART)){
+			//Updates Live chart data with state as 'Live'
+			String updateQuery = Queries.UPADET_LIVE_CHART_DATA;
+			getJdbcTemplate().update(updateQuery, new Object[] { 
+					portlet.getWidgetState(),
+					portlet.getChartType(),
+					portlet.getChartDataXML(),
+					portlet.getId()
+			});
+		}else if(portlet.getChartType() != null){
+			//Updates widget state as 'Grayed'
+			String addQuery = Queries.ADD_CHART_DATA;
+			getJdbcTemplate().update(addQuery, new Object[] { 
+					portlet.getWidgetState(),
+					portlet.getChartType(),
+					portlet.getId()
+			});
+		}else {
+			//Resets widget data/Clears chart data
+			String clearQuery = Queries.CLEAR_CHART_DATA;
+			getJdbcTemplate().update(clearQuery, new Object[] {
+					portlet.getName(),					
+					portlet.getWidgetState(),
+					portlet.getChartType(),
+					portlet.getChartDataXML(),
+					portlet.getId()
+			});
+		}
+		
+	}
+	@Override
+	public void updateWidgetTitle(Portlet portlet) throws DataAccessException {
+		String sql = Queries.UPADET_WIDGET_NAME;
+		getJdbcTemplate().update(sql, new Object[] {
+				portlet.getName(),					
+				portlet.getId()
+		});
+		
+	}
+
+	@Override
+	public Integer addWidget(final Integer dashboardId, final Portlet portlet, final Integer sequence)	throws DataAccessException {
+
+		getJdbcTemplate().update(Queries.INSERT_WIDGET_DETAILS,
+				new PreparedStatementSetter() {
+					public void setValues(PreparedStatement statement)
+							throws SQLException {
+						statement.setInt(1, dashboardId);
+						statement.setString(2, portlet.getName());
+						statement.setString(3, portlet.getWidgetState());
+						if (Constants.STATE_EMPTY.equals(portlet.getWidgetState())) {
+							statement.setInt(4, 0);
+						} else {
+							statement.setInt(4, portlet.getChartType());
+						}
+						statement.setInt(5, portlet.getColumn());
+						statement.setInt(6, sequence);
+						statement.setString(7, portlet.getChartDataXML());
+					}
+
+				});
+		
+		return jdbcTemplate.queryForInt("select last_insert_id()"); 
+
+	}
+}

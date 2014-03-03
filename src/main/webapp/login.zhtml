@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:zul="http://www.zkoss.org/2005/zul">
+  <head>
+    <meta charset="utf-8" />
+    <title>Dashboard</title>
+
+    <!-- styles -->
+    <link href="demo/css/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="demo/css/login.css" />
+	
+  </head>
+
+  <body>
+	
+	<div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+         <img src="demo/images/logo.png" alt="Lexis Nexis" class="logo"/>
+        </div>
+      </div>
+    </div>
+    
+    <div class="container">
+
+        <div id="login-wraper">
+            <zul:div
+            	apply="org.hpccsystems.dashboard.controller.LoginController" 
+            	class="login-form">
+                <legend>Sign in to <span class="blue">Dashboard</span></legend>
+	            
+	            <div class="form-group">
+				   <label for="apps">Application</label >
+				   <zul:listbox sclass="form-control" id="apps" mold="select" width="200px" style="display:inline">
+						<template name="model">
+							<zul:listitem label="${each.appName}" value="${each.appId}" />
+						</template>
+					</zul:listbox> 
+				 </div>
+	            
+	            <div class="form-group">
+				   <label for="account">Username</label >
+				   <zul:textbox type="text" sclass="form-control" id="account" style="display:inline"/> 
+				 </div>
+				 
+				 <div class="form-group">
+				   <label for="password">Password</label >
+				   <zul:textbox type="password" class="form-control" id="password" style="display:inline"/>
+				 </div>
+                
+                <div class="footer"> 
+                	<zul:label id="message" sclass="warn" value="&#160;" />
+                    <zul:button type="button" id="login" sclass="btn btn-success" label="Login" />
+                </div>
+            
+            </zul:div>
+        </div>
+
+    </div>
+    
+    <footer class="white navbar-fixed-bottom">
+      Don't have an account yet? <a href="#" class="btn btn-black">Register</a>
+    </footer>
+  </body>
+</html>

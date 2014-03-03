@@ -9,27 +9,62 @@
  
  	<context:component-scan base-package="org.hpccsystems.dashboard" />
  	
+ 	<bean id="hpccService" class="org.hpccsystems.dashboard.services.impl.HPCCServiceImpl" />
+ 	
  	<bean id="dashboardService" class="org.hpccsystems.dashboard.services.impl.DashboardServiceImpl" >
 	    <property name="dashboardDao"><ref bean="dashboardDao"/></property>	
 	</bean> 
 	
-	<bean id="dashboardDao" class="org.hpccsystems.dashboard.dao.impl.DashboardDaoImpl" init-method="initialize">
+	<bean id="dashboardDao" class="org.hpccsystems.dashboard.dao.impl.DashboardDaoImpl" >
 	   <property name="dataSource"><ref bean="mySQLDataSource"/></property>	   
 	</bean>
-    
+	
+	<bean id="authenticationService" class="org.hpccsystems.dashboard.services.impl.AuthenticationServiceImpl" >
+	    <property name="authendicationDao"><ref bean="authendicationDao"/></property>
+	</bean> 
+	
+	<bean id="authendicationDao" class="org.hpccsystems.dashboard.dao.impl.AuthenticationDaoImpl">
+	   <property name="dataSource"><ref bean="mySQLDataSource"/></property>	   
+	</bean>
+
+    <bean id="chartRenderer" class="org.hpccsystems.dashboard.entity.chart.utils.ChartRenderer">
+    	 <property name="hpccService"><ref bean="hpccService"/></property>
+	</bean>
+	
+	<bean id="fileConverter" class="org.hpccsystems.dashboard.entity.chart.utils.FileConverter" />
+	
+	<bean id="tableRenderer" class="org.hpccsystems.dashboard.entity.chart.utils.TableRenderer">
+	<!-- 
+    	 <property name="fileConverter"> <ref bean="fileConverter"/> </property>
+	 -->
+	</bean>
+		
+	<bean id="widgetService" class="org.hpccsystems.dashboard.services.impl.WidgetServiceImpl" >
+	    <property name="widgetDao"><ref bean="widgetDao"/></property>
+	</bean> 
+	<bean id="widgetDao" class="org.hpccsystems.dashboard.dao.impl.WidgetDaoImpl">
+	   <property name="dataSource"><ref bean="mySQLDataSource"/></property>	   
+	</bean>
+	
+	<bean id="applicationService" class="org.hpccsystems.dashboard.services.impl.ApplicationServiceImpl" >
+	    <property name="applicationDao"><ref bean="applicationDao"/></property>
+	</bean> 
+	<bean id="applicationDao" class="org.hpccsystems.dashboard.dao.impl.ApplicationDaoImpl">
+	   <property name="dataSource"><ref bean="mySQLDataSource"/></property>	   
+	</bean>	 
  	
  	<bean id="mySQLDataSource" class="org.apache.commons.dbcp.BasicDataSource">
         <property name="driverClassName">
             <value>com.mysql.jdbc.Driver</value>
         </property>
         <property name="url">
-            <value>jdbc:mysql://localhost:3307/dashboard</value>
+            <value>jdbc:mysql://localhost:3306/dashboard</value>
         </property>
         <property name="username">
             <value>root</value>
         </property>
         <property name="password">
-            <value>admin</value>
+            <value></value>
         </property>
         <property name="removeAbandoned">
             <value>true</value>

@@ -1,8 +1,0 @@
-<?page title="Dash Board 1" contentType="text/html;charset=UTF-8"?>
-<zk>
-<window title="DashBoard1" border="normal">
-
-<caption src="/imgs/demo/dashboard1-32.png" sclass="fn-caption" />
-New Content Here!
-</window>
-</zk>

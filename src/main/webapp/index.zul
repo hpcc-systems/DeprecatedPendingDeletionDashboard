@@ -1,4 +1,3 @@
-<?link rel="stylesheet" type="text/css" href="/style.css"?>
 <?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c" ?>
 <!-- protect page by the authentication init  -->
 <?init class="org.hpccsystems.dashboard.controller.AuthenticationInit"?>

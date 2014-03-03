@@ -16,7 +16,6 @@
 			<outputDirectory>/${project.artifactId}/WebContent</outputDirectory>
 		</fileSet>
 	</fileSets>
-	
 	<files>
 		<file>
 			<source>${project.build.directory}/${project.artifactId}.war</source>

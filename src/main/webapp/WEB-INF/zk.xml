@@ -9,5 +9,32 @@
 		<value>Dashboard</value>
 	</preference>
 	-->
+	<!-- API Richlets -->
+	<richlet>
+	   <richlet-name>chartSettings</richlet-name>
+	   <richlet-class>org.hpccsystems.dashboard.api.richlet.ChartSettings</richlet-class>
+	</richlet>
+	<richlet-mapping>
+	    <richlet-name>chartSettings</richlet-name>
+	    <url-pattern>/api/chart_config/*</url-pattern>
+	</richlet-mapping>
+	<richlet>
+	   <richlet-name>ViewDashboard</richlet-name>
+	   <richlet-class>org.hpccsystems.dashboard.api.richlet.ViewDashboard</richlet-class>
+	</richlet>
+	<richlet-mapping>
+	    <richlet-name>ViewDashboard</richlet-name>
+	    <url-pattern>/api/view_dashboard/*</url-pattern>
+	</richlet-mapping>
+	<!-- API Richlets -->
 	
+	<session-config>
+    	<device-type>ajax</device-type>    
+    	<timeout-uri></timeout-uri>    
+	</session-config>
+	
+	<error-page>
+	    <exception-type>java.lang.Throwable</exception-type>    
+	    <location>/error.zul</location>    
+	</error-page>
 </zk>

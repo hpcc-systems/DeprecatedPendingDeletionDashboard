@@ -1,11 +1,3 @@
-/* 
-	Description:
-		ZK Essentials
-	History:
-		Created by dennis
-
-Copyright (C) 2012 Potix Corporation. All Rights Reserved.
-*/
 package org.hpccsystems.dashboard.profile;
 
 import java.io.Serializable;
@@ -15,8 +7,13 @@ import java.util.List;
 import org.hpccsystems.dashboard.entity.User;
 import org.hpccsystems.dashboard.services.UserInfoService;
 
+/**
+ * UserInfoServiceImpl is implementation class for UserInfoService.
+ *
+ */
 public class UserInfoServiceImpl implements UserInfoService,Serializable{
 	private static final long serialVersionUID = 1L;
+	
 	
 	static protected List<User> userList = new ArrayList<User>();  
 	static{
@@ -25,29 +22,34 @@ public class UserInfoServiceImpl implements UserInfoService,Serializable{
 		userList.add(new User("zkoss","1234","ZKOSS","info@zkoss.org"));
 	}
 	
-	/** synchronized is just because we use static userList in this demo to prevent concurrent access **/
-	public synchronized User findUser(String account){
-		int s = userList.size();
-		for(int i=0;i<s;i++){
-			User u = userList.get(i);
-			if(account.equals(u.getAccount())){
-				return User.clone(u);
+	/** synchronized is just because we use static userList 
+	 * in this demo to prevent concurrent access **/
+	public User findUser(final String account){
+		synchronized(this){
+		for(int i=0;i<userList.size();i++){
+			final User usr = userList.get(i);
+			if(account.equals(usr.getAccount())){
+				return User.clone(usr);
 			}
-		}
+		  }
+		}	
 		return null;
 	}
 	
-	/** synchronized is just because we use static userList in this demo to prevent concurrent access **/
-	public synchronized User updateUser(User user){
-		int s = userList.size();
-		for(int i=0;i<s;i++){
-			User u = userList.get(i);
-			if(user.getAccount().equals(u.getAccount())){
-				userList.set(i,u = User.clone(user));
-				return u;
+	 /** synchronized is just because we use static userList 
+	  *   in this demo to prevent concurrent access
+	 **/
+	public User updateUser(final User user){
+		synchronized(this){
+		User usr=null;
+		for(int i=0;i<userList.size() ;i++){
+			usr = userList.get(i);
+			if(usr.getAccount().equals(usr.getAccount())){
+				userList.set(i,usr = User.clone(usr));
+				return usr;
 			}
-		}
+		 }
+		}	
 		throw new RuntimeException("user not found "+user.getAccount());
 	}
 }
-

@@ -1,19 +1,14 @@
-/* 
-	Description:
-		ZK Essentials
-	History:
-		Created by dennis
-
-Copyright (C) 2012 Potix Corporation. All Rights Reserved.
-*/
 package org.hpccsystems.dashboard.services;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class CommonInfoService {
-
+/**
+ * CommonInfoService is used to display the country list while creating profile in profile page.
+ *
+ */
+public class CommonInfoService  {
 
 	static List<String> countryList = new ArrayList<String>();
 	static{
@@ -262,7 +257,6 @@ public class CommonInfoService {
 		countryList.add("Montenegro");
 		countryList = Collections.unmodifiableList(countryList);
 	}
-	
 	public static List<String> getCountryList() {
 		return countryList;
 	}
