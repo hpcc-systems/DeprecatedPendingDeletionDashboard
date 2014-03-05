@@ -174,12 +174,10 @@ public class ChartPanel extends Panel {
 	
 	//To construct Table Widget
 	public void drawTableWidget(){
-		if(portlet.getTableDataMap()!=null && portlet.getTableDataMap().size()>0){
-			TableRenderer tableRenderer = new TableRenderer();
-			Vbox vbox = tableRenderer.constructTableWidget(portlet.getTableDataMap(), false,portlet.getName());
-			chartDiv.getChildren().clear();
-			chartDiv.appendChild(vbox);
-		}
+		TableRenderer tableRenderer = (TableRenderer) SpringUtil.getBean("tableRenderer");
+		Vbox vbox = tableRenderer.constructTableWidget(portlet, false);
+		chartDiv.getChildren().clear();
+		chartDiv.appendChild(vbox);
 	}
 
 	private void setStaticImage() {

@@ -21,6 +21,47 @@
 </caption>
 
 <vlayout vflex="1" hflex="1" zclass="dashboard-body" style="overflow:auto; margin-top: 30px; margin-left: 5px;">
+	<panel zclass="panel" border="normal" style="margin-bottom: 0px;">
+		<caption>
+			<div hflex="1">
+				<hbox align="center" pack="stretch" hflex="1">
+					<div>
+						<label sclass="h5"> Global Filters </label>
+					</div>
+					
+					<toolbar align="end" style="float:right; border-style: none;">
+						<popup id="columnListPopup">
+							<listbox >
+							</listbox>
+						</popup>
+						<button sclass="glyphicon glyphicon-plus btn btn-link img-btn" popup="columnListPopup"></button>
+					</toolbar>
+				</hbox>
+			</div>
+		</caption>
+		<panelchildren>
+			<grid style="border:none;">
+				<columns>
+					<column width="120px"></column>
+					<column></column>
+				</columns>
+				<rows>
+					<row>
+						<div>
+							<label sclass="h5"> Country </label>
+							<button sclass="glyphicon glyphicon-remove-circle btn btn-link img-btn" style="float: right;"></button>
+						</div>
+						<hbox>
+							<checkbox zclass="checkbox" value="" label="India" style="margin: 0px; padding-right: 5px;"></checkbox>
+							<checkbox zclass="checkbox" value="" label="Italy" style="margin: 0px; padding-right: 5px;"></checkbox>
+							<checkbox zclass="checkbox" value="" label="Germany" style="margin: 0px; padding-right: 5px;"></checkbox>
+							<checkbox zclass="checkbox" value="" label="Australia" style="margin: 0px; padding-right: 5px;"></checkbox>
+						</hbox>
+					</row>
+				</rows>
+			</grid>
+		</panelchildren>
+	</panel>
 	<portallayout>
 		<portalchildren visible="false"/>
 		<portalchildren visible="false"/>

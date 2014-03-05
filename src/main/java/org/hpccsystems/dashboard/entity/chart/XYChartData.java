@@ -6,6 +6,8 @@ import java.util.List;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.hpccsystems.dashboard.api.entity.Field;
+
 @XmlRootElement
 public class XYChartData {
 	
@@ -22,8 +24,9 @@ public class XYChartData {
 	private List<Filter> filterList;
 	
 	private Boolean isGrouped = false;
-	
 	private Group group;
+	
+	private List<Field> fields;
 	
 	@XmlElement
 	public String getFileName() {
@@ -118,15 +121,24 @@ public class XYChartData {
 	public void setFilterList(List<Filter> filterList) {
 		this.filterList = filterList;
 	}
+	
+	@XmlElement
+	public List<Field> getFields() {
+		return fields;
+	}
+	
+	public void setFields(List<Field> fields) {
+		this.fields = fields;
+	}
 
 	@Override
 	public String toString() {
 		return "XYChartData [hpccConnection=" + hpccConnection + ", fileName="
-				+ fileName + ", xColumnNames=" + xColumnNames
-				+ ", yColumnNames=" + yColumns + ", tableColumns="
-				+ tableColumns + ", isFiltered=" + isFiltered + ", filterList="
-				+ filterList + ", isGrouped=" + isGrouped + ", group=" + group
-				+ "]";
+				+ fileName + ", xColumnNames=" + xColumnNames + ", yColumns="
+				+ yColumns + ", tableColumns=" + tableColumns + ", isFiltered="
+				+ isFiltered + ", filterList=" + filterList + ", isGrouped="
+				+ isGrouped + ", group=" + group + ", fields=" + fields + "]";
 	}
 
+	
 }
