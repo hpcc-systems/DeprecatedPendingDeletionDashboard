@@ -1,7 +1,6 @@
 package org.hpccsystems.dashboard.controller;
 
 import java.util.HashMap;
-import java.util.LinkedHashMap; 
 import java.util.List;
 import java.util.Map;
 
@@ -90,7 +89,7 @@ public class EditTableController extends SelectorComposer<Component> {
 						throw new Exception("Column doesn't exist");
 					}
 				}
-				tableHolder.appendChild(tableRenderer.constructTableWidget(hpccService.fetchTableData(tableData), true, portlet.getName()));
+				tableHolder.appendChild(tableRenderer.constructTableWidget(portlet, true));
 			} catch (Exception e) {
 				LOG.error(e.getMessage());
 			}
@@ -113,11 +112,9 @@ public class EditTableController extends SelectorComposer<Component> {
 			}
 			
 			//TODO: Add else part
-			if(portlet.getTableDataMap() != null){
-				tableHolder.appendChild(
-						tableRenderer.constructTableWidget(portlet.getTableDataMap(), true,portlet.getName())
+			tableHolder.appendChild(
+						tableRenderer.constructTableWidget(portlet, true)
 					);
-			}
 		} else {
 			for (Map.Entry<String, String> entry : columnSchemaMap.entrySet()) {
 				listItem = new Listitem(entry.getKey());
@@ -179,13 +176,11 @@ public class EditTableController extends SelectorComposer<Component> {
 				}
 			}
 			
-			LinkedHashMap<String, List<String>> tableValues = null;
 			try {
-				tableValues = hpccService.fetchTableData(tableData);
 				
 				tableHolder.getChildren().clear();
 				tableHolder.appendChild(
-						tableRenderer.constructTableWidget(tableValues, true,portlet.getName())
+						tableRenderer.constructTableWidget(portlet, true)
 						);
 			} catch (Exception e) {
 				Clients.showNotification("Table Creation failed. Please try again.", "error", tableHolder, "middle_center", 3000, true);
@@ -194,8 +189,6 @@ public class EditTableController extends SelectorComposer<Component> {
 			}
 			
 			doneButton.setDisabled(false);
-			
-			portlet.setTableDataMap(tableValues);
 		} else {
 			Clients.showNotification("Move some columns over here to draw a Table", "error", targetList, "middle_center", 3000, true);
 		}

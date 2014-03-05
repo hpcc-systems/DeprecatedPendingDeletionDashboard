@@ -20,13 +20,11 @@ import org.hpccsystems.dashboard.services.DashboardService;
 import org.hpccsystems.dashboard.services.HPCCService;
 import org.hpccsystems.dashboard.services.WidgetService;
 import org.springframework.dao.DataAccessException;
-import org.zkoss.lang.Threads;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
-import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.event.MouseEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
@@ -287,6 +285,7 @@ public class EditWidgetController extends SelectorComposer<Component> {
 			
 		} else {
 			//General flow
+			portlet.setChartData(chartData);
 			try {
 				Div div = chartPanel.removeStaticImage();
 
@@ -295,7 +294,7 @@ public class EditWidgetController extends SelectorComposer<Component> {
 					div.getChildren().clear();
 					div.appendChild(
 							tableRenderer.constructTableWidget(
-									portlet.getTableDataMap(), false,portlet.getName())
+									portlet, false)
 							);
 				} else {
 					//For Chart Widgets

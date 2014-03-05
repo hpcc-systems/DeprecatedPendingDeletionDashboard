@@ -1,24 +1,9 @@
 package org.hpccsystems.dashboard.entity;
 
-import java.util.List;
-import java.util.LinkedHashMap; 
+import org.hpccsystems.dashboard.entity.chart.XYChartData;
 
 public class Portlet {
 	
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("Portlet [name=").append(name)
-				.append(", id=").append(id)
-				.append(", chartType=").append(chartType)
-				.append(", widgetState=").append(widgetState)
-				.append(", chartDataXML=").append(chartDataXML)
-				.append(", chartDataJSON=").append(chartDataJSON)
-				.append(", tableDataMap=").append(tableDataMap)
-				.append(", persisted=").append(persisted)
-				.append(", column=").append(column).append("]");
-		return  builder.toString() ;
-	}
 	private String name;
 	private Integer id;
 	private Integer chartType;
@@ -27,15 +12,9 @@ public class Portlet {
 	
 	private String chartDataXML;
 	private String chartDataJSON;
-	private LinkedHashMap<String, List<String>> tableDataMap;
-	private boolean persisted = true; 	
+	
+	private XYChartData chartData;
 
-	public boolean isPersisted() {
-		return persisted;
-	}
-	public void setPersisted(boolean persisted) {
-		this.persisted = persisted;
-	}
 	public final Integer getColumn() {
 		return column;
 	}
@@ -78,10 +57,20 @@ public class Portlet {
 	public void setChartDataXML(String chartData) {
 		this.chartDataXML = chartData;
 	}
-	public final LinkedHashMap<String, List<String>> getTableDataMap() {
-		return tableDataMap;
+	public XYChartData getChartData() {
+		return chartData;
 	}
-	public final void setTableDataMap(LinkedHashMap<String, List<String>> tableDataMap) {
-		this.tableDataMap = tableDataMap;
+	public void setChartData(XYChartData chartData) {
+		this.chartData = chartData;
 	}
+	
+	@Override
+	public String toString() {
+		return "Portlet [name=" + name + ", id=" + id + ", chartType="
+				+ chartType + ", widgetState=" + widgetState + ", column="
+				+ column + ", chartDataXML=" + chartDataXML
+				+ ", chartDataJSON=" + chartDataJSON + ", chartData="
+				+ chartData + "]";
+	}
+	
 }

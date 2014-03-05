@@ -7,9 +7,13 @@ import java.util.Map;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hpccsystems.dashboard.entity.Portlet;
+import org.hpccsystems.dashboard.services.HPCCService;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
+import org.zkoss.zk.ui.util.Clients;
+import org.zkoss.zkplus.spring.SpringUtil;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Hbox;
 import org.zkoss.zul.Listbox;
@@ -40,7 +44,18 @@ public class TableRenderer {
 		 * @return
 		 * 	Table as Listbox
 		 */	
-		public Vbox constructTableWidget(LinkedHashMap<String, List<String>> tableDataMap, Boolean isEditing,final String chartTitle){		
+		public Vbox constructTableWidget(final Portlet portlet, Boolean isEditing){		
+			
+			HPCCService hpccService = (HPCCService) SpringUtil.getBean("hpccService");
+			
+			LinkedHashMap<String, List<String>> tableDataMap;
+			try {
+				tableDataMap = hpccService.fetchTableData(portlet.getChartData());
+			} catch (Exception e) {
+				Clients.showNotification("Unexpected error. Could not construct table.", true);
+				LOG.error("Table data error", e);
+				return null;
+			}
 			
 			final Listbox listBox = new Listbox();
 			listBox.setMold("paging");
@@ -92,7 +107,7 @@ public class TableRenderer {
 			button.setLabel("Excel");
 			button.addEventListener(Events.ON_CLICK, new EventListener<Event>() {
 				public void onEvent(Event event) throws Exception {
-					fileConverter.exportListboxToExcel(listBox,chartTitle);
+					fileConverter.exportListboxToExcel(listBox,portlet.getName());
 				}
 			});
 			hbox.appendChild(button);
@@ -103,7 +118,7 @@ public class TableRenderer {
 			button.setLabel("CSV");
 			button.addEventListener(Events.ON_CLICK, new EventListener<Event>() {
 				public void onEvent(Event event) throws Exception {
-					TableRenderer.this.fileConverter.exportListboxToCsv(listBox,chartTitle);
+					TableRenderer.this.fileConverter.exportListboxToCsv(listBox,portlet.getName());
 				}
 			});
 			hbox.appendChild(button);

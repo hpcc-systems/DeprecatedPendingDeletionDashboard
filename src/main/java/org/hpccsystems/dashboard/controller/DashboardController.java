@@ -167,17 +167,8 @@ public class DashboardController extends SelectorComposer<Component>{
 					//Constructing chart data only when live chart is drawn
 					if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())){
 						chartData = chartRenderer.parseXML(portlet.getChartDataXML());
-						if(portlet.getChartType().equals(Constants.TABLE_WIDGET)){
-							//Fetching data and setting into portlet to construct Table Widget
-							try{
-								portlet.setTableDataMap(hpccService.fetchTableData(chartData));
-							}catch(Exception e){
-								Clients.showNotification(
-										"Unable to fetch table data from Hpcc ",
-										"error", comp, "middle_center", 3000,true);
-								LOG.error("Exception while fetching data from Hpcc for table columns", e);
-							}
-						} else {
+						portlet.setChartData(chartData);
+						if(! portlet.getChartType().equals(Constants.TABLE_WIDGET)){
 							//For chart widgets
 							try	{
 								chartRenderer.constructChartJSON(chartData, portlet, false);
@@ -220,34 +211,33 @@ public class DashboardController extends SelectorComposer<Component>{
 	public void addWidget() {
 		ChartPanel chartPanel=null;
 		try{
-		final Portlet portlet = new Portlet();
-		
-		portlet.setWidgetState(Constants.STATE_EMPTY);
-		portlet.setPersisted(false);
-		dashboard.getPortletList().add(portlet);
-		
-		// Adding new Widget to the column with lowest number of widgets
-		Integer count = 0, childCount = 0, column = 0;
-		for (Portalchildren portalchildren : portalChildren) {
-			if(! (count < dashboard.getColumnCount())) {
-				break;
+			final Portlet portlet = new Portlet();
+			
+			portlet.setWidgetState(Constants.STATE_EMPTY);
+			dashboard.getPortletList().add(portlet);
+			
+			// Adding new Widget to the column with lowest number of widgets
+			Integer count = 0, childCount = 0, column = 0;
+			for (Portalchildren portalchildren : portalChildren) {
+				if(! (count < dashboard.getColumnCount())) {
+					break;
+				}
+				if(portalchildren.getChildren().size() < childCount) {
+					column = count;
+				}
+				childCount = portalchildren.getChildren().size();
+				count ++;
 			}
-			if(portalchildren.getChildren().size() < childCount) {
-				column = count;
-			}
-			childCount = portalchildren.getChildren().size();
-			count ++;
-		}
-		portlet.setColumn(column);
-		chartPanel = new ChartPanel(portlet);
-		portalChildren.get(portlet.getColumn()).appendChild(chartPanel);
-		chartPanel.focus();
-		
-		manipulatePortletObjects(Constants.ReorderPotletPanels);
-		
-		portlet.setId(widgetService.addWidget(dashboardId, portlet, dashboard.getPortletList().indexOf(portlet)));
-		//Updating new widget sequence to DB
-		widgetService.updateWidgetSequence(dashboard);
+			portlet.setColumn(column);
+			chartPanel = new ChartPanel(portlet);
+			portalChildren.get(portlet.getColumn()).appendChild(chartPanel);
+			chartPanel.focus();
+			
+			manipulatePortletObjects(Constants.ReorderPotletPanels);
+			
+			portlet.setId(widgetService.addWidget(dashboardId, portlet, dashboard.getPortletList().indexOf(portlet)));
+			//Updating new widget sequence to DB
+			widgetService.updateWidgetSequence(dashboard);
 		}catch (DataAccessException e) {
 			LOG.error("Error while adding new Widget", e);
 			Clients.showNotification("This widget may not have been saved", "error", chartPanel, "middle_center", 5000, true);

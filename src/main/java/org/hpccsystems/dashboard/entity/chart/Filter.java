@@ -10,14 +10,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 public class Filter {
 	private Integer type;
 	private String column;
-	
-	@Override
-	public String toString() {
-		return "Filter [type=" + type + ", column=" + column + ", values="
-				+ values + ", StartValue=" + StartValue + ", EndValue="
-				+ EndValue + "]";
-	}
-
 	/**
 	 *  Present only got String Filter
 	 */
@@ -28,6 +20,9 @@ public class Filter {
 	 */
 	private Double StartValue;
 	private Double EndValue;
+	
+	private boolean isGlobalFilter = false;
+	
 	
 	@XmlAttribute
 	public Integer getType() {
@@ -74,6 +69,15 @@ public class Filter {
 		this.column = column;
 	}
 	
+	@XmlElement
+	public boolean getIsGlobalFilter() {
+		return isGlobalFilter;
+	}
+	
+	public void setIsGlobalFilter(boolean isGlobalFilter) {
+		this.isGlobalFilter = isGlobalFilter;
+	}
+	
 	@Override
 	public boolean equals(Object obj) {
 		if(obj instanceof Filter){
@@ -92,4 +96,13 @@ public class Filter {
 	public int hashCode() {
 		return this.column.hashCode();
 	}
+
+	@Override
+	public String toString() {
+		return "Filter [type=" + type + ", column=" + column + ", values="
+				+ values + ", StartValue=" + StartValue + ", EndValue="
+				+ EndValue + ", isGlobalFilter=" + isGlobalFilter + "]";
+	}
+	
+	
 }
