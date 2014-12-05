@@ -2,6 +2,7 @@ package org.hpccsystems.dashboard.controller;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.services.AuthenticationService;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
@@ -13,6 +14,7 @@ import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zkmax.zul.Navbar;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.Menuitem;
 
@@ -21,32 +23,49 @@ import org.zkoss.zul.Menuitem;
  * This includes profile link.
  * 
  */
+/**
+ * @author 370627
+ *
+ */
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class LogoutController extends SelectorComposer<Component> {
 
-	private static final Log LOG = LogFactory.getLog(LogoutController.class);
-	private static final long serialVersionUID = 1L;
+    private static final Log LOG = LogFactory.getLog(LogoutController.class);
+    private static final long serialVersionUID = 1L;
 
-	@WireVariable
-	AuthenticationService authenticationService;
+    @WireVariable
+    AuthenticationService authenticationService;
 
-	@Wire
-	Menuitem logout;
+    @Wire
+    Menuitem logout;
 
-	@Listen("onClick=#logout")
-	public void doLogout() throws Exception {
-		authenticationService.logout(Sessions.getCurrent().getAttribute("user"));
-		Executions.sendRedirect("/demo/");
-		if (LOG.isInfoEnabled()) {
-			LOG.debug("Successfully Logged out");
-		}
-	}
+    @Listen("onClick=#logout")
+    public void doLogout() throws Exception {
+        authenticationService.logout(Sessions.getCurrent().getAttribute("user"));
+        Executions.sendRedirect("/demo/");
+        if (LOG.isInfoEnabled()) {
+            LOG.debug("Successfully Logged out");
+        }
+    }
 
-	@Listen("onClick=#profile-link")
-	public void onEvent(final Event arg0) throws Exception {
-		// use iterable to find the first include only
-		final Include include = (Include) Selectors
-				.iterable(this.getPage(), "#mainInclude").iterator().next();
-		include.setSrc("/demo/profile-mvc.zul");
-	}
+    @Listen("onClick=#profile-link")
+    public void onEvent(final Event arg0) throws Exception {
+        // use iterable to find the first include only
+        final Include include = (Include) Selectors
+                .iterable(this.getPage(), "#mainInclude").iterator().next();
+        Navbar navbar = (Navbar) Sessions.getCurrent().getAttribute(Constants.NAVBAR);
+        navbar.setSelectedItem(null);
+        include.setSrc("/demo/profile-mvc.zul");
+    }
+    
+    //For Adding new Widget Plugins. 
+    @Listen("onClick=#plugin")
+    public void onClick(final Event arg0) throws Exception {
+        // use iterable to find the first include only
+        final Include include = (Include) Selectors
+                .iterable(this.getPage(), "#mainInclude").iterator().next();
+        Navbar navbar = (Navbar) Sessions.getCurrent().getAttribute(Constants.NAVBAR);
+        navbar.setSelectedItem(null);
+        include.setSrc("/demo/plugin.zul");
+    }
 }

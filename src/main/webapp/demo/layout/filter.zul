@@ -1,0 +1,50 @@
+<panel id="chartFilter" 
+	height="180px" 
+	title="${labels.chartFilters}"
+	apply="org.hpccsystems.dashboard.controller.FilterController"
+	sclass="editPanel">
+	<caption>
+		<popup id="currentDateFilter" zclass="popup">
+			<vlayout height="250px" id="dateFilterContainer"
+				apply="org.hpccsystems.dashboard.controller.CurrentDateFilterController">
+
+				<listbox width="200px" vflex="1" id="dateFilterListBox" droppable="false">
+					<listhead>
+						<listheader label="Current Date Filter">
+							<button id="dateFilterBtn" sclass="glyphicon glyphicon-ok btn btn-link img-btn"
+								style="float:right">
+							</button>
+						</listheader>
+					</listhead>
+					<listitem>
+						<listcell>
+							<combobox id="columnList" />
+						</listcell>
+					</listitem>
+					<listitem>
+						<listcell>
+							<label>Filters data by current date</label>
+						</listcell>
+					</listitem>
+					<listitem>
+						<listcell>
+							<label>Date Format :</label>
+							<textbox id="dateFormatTextbox" sclass="form-control input-sm"></textbox>
+						</listcell>
+					</listitem>
+					<listitem>
+						<listcell>
+							<label>Sample Date value:</label>
+							<label id="sampleDate" sclass="form-control input-sm"></label>
+						</listcell>
+					</listitem>
+				</listbox>
+			</vlayout>
+		</popup>
+		<button iconSclass="glyphicon glyphicon-calendar" sclass="btn btn-link img-btn"
+			popup="currentDateFilter,position=end_center" style="float:right" />
+	</caption>
+	<panelchildren>
+		<listbox width="200px" vflex="1" id="filterListBox" droppable="true"></listbox>
+	</panelchildren>
+</panel>

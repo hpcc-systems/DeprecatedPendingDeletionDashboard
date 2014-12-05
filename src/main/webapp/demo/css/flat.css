@@ -423,7 +423,7 @@ body{
 	background: none repeat scroll 0 0 #f2f2f2;
 }
 .dashboard-zk-window{
-	margin-top: 40px;
+	margin-top: 45px;
 }
 
 .dashboard-header {
@@ -509,6 +509,7 @@ body{
 	margin: 0;
 }
 .z-window-modal > .z-window-header > .z-caption > .z-window-icon {
+	padding-top: 3px;
 	border: none;
 	background: none;
 	border-left: 1px solid #cdcdcd;
@@ -553,7 +554,6 @@ body{
  */
 
 .form-group {
-	min-height: 76px;
 	border-top: 1px solid #ffffff;
 	border-bottom: 1px solid #eeeeee;
 	margin: 0;
@@ -568,4 +568,21 @@ body{
 	color: #555555;
 	text-shadow: 0 1px 0 #fff;
 	font-size: 14px;
+}
+
+.form-control {
+	border-radius: 0 !important;
+	-webkit-box-shadow: none !important;
+	box-shadow: none !important;
+	color: #474747;
+}
+
+.form-control:focus {
+	border-color: #34495e !important;
+}
+
+.control-label {
+	font-weight: bold;
+	color: #555555;
+	text-shadow: 0 1px 0 #fff;
 }

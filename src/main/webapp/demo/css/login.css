@@ -15,6 +15,26 @@ body {
   -o-background-size: cover;
   background-size: cover;
 }
+
+
+.form-control {
+	border-radius: 0 !important;
+	-webkit-box-shadow: none !important;
+	box-shadow: none !important;
+	color: #474747;
+}
+
+.form-control:focus {
+	border-color: #34495e !important;
+}
+
+.control-label {
+	font-weight: bold;
+	color: #555555;
+	text-shadow: 0 1px 0 #fff;
+}
+
+
 @media (min-width: 979px) {
   /* line 13, ../sass/typica-login.scss */
   body {

@@ -6,7 +6,7 @@
 	<version>0.0.1-SNAPSHOT</version>
 
 	<properties>
-		<zk.version>7.0.0-Preview</zk.version>
+		<zk.version>7.0.1</zk.version>
 		<spring.version>3.1.2.RELEASE</spring.version>
 		<commons-io>1.3.1</commons-io>
 		<commons-lang>2.6</commons-lang>
@@ -46,6 +46,13 @@
 	</pluginRepositories>
 
 	<dependencies>
+	<!--For ckeditor  -->
+		<dependency>
+			<groupId>org.zkoss.zkforge</groupId>
+			<artifactId>ckez</artifactId>
+			<version>4.0.1.0</version>
+		</dependency>
+		
 		<dependency>
 			<groupId>org.zkoss.zk</groupId>
 			<artifactId>zkbind</artifactId>
@@ -59,7 +66,7 @@
 		<dependency>
 			<groupId>org.zkoss.zk</groupId>
 			<artifactId>zhtml</artifactId>
-			<version>${zk.version}</version>
+			<version>7.0.1</version>
 		</dependency>
 		<dependency>
 			<groupId>org.zkoss.poi</groupId>
@@ -75,6 +82,12 @@
 		<dependency>
 			<groupId>org.zkoss.zk</groupId>
 			<artifactId>zkmax</artifactId>
+			<version>${zk.version}</version>
+		</dependency>
+		<!-- ZK Theme -->
+		<dependency>
+			<groupId>org.zkoss.theme</groupId>
+			<artifactId>silvertail</artifactId>
 			<version>${zk.version}</version>
 		</dependency>
 
@@ -168,6 +181,14 @@
 			<version>1.0</version>
 			<systemPath>${basedir}\src\lib\HPCCWebservice.jar</systemPath>
 		</dependency>
+		
+		<dependency>
+			<groupId>mbs</groupId>
+			<artifactId>mbs</artifactId>
+			<scope>system</scope>
+			<version>1.0</version>
+			<systemPath>${basedir}\src\lib\mbs-service.jar</systemPath>
+		</dependency>
 
 		<dependency>
 			<groupId>exporter</groupId>
@@ -181,7 +202,9 @@
 			<groupId>com.lowagie</groupId>
 			<artifactId>itext</artifactId>
 			<version>2.1.7</version>
-		</dependency>
+		</dependency>	
+		
+		
 	</dependencies>
 	<build>
 		<finalName>${project.artifactId}</finalName>

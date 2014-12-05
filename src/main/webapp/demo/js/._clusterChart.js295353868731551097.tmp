@@ -1,0 +1,97 @@
+function createChart(divId, reqData) {
+	var chartData = jq.parseJSON(reqData);
+	console.log(chartData);		
+	
+	var divElement = jq('$'+divId).empty();
+	divElement.append(jq("<div id='chartHolder'/>" ));		
+	var container = d3.select(divElement.get(0)).select("div");
+	
+	// size of the diagram
+    var width = divElement.width();
+    var height = divElement.height();
+
+ 	if(width < 50 ){ width = 400; } 
+	if(height < 50 ){ height = 385; }
+	
+	var force = d3.layout.force()
+    .charge(-120)
+    .linkDistance(30)
+    .size([width, height]);
+
+	var svg = container.append("svg")
+	    .attr("width", width)
+	    .attr("height", height);
+	    
+	var tooltip = container.append("div")
+		.attr("class", "cluster-tooltip hidden");
+			
+	tooltip.append("p");
+	
+	 var color = d3.scale
+	  	.ordinal()
+	  	.range(["#1f77b4", "#ff7f0e", "#2ca02c", "#d62728", "#9467bd", "#8c564b", "#e377c2"])
+	  	.domain(chartData.types);
+	  
+	  var circleRadius = function(d) {
+		  return d.weight * 5;
+	  }
+	  
+	  force
+	      .nodes(chartData.nodes)
+	      .links(chartData.links)
+	      .linkDistance(100)
+	      .start();
+	
+	  var link = svg.selectAll(".cluster-link")
+	      .data(chartData.links)
+	    .enter().append("line")
+	      .attr("class", "cluster-link")
+	      .style("stroke-width", 2);
+	
+	  
+	  
+	  var node = svg.selectAll(".cluster-node")
+	      .data(chartData.nodes)
+	    .enter().append("g")
+	      .attr("class", "cluste-node")
+	      .call(force.drag);
+	  
+	  node.append("circle")
+	  	.attr("r", circleRadius)
+	  	.style("fill", function(d) { return color(d.type); })
+	  	.on("mouseover", mouseover)
+	    .on("mouseout", mouseout);
+	  
+	  function mouseover(d) {
+		  tooltip
+		  	.style("left", d.x + circleRadius(d)/2 + "px")
+		  	.style("top", d.y + circleRadius(d)/2 + "px")
+		  	.classed("hidden", false);
+		  
+		  tooltip.select("p")
+		  	.text(function(){
+		  		return d.detail;
+		  	});
+		  
+		  d3.select(this).
+		  	style("fill", function(d) { 
+		  		return d3.rgb(color(d.type)).brighter(1); 
+		  	});
+	  }
+	  
+	  function mouseout(d) {
+		  tooltip.classed("hidden", true);
+		  
+		  d3.select(this).style("fill", function(d) { return color(d.type); });
+	  }
+	    
+	  force.on("tick", function() {
+	    link.attr("x1", function(d) { return d.source.x; })
+	        .attr("y1", function(d) { return d.source.y; })
+	        .attr("x2", function(d) { return d.target.x; })
+	        .attr("y2", function(d) { return d.target.y; });
+	
+	    node
+	    .attr("transform", function(d) { return "translate(" + d.x + "," + d.y + ")"; });
+	  });
+}

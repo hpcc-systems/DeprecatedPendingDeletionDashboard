@@ -1,0 +1,150 @@
+<panel apply="org.hpccsystems.dashboard.controller.PluginConfigurationController" sclass="pagePanel" collapsible="true" border="normal" closable="true">
+	<caption iconSclass="glyphicon glyphicon-wrench">
+		<label zclass="h5">Configure Plugin</label>
+	</caption>
+	<panelchildren>
+		<style>
+			.uploaded-label {
+				padding: 3px;
+				border: 1px solid #46b8da;
+			}
+		</style>
+		<vlayout zclass="form">
+			<hbox sclass="form-group" hflex="1" align="center" pack="center">
+				<div width="250px" sclass="form-label-div" align="right">
+					<label zclass="control-label">Name</label>
+				</div>
+				<textbox id="name" zclass="form-control input-sm" hflex="1"></textbox> 
+			</hbox>
+			<hbox sclass="form-group" hflex="1" align="center" pack="center">
+				<div width="250px" sclass="form-label-div" align="right">
+					<label zclass="control-label">Description</label>
+				</div>
+				<textbox id="description" zclass="form-control input-sm" hflex="1"></textbox> 
+			</hbox>
+			<hbox sclass="form-group" hflex="1" align="center" pack="center" id="dependentJsHbox">
+				<div width="250px" sclass="form-label-div" align="right">
+					<label zclass="control-label">Dependent JavaScript libraries</label>
+				</div>
+				<hbox id="addedJsDiv"></hbox>
+				<combobox id="exsistingJsList" placeholder="Choose existing js library">
+				</combobox> 
+					or
+				<fileupload label="Upload js" id="dependentjsId" zclass="btn btn-info btn-xs"> </fileupload>
+			</hbox>
+			<hbox sclass="form-group" hflex="1" align="center" pack="center" visible="false" id="googleChartHbox">
+				<div width="250px" sclass="form-label-div" align="right">
+					<label zclass="control-label">Google Chart Packages</label>
+				</div>
+				<anchorlayout>
+				 <anchorchildren>
+					 <hbox id="googlePackages">
+					 	<checkbox id="" label="corechart" zclass="checkbox"></checkbox>
+					 	<checkbox id="" label="geochart" zclass="checkbox"></checkbox>
+					 	<checkbox id="" label="tablechart" zclass="checkbox"></checkbox>
+				 	</hbox>
+				 </anchorchildren>
+				 </anchorlayout>
+			</hbox>
+			
+			<hbox sclass="form-group" hflex="1" align="center" pack="center">
+				<div width="250px" sclass="form-label-div" align="right">
+					<label zclass="control-label">Data Model</label>
+				</div>
+				<combobox id="category" autodrop="true" />
+				<popup id="dataModelPopup">
+					<label id="dataModelLabel" pre="true" value="">
+						
+					</label>
+				</popup>
+				<button id="dataModelHelp" visible="false" popup="dataModelPopup, position=end_center" iconSclass="glyphicon glyphicon-question-sign" zclass="img-btn btn btn-link"></button>
+			</hbox>
+			
+			<hbox id="xyConfig" sclass="form-group" hflex="1" align="center" pack="center" spacing="25px" visible="false">
+				<div width="250px" sclass="form-label-div" align="right">
+					<label zclass="control-label">XY Chart Configuration</label>
+				</div>
+				<div>
+					Enable Grouping:
+					<checkbox id="groupingCheckbox" tooltiptext="${labels.groupLabel}"></checkbox> 
+				</div>					
+			</hbox>
+			
+			<hbox id="treeConfig" sclass="form-group" hflex="1" align="center" pack="center" spacing="25px" visible="false">
+				<div width="250px" sclass="form-label-div" align="right">
+					<label zclass="control-label">Hierarchical Chart Configuration</label>
+				</div>
+				<div>
+					Minimum Levels
+					<intbox id="minLevel" zclass="form-control imput-sm" width="75px" disabled="true" ></intbox>
+				</div>
+				<div>
+					Maximum Levels
+					<intbox id="maxLevel" zclass="form-control imput-sm" width="75px" ></intbox> 
+				</div>
+			</hbox>
+			
+			<hbox sclass="form-group" hflex="1" align="center" pack="center">
+				<div width="250px" sclass="form-label-div" align="right">
+					<label zclass="control-label">Static image representing the chart</label>
+				</div>
+				<fileupload label="Upload Image" id="imageId" zclass="btn btn-info btn-xs" tooltiptext="${labels.imageLabel}"> </fileupload>
+			</hbox>
+			
+			<hbox sclass="form-group" hflex="1" align="center" pack="center">
+				<div width="250px" sclass="form-label-div" align="right">
+					<label zclass="control-label">JavaScript to create chart</label>
+				</div>
+				<fileupload label="Upload js" id="javascriptId" zclass="btn btn-info btn-xs"> </fileupload>
+				<popup id="createChartHelp">
+					<label id="createChartLabel" pre="true">
+		function createChart (divId,chartData) {
+			 var response = jq.parseJSON(chartData);
+			 /*response will contain JSON based on the Data Model*/
+			 var divElement = jq('$'+divId).empty();
+			 /*divElement is a jQuery object that has to contain your Visualisation*/								
+			/* Your Code to create visualisation should go here*/
+		}
+						
+					</label>
+				</popup>
+				<button popup="createChartHelp, position=end_center" iconSclass="glyphicon glyphicon-question-sign" zclass="img-btn btn btn-link"></button>
+			</hbox>
+			
+			<hbox sclass="form-group" hflex="1" align="center" pack="center">
+				<div width="250px" sclass="form-label-div" align="right">
+					<label zclass="control-label">Function to render chart</label>
+				</div>
+				<textbox id="jsFunctionName" zclass="form-control input-sm" width="300px"> </textbox>
+				<popup id="functionPopup">
+					<label>Function name in uploaded 'JavaScript to create chart' file that renders the chart</label>
+				</popup>
+				<button popup="functionPopup, position=end_center" iconSclass="glyphicon glyphicon-question-sign" zclass="img-btn btn btn-link"></button>
+			</hbox>
+			
+			<hbox sclass="form-group" hflex="1" align="center" pack="center">
+				<div width="250px" sclass="form-label-div" align="right">
+					<label zclass="control-label">Style Sheets</label>
+				</div>
+				<fileupload label="Upload CSS" id="cssFileId" zclass="btn btn-info btn-xs"> </fileupload>
+				<popup id="styleSheetHelp">
+					<label id="styleSheetLabel" pre="true" value="${labels.styleSheetLabel}">
+					</label>
+					
+				</popup>
+				<button popup="styleSheetHelp, position=end_center" iconSclass="glyphicon glyphicon-question-sign" zclass="img-btn btn btn-link"></button>
+			</hbox>
+			
+			<hbox sclass="form-group" hflex="1" align="center" pack="center" visible="false">
+				<div width="250px" sclass="form-label-div" align="right">
+					<label zclass="control-label">Enable Filtering</label>
+				</div>
+				<checkbox id="filterCheckbox" hflex="1"></checkbox> 
+			</hbox>
+			
+			<div zclass="form-actions">
+				<button id="submitBtn" zclass="btn btn-primary btn-sm" label="Save Plugin"/>
+			</div>
+		</vlayout>
+	</panelchildren>
+</panel>

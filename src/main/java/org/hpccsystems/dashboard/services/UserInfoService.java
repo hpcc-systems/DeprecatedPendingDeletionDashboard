@@ -8,9 +8,9 @@ import org.hpccsystems.dashboard.entity.User;
  */
 public interface UserInfoService  {
 
-	/** find user by account **/
-	 User findUser(String account);
-	
-	/** update user **/
-	 User updateUser(User user);
+    /** find user by account **/
+     User findUser(String account);
+    
+    /** update user **/
+     User updateUser(User user);
 }

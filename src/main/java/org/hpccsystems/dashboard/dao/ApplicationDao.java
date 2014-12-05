@@ -10,7 +10,7 @@ import org.springframework.dao.DataAccessException;
  *
  */
 public interface ApplicationDao {
-	
-	List<Application> retrieveApplicationIds() throws DataAccessException;
+    
+    List<Application> retrieveApplicationIds() throws DataAccessException;
 
 }

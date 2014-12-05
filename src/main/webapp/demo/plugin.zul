@@ -1,0 +1,36 @@
+<window apply="org.hpccsystems.dashboard.controller.PluginController" border="normal" hflex="1" vflex="1" contentStyle="overflow:auto" zclass="dashboard-container">
+	
+	<caption sclass="panel-heading" zclass="dashboard-header">
+		<div style="padding:0">
+			<hbox pack="stretch" width="100%" style="font-size:12px">
+				<label zclass="h1" value="${labels.plugin}" />  
+				<toolbar id="dashboardToolbar" align="end" style="float:right; border-style: none; margin-right:25px;" height="46px" zclass="btn-group">
+					<button id="addPlugin" iconSclass="glyphicon glyphicon-plus" zclass="btn btn-sm btn-primary" label=" Add Plugin" ></button>
+					<button id="help" iconSclass="glyphicon glyphicon-book" zclass="btn btn-sm btn-info" label=" How to create a Plugin" ></button>
+				</toolbar>
+			</hbox> 
+		</div>
+	</caption>
+
+	<vlayout zclass="dashboard-body" style="margin-top: 32px; padding:10px">
+		<panel sclass="pagePanel" collapsible="true">
+			<caption iconSclass="glyphicon glyphicon-pushpin">
+				<label zclass="h5">Installed Plugins </label>			
+			</caption>
+			<panelchildren>
+				<grid emptyMessage="Click 'Add Plugin' to install a new plugin">
+					<columns>
+						<column width="200px" align="right"></column>
+						<column hflex="1"></column>
+						<column width="50px"></column>
+						<column width="60px"></column>
+					</columns>
+					<rows id="pluginRows">
+					</rows>
+				</grid>
+			</panelchildren>
+		</panel>
+		<include id="addHolder" ></include>
+		<include id="helpHolder" ></include>
+	</vlayout>
+</window>

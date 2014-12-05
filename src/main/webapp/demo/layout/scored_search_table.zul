@@ -1,0 +1,67 @@
+<zk xmlns="http://www.zkoss.org/2005/zul">
+	<vbox width="1000px" height="570px" apply="org.hpccsystems.dashboard.controller.ScoredSearchController">
+		<panel id="inputPanel" title="Search Criteria" collapsible="true" height="570px">
+			<panelchildren>
+				<hbox id="inputDataHbox">
+					<listbox id="inputFields" vflex="1">
+						<listhead>
+							<listheader label="${labels.inputFields}"></listheader>
+						</listhead>			
+					</listbox>
+					<vbox vflex="1">
+						<hbox height="240px">
+							<listbox id="model" vflex="1">
+								<listhead>
+									<listheader label="${labels.model}"></listheader>
+								</listhead>
+							</listbox>
+							<listbox id="groupby" vflex="1" droppable="true">
+								<listhead>
+									<listheader label="${labels.groupby}"></listheader>									
+								</listhead>
+							</listbox>
+							<listbox id="aggregate" vflex="1" checkmark="true"> 
+								<listhead>
+									<listheader label="${labels.aggregates}"></listheader>									
+								</listhead>
+								<listitem label="Average" value="A"></listitem>
+								<listitem label="Sum" value="S"></listitem>
+								<listitem label="Count" value="C"></listitem>
+							</listbox>
+						</hbox>
+						<grid id="filterGrid" vflex="1" hflex="1" droppable="true">
+							<auxhead>
+								<auxheader colspan="5" style="float:center"  label="${labels.filters}"></auxheader>
+							</auxhead>
+							<columns hflex="1">
+								<column label="${labels.columnName}"/>
+								<column label="${labels.operator}"/>
+								<column label="${labels.value}"/>
+								<column label="${labels.modifier}"/>
+								<column label="${labels.actions}"/>
+							</columns>
+							<rows id="filterRows">
+								
+							</rows>
+						</grid>
+						<button id="inputDoneButton" label="Add Chart to Dashboard" zclass="btn btn-sm btn-success right-btn"/>
+					</vbox>
+				</hbox>
+			</panelchildren>
+		</panel>
+		<panel id="outputPanel" height="500px" collapsible="true">
+			<panelchildren>
+				<tabbox height="540px" vflex="1" id="tabBox">
+					<tabs id="tableTabs"></tabs>
+					<tabpanels id="tableTabpanels" vflex="1"></tabpanels>
+				</tabbox>
+			</panelchildren>
+		</panel>
+	</vbox>
+	
+	<style>
+		.z-tab-content { background: rgb(235, 235, 235); }
+		
+		.cke_contents { height: 465px !important; }
+	</style>
+</zk>
