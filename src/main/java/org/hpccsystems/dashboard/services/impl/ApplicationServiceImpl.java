@@ -18,28 +18,25 @@ import org.springframework.stereotype.Service;
 @Service("applicationService") 
 @Scope(proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class ApplicationServiceImpl implements ApplicationService {
-	
-	
-	ApplicationDao applicationDao;
+    
+    
+    ApplicationDao applicationDao;
 
-	public ApplicationDao getApplicationDao() {
-		return applicationDao;
-	}
+    public ApplicationDao getApplicationDao() {
+        return applicationDao;
+    }
 
-	@Autowired
-	public void setApplicationDao(ApplicationDao applicationDao) {
-		this.applicationDao = applicationDao;
-	}
+    @Autowired
+    public void setApplicationDao(ApplicationDao applicationDao) {
+        this.applicationDao = applicationDao;
+    }
 
-	public List<Application> retrieveApplicationIds() throws Exception{
-		try
-		{
-		return applicationDao.retrieveApplicationIds();
-		}
-		catch(DataAccessException ex)
-		{
-			throw ex;
-		}
-	}
+    public List<Application> retrieveApplicationIds() throws DataAccessException{
+        try {
+            return applicationDao.retrieveApplicationIds();
+        } catch(DataAccessException ex) {
+            throw ex;
+        }
+    }
 
 }

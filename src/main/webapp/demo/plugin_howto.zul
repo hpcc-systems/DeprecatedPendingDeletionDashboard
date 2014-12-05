@@ -1,0 +1,160 @@
+<panel 
+	apply="org.hpccsystems.dashboard.controller.PluginHowtoController"
+	sclass="pagePanel" collapsible="true" border="normal" closable="true">
+	<caption iconSclass="glyphicon glyphicon-book">
+		<label zclass="h5">Plugin Documentation</label>
+	</caption>
+	<panelchildren style="border: 1px solid #CFCFCF;border-top: none;padding: 5px;padding-left: 10px;">
+		<style>
+			p {
+				line-height: normal;
+				font-size: small;
+			}
+			.z-tab {
+				border-radius: 0px;
+				background: whitesmoke;
+			}
+			.z-tab-selected {
+				background: white;
+			}
+		</style>
+		<zk xmlns:h="native">
+			<vlayout hflex="1">
+				<h:h4> Dashboard Plugins </h:h4>
+				<h:p>
+					Dashboard Plugins provide the ability to extend the dashboard's functionality by adding your own visualisations to the existing library of charts. You can create custom visualisation using any javascript visualisation platforms available like D3, Google Charts, JqPlot etc.,
+				</h:p>
+				
+				<h:h4> Prerequisite	</h:h4>
+				<h:p>
+					The type of visualisation that is to be created has to be decided. You should be aware of data required for creating the chart.
+				</h:p>
+
+				<h:h4>Getting the data</h:h4>
+				<h:p>
+					Dashboard application will provide data as JSON. The JSON structure will be based on the chosen Data Model.
+				</h:p>
+				
+				<h:h4>Data Models</h:h4>
+				<h:p>
+					The data models provided are as follows
+				</h:p>
+				<tabbox>
+					<tabs>
+						<tab label="Pie Model"> </tab>
+						<tab label="XY Model"> </tab>
+						<tab label="Hierarchy Model"> </tab>
+					</tabs>
+					<tabpanels>
+						<tabpanel>
+							<h:h4>Pie Model</h:h4>
+							<h:p>Pie model is the most basic data models. The JSON returned by Pie Model is </h:p>
+							<h:pre>
+{
+    "xAxisLabel": "The column name of Pie Attributes",
+    "yAxisLabel": "The column name of pie measures",
+    "portletId": "A unique id for every chart being created",
+    "filterDescription": "A description of all applied filters",
+    "dataRows": [
+        [
+            "Attribute 1",
+            "Attribute 2"
+        ],
+        [
+            "Value 1",
+           "Value 2"
+        ]
+    ]
+}</h:pre>
+							<h:p>
+								In the specified JSON, <h:code>Value 1, Value 2</h:code> will always be numeric. 
+								The data can be fed only from two columns, ie., Only one measure and attribute can be dropped in the Edit Screen.
+								The <h:code>filterDescription</h:code> element will be an empty string when no filters are applied. 
+								When Filters are applied this element will hold both filters applied for this specific widget and Filters appllied at Dashboard level. 
+							</h:p>
+						</tabpanel>
+						<tabpanel>
+							<h:h4> XY Model</h:h4>
+							<h:p>XY Model provides data in the following format </h:p>
+							<h:pre>
+{
+    "xAxisLabel": "Label for X Axis",
+    "yAxisLabel": "Label for Y Axis",
+    "portletId": "A unique id for every chart being created",
+    "timeseries": {
+        "isEnabled": false
+    },
+    "filterDescription": "A description of all applied filters",
+    "dataRows": [
+        [
+            "Y Column 1", "Y Column 2"
+        ],
+        [
+            "Column 1 data1", "Column 2 data1" 
+        ],
+        [
+            "Column 1 data2", "Column 2 data2"
+        ]
+    ],
+    "xCategoryLabels": [
+        "Label 1",
+        "Label 2"
+    ]
+}							
+							</h:pre>
+							<h:p>
+								In XY Model, X axis is treated as descreate values, which implies, the <h:code>xCategoryLabels</h:code> element values can have duplicates and will not be sorted.
+							</h:p>
+						</tabpanel>
+						<tabpanel>
+							<h:h4> Hierarchy Model</h:h4>
+							<h:p>Hierarchy Model provides data in the following format </h:p>
+							<h:pre>
+{
+    "name": "Parent",
+    "children": [
+        {
+            "name": "First Level Child",
+            "children": [
+                {
+                    "name": "Second Level Child"
+                }
+            ]
+        }
+    ]
+}</h:pre>
+						</tabpanel>
+					</tabpanels>
+				</tabbox>
+				
+				<h:h4>Creating javascript</h:h4>
+				<h:p>
+					The javascript to create the visualisation must have a functioned in the signature <h:code>createChart (divId,chartData)</h:code>.
+					The first argument <h:code>divId</h:code> is an id specific to the application. This denotes the id of the div which is going to contatin the visualisation.
+					Dashboard application uses <h:code>jq</h:code> as the jQuery core function istead of <h:code>$</h:code>. Inorder to get the container div, the following code must be used.
+				<h:pre>
+var divElement = jq('$'+divId).empty();</h:pre>
+					It is important to clear the contents of the div as well before statring to draw your visualisation within it.
+					A typical java script code to create a visualisation will be as follows.
+				<h:pre>
+function createChart (divId,chartData) {
+  var response = jq.parseJSON(chartData);
+  /*response will contain JSON based on the Data Model*/
+  var divElement = jq('$'+divId).empty();
+  /*divElement is a jQuery object that has to contain your Visualisation*/
+	
+	/* Your Code to create visualisation should go here*/
+}</h:pre> 
+					It is required that you utilise the unique identifier for the passed though the parameter <h:code>portletId</h:code> while implementing any interactiveness within the visualisation.
+					This hepls in aviding conflicts between same widgets in a dashboard.
+				</h:p>
+				
+				<h:h4>CSS Guidelines</h:h4>
+				<h:p>
+					While defining styles for the Visualisation, it is necessory to base all your styles based off of class selectors.
+					Applying Styles for the elements like <h:code>svg</h:code> will cause conflicts with other visualisations on the page. 
+				</h:p>
+			</vlayout>
+		</zk>
+	</panelchildren>
+</panel>

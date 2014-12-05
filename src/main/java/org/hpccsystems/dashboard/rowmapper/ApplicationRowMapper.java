@@ -14,11 +14,11 @@ import org.springframework.jdbc.core.RowMapper;
  */
 public class ApplicationRowMapper implements RowMapper<Application> {
 
-	public Application mapRow(ResultSet rs, int rowNum) throws SQLException {
-		Application application = new Application();
-		application.setAppId(rs.getString("dash_app_id"));
-		application.setAppName(rs.getString("dash_app_name"));
-		return application;
-	}
+    public Application mapRow(ResultSet rs, int rowNum) throws SQLException {
+        Application application = new Application();
+        application.setAppId(rs.getString("dash_app_id"));
+        application.setAppName(rs.getString("dash_app_name"));
+        return application;
+    }
 
 }

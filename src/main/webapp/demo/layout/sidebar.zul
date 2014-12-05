@@ -20,6 +20,7 @@
 		}); 
 	}
 	</script>
-<button zclass="btn sidebar-button" id="addDash" label="${labels.plusAddDashboard}"  if="${not sessionScope.userCredential.hasRole('viewDashboard')}"></button>
+<button zclass="btn sidebar-button" id="addDash" label="${labels.plusAddDashboard}" 
+	 if="${not sessionScope.userCredential.hasRole('viewDashboard') and sessionScope.userCredential.hasRole('dashboardCreateRole')}"></button>
 </div>
 </div>

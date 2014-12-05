@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<hpccConnections>
+	<hpccConnection name="File Cluster">
+		<hostIp>216.19.105.2</hostIp>
+		<username>generic_dashboard</username>
+		<password>Lexis123!</password>
+		<isSSL>true</isSSL>
+		<espPort>18010</espPort>
+		<!-- wsEclPort is the roxie port (8002). 
+		This is required even for thor cluster, as user may want to visualize queries in thor -->
+		<wsEclPort>18002</wsEclPort>
+		<wssqlPort>18009</wssqlPort>
+		<allowInvalidCerts>true</allowInvalidCerts>
+	</hpccConnection>
+	<hpccConnection name="Query Cluster">
+		<hostIp>216.19.105.2</hostIp>
+		<username>generic_dashboard</username>
+		<password>Lexis123!</password>
+		<isSSL>true</isSSL>
+		<datasource>query</datasource>
+		<espPort>18010</espPort>
+		<!-- wsEclPort is the roxie port (8002). 
+		This is required even for thor cluster, as user may want to visualize queries in thor -->
+		<wsEclPort>18002</wsEclPort>
+		<wssqlPort>18009</wssqlPort>
+		<allowInvalidCerts>true</allowInvalidCerts>		
+	</hpccConnection>
+</hpccConnections>

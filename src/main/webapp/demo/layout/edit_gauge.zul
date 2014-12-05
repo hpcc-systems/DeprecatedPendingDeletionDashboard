@@ -1,0 +1,66 @@
+<zk xmlns="http://www.zkoss.org/2005/zul">
+	<vlayout
+		apply="org.hpccsystems.dashboard.controller.EditGaugeController"
+		style="background-color: white;">
+		<hlayout id="editLayout">
+			<vbox spacing="0em">
+				<panel title="${labels.measures}" height="270px" sclass="editPanel">
+					<panelchildren>
+						<tabbox id="measureTabbox" vflex="1" width="200px" mold="accordion" >
+						  	<tabs>	</tabs>
+						  	<tabpanels> </tabpanels>
+						</tabbox>
+					</panelchildren>
+				</panel>
+				<panel title="${labels.attributes}" height="270px" sclass="editPanel">
+					<panelchildren>
+						<tabbox id="attributeTabbox" vflex="1" width="200px" mold="accordion" >  
+						  	<tabs> </tabs>
+							<tabpanels>	</tabpanels>
+						</tabbox> 	
+					</panelchildren>
+				</panel>
+			</vbox>
+
+			<vbox spacing="0em">	
+				<panel height="140px" title="Actual Measure" sclass="editPanel">
+					<panelchildren>
+						<listbox width="200px" vflex="1" id="valueMeasuresListbox" droppable="true">
+							<listfoot>
+								<listfooter>
+									<checkbox label="Percentage column" id="percentageCheck" zclass="checkbox" style="margin:0"></checkbox>
+								</listfooter>
+							</listfoot>
+						</listbox>
+					</panelchildren>
+				</panel>
+				
+				<panel height="110px" title="Total Measure" sclass="editPanel">
+					<panelchildren>
+						<listbox width="200px" vflex="1"  id="totalMeasuresListbox" droppable="true">
+						</listbox>
+					</panelchildren>
+				</panel>
+				
+				<panel height="110px" title="${labels.chartAttributes}" sclass="editPanel">
+					<panelchildren>
+						<listbox width="200px" vflex="1" id="attributesListbox" droppable="true">
+						</listbox>
+					</panelchildren>
+				</panel>	
+							
+				<include id="filterHolder"></include>
+				
+			</vbox>
+
+			<div vflex="1" hflex="1"
+				style="border: 1px solid; border-color: rgb(184, 177, 177);"
+				id="chart">
+
+			</div>
+
+		</hlayout>
+	</vlayout>
+
+</zk>
+

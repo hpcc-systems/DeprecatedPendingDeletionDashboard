@@ -1,0 +1,109 @@
+<vlayout id="joinLayout"  
+	apply="org.hpccsystems.dashboard.controller.JoinController"
+	style="background-color: white;"> 
+	<style>
+		.joinTitle { 
+			padding: 5px; 
+			border: 1px solid rgb(187, 187, 187);
+			border-right: none; 
+		}
+
+		.lightHeader > .z-listheader-content { 
+			background: whitesmoke; 
+		}
+
+		input[type="text"] { 
+			border-radius: 0px !important; 
+		}
+		 
+		.wrappedText {
+			word-wrap: break-word;
+			word-break: break-all;
+		}
+		
+		.selectedText {
+			margin-right: 10px;
+			font-weight: bold;
+		}
+	</style>  
+	<vbox spacing="0">
+
+		<panel title="Define a Relation" sclass="editPanel" hflex="1">
+			<panelchildren>
+				<hbox spacing="0" height="282px" width="1000px">
+					<vbox hflex="1" align="center" pack="center">
+						<div hflex="1" sclass="joinTitle">
+							<label zclass="h5">${labels.jointype}</label>
+						</div>
+						<combobox id="joinsCombobox" autodrop="true">
+							<comboitem value="InnerJoin" label="Inner Join"/>
+						</combobox>
+					</vbox>
+
+					<vbox hflex="1" align="center" pack="center">
+						<div hflex="1" sclass="joinTitle">
+							<label zclass="h5">${labels.leftside}</label>
+						</div>
+						<combobox id="file1Combobox" autodrop="true"></combobox>
+						<listbox id="file1ListBox" style="margin:3px;" height="220px" multiple="false" visible="false">
+							<listhead>
+								<listheader label="Columns" sclass="lightHeader"></listheader>
+							</listhead>
+						</listbox>
+					</vbox>
+
+					<vbox hflex="1" align="center" pack="center">
+						<div hflex="1" sclass="joinTitle">
+							<label zclass="h5">${labels.condition}</label>
+						</div>
+						<combobox id="conditionsCombobox" autodrop="true">
+							<comboitem value="=" label="equals" />
+						</combobox>
+					</vbox>
+
+					<vbox hflex="1" align="center" pack="center">
+						<div hflex="1" sclass="joinTitle">
+							<label zclass="h5">${labels.rightside}</label>
+						</div>
+						<combobox id="file2Combobox" autodrop="true"></combobox>
+						<listbox id="file2ListBox" style="margin:3px;" height="220px" multiple="false" visible="false">
+							<listhead>
+								<listheader label="Columns" sclass="lightHeader">
+								</listheader>
+							</listhead>
+						</listbox>			
+					</vbox>
+				</hbox>
+				<hbox style="background: rgb(248, 248, 248); border-bottom: 1px solid rgb(187, 187, 187);">
+					<hbox width="850px" vflex="1" align="center" pack="center" style="padding-left: 5px">
+						<label value="${labels.jointype}" id="joinType"></label>
+						<label value="${labels.chooseColumn1}" id="fileOneColumn" sclass="wrappedText"></label>
+						<label value="${labels.condition}" id="joinCondition"></label>
+						<label value="${labels.chooseColumn2}" id="fileTwoColumn" sclass="wrappedText"></label>
+					</hbox>
+					<div width="150px" align="center">
+						<button zclass="btn btn-xs btn-info" id="addJoin" style="float:right; margin: 5px" disabled="true">
+							${labels.addrelation}
+						</button>
+					</div>
+				</hbox>
+			</panelchildren>
+		</panel>
+		
+		<panel title="${labels.joinConditions}" id="joinConditionPanel" sclass="editPanel"	height="150px">
+			<panelchildren>
+				<listbox id="joinConditionsListbox" height="250px" emptyMessage="Define a Relation">
+				</listbox>
+			</panelchildren>
+		</panel>
+		
+		<hbox align="center" pack="center" hflex="1">
+			<div hflex="1" align="center">
+				<label value="${labels.filesWithRelationWarning}"></label>
+			</div>
+			<div width="150px" align="center">
+				<button label="${labels.visualize}" zclass="btn btn-success" id="proceedBtn" style="float:right; margin: 5px" />
+			</div>		
+		</hbox>
+	</vbox>
+</vlayout>

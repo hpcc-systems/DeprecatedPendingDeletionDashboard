@@ -6,10 +6,14 @@
         http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
         http://www.springframework.org/schema/context 
         http://www.springframework.org/schema/context/spring-context-3.0.xsd">
- 
+  
  	<context:component-scan base-package="org.hpccsystems.dashboard" />
- 	
+ 	 	
+    <context:property-placeholder location="/WEB-INF/config.properties" />    
+        
  	<bean id="hpccService" class="org.hpccsystems.dashboard.services.impl.HPCCServiceImpl" />
+ 	
+ 	<bean id="hpccQueryService" class="org.hpccsystems.dashboard.services.impl.HPCCQueryServiceImpl" />
  	
  	<bean id="dashboardService" class="org.hpccsystems.dashboard.services.impl.DashboardServiceImpl" >
 	    <property name="dashboardDao"><ref bean="dashboardDao"/></property>	
@@ -23,22 +27,25 @@
 	    <property name="authendicationDao"><ref bean="authendicationDao"/></property>
 	</bean> 
 	
+	<bean id="LDAPService" class="org.hpccsystems.dashboard.services.impl.LDAPAuthenticationServiceImpl" >
+	</bean> 
+	
 	<bean id="authendicationDao" class="org.hpccsystems.dashboard.dao.impl.AuthenticationDaoImpl">
 	   <property name="dataSource"><ref bean="mySQLDataSource"/></property>	   
 	</bean>
 
-    <bean id="chartRenderer" class="org.hpccsystems.dashboard.entity.chart.utils.ChartRenderer">
+    <bean id="chartRenderer" class="org.hpccsystems.dashboard.chart.utils.ChartRenderer">
     	 <property name="hpccService"><ref bean="hpccService"/></property>
 	</bean>
 	
-	<bean id="fileConverter" class="org.hpccsystems.dashboard.entity.chart.utils.FileConverter" />
+	<bean id="fileConverter" class="org.hpccsystems.dashboard.chart.utils.FileConverter" />
 	
-	<bean id="tableRenderer" class="org.hpccsystems.dashboard.entity.chart.utils.TableRenderer">
+	<bean id="tableRenderer" class="org.hpccsystems.dashboard.chart.utils.TableRenderer">
 	<!-- 
     	 <property name="fileConverter"> <ref bean="fileConverter"/> </property>
 	 -->
 	</bean>
-		
+	
 	<bean id="widgetService" class="org.hpccsystems.dashboard.services.impl.WidgetServiceImpl" >
 	    <property name="widgetDao"><ref bean="widgetDao"/></property>
 	</bean> 
@@ -52,8 +59,23 @@
 	<bean id="applicationDao" class="org.hpccsystems.dashboard.dao.impl.ApplicationDaoImpl">
 	   <property name="dataSource"><ref bean="mySQLDataSource"/></property>	   
 	</bean>	 
- 	
- 	<bean id="mySQLDataSource" class="org.apache.commons.dbcp.BasicDataSource">
+	
+	<bean id="chartService" class="org.hpccsystems.dashboard.services.impl.ChartServiceImpl" >
+	    <property name="chartDao"><ref bean="chartDao"/></property>
+	</bean> 
+	<bean id="chartDao" class="org.hpccsystems.dashboard.dao.impl.ChartDaoImpl">
+	   <property name="dataSource"><ref bean="mySQLDataSource"/></property>	   
+	</bean>
+	
+	<bean id="groupService" class="org.hpccsystems.dashboard.services.impl.GroupServiceImpl">
+		<property name="groupDao" ref="groupDao"></property>
+	</bean>
+	
+	<bean id="groupDao" class="org.hpccsystems.dashboard.dao.impl.GroupDaoImpl">
+		<property name="dataSource" ref="mySQLDataSource"></property>
+	</bean>
+   
+  <bean id="mySQLDataSource" class="org.apache.commons.dbcp.BasicDataSource">
         <property name="driverClassName">
             <value>com.mysql.jdbc.Driver</value>
         </property>
@@ -84,6 +106,5 @@
 		<property name="testWhileIdle">
 			<value>true</value>
 		</property>
-   </bean>
- 
+   </bean> 
 </beans>

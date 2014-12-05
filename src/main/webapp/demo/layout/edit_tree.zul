@@ -1,0 +1,121 @@
+<hbox apply="org.hpccsystems.dashboard.controller.EditTreeController"
+	height="542px" hflex="1">
+	<style>
+		.levelPanel > .z-panel-body{
+			border-bottom: 1px solid #cfcfcf;
+		}
+		
+		.levelPanel > .z-panel-head {
+			border-radius: 0px;
+			border: none;
+		}
+		
+		.levelPanel > .z-panel-head > .z-panel-header {
+			background: rgb(240, 240, 240);
+			padding-left: 10px;
+			font-weight: bold;
+			font-size: inherit;
+			color: rgb(24, 24, 24);
+		}
+		
+		.levelPanel > .z-panel-head > .z-panel-header .z-panel-icon {
+			border: none;
+			background: none;
+			border-left: 1px solid #cdcdcd;
+			border-radius: 0px;
+			width: 35px;
+		}
+		
+		.levelPanel > .z-panel-head > .z-panel-header .z-panel-close {
+			color: rgb(189, 25, 25);
+		}
+		
+		.borderedChildren {
+			border: 1px solid #cfcfcf;
+			overflow-y: scroll;
+		}
+		
+		.levelInsideBtn {
+			margin: 5px;
+			float: right;	
+		}
+		
+		.noPaddingCell > .z-listcell-content {
+			padding: 0;
+		}
+		
+		.levelColumn { 
+			margin: 5px;
+			border: 1px solid rgb(216, 216, 216);
+		}
+		
+		.levelConjenction {
+			margin: 5px;
+			border: 1px solid rgb(77, 187, 207);
+		}
+		
+		.levelColumn,.levelConjenction > tbody > tr > td {
+			padding-left: 5px;
+		} 
+		
+		.dropZone {
+			background-image: url('./css/images/drop_bg.png');
+			background-repeat: no-repeat;
+			background-size: contain;
+			background-position: 0;
+		}
+		
+		.levelPanel > .z-panel-head > .z-panel-header > .z-caption > .z-caption-content {
+			margin-left: 20px;
+		}
+		
+		.levelPanel > .z-panel-head > .z-panel-header > .z-caption > button {
+			position: absolute;
+			left: 2px;
+			margin-top: -3px;
+		}
+		
+		.row-nohover:hover>.z-row-inner,
+		.row-nohover:hover>.z-cell {
+			background: none;
+		}
+		
+		.white-grid > .z-grid-body {
+			background-color: whitesmoke;
+		} 
+	</style>
+	
+	<vlayout vflex="1">
+		<hlayout vflex="1">
+			<panel width="200px" sclass="editPanel" height="500px"	title="Available Columns">
+				<panelchildren>
+					<tabbox id="filesTabbox" vflex="1" mold="accordion">
+						<tabs id="tabs"> </tabs>
+						<tabpanels id="tabpanels"> </tabpanels>
+					</tabbox>
+				</panelchildren>
+			</panel>
+
+			<panel sclass="editPanel" height="500px" title="Tree Levels" border="normal">
+				<panelchildren sclass="borderedChildren">
+					<vbox vflex="1" width="200px" id="levelsContainer">
+						<button label="${labels.addLevel}" id="addLevel" zclass="btn btn-primary levelInsideBtn"/>
+					</vbox>
+				</panelchildren>
+			</panel>
+
+
+		</hlayout>
+		<box vflex="0" hflex="1" align="center">
+			<button label="${labels.drawChart}" id="drawTree" zclass="btn btn-success" style="margin-bottom: 3px">
+			</button>
+		</box>
+	</vlayout>
+	<vlayout vflex="1" hflex="1">
+		<hbox>
+			<label id="rootLabel" visible="false"></label>
+			<combobox id="rootCombobox" visible="false"></combobox>
+		</hbox>
+		<div vflex="1" hflex="1" id="chart" style="margin-right:2px"></div>
+	</vlayout>
+</hbox>

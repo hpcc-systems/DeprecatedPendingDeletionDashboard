@@ -11,15 +11,15 @@ import org.springframework.jdbc.core.RowMapper;
  *
  */
 public class UserRowMapper implements RowMapper<User> {
-	
-	public User mapRow(ResultSet rs, int rowNum) throws SQLException {
-		User user = new User();
-		user.setUserId(String.valueOf(rs.getInt("user_id")));
-		user.setFullName(rs.getString("user_name"));
-		user.setPassword(rs.getString("password"));
-		user.setActiveFlag(rs.getString("active_flag"));
-		return user;
-	}
+    
+    public User mapRow(ResultSet rs, int rowNum) throws SQLException {
+        User user = new User();
+        user.setUserId(rs.getString("user_id"));
+        user.setFullName(rs.getString("user_name"));
+        user.setPassword(rs.getString("password"));
+        user.setActiveFlag(rs.getString("active_flag"));
+        return user;
+    }
 
 
 

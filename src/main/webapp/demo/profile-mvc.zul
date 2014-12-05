@@ -3,7 +3,7 @@
 	
 	<caption zclass="dashboard-header">
 		<image src="/imgs/demo/profile-32.png" style="margin-left: 20px; margin-bottom: 15px;"></image>
-		<label zclass="h1">  Profile</label>
+		<label zclass="h1" value="${labels.profile}" />  
 	</caption>
 	<vlayout zclass="dashboard-body">
 		<grid width="500px">

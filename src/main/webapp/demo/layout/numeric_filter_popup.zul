@@ -1,25 +1,29 @@
-<div width="250px" 
+<div width="250px"  
+	id="numericFilterPopup"
 	style="background: white;"
 	apply="org.hpccsystems.dashboard.controller.NumericFilterController">
 	
 	<listbox hflex="1" nonselectableTags="*" oddRowSclass="non-odd">
 		<listhead>
-	    	<listheader label="Specify Range">
-	    		<button sclass="glyphicon glyphicon-new-window btn btn-link img-btn" style="float:right" id="filtersSelectedBtn"></button>
+	    	<listheader label="${labels.specifyRange}">
+	    		<button sclass="glyphicon glyphicon-ok btn btn-link img-btn" style="float:right" id="filtersSelectedBtn"></button>
 	    	</listheader>
 	    </listhead>
 	    <listitem>
-	    	<listcell>
-	    		<label>From - </label>
-	    		<label id="minimumLabel"></label>
-				<slider id="minimumSlider" />
-	    	</listcell>
-	    </listitem>
-	    <listitem>
-	    	<listcell>
-	    		<label>To - </label>
-	    		<label id="maximumLabel"></label>
-				<slider id="maximumSlider" />	
+	    	<listcell zclass="nothing" style="overflow:hidden">
+	    		<vbox hflex="1" spacing="0">
+					<hbox spacing="0px" align="stretch" style="background: rgba(170, 170, 170, 0.45);">
+						<hlayout zclass="form-group" width="125px">
+							<label zclass="label" value="${labels.from}"></label>
+							<label id="minimumLabel" zclass="form-control"></label>
+						</hlayout>
+						<hlayout zclass="form-group" width="125px">
+							<label zclass="label" value="${labels.to}"></label>
+							<label id="maximumLabel" zclass="form-control"></label>
+						</hlayout>
+					</hbox>
+					<div style="margin: 5px;width: 230px;" id="sliderDiv"> </div>
+				</vbox>
 	    	</listcell>
 	    </listitem>
 	</listbox>
