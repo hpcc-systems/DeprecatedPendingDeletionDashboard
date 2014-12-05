@@ -9,23 +9,13 @@
 		<value>Dashboard</value>
 	</preference>
 	-->
-	<!-- API Richlets -->
-	<richlet>
-	   <richlet-name>chartSettings</richlet-name>
-	   <richlet-class>org.hpccsystems.dashboard.api.richlet.ChartSettings</richlet-class>
-	</richlet>
-	<richlet-mapping>
-	    <richlet-name>chartSettings</richlet-name>
-	    <url-pattern>/api/chart_config/*</url-pattern>
-	</richlet-mapping>
-	<richlet>
-	   <richlet-name>ViewDashboard</richlet-name>
-	   <richlet-class>org.hpccsystems.dashboard.api.richlet.ViewDashboard</richlet-class>
-	</richlet>
-	<richlet-mapping>
-	    <richlet-name>ViewDashboard</richlet-name>
-	    <url-pattern>/api/view_dashboard/*</url-pattern>
-	</richlet-mapping>
+	
+	<library-property>
+	    <name>org.zkoss.theme.preferred</name>
+	    <value>silvertail</value>
+	</library-property>
+
+	
 	<!-- API Richlets -->
 	
 	<session-config>
@@ -33,8 +23,17 @@
     	<timeout-uri></timeout-uri>    
 	</session-config>
 	
-	<error-page>
+	<system-config>
+   		<label-location>/WEB-INF/label.properties</label-location>
+   		
+   		<!-- [Optional]
+		Uncomment while running test suite
+	    <id-generator-class>org.zkoss.zk.ui.impl.StaticIdGenerator</id-generator-class>
+		-->
+	</system-config>
+
+	<!-- <error-page>
 	    <exception-type>java.lang.Throwable</exception-type>    
 	    <location>/error.zul</location>    
-	</error-page>
+	</error-page> -->
 </zk>

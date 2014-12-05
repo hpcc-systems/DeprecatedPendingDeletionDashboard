@@ -6,54 +6,13 @@
         http://www.springframework.org/schema/beans/spring-beans-3.0.xsd
         http://www.springframework.org/schema/context 
         http://www.springframework.org/schema/context/spring-context-3.0.xsd">
- 
+  
  	<context:component-scan base-package="org.hpccsystems.dashboard" />
- 	
- 	<bean id="hpccService" class="org.hpccsystems.dashboard.services.impl.HPCCServiceImpl" />
- 	
- 	<bean id="dashboardService" class="org.hpccsystems.dashboard.services.impl.DashboardServiceImpl" >
-	    <property name="dashboardDao"><ref bean="dashboardDao"/></property>	
-	</bean> 
-	
-	<bean id="dashboardDao" class="org.hpccsystems.dashboard.dao.impl.DashboardDaoImpl" >
-	   <property name="dataSource"><ref bean="mySQLDataSource"/></property>	   
-	</bean>
-	
-	<bean id="authenticationService" class="org.hpccsystems.dashboard.services.impl.AuthenticationServiceImpl" >
-	    <property name="authendicationDao"><ref bean="authendicationDao"/></property>
-	</bean> 
-	
-	<bean id="authendicationDao" class="org.hpccsystems.dashboard.dao.impl.AuthenticationDaoImpl">
-	   <property name="dataSource"><ref bean="mySQLDataSource"/></property>	   
-	</bean>
-
-    <bean id="chartRenderer" class="org.hpccsystems.dashboard.entity.chart.utils.ChartRenderer">
-    	 <property name="hpccService"><ref bean="hpccService"/></property>
-	</bean>
-	
-	<bean id="fileConverter" class="org.hpccsystems.dashboard.entity.chart.utils.FileConverter" />
-	
-	<bean id="tableRenderer" class="org.hpccsystems.dashboard.entity.chart.utils.TableRenderer">
-	<!-- 
-    	 <property name="fileConverter"> <ref bean="fileConverter"/> </property>
-	 -->
-	</bean>
-		
-	<bean id="widgetService" class="org.hpccsystems.dashboard.services.impl.WidgetServiceImpl" >
-	    <property name="widgetDao"><ref bean="widgetDao"/></property>
-	</bean> 
-	<bean id="widgetDao" class="org.hpccsystems.dashboard.dao.impl.WidgetDaoImpl">
-	   <property name="dataSource"><ref bean="mySQLDataSource"/></property>	   
-	</bean>
-	
-	<bean id="applicationService" class="org.hpccsystems.dashboard.services.impl.ApplicationServiceImpl" >
-	    <property name="applicationDao"><ref bean="applicationDao"/></property>
-	</bean> 
-	<bean id="applicationDao" class="org.hpccsystems.dashboard.dao.impl.ApplicationDaoImpl">
-	   <property name="dataSource"><ref bean="mySQLDataSource"/></property>	   
-	</bean>	 
- 	
- 	<bean id="mySQLDataSource" class="org.apache.commons.dbcp.BasicDataSource">
+ 	 	
+    <context:property-placeholder location="/WEB-INF/config.properties" />    
+      
+   
+  <bean id="mySQLDataSource" class="org.apache.commons.dbcp.BasicDataSource">
         <property name="driverClassName">
             <value>com.mysql.jdbc.Driver</value>
         </property>
@@ -84,6 +43,5 @@
 		<property name="testWhileIdle">
 			<value>true</value>
 		</property>
-   </bean>
- 
+   </bean> 
 </beans>
