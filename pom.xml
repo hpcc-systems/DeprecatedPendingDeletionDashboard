@@ -32,8 +32,7 @@
 			<id>ZK CE</id>
 			<url>http://mavensync.zkoss.org/maven2</url>
 		</repository>
-		<repository>
-			<id>ZK EE</id>
+		<repository>			<id>ZK EE</id>
 			<url>https://maven.zkoss.org/repo/zk/ee</url>
 		</repository>
 		<repository>
@@ -70,6 +69,12 @@
 			<groupId>org.zkoss.zk</groupId>
 			<artifactId>zkbind</artifactId>
 			<version>${zk.version}</version>
+			<exclusions>
+				<exclusion>
+					<artifactId>slf4j-jdk14</artifactId>
+					<groupId>org.slf4j</groupId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 		<dependency>
 			<groupId>org.zkoss.zk</groupId>
@@ -91,6 +96,7 @@
 			<artifactId>zkmax</artifactId>
 			<version>${zk.version}</version>
 		</dependency>
+		
 		<!-- ZK Theme -->
 		<dependency>
 			<groupId>org.zkoss.theme</groupId>
@@ -118,11 +124,13 @@
 			<artifactId>commons-dbcp</artifactId>
 			<version>1.4</version>
 		</dependency>
+		
 		<dependency>
-			<groupId>log4j</groupId>
-			<artifactId>log4j</artifactId>
-			<version>1.2.16</version>
+			<groupId>org.slf4j</groupId>
+			<artifactId>slf4j-log4j12</artifactId>
+			<version>1.7.7</version>
 		</dependency>
+		
 		<dependency>
 			<groupId>mysql</groupId>
 			<artifactId>mysql-connector-java</artifactId>
@@ -203,9 +211,9 @@
 			<plugin>
 				<groupId>org.eclipse.jetty</groupId>
 				<artifactId>maven-jetty-plugin</artifactId>
-				<version>9.2.5.v20141112</version>
+				<version>9.2.5.v20140723</version>
 				<configuration>
-					<scanIntervalSeconds>5</scanIntervalSeconds>
+					<scanIntervalSeconds>1</scanIntervalSeconds>
 					<webApp>
 				      <contextPath>/Dashboard</contextPath>
 				    </webApp>

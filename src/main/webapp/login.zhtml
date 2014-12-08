@@ -5,8 +5,8 @@
     <title>${labels.dashboard}</title>
 
     <!-- styles -->
-    <link href="demo/css/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
-    <link rel="stylesheet" href="demo/css/login.css" />
+    <link href="assets/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="assets/css/login.css" />
 	
   </head>
 
@@ -36,7 +36,7 @@
 				  <label for="apps">${labels.lblApplication}</label >
 				   <zul:listbox sclass="form-control" id="apps" mold="select" width="200px" style="display:inline">
 						<template name="model">
-							<zul:listitem label="${each.appName}" value="${each.appId}" />
+							<zul:listitem label="${each.name}" value="${each.id}" />
 						</template>
 					</zul:listbox> 
 				 </div>
@@ -71,7 +71,6 @@
 					<zul:listitem id="listItemChinese" label="中文" value="Chinese"/>
 			</zul:listbox> 
 		 </div>
-      ${labels.donthaveanAccountYet} <a href="#" class="btn btn-black">${labels.register}</a>
     </footer>
     
     </zul:div>
