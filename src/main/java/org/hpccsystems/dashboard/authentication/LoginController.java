@@ -6,7 +6,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.select.SelectorComposer;
-import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
@@ -28,12 +27,9 @@ public class LoginController extends SelectorComposer<Component>{
 	
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
-		super.doAfterCompose(comp);
-		
-		Selectors.wireVariables(comp, this, Selectors.newVariableResolvers(getClass(), null));
+		super.doAfterCompose(comp);	
 		
 		LOGGER.debug("Class - {}", SpringUtil.getBean("authenticationService"));
-		
 		apps.setModel(new ListModelList<Application>(authenticationService.getAllApplications()));
 		
 	}
