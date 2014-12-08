@@ -31,6 +31,11 @@
 	    <id-generator-class>org.zkoss.zk.ui.impl.StaticIdGenerator</id-generator-class>
 		-->
 	</system-config>
+	
+	<listener>
+        <description>Initializer for HIPIE Service</description>
+        <listener-class>org.hpccsystems.dashboard.init.HipieSingleton</listener-class>
+	</listener>
 
 	<!-- <error-page>
 	    <exception-type>java.lang.Throwable</exception-type>    

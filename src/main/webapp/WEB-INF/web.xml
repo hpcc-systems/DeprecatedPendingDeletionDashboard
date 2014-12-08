@@ -8,10 +8,15 @@
 	
 	<!-- Loading all configuration xml into servletContext -->
 	 <context-param>
-        <param-name>contextConfigLocation</param-name>
-        <param-value>
-        </param-value>
+        <param-name>HipieConfigLocation</param-name>
+		<param-value>/WEB-INF/repositories.cfg</param-value>       
     </context-param> 
+     <context-param>
+      <param-name>contextConfigLocation</param-name>
+        <param-value>
+        /WEB-INF/applicationContext.xml
+        </param-value>
+     </context-param>
     
 	<!-- Spring configuration -->
 	<!-- Initialize spring context -->
