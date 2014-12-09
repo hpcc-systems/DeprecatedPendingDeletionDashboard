@@ -14,8 +14,8 @@ import org.hpcc.HIPIE.dude.InputElement;
 import org.hpcc.HIPIE.dude.OutputElement;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.HpccConnection;
-import org.hpccsystems.dashboard.init.HipieSingleton;
 import org.hpccsystems.dashboard.service.hipie.CompositionService;
+import org.hpccsystems.dashboard.service.hipie.HipieSingleton;
 
 public class CompositionServiceImpl implements CompositionService {
 
