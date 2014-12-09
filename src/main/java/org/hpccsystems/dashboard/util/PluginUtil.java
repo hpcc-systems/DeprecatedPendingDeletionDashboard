@@ -17,7 +17,7 @@ import org.hpcc.HIPIE.dude.VisualElement;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.chart.entity.HPCCConnection;
 import org.hpccsystems.dashboard.entity.Widget;
-import org.hpccsystems.dashboard.init.HipieSingleton;
+import org.hpccsystems.dashboard.service.hipie.HipieSingleton;
 import org.hpccsystems.dashboard.service.AuthenticationService;
 import org.springframework.beans.factory.annotation.Autowired;
 

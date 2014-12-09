@@ -7,11 +7,11 @@ import org.hpcc.HIPIE.HIPIEService;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.chart.entity.HPCCConnection;
 import org.hpccsystems.dashboard.entity.Widget;
-import org.hpccsystems.dashboard.init.HipieSingleton;
 import org.hpccsystems.dashboard.service.AuthenticationService;
 import org.hpccsystems.dashboard.service.hipie.CompositionService;
 import org.hpccsystems.dashboard.util.PluginUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.hpccsystems.dashboard.service.hipie.HipieSingleton;
 
 public class CompositionServiceImpl implements CompositionService {
 

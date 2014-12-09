@@ -34,7 +34,7 @@
 	
 	<listener>
         <description>Initializer for HIPIE Service</description>
-        <listener-class>org.hpccsystems.dashboard.init.HipieSingleton</listener-class>
+        <listener-class>org.hpccsystems.dashboard.service.hipie.HipieSingleton</listener-class>
 	</listener>
 
 	<!-- <error-page>

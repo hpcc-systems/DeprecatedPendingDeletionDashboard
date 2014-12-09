@@ -210,15 +210,14 @@
 			<!-- Run with Jetty -->
 			<plugin>
 				<groupId>org.eclipse.jetty</groupId>
-				<artifactId>maven-jetty-plugin</artifactId>
-				<version>9.2.5.v20140723</version>
+  				<artifactId>jetty-maven-plugin</artifactId>
+  				<version>9.2.3.v20140905</version>
 				<configuration>
 					<scanIntervalSeconds>1</scanIntervalSeconds>
+					<contextXml>${basedir}/src/main/webapp/WEB-INF/jetty-context.xml</contextXml>
 					<webApp>
 				      <contextPath>/Dashboard</contextPath>
 				    </webApp>
-					<stopKey>foo</stopKey>
-					<stopPort>9999</stopPort>
 				</configuration>
 				<executions>
 					<execution>

@@ -8,6 +8,7 @@ import javax.sql.DataSource;
 
 import org.hpccsystems.dashboard.dao.UserDao;
 import org.hpccsystems.dashboard.entity.Application;
+import org.hpccsystems.dashboard.entity.UserCredential;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,8 +39,7 @@ public class UserDaoImpl implements UserDao {
         this.jdbcTemplate = new JdbcTemplate(dataSource);
     }
     
-	@Override
-	public List<Application> getAllApplications() {
+    public List<Application> getAllApplications() {
         List<Application> applications = new ArrayList<Application>();
         
         List<Map<String, Object>> rows = getJdbcTemplate().queryForList("SELECT dash_app_id,dash_app_name FROM dash_application");
@@ -55,6 +55,20 @@ public class UserDaoImpl implements UserDao {
         }
         
         return applications;
+	}
+
+	@Override
+	public boolean validatePassword(String userId, String password) {
+		int rows = getJdbcTemplate().queryForObject("SELECT COUNT(*) FROM user_details WHERE user_details.user_id = ? AND user_details.password = ?", 
+				new Object[]{userId, password},
+				Integer.class);
+		
+		return rows > 0;
+	}
+
+	@Override
+	public UserCredential getUserCredential(String userId) {
+		return null;
 	}
 
 }

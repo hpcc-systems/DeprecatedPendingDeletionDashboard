@@ -27,7 +27,7 @@ public class LoginController extends SelectorComposer<Component>{
 	
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
-		super.doAfterCompose(comp);	
+		super.doAfterCompose(comp);
 		
 		apps.setModel(new ListModelList<Application>(authenticationService.getAllApplications()));
 		

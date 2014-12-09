@@ -1,6 +1,6 @@
 package org.hpccsystems.dashboard.chart.entity;
 
-import org.hpccsystems.dashboard.init.HipieSingleton;
+import org.hpccsystems.dashboard.service.hipie.HipieSingleton;
 
 public class HPCCConnection {
 
