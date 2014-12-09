@@ -1,4 +1,4 @@
-package org.hpccsystems.dashboard.impl.hipie;
+package org.hpccsystems.dashboard.service.impl.hipie;
 
 import org.hpcc.HIPIE.Composition;
 import org.hpcc.HIPIE.CompositionInstance;
