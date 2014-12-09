@@ -27,9 +27,10 @@ public class LoginController extends SelectorComposer<Component>{
 	
 	@Override
 	public void doAfterCompose(Component comp) throws Exception {
-		super.doAfterCompose(comp);	
+		super.doAfterCompose(comp);
 		
 		LOGGER.debug("Class - {}", SpringUtil.getBean("authenticationService"));
+		
 		apps.setModel(new ListModelList<Application>(authenticationService.getAllApplications()));
 		
 	}
