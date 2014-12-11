@@ -11,8 +11,13 @@ import org.hpccsystems.dashboard.service.AuthenticationService;
 import org.hpccsystems.dashboard.service.hipie.CompositionService;
 import org.hpccsystems.dashboard.util.PluginUtil;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.stereotype.Service;
 import org.hpccsystems.dashboard.service.hipie.HipieSingleton;
 
+@Service("compositionService") 
+@Scope(value = "singleton", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class CompositionServiceImpl implements CompositionService {
 
 	private HIPIEService hipieService = HipieSingleton.getHipie();
