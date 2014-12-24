@@ -1,9 +1,11 @@
 <?init class="org.hpccsystems.dashboard.authentication.Validator"?>
 
 <zk>
-<window border="none" vflex="1" hflex="1">
+<?style src="assets/bootstrap/css/bootstrap.css"?>
+
+<div vflex="1" hflex="1">
 	<borderlayout>
-		<north>
+		<north height="50px">
 			<include src="banner.zul"></include>
 		</north>
 		<west width="250px">
@@ -20,5 +22,5 @@
 			Dashboard..!
 		</center>
 	</borderlayout>	
-</window>
+</div>
 </zk>
