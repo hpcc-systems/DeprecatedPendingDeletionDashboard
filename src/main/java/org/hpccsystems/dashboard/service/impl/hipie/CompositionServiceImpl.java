@@ -9,7 +9,7 @@ import org.hpccsystems.dashboard.chart.entity.HPCCConnection;
 import org.hpccsystems.dashboard.entity.Widget;
 import org.hpccsystems.dashboard.service.AuthenticationService;
 import org.hpccsystems.dashboard.service.hipie.CompositionService;
-import org.hpccsystems.dashboard.util.PluginUtil;
+import org.hpccsystems.dashboard.util.HIPIEUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
@@ -39,8 +39,8 @@ public class CompositionServiceImpl implements CompositionService {
 		compName = label.replaceAll("[^a-zA-Z0-9]+", "");
 		composition.setName(compName);
 		//TODO:Need to iterate widget list create rawdataset
-		PluginUtil.updateRawDataset(composition,widget.getChartConfig().getFile(),hpccConnection);
-		ContractInstance pluginContract = PluginUtil.createPlugin(label,composition,widget);		
+		HIPIEUtil.updateRawDataset(composition,widget.getChartConfig().getFile(),hpccConnection);
+		ContractInstance pluginContract = HIPIEUtil.createPlugin(authenticationService.getUserCredential(), label,composition,widget);		
 		
 		ContractInstance datasource=composition.getContractInstanceByName(Constants.HIPIE_RAW_DATASET);
 		pluginContract.addPrecursor(datasource);	

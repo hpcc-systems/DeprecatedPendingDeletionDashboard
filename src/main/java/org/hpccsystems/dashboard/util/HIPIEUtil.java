@@ -16,21 +16,14 @@ import org.hpcc.HIPIE.dude.RecordInstance;
 import org.hpcc.HIPIE.dude.VisualElement;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.chart.entity.HPCCConnection;
+import org.hpccsystems.dashboard.entity.UserCredential;
 import org.hpccsystems.dashboard.entity.Widget;
 import org.hpccsystems.dashboard.service.hipie.HipieSingleton;
-import org.hpccsystems.dashboard.service.AuthenticationService;
-import org.springframework.beans.factory.annotation.Autowired;
 
-public class PluginUtil {
+public class HIPIEUtil {
 
 	private static HIPIEService hipieService = HipieSingleton.getHipie();
-	private static AuthenticationService authenticationService;
 	private static final String CHART_2D = "2DCHART";
-	
-	@Autowired
-	public void setAuthenticationService(AuthenticationService authenticationService) {
-		this.authenticationService = authenticationService;
-	}
 		
 	/**
 	 * @param compName
@@ -38,14 +31,14 @@ public class PluginUtil {
 	 * @param widget
 	 * @throws Exception
 	 */
-	public static ContractInstance createPlugin(String compName,Composition composition,Widget widget) throws Exception {	
+	public static ContractInstance createPlugin(UserCredential credential, String compName,Composition composition,Widget widget) throws Exception {	
 		
 		Contract contract = new Contract();
 		contract.setRepository(hipieService.getRepositoryManager().getDefaultRepository());		
 		contract.setLabel(compName);
 		compName = compName.replaceAll("[^a-zA-Z0-9]+", "");
 		contract.setName(compName);
-		contract.setAuthor(authenticationService.getUserCredential().getId());
+		contract.setAuthor(credential.getId());
 		contract.setDescription(widget.getChartName());
 		
 		InputElement input = new InputElement();
@@ -87,7 +80,7 @@ public class PluginUtil {
         visualElement.addCustomOption(new ElementOption("_chartType",new FieldInstance(null,widget.getChartType())));
         visualization.addChildElement(visualElement);
         
-        contract = hipieService.saveContractAs(authenticationService.getUserCredential().getId(), contract,contract.getName());
+        contract = hipieService.saveContractAs(credential.getId(), contract,contract.getName());
 		 
 		return  contract.createContractInstance();
 
