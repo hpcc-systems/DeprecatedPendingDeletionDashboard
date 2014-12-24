@@ -1,4 +1,4 @@
-package org.hpccsystems.dashboard.service.hipie;
+package org.hpccsystems.dashboard.service.impl.hipie;
 
 import javax.servlet.ServletContext;
 

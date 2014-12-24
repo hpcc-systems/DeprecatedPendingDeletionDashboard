@@ -1,11 +1,10 @@
 package org.hpccsystems.dashboard.entity;
 
-import org.hpccsystems.dashboard.chart.entity.ChartConfig;
 
 public class Widget {
 	
 	private String chartName;
-	private ChartConfig chartConfig;
+	private Widget chartConfig;
 	private String chartType;
 	
 	public String getChartType() {
@@ -14,10 +13,10 @@ public class Widget {
 	public void setChartType(String chartType) {
 		this.chartType = chartType;
 	}
-	public ChartConfig getChartConfig() {
+	public Widget getChartConfig() {
 		return chartConfig;
 	}
-	public void setChartConfig(ChartConfig chartConfig) {
+	public void setChartConfig(Widget chartConfig) {
 		this.chartConfig = chartConfig;
 	}
 	public String getChartName() {
