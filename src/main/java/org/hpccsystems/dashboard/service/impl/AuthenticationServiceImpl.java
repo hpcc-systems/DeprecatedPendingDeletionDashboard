@@ -23,9 +23,8 @@ public class AuthenticationServiceImpl implements AuthenticationService{
 	UserDao userDao;
 	
 	@Override
-	public boolean authenticate(String userId, String pasword) {
-		
-		return false;
+	public boolean authenticate(String userId, String password) {
+		return userDao.validatePassword(userId, password);
 	}
 
 	@Override
@@ -35,15 +34,15 @@ public class AuthenticationServiceImpl implements AuthenticationService{
 
 	@Override
 	public UserCredential getUserCredential() {
-
 		Session session = Executions.getCurrent().getSession();
 		UserCredential userCredential = (UserCredential)session.getAttribute(Constants.USER_CREDENTIAL);
-		if(userCredential == null){
-			userCredential = new UserCredential();//new a anonymous user and set to session
-			session.setAttribute(Constants.USER_CREDENTIAL,userCredential);
-		}
 		return userCredential;
-	
 	}
+
+    @Override
+    public void setUserCredential(UserCredential userCredential) {
+        Session session = Executions.getCurrent().getSession();
+        session.setAttribute(Constants.USER_CREDENTIAL, userCredential);
+    }
 
 }

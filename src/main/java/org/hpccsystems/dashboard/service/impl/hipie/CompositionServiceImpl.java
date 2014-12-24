@@ -3,24 +3,21 @@ package org.hpccsystems.dashboard.service.impl.hipie;
 import org.hpcc.HIPIE.Composition;
 import org.hpcc.HIPIE.CompositionInstance;
 import org.hpcc.HIPIE.ContractInstance;
-import org.hpcc.HIPIE.HIPIEService;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.chart.entity.HPCCConnection;
 import org.hpccsystems.dashboard.entity.Widget;
 import org.hpccsystems.dashboard.service.AuthenticationService;
 import org.hpccsystems.dashboard.service.hipie.CompositionService;
+import org.hpccsystems.dashboard.service.hipie.HipieSingleton;
 import org.hpccsystems.dashboard.util.HIPIEUtil;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
-import org.hpccsystems.dashboard.service.hipie.HipieSingleton;
 
 @Service("compositionService") 
 @Scope(value = "singleton", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class CompositionServiceImpl implements CompositionService {
-
-	private HIPIEService hipieService = HipieSingleton.getHipie();
 	
 	private AuthenticationService authenticationService;
 	
@@ -33,7 +30,7 @@ public class CompositionServiceImpl implements CompositionService {
 	public Composition createComposition(String compName,HPCCConnection hpccConnection,Widget widget)
 			throws Exception {
 		String label = compName;
-		Composition composition = hipieService.getCompositionTemplate(
+		Composition composition = HipieSingleton.getHipie().getCompositionTemplate(
 				authenticationService.getUserCredential().getId(),"BasicTemplate");
 		composition.setLabel(label);
 		compName = label.replaceAll("[^a-zA-Z0-9]+", "");

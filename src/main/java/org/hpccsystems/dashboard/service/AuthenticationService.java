@@ -9,7 +9,9 @@ public interface AuthenticationService {
 	
 	List<Application> getAllApplications();
 	
-	boolean authenticate(String userId, String pasword);
+	boolean authenticate(String userId, String password);
+	
+	void setUserCredential(UserCredential userCredential);
 	
 	UserCredential getUserCredential();
 }

@@ -1,5 +1,7 @@
+<?init class="org.hpccsystems.dashboard.authentication.Validator"?>
+
 <zk>
-<window apply="org.hpccsystems.dashboard.authentication.LoginController">
+<window>
 Dashboard Visualization
 </window>
 </zk>
