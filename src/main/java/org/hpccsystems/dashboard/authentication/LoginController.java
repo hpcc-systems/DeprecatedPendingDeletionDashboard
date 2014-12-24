@@ -53,36 +53,36 @@ public class LoginController extends SelectorComposer<Component>{
 		apps.setModel(applications);
 	}
 	
-	 @Listen("onClick=#login; onOK=#loginWin")
-	    public void doLogin() {
+	@Listen("onClick=#login; onOK=#loginWin")
+    public void doLogin() {
 
-	        final String accountString = account.getText();
-	        final String passwordString = password.getText();
-	        
-	        // Validations
-	        if(apps.getSelectedItem() == null){
-	            message.setValue(Labels.getLabel("selectAppln"));
-	            return;
-	        }else if(accountString == null || passwordString== null || accountString.isEmpty() || passwordString.isEmpty()){
-	            message.setValue(Labels.getLabel("enterCredential"));
-	            return;
-	        }	
-	        
-	        Boolean isAuthenticated = authenticationService.authenticate(accountString, passwordString);
-	        
-	        if (isAuthenticated) {            
-	            message.setValue(Labels.getLabel("validUser") +" "+ accountString);
-	            UserCredential userCredential = new UserCredential();
-	            userCredential.setApplicationId(applications.getSelection().iterator().next().getId());
-	            userCredential.setId(accountString);
-	            userCredential.setName(accountString);
-	            authenticationService.setUserCredential(userCredential);
-	        } else {
-	            message.setValue(Labels.getLabel("invalidUser"));
-	            return;
-	        }
+        final String accountString = account.getText();
+        final String passwordString = password.getText();
+        
+        // Validations
+        if(apps.getSelectedItem() == null){
+            message.setValue(Labels.getLabel("selectAppln"));
+            return;
+        }else if(accountString == null || passwordString== null || accountString.isEmpty() || passwordString.isEmpty()){
+            message.setValue(Labels.getLabel("enterCredential"));
+            return;
+        }	
+        
+        Boolean isAuthenticated = authenticationService.authenticate(accountString, passwordString);
+        
+        if (isAuthenticated) {            
+            message.setValue(Labels.getLabel("validUser") +" "+ accountString);
+            UserCredential userCredential = new UserCredential();
+            userCredential.setApplicationId(applications.getSelection().iterator().next().getId());
+            userCredential.setId(accountString);
+            userCredential.setName(accountString);
+            authenticationService.setUserCredential(userCredential);
+        } else {
+            message.setValue(Labels.getLabel("invalidUser"));
+            return;
+        }
 
-	        LOGGER.info("Logged in {} Sucessfully", accountString);
-	        Executions.sendRedirect("/");
-	    }
+        LOGGER.info("Logged in {} Sucessfully", accountString);
+        Executions.sendRedirect("/");
+    }
 }

@@ -18,7 +18,7 @@
 			" Attributes : " + Executions.getCurrent().getAttributes() + 
 			" User Principal: " +  Executions.getCurrent().getUserPrincipal() );
     </zscript>
-     <zul:div apply="org.hpccsystems.dashboard.authentication.LoginController"> 
+     <zul:div apply="org.hpccsystems.dashboard.authentication.LoginController" id= "loginWin"> 
 	<div class="navbar navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
