@@ -9,13 +9,13 @@
 			<include src="banner.zul"></include>
 		</north>
 		<west width="250px">
-			<vbox vflex="1" >
+			<vbox vflex="1" apply="org.hpccsystems.dashboard.manage.NavigationController">
 				<listbox vflex="1">
 					<listitem label="Dashbaord 1"></listitem>
 					<listitem label="Dashbaord 2"></listitem>
 					<listitem label="Dashbaord 3"></listitem>
 				</listbox>
-				<button iconSclass="z-icon-plus">Add Dashboard</button>
+				<button id="addDashboard">Add Dashboard</button>
 			</vbox>
 		</west>
 		<center vflex="1" hflex="1">
