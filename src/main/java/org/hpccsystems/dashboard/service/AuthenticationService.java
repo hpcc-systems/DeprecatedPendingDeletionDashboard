@@ -14,4 +14,6 @@ public interface AuthenticationService {
 	void setUserCredential(UserCredential userCredential);
 	
 	UserCredential getUserCredential();
+
+    void logout();
 }

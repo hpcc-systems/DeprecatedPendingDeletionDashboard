@@ -1,0 +1,16 @@
+<div hflex="1"> 
+	<hbox hflex="1" align="center">
+		<vbox align="center" width="200px">
+			<image src="assets/img/logo.png"/>
+		</vbox>
+		
+		<hbox 
+			apply="org.hpccsystems.dashboard.authentication.LogoutController" 
+			hflex="1" pack="end" align="start" style="margin-right:30px">
+			<menubar zclass="user-nav">
+				<menuitem zclass="btn" iconSclass="glyphicon glyphicon-user" id="profile-link" label="${sessionScope.userCredential.name}" /> 
+				<menuitem zclass="btn" iconSclass="glyphicon glyphicon-share-alt" id="logout" label="${labels.logout}" />
+			</menubar>
+		</hbox>
+	</hbox>
+</div>

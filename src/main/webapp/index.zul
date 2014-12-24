@@ -1,7 +1,24 @@
 <?init class="org.hpccsystems.dashboard.authentication.Validator"?>
 
 <zk>
-<window>
-Dashboard Visualization
+<window border="none" vflex="1" hflex="1">
+	<borderlayout>
+		<north>
+			<include src="banner.zul"></include>
+		</north>
+		<west width="250px">
+			<vbox vflex="1" >
+				<listbox vflex="1">
+					<listitem label="Dashbaord 1"></listitem>
+					<listitem label="Dashbaord 2"></listitem>
+					<listitem label="Dashbaord 3"></listitem>
+				</listbox>
+				<button>Add Dashboard</button>
+			</vbox>
+		</west>
+		<center vflex="1" hflex="1">
+			Dashboard..!
+		</center>
+	</borderlayout>	
 </window>
 </zk>

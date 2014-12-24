@@ -45,4 +45,9 @@ public class AuthenticationServiceImpl implements AuthenticationService{
         session.setAttribute(Constants.USER_CREDENTIAL, userCredential);
     }
 
+    @Override
+    public void logout() {
+        Executions.getCurrent().getSession().removeAttribute(Constants.USER_CREDENTIAL);
+    }
+
 }
