@@ -28,13 +28,13 @@ public class DashboardDaoImpl implements DashboardDao {
 
     @Override
     public void insertDashboard(Dashboard dashboard,String userId) {
-        String sql="INSERT INTO dashboard(name,user_id,application_id,last_updated_date,sequence) values(?,?,?,?,?)";
+        //String sql="INSERT INTO dashboard(name,user_id,application_id,last_updated_date,sequence) values(?,?,?,?,?)";
+       String sql="INSERT INTO dashboard(name,user_id,application_id,sequence) values(?,?,?,?,?)";
         Map<String, Object> parameters = new HashMap<String, Object>();
         parameters.put("name", dashboard.getName());
         parameters.put("user_id", userId);
         parameters.put("application_id", dashboard.getApplicationId());
-        parameters.put("last_updated_date", dashboard.getLastUpDateTime());
-        parameters.put("sequence", dashboard.getSequence());
+       // parameters.put("last_updated_date", new java.sql.Date(dashboard.getLastUpDateTime().toLocalDate().get));
 
         Number dashboardId = new SimpleJdbcInsert(jdbcTemplate.getDataSource())
                 .withTableName("dashboard")

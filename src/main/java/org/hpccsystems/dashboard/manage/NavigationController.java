@@ -11,6 +11,11 @@ import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
+import org.zkoss.zk.ui.select.annotation.Wire;
+import org.zkoss.zul.ListModelList;
+import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Listitem;
+import org.zkoss.zul.ListitemRenderer;
 import org.zkoss.zul.Window;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
@@ -18,11 +23,26 @@ public class NavigationController extends SelectorComposer<Component> {
 
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger(NavigationController.class);
-
+    
+    
+    @Wire
+    private Listbox dashboardListbox;
+    private ListModelList<Dashboard> dashboardModel = new ListModelList<Dashboard>();
+    
     @Override
     public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
         
+        dashboardListbox.setModel(dashboardModel);
+        dashboardListbox.setItemRenderer(new ListitemRenderer<Dashboard>() {
+
+            @Override
+            public void render(Listitem listitem, Dashboard dashboard, int index)
+                    throws Exception {
+                listitem.setLabel(dashboard.getName());
+                listitem.setAttribute(Constants.DASHBOARD, dashboard);
+            }
+        });
         this.getSelf().addEventListener(Constants.ON_ADD_DASHBOARD, new EventListener<Event>() {
 
             @Override
@@ -36,7 +56,8 @@ public class NavigationController extends SelectorComposer<Component> {
      * @param dashboard
      */
     protected void addDashbordToNavbar(Dashboard dashboard) {
-        System.out.println("dashboard -->"+dashboard);
+        dashboardModel.add(dashboard);
+        
     }
 
     @Listen("onClick = #addDashboard")

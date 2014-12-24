@@ -76,6 +76,7 @@ public class LoginController extends SelectorComposer<Component>{
             userCredential.setApplicationId(applications.getSelection().iterator().next().getId());
             userCredential.setId(accountString);
             userCredential.setName(accountString);
+            userCredential.setApplicationId(apps.getSelectedItem().getValue().toString());
             authenticationService.setUserCredential(userCredential);
         } else {
             message.setValue(Labels.getLabel("invalidUser"));

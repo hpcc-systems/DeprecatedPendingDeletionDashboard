@@ -42,11 +42,11 @@ public class UserDaoImpl implements UserDao {
     public List<Application> getAllApplications() {
         List<Application> applications = new ArrayList<Application>();
         
-        List<Map<String, Object>> rows = getJdbcTemplate().queryForList("SELECT dash_app_id,dash_app_name FROM dash_application");
+        List<Map<String, Object>> rows = getJdbcTemplate().queryForList("SELECT app_id,app_name FROM application");
         for (Map<String,Object> row : rows) {
             Application application = new Application(
-            		row.get("dash_app_id").toString(), 
-            		row.get("dash_app_name").toString());
+            		row.get("app_id").toString(), 
+            		row.get("app_name").toString());
             applications.add(application);
         }
         
@@ -59,7 +59,7 @@ public class UserDaoImpl implements UserDao {
 
 	@Override
 	public boolean validatePassword(String userId, String password) {
-		int rows = getJdbcTemplate().queryForObject("SELECT COUNT(*) FROM user_details WHERE user_details.user_id = ? AND user_details.password = ?", 
+		int rows = getJdbcTemplate().queryForObject("SELECT COUNT(*) FROM user WHERE id = ? AND password = ?", 
 				new Object[]{userId, password},
 				Integer.class);
 		

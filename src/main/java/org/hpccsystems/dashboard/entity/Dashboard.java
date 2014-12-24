@@ -8,9 +8,8 @@ public class Dashboard {
 
     private int id;
     private String name;
-    private int applicationId;
+    private String applicationId;    
     private LocalDateTime lastUpDateTime;
-    private int sequence;
     private int visiblity;      
    
     public int getId() {
@@ -25,24 +24,18 @@ public class Dashboard {
     public void setName(String name) {
         this.name = name;
     }
-    public int getApplicationId() {
+    public String getApplicationId() {
         return applicationId;
     }
-    public void setApplicationId(int applicationId) {
+    public void setApplicationId(String applicationId) {
         this.applicationId = applicationId;
-    }
+    }    
     public LocalDateTime getLastUpDateTime() {
         return lastUpDateTime;
     }
     public void setLastUpDateTime(LocalDateTime lastUpDateTime) {
         this.lastUpDateTime = lastUpDateTime;
-    }
-    public int getSequence() {
-        return sequence;
-    }
-    public void setSequence(int sequence) {
-        this.sequence = sequence;
-    } 
+    }    
     public int getVisiblity() {
         return visiblity;
     }

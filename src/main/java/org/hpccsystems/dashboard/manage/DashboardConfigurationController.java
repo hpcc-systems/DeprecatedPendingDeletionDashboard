@@ -1,5 +1,7 @@
 package org.hpccsystems.dashboard.manage;
 
+import java.time.LocalDateTime;
+
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.service.AuthenticationService;
@@ -13,6 +15,7 @@ import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zul.Radiogroup;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Vbox;
 
@@ -30,6 +33,8 @@ public class DashboardConfigurationController extends
     private DashboardService dashboardService;
     @WireVariable
     private AuthenticationService authenticationService;
+    @Wire
+    private Radiogroup visiblityRadiogroup;
     
     
     @Override
@@ -46,14 +51,16 @@ public class DashboardConfigurationController extends
         if(parent instanceof Vbox){
             Dashboard dashboard = new Dashboard();
             dashboard.setName(nameTextbox.getText());
+            dashboard.setApplicationId(authenticationService.getUserCredential().getApplicationId());
+            dashboard.setLastUpDateTime(LocalDateTime.now());
+            dashboard.setVisiblity(Integer.parseInt(visiblityRadiogroup.getSelectedItem().getValue().toString()));
             //inserts dashboard into DB
             dashboardService.insertDashboard(dashboard, authenticationService.getUserCredential().getId());
-            Events.postEvent(Constants.ON_ADD_DASHBOARD, parent, dashboard);
-            
+            Events.postEvent(Constants.ON_ADD_DASHBOARD, parent, dashboard);            
         }else{
           //Editing dashboard
             
         }
-        
+        this.getSelf().detach();
     }
 }

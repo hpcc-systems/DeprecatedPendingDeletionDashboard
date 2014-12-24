@@ -10,10 +10,10 @@
 		</north>
 		<west width="250px">
 			<vbox vflex="1" apply="org.hpccsystems.dashboard.manage.NavigationController">
-				<listbox vflex="1">
-					<listitem label="Dashbaord 1"></listitem>
+				<listbox vflex="1" id="dashboardListbox">
+					<!-- <listitem label="Dashbaord 1"></listitem>
 					<listitem label="Dashbaord 2"></listitem>
-					<listitem label="Dashbaord 3"></listitem>
+					<listitem label="Dashbaord 3"></listitem> -->
 				</listbox>
 				<button id="addDashboard">Add Dashboard</button>
 			</vbox>
