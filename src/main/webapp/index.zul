@@ -15,7 +15,7 @@
 					<listitem label="Dashbaord 2"></listitem>
 					<listitem label="Dashbaord 3"></listitem>
 				</listbox>
-				<button>Add Dashboard</button>
+				<button iconSclass="z-icon-plus">Add Dashboard</button>
 			</vbox>
 		</west>
 		<center vflex="1" hflex="1">

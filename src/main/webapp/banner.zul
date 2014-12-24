@@ -5,8 +5,8 @@
 		<hbox 
 			apply="org.hpccsystems.dashboard.authentication.LogoutController" 
 			hflex="1" pack="end" align="end">
-			<button iconSclass="glyphicon glyphicon-user" id="profile-link" label="${sessionScope.userCredential.name}" /> 
-			<button iconSclass="glyphicon glyphicon-share-alt" id="logout" label="${labels.logout}" />
+			<button iconSclass="z-icon-user" id="profile-link" label="${sessionScope.userCredential.name}" /> 
+			<button iconSclass="z-icon-sign-out" id="logout" label="${labels.logout}" />
 		</hbox>
 	</hbox>
 </div>
