@@ -195,6 +195,13 @@
 			<version>snapshot</version>					
 		</dependency>
 		
+		<!-- WSSQL Dependency -->
+		<dependency>
+			<groupId>WSSQL</groupId>
+			<artifactId>HPCCWebservice</artifactId>
+			<version>1.0</version>					
+		</dependency>
+		
 	</dependencies>
 	<build>
 		<finalName>${project.artifactId}</finalName>
