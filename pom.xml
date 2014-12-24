@@ -32,10 +32,6 @@
 			<id>ZK CE</id>
 			<url>http://mavensync.zkoss.org/maven2</url>
 		</repository>
-		<repository>		
-			<id>ZK EE</id>
-			<url>https://maven.zkoss.org/repo/zk/ee</url>
-		</repository>
 		<repository>
       		<id>LocalLibs</id>
       		<name>LocalLibs</name>
@@ -91,11 +87,6 @@
 			<groupId>org.zkoss.poi</groupId>
 			<artifactId>zpoi</artifactId>
 			<version>3.8.1</version>
-		</dependency>
-		 <dependency>
-			<groupId>org.zkoss.zk</groupId>
-			<artifactId>zkmax</artifactId>
-			<version>${zk.version}</version>
 		</dependency>
 		
 		<!-- ZK Theme -->
