@@ -216,6 +216,7 @@
 					<contextXml>${basedir}/src/main/webapp/WEB-INF/jetty-context.xml</contextXml>
 					<webApp>
 				      <contextPath>/Dashboard</contextPath>
+				      <defaultsDescriptor>src/main/resources/webdefault.xml</defaultsDescriptor>
 				    </webApp>
 				</configuration>
 				<executions>
