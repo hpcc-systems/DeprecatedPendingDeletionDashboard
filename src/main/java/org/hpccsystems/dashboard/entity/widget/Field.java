@@ -7,7 +7,18 @@ public class Field {
 	private String dataType;
 	private String displayName;
 	
-	public String getColumn() {
+	public Field(String column, String dataType) {
+	    this.column = column;
+	    this.dataType = dataType;
+    }
+	
+	public Field() {
+        super();
+    }
+
+
+
+    public String getColumn() {
 		return column;
 	}
 	public void setColumn(String column) {

@@ -62,12 +62,9 @@ public class HPCCFileServiceImpl implements HPCCFileService{
         List<Field> fieldList=new ArrayList<Field>();
         try {
             recordInstance = hpccConnection.getDatasetFields(logicalFile, null);
-            recordInstance.stream().forEach(fieldInstance->{
-                Field nameAndType = null;
-                nameAndType.setColumn(fieldInstance.getName());
-                nameAndType.setDataType(fieldInstance.getType());
-                fieldList.add(nameAndType);
-            });
+            recordInstance.stream().forEach(fieldInstance -> 
+                fieldList.add(new Field(fieldInstance.getName(), fieldInstance.getType()))
+            );
             
         } catch (Exception e) {
             LOGGER.error(Constants.EXCEPTION, e);
