@@ -2,12 +2,14 @@ package org.hpccsystems.dashboard.service.impl;
 
 import java.io.IOException;
 import java.io.StringReader;
+import java.math.BigDecimal;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.rpc.ServiceException;
 import javax.xml.stream.XMLEventReader;
@@ -16,6 +18,7 @@ import javax.xml.stream.XMLStreamException;
 import javax.xml.stream.events.EndElement;
 import javax.xml.stream.events.StartElement;
 import javax.xml.stream.events.XMLEvent;
+
 import org.apache.commons.lang.StringUtils;
 import org.hpcc.HIPIE.utils.HPCCConnection;
 import org.hpccsystems.dashboard.Constants;
@@ -29,6 +32,7 @@ import org.hpccsystems.dashboard.service.WSSQLService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
+
 import ws_sql.ws.hpccsystems.ExecuteSQLRequest;
 import ws_sql.ws.hpccsystems.Ws_sqlLocator;
 import ws_sql.ws.hpccsystems.Ws_sqlServiceSoap;
@@ -115,7 +119,12 @@ public class WSSQLServiceImpl implements WSSQLService{
 	                       }
 	                       else if(!startElement.getName().getLocalPart().equals("Dataset")){
 	                           xmlEvent = xmlEventReader.nextEvent();
-	                           dataRowList.add(xmlEvent.asCharacters().getData());
+	                           if(xmlEvent.isCharacters()){
+	                        	   dataRowList.add(xmlEvent.asCharacters().getData());
+	 	                           }else{
+	 	                        	  dataRowList.add("0");
+	 	                           }
+	                          
 	                       }
 	                }
 					if(xmlEvent.isEndElement()){
@@ -138,7 +147,7 @@ public class WSSQLServiceImpl implements WSSQLService{
     
     @Override
     public List<String> getDistinctValues(Field field, HPCCConnection connection, String fileName, List<Filter> filters) throws Exception  {
-    	 List<String> filterDataList = new ArrayList<String>();
+    	 List<String> dataList = null;
          try {
              final StringBuilder queryTxt = new StringBuilder(SELECT);
              queryTxt.append(fileName);
@@ -162,7 +171,27 @@ public class WSSQLServiceImpl implements WSSQLService{
 
              final String resultString = executeSQL(connection, queryTxt.toString());
              if (resultString != null && resultString.length() > 0) {
-            	  // TO DO implement parser
+            	 XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+            	 XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(new StringReader(resultString));
+ 				 dataList=new ArrayList<String>();
+ 				while(xmlEventReader.hasNext()){
+ 					XMLEvent xmlEvent = xmlEventReader.nextEvent();
+ 					if (xmlEvent.isStartElement()){
+ 	                       StartElement startElement = xmlEvent.asStartElement();
+ 	                       if(startElement.getName().getLocalPart().equals("Row") || startElement.getName().getLocalPart().equals("Dataset")){
+ 	                    	   continue;
+ 	                       }
+ 	                       else {
+ 	                           xmlEvent = xmlEventReader.nextEvent();
+ 	                           if(xmlEvent.isCharacters()){
+ 	                        	  dataList.add(xmlEvent.asCharacters().getData());
+ 	                           }else{
+ 	                        	  dataList.add("");
+ 	                           }
+ 	                          
+ 	                       }
+ 	                }
+ 				}
             	 
              }else{
             	 throw new HpccConnectionException(Constants.UNABLE_TO_FETCH_DATA);
@@ -175,13 +204,15 @@ public class WSSQLServiceImpl implements WSSQLService{
              LOGGER.error(Constants.EXCEPTION, e);
              throw e;
          } catch (ServiceException | ParserConfigurationException | SAXException | IOException ex) {
+        	 LOGGER.error(Constants.EXCEPTION, ex);
+             throw ex;
          }
-         return filterDataList;
+         return dataList;
     }
 
     @Override
     public Map<String, Number> getMinMax(Field field, HPCCConnection connection, String fileName, List<Filter> filters) throws Exception {
-    	Map<String, Number> resultMap = new HashMap<String, Number>();
+    	Map<String, Number> resultMap = null;
 
           try {
         	  
@@ -204,7 +235,33 @@ public class WSSQLServiceImpl implements WSSQLService{
               }
               if (resultString != null && resultString.length() > 0) {
             	  
-                 // TO DO implement parser by SENTHIL
+            	 XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+            	 XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(new StringReader(resultString));
+            	 resultMap=new HashMap<String, Number>();
+  				while(xmlEventReader.hasNext()){
+  					XMLEvent xmlEvent = xmlEventReader.nextEvent();
+  					if (xmlEvent.isStartElement()){
+  	                       StartElement startElement = xmlEvent.asStartElement();
+  	                       if(startElement.getName().getLocalPart().equals("Row") || startElement.getName().getLocalPart().equals("Dataset")){
+  	                    	   continue;
+  	                       }
+  	                       else if(startElement.getName().getLocalPart().equals("minout1")){
+  	                           xmlEvent = xmlEventReader.nextEvent();
+  	                         if(xmlEvent.isCharacters())
+  	                        	resultMap.put("min",new BigDecimal(xmlEvent.asCharacters().getData()));
+  	                        else
+  	                        	resultMap.put("min",new BigDecimal(0));
+  	                       }
+  	                       else{
+	                           xmlEvent = xmlEventReader.nextEvent();
+							if (xmlEvent.isCharacters())
+								resultMap.put("max", new BigDecimal(xmlEvent
+										.asCharacters().getData()));
+							else
+								resultMap.put("max", new BigDecimal(0));
+						}
+  	                }
+  				}
             	  
               } else {
             	  throw new HpccConnectionException(Constants.UNABLE_TO_FETCH_DATA);
