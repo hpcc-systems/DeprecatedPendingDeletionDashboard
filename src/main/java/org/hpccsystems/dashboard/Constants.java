@@ -12,6 +12,9 @@ public class Constants {
 	public static final String USER_CREDENTIAL = "userCredential";
     public static final String ON_ADD_DASHBOARD = "onAddDashboard";
     public static final String DASHBOARD = "dashboard";
+    public static final Integer FILTER_MINIMUM = 0;
+    public static final Integer FILTER_MAXIMUM = 1;
+    public static final String UNABLE_TO_FETCH_DATA = "Unable to fetch Hpcc data";
     
     public static enum CHARTS {PIE, DONUT, LINE, BAR, COLUMN, US_MAP}; 
 

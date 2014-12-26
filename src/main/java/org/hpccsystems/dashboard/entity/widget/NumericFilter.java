@@ -3,6 +3,7 @@ package org.hpccsystems.dashboard.entity.widget;
 public class NumericFilter extends Filter {
     private Number minValue;
     private Number maxValue;
+    private static final String DOT=".";
     
     public Number getMinValue() {
         return minValue;
@@ -18,7 +19,21 @@ public class NumericFilter extends Filter {
     }
     @Override
     public String generateFilterSQL() {
-        // TODO Auto-generated method stub
-        return null;
+        StringBuilder numFilterSql=new StringBuilder();
+        numFilterSql.append("[")
+        .append(this.getFile())
+        .append(DOT)
+        .append(this.getColumn())
+        .append(" <=")
+        .append(maxValue)
+        .append(" AND ")
+        .append(this.getFile())
+        .append(DOT)
+        .append(this.getColumn())
+        .append(" >=")
+        .append(minValue)
+        .append("]");
+        
+        return numFilterSql.toString();
     }
 }
