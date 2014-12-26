@@ -11,7 +11,7 @@ import org.hpccsystems.dashboard.entity.widget.Widget;
 import com.mysql.jdbc.Field;
 
 public interface WSSQLService {
-    List<String> getDistinctValues(Field field, HPCCConnection connection, String fileName, List<Filter> filters);
-    Map<String, Number> getMinMax(Field field, HPCCConnection connection, String fileName, List<Filter> filters);
-    ChartdataJSON getChartdata(Widget widget, HPCCConnection connection);
+    List<String> getDistinctValues(Field field, HPCCConnection connection, String fileName, List<Filter> filters) throws Exception;
+    Map<String, Number> getMinMax(Field field, HPCCConnection connection, String fileName, List<Filter> filters) throws Exception;
+    ChartdataJSON getChartdata(Widget widget, HPCCConnection connection) throws Exception;
 }
