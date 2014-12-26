@@ -6,6 +6,12 @@ public class Filter extends Field {
     private List<String> values;
     private Number minValue;
     private Number maxValue;
+    
+    public String generateFilterSQL() {
+    	//TODO implement
+    	return null;
+    }
+    
     public List<String> getValues() {
         return values;
     }
