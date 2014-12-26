@@ -1,4 +1,4 @@
-<vlayout>
+<vlayout apply="org.hpccsystems.dashboard.manage.DashboardController">
 	<hbox>
 		<button id="addWidget" iconSclass="glyphicon glyphicon-plus" zclass="btn btn-sm btn-primary" label="${labels.addWidget}" />
 		<button id="configureDashboard" iconSclass="glyphicon glyphicon-cog" zclass="btn btn-sm btn-primary" label="${labels.configureDashboard}" />

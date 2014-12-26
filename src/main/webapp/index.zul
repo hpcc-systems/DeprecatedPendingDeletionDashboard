@@ -128,11 +128,13 @@
 					<listitem label="Dashbaord 2"></listitem>
 					<listitem label="Dashbaord 3"></listitem> 
 				</listbox>
-				<button id="addDashboard">Add Dashboard</button>
+				<button id="addDashboard" zclass="btn btn-info" iconSclass="z-icon-plus">Add Dashboard</button>
 			</vbox>
 		</west>
 		<center vflex="1" hflex="1">			
-			<div zclass="content" vflex="1" hflex="1">Dashboard..!</div>
+			<div zclass="content" vflex="1" hflex="1">
+				<include src="dashboard/container.zul"></include>
+			</div>
 		</center>
 	</borderlayout>	
 </div>
