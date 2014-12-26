@@ -119,16 +119,16 @@
 			<include src="banner.zul"></include>
 		</north>
 		<west width="205px">
-			<vbox vflex="1" zclass="left-sidebar">				
+			<vbox vflex="1" zclass="left-sidebar" apply="org.hpccsystems.dashboard.manage.NavigationController">				
 				<div zclass="empty-space">
 					<space></space>					
 				</div>				
-				<listbox vflex="1" zclass="sidebar-list">
+				<listbox vflex="1" zclass="sidebar-list" id="dashboardListbox">
 					<listitem label="Dashbaord 1" selected="true"></listitem>
 					<listitem label="Dashbaord 2"></listitem>
-					<listitem label="Dashbaord 3"></listitem>
+					<listitem label="Dashbaord 3"></listitem> -->
 				</listbox>
-				<button iconSclass="z-icon-plus">Add Dashboard</button>
+				<button id="addDashboard">Add Dashboard</button>
 			</vbox>
 		</west>
 		<center vflex="1" hflex="1">			

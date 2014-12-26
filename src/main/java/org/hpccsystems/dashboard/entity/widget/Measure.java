@@ -1,4 +1,4 @@
-package org.hpccsystems.dashboard.chart.entity;
+package org.hpccsystems.dashboard.entity.widget;
 
 public class Measure extends Field {
 	

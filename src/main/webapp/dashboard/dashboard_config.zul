@@ -1,0 +1,33 @@
+<window border="normal"
+	width="350px"
+	apply="org.hpccsystems.dashboard.manage.DashboardConfigurationController"
+	closable="true" sclass="panel">
+	<caption iconSclass="glyphicon glyphicon-cog">
+		<label zclass="h5">${labels.configureDashboard}</label>
+		<toolbar style="position: absolute; right: 40px;">
+			<button id="configOkButton" zclass="glyphicon glyphicon-ok btn btn-link img-btn z-button" /> 
+		</toolbar>
+	</caption>	
+	
+	<vbox spacing="0px" hflex="1">		
+		
+		<hlayout zclass="form-group">
+			<label zclass="h5">${labels.dashBoardName}</label>
+			<textbox id="nameTextbox"  zclass="form-control"></textbox>
+		</hlayout>
+	
+		<hlayout zclass="form-group">			
+			<hbox align="center" sclass="options-form">
+				<div zclass="options-div">
+					<label value="${labels.dashboardVisiblity}" zclass="h5"></label>
+				</div>
+				<radiogroup id="visiblityRadiogroup">
+					<radio  zclass="radio-inline" value="0" label="Private" selected="true"></radio>
+					<radio  zclass="radio-inline" value="1" label="Public"></radio>
+				</radiogroup>
+			</hbox>
+		</hlayout>
+		
+	</vbox>
+	
+</window>
