@@ -1,4 +1,4 @@
-package org.hpccsystems.dashboard.chart.entity;
+package org.hpccsystems.dashboard.entity.widget;
 
 import javax.xml.bind.annotation.XmlRootElement;
 

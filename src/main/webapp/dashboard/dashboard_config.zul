@@ -9,19 +9,6 @@
 		</toolbar>
 	</caption>	
 	
-	<style>			
-		.radio-inline > input[type=radio] {
-			box-shadow: none;
-			border: none;
-			outline: none;
-		}
-		
-		.options-form {
-			margin-left: 12px;
-		}	
-		
-</style>
-	
 	<vbox spacing="0px" hflex="1">		
 		
 		<hlayout zclass="form-group">
