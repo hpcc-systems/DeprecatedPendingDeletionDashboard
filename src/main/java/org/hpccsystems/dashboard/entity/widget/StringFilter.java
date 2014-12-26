@@ -12,4 +12,9 @@ public class StringFilter extends Filter {
     public void setValues(List<String> values) {
         this.values = values;
     }
+    @Override
+    public String generateFilterSQL() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

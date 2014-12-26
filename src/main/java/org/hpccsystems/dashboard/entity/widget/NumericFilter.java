@@ -16,4 +16,9 @@ public class NumericFilter extends Filter {
     public void setMaxValue(Number maxValue) {
         this.maxValue = maxValue;
     }
+    @Override
+    public String generateFilterSQL() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }
