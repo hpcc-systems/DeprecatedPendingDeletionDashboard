@@ -1,5 +1,8 @@
 package org.hpccsystems.dashboard.manage;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.slf4j.Logger;
@@ -57,6 +60,9 @@ public class NavigationController extends SelectorComposer<Component> {
      */
     protected void addDashbordToNavbar(Dashboard dashboard) {
         dashboardModel.add(dashboard);
+        List<Dashboard> selectionList = new ArrayList<Dashboard>();
+        selectionList.add(dashboard);
+        dashboardModel.setSelection(selectionList);
         
     }
 

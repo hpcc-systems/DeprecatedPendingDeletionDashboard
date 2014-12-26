@@ -1,7 +1,5 @@
 package org.hpccsystems.dashboard.manage;
 
-import java.time.LocalDateTime;
-
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.service.AuthenticationService;
@@ -52,7 +50,6 @@ public class DashboardConfigurationController extends
             Dashboard dashboard = new Dashboard();
             dashboard.setName(nameTextbox.getText());
             dashboard.setApplicationId(authenticationService.getUserCredential().getApplicationId());
-            dashboard.setLastUpDateTime(LocalDateTime.now());
             dashboard.setVisiblity(Integer.parseInt(visiblityRadiogroup.getSelectedItem().getValue().toString()));
             //inserts dashboard into DB
             dashboardService.insertDashboard(dashboard, authenticationService.getUserCredential().getId());
@@ -61,6 +58,7 @@ public class DashboardConfigurationController extends
           //Editing dashboard
             
         }
+       
         this.getSelf().detach();
     }
 }

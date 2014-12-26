@@ -35,7 +35,7 @@ name  VARCHAR(200) ,
 user_id VARCHAR(100) ,
 application_id VARCHAR(50),
 visibility TINYINT,
-last_updated_date TIMESTAMP,
+last_updated_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 PRIMARY KEY(id)
 ) ENGINE=InnoDB;
 
