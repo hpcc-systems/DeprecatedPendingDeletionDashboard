@@ -1,8 +1,6 @@
 package org.hpccsystems.dashboard.entity.widget;
 
-import javax.xml.bind.annotation.XmlRootElement;
 
-@XmlRootElement
 public class Field {
 
 	private String column;
