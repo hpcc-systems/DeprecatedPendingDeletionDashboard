@@ -10,6 +10,8 @@ public class USMap extends Widget{
 
     private Attribute states;
     private Measure measure;
+    private static final String DOT=".";
+    private static final String COMMA=" , ";
     
     @Override
     public List<String> getColumns() {
@@ -19,8 +21,27 @@ public class USMap extends Widget{
 
     @Override
     public String generateSQL() {
-        // TODO Auto-generated method stub
-        return null;
+        StringBuilder sql=new StringBuilder();        
+        sql.append("SELECT ")
+        .append(states.getFile())
+        .append(DOT)
+        .append(states.getColumn())
+        .append(COMMA)
+        .append(measure.getFile())
+        .append(DOT)
+        .append(measure.getColumn())
+        .append(" FROM ")
+        .append(states.getFile());
+        
+        if((this.getFilters()!=null)&&(!this.getFilters().isEmpty())){
+                sql.append(" WHERE ");
+                this.getFilters().stream().forEach(eachFilter->{
+                    sql.append(eachFilter.generateFilterSQL())
+                    .append(" AND ");
+                });                
+                sql.substring(0, sql.length()-6);
+            }
+        return sql.toString();
     }
 
     public Attribute getStates() {

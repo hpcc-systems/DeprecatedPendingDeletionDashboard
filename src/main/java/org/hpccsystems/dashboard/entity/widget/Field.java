@@ -5,7 +5,7 @@ public class Field {
 
 	private String column;
 	private String dataType;
-	private String displayName;
+	private String file;
 	
 	public Field(String column, String dataType) {
 	    this.column = column;
@@ -24,12 +24,6 @@ public class Field {
 	public void setColumn(String column) {
 		this.column = column;
 	}
-	public String getDisplayName() {
-		return displayName;
-	}
-	public void setDisplayName(String displayName) {
-		this.displayName = displayName;
-	}
 	public String getDataType() {
 		return dataType;
 	}
@@ -41,5 +35,11 @@ public class Field {
 	    //TODO implement
 	    return false;
 	}
+	public String getFile() {
+        return file;
+    }
+    public void setFile(String file) {
+        this.file = file;
+    }
 
 }

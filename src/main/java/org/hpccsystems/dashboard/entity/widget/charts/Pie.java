@@ -9,11 +9,32 @@ import org.hpccsystems.dashboard.entity.widget.Widget;
 public class Pie extends Widget{
     private Attribute weight;
     private Measure label;
+    private static final String DOT=".";
+    private static final String COMMA=" , ";
     
     @Override
     public String generateSQL() {
-        // TODO Implement
-        return null;
+        StringBuilder sql=new StringBuilder();        
+        sql.append("SELECT ")
+        .append(weight.getFile())
+        .append(DOT)
+        .append(weight.getColumn())
+        .append(COMMA)
+        .append(label.getFile())
+        .append(DOT)
+        .append(label.getColumn())
+        .append(" FROM ")
+        .append(weight.getFile());
+        
+        if((this.getFilters()!=null)&&(!this.getFilters().isEmpty())){
+                sql.append(" WHERE ");
+                this.getFilters().stream().forEach(eachFilter->{
+                    sql.append(eachFilter.generateFilterSQL())
+                    .append(" AND ");
+                });                
+                sql.substring(0, sql.length()-6);
+            }
+        return sql.toString();
     }
 
     @Override

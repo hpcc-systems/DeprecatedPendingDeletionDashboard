@@ -14,7 +14,15 @@ public class StringFilter extends Filter {
     }
     @Override
     public String generateFilterSQL() {
-        // TODO Auto-generated method stub
-        return null;
+        StringBuilder stringSql=new StringBuilder();
+        stringSql.append("IN [");
+        values.stream().forEach(value->{
+            stringSql.append("'")
+            .append(value)
+            .append("', ");
+        });
+        stringSql.substring(0, stringSql.length()-4);
+        stringSql.append("]");
+        return stringSql.toString();
     }
 }

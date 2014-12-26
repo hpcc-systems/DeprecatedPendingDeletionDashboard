@@ -11,6 +11,8 @@ public class XYChart extends Widget{
     private Attribute attribute;
     private List<Measure> measure;
     private Attribute groupAttribute;
+    private static final String DOT=".";
+    private static final String COMMA=" , ";
     
     @Override
     public List<String> getColumns() {
@@ -20,8 +22,31 @@ public class XYChart extends Widget{
 
     @Override
     public String generateSQL() {
-        // TODO Auto-generated method stub
-        return null;
+        StringBuilder sql=new StringBuilder();
+        sql.append("SELECT ")
+        .append(attribute.getFile())
+        .append(DOT)
+        .append(attribute.getColumn())
+        .append(COMMA);
+        measure.stream().forEach(everyMeasure->{
+            sql.append(everyMeasure.getFile())
+            .append(DOT)
+            .append(everyMeasure.getColumn())
+            .append(COMMA);
+        });
+        sql.substring(0, sql.length()-4);
+        sql.append(" FROM ")
+        .append(attribute.getFile());
+        
+        if((this.getFilters()!=null)&&(!this.getFilters().isEmpty())){
+            sql.append(" WHERE ");
+            this.getFilters().stream().forEach(eachFilter->{
+                sql.append(eachFilter.generateFilterSQL())
+                .append(" AND ");
+            });                
+            sql.substring(0, sql.length()-6);
+        }
+        return sql.toString();
     }
 
     public Attribute getAttribute() {
