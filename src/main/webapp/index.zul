@@ -126,7 +126,7 @@
 				<listbox vflex="1" zclass="sidebar-list" id="dashboardListbox">
 					<listitem label="Dashbaord 1" selected="true"></listitem>
 					<listitem label="Dashbaord 2"></listitem>
-					<listitem label="Dashbaord 3"></listitem> -->
+					<listitem label="Dashbaord 3"></listitem> 
 				</listbox>
 				<button id="addDashboard">Add Dashboard</button>
 			</vbox>
