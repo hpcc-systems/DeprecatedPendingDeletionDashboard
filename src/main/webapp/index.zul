@@ -2,24 +2,137 @@
 
 <zk>
 <?style src="assets/bootstrap/css/bootstrap.css"?>
-
-<div vflex="1" hflex="1">
+<style>
+.wrapper {
+  background-color: #3c3c3c;
+}
+.z-north, .z-south, .z-west, .z-center, .z-east {
+	background: none;
+    border: none;
+}	
+.z-borderlayout{
+	background: none;
+}
+.z-listbox {
+    border: none;
+}    
+.header{
+	background-image: none;
+    border-bottom: 0 none;
+    box-shadow: none;
+    background-color: #292929;
+    height: 35px;
+    position: relative;
+    width: 100%;
+    z-index: 0;	
+    padding:10px;
+}
+.user-nav{
+	height: 25px !important;    
+    min-height: auto !important;
+    position: absolute;
+    right: 30px;
+    top: 5px;
+    z-index: 20;
+	border-left: 1px solid #1c1c1c;	 
+    margin: -1px 0 0;
+    padding: 0;
+}
+.user-nav .z-button{
+	color:rgba(255, 255, 255, 0.55);	
+	background: none repeat scroll 0 0 #292929;
+	border:none;
+	font-family: Arial,sans-serif;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: normal;
+}
+.user-nav .z-button:hover{
+	color:#fff;
+	background: none repeat scroll 0 0 #292929;
+	border:none;
+	font-family: Arial,sans-serif;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: normal;	
+}
+.content {
+	background: none repeat scroll 0 0 #f2f2f2;
+    /*border-bottom-left-radius: 8px;*/
+    border-top-left-radius: 8px;    
+    margin-right: 0;    
+    min-height: 500px;
+    position: relative;
+    width: auto;
+    padding:10px;
+}
+.empty-space{
+	background-color: #292929;
+	margin:0;
+	padding:0;
+}
+.left-sidebar-separator{
+	margin:0;
+	padding:0;
+	visibility: hidden
+}
+.left-sidebar-separator img{
+	margin:0;
+	padding:0;
+	visibility: hidden;
+	height:0;
+}
+.sidebar-list{
+	background-color: #3c3c3c;
+}	
+.sidebar-list .z-listcell-content{
+	background-color: #3c3c3c;	
+	color:rgba(255, 255, 255, 0.55);
+	padding: 10px 0 10px 15px;
+}
+.sidebar-list .z-listitem.z-listitem-selected .z-listcell-content {
+	background-color: #434343;	
+	color:#fff;
+	background-image: url("assets/img/menu-active.png");
+	background-repeat:no-repeat;
+	background-position:right center;	
+}	
+.sidebar-list .z-listitem:hover{
+	background-color: #434343;	
+	color:#fff;
+}
+.sidebar-list .z-listitem .z-listcell-content:hover {
+	background-color: #434343;
+	color:#fff;
+}
+.sidebar-list .z-listitem .z-listcell:hover{	
+	background-color: #434343;
+	color:#fff;
+}
+.left-sidebar .z-button{
+ margin:10px 10px 10px 40px;
+}
+</style>
+<div vflex="1" hflex="1" sclass="wrapper" style="">
 	<borderlayout>
-		<north height="50px">
+		<north sclass="header">
 			<include src="banner.zul"></include>
 		</north>
-		<west width="250px">
-			<vbox vflex="1" >
-				<listbox vflex="1">
-					<listitem label="Dashbaord 1"></listitem>
+		<west width="205px">
+			<vbox vflex="1" zclass="left-sidebar">				
+				<div zclass="empty-space">
+					<space></space>					
+				</div>				
+				<listbox vflex="1" zclass="sidebar-list">
+					<listitem label="Dashbaord 1" selected="true"></listitem>
 					<listitem label="Dashbaord 2"></listitem>
 					<listitem label="Dashbaord 3"></listitem>
 				</listbox>
 				<button iconSclass="z-icon-plus">Add Dashboard</button>
 			</vbox>
 		</west>
-		<center vflex="1" hflex="1">
-			Dashboard..!
+		<center vflex="1" hflex="1">			
+			<div zclass="content" vflex="1" hflex="1">Dashboard..!</div>
 		</center>
 	</borderlayout>	
 </div>
