@@ -1,0 +1,36 @@
+<zk>
+	<window apply="org.hpccsystems.dashboard.manage.widget.FileBrowserController">
+		<tree id="fileTree" height="504px" width="1000px" multiple="true"
+			checkmark="true" >
+			<treecols>
+				<treecol id="treeColumn"
+					label="${labels.chooseFile}" />
+			</treecols>
+
+			<template name="model">
+				<treeitem>
+					<treerow>
+						<treecell>
+							<label value="${each.fileName}" sclass="link-btn">
+							</label>
+						</treecell>
+					</treerow>
+				</treeitem>
+			</template>
+			<treefoot>
+				<treefooter>
+					<hbox hflex="1" spacing="0px" pack="center" align="center" height="50px">
+						<vbox hflex="1" vflex="1" pack="center" align="center">
+							<textbox hflex="1" id="selectedFile" placeholder="${labels.chooseFile}" readonly="true" />
+						</vbox>
+						<div width="150px" align="center">
+							<button label="${labels.visualize}"
+								zclass="btn btn-success" id="visualizeBtn">
+							</button>
+						</div>
+					</hbox>
+				</treefooter>
+			</treefoot>
+		</tree>
+	</window>
+</zk>

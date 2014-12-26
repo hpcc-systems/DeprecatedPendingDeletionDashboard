@@ -2,6 +2,9 @@ package org.hpccsystems.dashboard.entity;
 
 import java.time.LocalDateTime;
 
+import org.hpcc.HIPIE.utils.HPCCConnection;
+import org.hpccsystems.dashboard.util.HipieSingleton;
+
 
 public class Dashboard {
 
@@ -48,5 +51,18 @@ public class Dashboard {
     }
     public void setHpccId(String hpccId) {
         this.hpccId = hpccId;
+    }
+    
+    /**
+     * @return Returns HPCCConnection from HIPIE based on the Hpcc server type
+     * selected from UI 
+     */
+    public HPCCConnection getHpccConnection() {
+        if(getHpccId() != null){
+            HPCCConnection connection = HipieSingleton.getHipie()
+                    .getHpccManager().getConnection(getHpccId());
+            return connection;
+        }
+        return null;
     }
 }

@@ -15,6 +15,7 @@ public class Constants {
     public static final Integer FILTER_MINIMUM = 0;
     public static final Integer FILTER_MAXIMUM = 1;
     public static final String UNABLE_TO_FETCH_DATA = "Unable to fetch Hpcc data";
+    public static final String HPCC_CONNECTION = "hpccConnection";
     
     public static enum CHARTS {PIE, DONUT, LINE, BAR, COLUMN, US_MAP}; 
 

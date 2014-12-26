@@ -59,6 +59,7 @@ public class NavigationController extends SelectorComposer<Component> {
                 listitem.setAttribute(Constants.DASHBOARD, dashboard);
             }
         });
+        //Selecting first dashboard
         if(!dashboardModel.isEmpty()){
             List<Dashboard> selectionList = new ArrayList<Dashboard>();
             selectionList.add(dashboardModel.get(0));
@@ -88,8 +89,7 @@ public class NavigationController extends SelectorComposer<Component> {
         dashboardModel.add(dashboard);
         List<Dashboard> selectionList = new ArrayList<Dashboard>();
         selectionList.add(dashboard);
-        dashboardModel.setSelection(selectionList);
-        
+        dashboardModel.setSelection(selectionList);        
     }
 
     @Listen("onClick = #addDashboard")

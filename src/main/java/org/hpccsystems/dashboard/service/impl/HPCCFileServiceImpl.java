@@ -12,7 +12,12 @@ import org.hpccsystems.dashboard.entity.widget.LogicalFile;
 import org.hpccsystems.dashboard.service.HPCCFileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.stereotype.Service;
 
+@Service("hpccFileService")
+@Scope(value = "singleton", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class HPCCFileServiceImpl implements HPCCFileService{
     
     private static final Logger LOGGER = LoggerFactory.getLogger(HPCCFileServiceImpl.class);
@@ -39,11 +44,11 @@ public class HPCCFileServiceImpl implements HPCCFileService{
 
                 logicalFile = new LogicalFile();
                 if (hpccLogicalFile.isDirectory()) {
-                    logicalFile.setIsDirectory(true);
+                    logicalFile.setDirectory(true);
                     logicalFile.setFileName(hpccLogicalFile.getFileName());
                     logicalFile = settingScopeBasedOnLength(scope, logicalFile, hpccLogicalFile);
                 } else {
-                    logicalFile.setIsDirectory(false);
+                    logicalFile.setDirectory(false);
                     logicalFile.setFileName(hpccLogicalFile.getFileName());
                 }
                 results.add(logicalFile);

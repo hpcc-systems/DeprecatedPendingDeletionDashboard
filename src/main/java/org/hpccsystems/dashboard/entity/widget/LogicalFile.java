@@ -5,7 +5,7 @@ import java.util.List;
 public class LogicalFile {
     private String fileName;
     private String scope;
-    private Boolean isDirectory;
+    private boolean directory;    
     private List<LogicalFile> childlist;
     
     public String getFileName() {
@@ -20,11 +20,11 @@ public class LogicalFile {
     public void setScope(String scope) {
         this.scope = scope;
     }
-    public Boolean getIsDirectory() {
-        return isDirectory;
+    public boolean isDirectory() {
+        return directory;
     }
-    public void setIsDirectory(Boolean isDirectory) {
-        this.isDirectory = isDirectory;
+    public void setDirectory(boolean directory) {
+        this.directory = directory;
     }
     public List<LogicalFile> getChildlist() {
         return childlist;
