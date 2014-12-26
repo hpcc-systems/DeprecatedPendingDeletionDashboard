@@ -13,8 +13,6 @@ public class Field {
 	public void setColumn(String column) {
 		this.column = column;
 	}
-	
-	
 	public String getDisplayName() {
 		return displayName;
 	}
@@ -28,5 +26,9 @@ public class Field {
 		this.dataType = dataType;
 	}
 
+	public boolean isNumeric() {
+	    //TODO implement
+	    return false;
+	}
 
 }
