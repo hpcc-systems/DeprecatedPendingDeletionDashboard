@@ -24,4 +24,24 @@ public class Constants {
             put(CHARTS.PIE, new ChartConfiguration("pie", "pie.png", "pie"));
         }
     };
+    
+    public enum AGGREGATION {
+        SUM ("SUM"),
+        COUNT ("COUNT"),
+        MIN ("MIN"),
+        MAX ("MAX"),
+        AVG ("AVG"),
+        NONE ("NONE");
+
+        private final String name;       
+
+        private AGGREGATION(String s) {
+            name = s;
+        }
+        public String toString(){
+           return name;
+        }
+
+    }
 }
+

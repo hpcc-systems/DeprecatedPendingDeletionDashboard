@@ -2,6 +2,7 @@ package org.hpccsystems.dashboard.entity.widget.charts;
 
 import java.util.List;
 
+import org.hpccsystems.dashboard.Constants.AGGREGATION;
 import org.hpccsystems.dashboard.entity.widget.Attribute;
 import org.hpccsystems.dashboard.entity.widget.Measure;
 import org.hpccsystems.dashboard.entity.widget.Widget;
@@ -29,10 +30,19 @@ public class XYChart extends Widget{
         .append(attribute.getColumn())
         .append(COMMA);
         measure.stream().forEach(everyMeasure->{
-            sql.append(everyMeasure.getFile())
+            if(everyMeasure.getAggregation()!=null && everyMeasure.getAggregation()!= AGGREGATION.NONE){
+            sql.append(everyMeasure.getAggregation())
+            .append("(")
+            .append(everyMeasure.getFile())
             .append(DOT)
             .append(everyMeasure.getColumn())
-            .append(COMMA);
+            .append(")");
+            } else {
+                sql.append(everyMeasure.getFile())
+                .append(DOT)
+                .append(everyMeasure.getColumn());                
+            }
+            sql.append(COMMA);
         });
         sql.substring(0, sql.length()-4);
         sql.append(" FROM ")

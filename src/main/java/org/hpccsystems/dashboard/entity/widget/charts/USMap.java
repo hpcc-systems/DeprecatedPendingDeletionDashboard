@@ -2,6 +2,7 @@ package org.hpccsystems.dashboard.entity.widget.charts;
 
 import java.util.List;
 
+import org.hpccsystems.dashboard.Constants.AGGREGATION;
 import org.hpccsystems.dashboard.entity.widget.Attribute;
 import org.hpccsystems.dashboard.entity.widget.Measure;
 import org.hpccsystems.dashboard.entity.widget.Widget;
@@ -26,11 +27,20 @@ public class USMap extends Widget{
         .append(states.getFile())
         .append(DOT)
         .append(states.getColumn())
-        .append(COMMA)
+        .append(COMMA);
+        if(measure.getAggregation()!=null && measure.getAggregation()!= AGGREGATION.NONE){
+        sql.append(measure.getAggregation())
+        .append("(")
         .append(measure.getFile())
         .append(DOT)
         .append(measure.getColumn())
-        .append(" FROM ")
+        .append(")");
+        }else{
+            sql.append(measure.getFile())
+            .append(DOT)
+            .append(measure.getColumn());
+        }
+        sql.append(" FROM ")
         .append(states.getFile());
         
         if((this.getFilters()!=null)&&(!this.getFilters().isEmpty())){
