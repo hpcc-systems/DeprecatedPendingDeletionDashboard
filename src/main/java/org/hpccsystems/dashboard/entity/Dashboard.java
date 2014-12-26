@@ -10,8 +10,9 @@ public class Dashboard {
     private String name;
     private String applicationId;    
     private LocalDateTime lastUpDateTime;
-    private int visiblity;      
-   
+    private int visiblity;   
+    private String hpccId;   
+    
     public int getId() {
         return id;
     }
@@ -41,5 +42,11 @@ public class Dashboard {
     }
     public void setVisiblity(int visiblity) {
         this.visiblity = visiblity;
+    }
+    public String getHpccId() {
+        return hpccId;
+    }
+    public void setHpccId(String hpccId) {
+        this.hpccId = hpccId;
     }
 }

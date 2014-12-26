@@ -36,6 +36,7 @@ user_id VARCHAR(100) ,
 application_id VARCHAR(50),
 visibility TINYINT,
 last_updated_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+hpcc_id VARCHAR(100),
 PRIMARY KEY(id)
 ) ENGINE=InnoDB;
 

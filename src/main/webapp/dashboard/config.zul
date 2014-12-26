@@ -26,6 +26,11 @@
 					<radio  zclass="radio-inline" value="1" label="Public"></radio>
 				</radiogroup>
 			</hbox>
+			
+		</hlayout>
+		<hlayout>
+			<label value="${labels.hpccConnection}"/>
+			<combobox id="connectionList" placeholder="${labels.chooseConnection}"></combobox>
 		</hlayout>
 		
 	</vbox>

@@ -1,5 +1,7 @@
 package org.hpccsystems.dashboard.service.impl;
 
+import java.util.List;
+
 import org.hpccsystems.dashboard.dao.DashboardDao;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.service.DashboardService;
@@ -23,6 +25,11 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     public void insertDashboard(Dashboard dashboard,String userId) {
         dashboardDao.insertDashboard(dashboard,userId);
+    }
+
+    @Override
+    public List<Dashboard> getDashboards(String userId, String applicationId) {
+        return dashboardDao.getDashboards(userId,applicationId);
     }
 
 }

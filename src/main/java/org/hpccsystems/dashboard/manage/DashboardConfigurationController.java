@@ -1,5 +1,8 @@
 package org.hpccsystems.dashboard.manage;
 
+import java.util.Map;
+
+import org.hpcc.HIPIE.utils.HPCCConnection;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.service.AuthenticationService;
@@ -13,9 +16,14 @@ import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zul.Combobox;
+import org.zkoss.zul.Comboitem;
+import org.zkoss.zul.ComboitemRenderer;
+import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Radiogroup;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Vbox;
+import org.hpccsystems.dashboard.util.HipieSingleton;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class DashboardConfigurationController extends
@@ -33,13 +41,33 @@ public class DashboardConfigurationController extends
     private AuthenticationService authenticationService;
     @Wire
     private Radiogroup visiblityRadiogroup;
+    @Wire
+    private Combobox connectionList;
     
-    
+    ListModelList<String> connectionModel = new ListModelList<String>();
     @Override
     public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
        
-        parent = this.getSelf().getParent();
+        parent = this.getSelf().getParent();       
+      
+        //Get Hipie's available hpcc connections
+        getHpccConnections();
+    }
+
+    private void getHpccConnections() {
+        Map<String,HPCCConnection> connections = HipieSingleton.getHipie().getHpccManager()
+                .getConnections();
+        connectionModel.addAll(connections.keySet());
+        connectionList.setModel(connectionModel);
+        connectionList.setItemRenderer(new ComboitemRenderer<String>() {
+
+            @Override
+            public void render(Comboitem comboitem, String label, int index)
+                    throws Exception {
+                comboitem.setLabel(label);
+            }
+        });
     }
 
     @Listen("onClick = #configOkButton")
@@ -51,14 +79,15 @@ public class DashboardConfigurationController extends
             dashboard.setName(nameTextbox.getText());
             dashboard.setApplicationId(authenticationService.getUserCredential().getApplicationId());
             dashboard.setVisiblity(Integer.parseInt(visiblityRadiogroup.getSelectedItem().getValue().toString()));
+            dashboard.setHpccId(connectionList.getSelectedItem().getLabel());
             //inserts dashboard into DB
             dashboardService.insertDashboard(dashboard, authenticationService.getUserCredential().getId());
             Events.postEvent(Constants.ON_ADD_DASHBOARD, parent, dashboard);            
         }else{
           //Editing dashboard
             
-        }
-       
+        }       
         this.getSelf().detach();
     }
+    
 }

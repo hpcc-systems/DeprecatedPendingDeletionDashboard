@@ -6,7 +6,6 @@ import org.hpcc.HIPIE.HIPIEService;
 import org.hpcc.HIPIE.utils.HPCCConnection;
 import org.hpccsystems.dashboard.entity.UserCredential;
 import org.hpccsystems.dashboard.entity.widget.Widget;
-import org.hpccsystems.dashboard.service.impl.hipie.HipieSingleton;
 
 public class HIPIEUtil {
 
