@@ -1,16 +1,21 @@
 package org.hpccsystems.dashboard.service.impl;
 
 import java.io.IOException;
+import java.io.StringReader;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.rpc.ServiceException;
-
+import javax.xml.stream.XMLEventReader;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.events.EndElement;
+import javax.xml.stream.events.StartElement;
+import javax.xml.stream.events.XMLEvent;
 import org.apache.commons.lang.StringUtils;
 import org.hpcc.HIPIE.utils.HPCCConnection;
 import org.hpccsystems.dashboard.Constants;
@@ -24,7 +29,6 @@ import org.hpccsystems.dashboard.service.WSSQLService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
-
 import ws_sql.ws.hpccsystems.ExecuteSQLRequest;
 import ws_sql.ws.hpccsystems.Ws_sqlLocator;
 import ws_sql.ws.hpccsystems.Ws_sqlServiceSoap;
@@ -88,10 +92,49 @@ public class WSSQLServiceImpl implements WSSQLService{
 
 	}
 
-    private static ChartdataJSON parseChartdataResponse(List<String> columns, String responseXML){
-        //TODO Implemented by Senthil
-        return null;
-    };
+	/* Sample response xml
+	 * 
+	 * <Dataset name='WsSQLResult'> <Row><productcode>S10_1678</productcode><quantityinstock>7933</quantityinstock><buyprice>48.81</buyprice></Row></Dataset>
+	 * 
+	 */
+	
+    @SuppressWarnings("unused")
+	private static ChartdataJSON parseChartdataResponse(List<String> columns, String responseXML){
+    	ChartdataJSON dataJSON=null;
+    	if (responseXML != null && responseXML.length() > 0) {
+    		XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+    		try {
+				XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(new StringReader(responseXML));
+				List <List<Object>> dataList=new ArrayList<List<Object>>();List<Object> dataRowList=null;
+				while(xmlEventReader.hasNext()){
+					XMLEvent xmlEvent = xmlEventReader.nextEvent();
+					if (xmlEvent.isStartElement()){
+	                       StartElement startElement = xmlEvent.asStartElement();
+	                       if(startElement.getName().getLocalPart().equals("Row")){
+	                    	   dataRowList=new ArrayList<Object>();
+	                       }
+	                       else if(!startElement.getName().getLocalPart().equals("Dataset")){
+	                           xmlEvent = xmlEventReader.nextEvent();
+	                           dataRowList.add(xmlEvent.asCharacters().getData());
+	                       }
+	                }
+					if(xmlEvent.isEndElement()){
+                       EndElement endElement = xmlEvent.asEndElement();
+                       if(endElement.getName().getLocalPart().equals("Row")){
+                    	   dataList.add(dataRowList);
+                       }
+	               }
+				}
+				dataJSON=new ChartdataJSON();
+				dataJSON.setColumns(columns);
+				dataJSON.setData(dataList);
+				LOGGER.info("data list {}",dataList);
+			} catch (XMLStreamException e) {
+				LOGGER.error(Constants.EXCEPTION, e);
+			}
+    	}
+        return dataJSON;
+    }
     
     @Override
     public List<String> getDistinctValues(Field field, HPCCConnection connection, String fileName, List<Filter> filters) throws Exception  {
