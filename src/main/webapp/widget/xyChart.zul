@@ -20,12 +20,12 @@
 				
 				<listbox width="200px" height="270px" id="chartMeasureListbox">
 					<listhead>
-						<listheader label="${labels.measures}"></listheader>
+						<listheader label="${labels.chartMeasures}"></listheader>
 					</listhead>
 				</listbox>
 				<listbox width="200px" height="270px" id="chartAttributeListbox">
 					<listhead>
-						<listheader label="${labels.attributes}"></listheader>
+						<listheader label="${labels.chartAttributes}"></listheader>
 					</listhead>
 				</listbox>
 				<include id="filterHolder"></include>
