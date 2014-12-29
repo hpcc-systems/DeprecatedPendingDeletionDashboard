@@ -14,6 +14,7 @@ import org.hpcc.HIPIE.dude.OutputElement;
 import org.hpcc.HIPIE.dude.RecordInstance;
 import org.hpcc.HIPIE.dude.VisualElement;
 import org.hpcc.HIPIE.utils.HPCCConnection;
+import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.widget.Widget;
 import org.hpccsystems.dashboard.service.AuthenticationService;
@@ -31,7 +32,7 @@ import org.zkoss.zkplus.spring.SpringUtil;
 @Scope(value = "singleton", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class CompositionServiceImpl implements CompositionService{
     
-    private static final Logger LOG = LoggerFactory.getLogger(CompositionServiceImpl.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(CompositionServiceImpl.class);
     private AuthenticationService authenticationService;
     private static final String HIPIE_RAW_DATASET  = "RawDataset";
     
@@ -60,7 +61,7 @@ public class CompositionServiceImpl implements CompositionService{
             composition = HipieSingleton.getHipie().saveCompositionAs(authenticationService.getUserCredential().getId(), composition,
                      compName + ".cmp");
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error(Constants.EXCEPTION, e);
         }
     }
 
@@ -73,7 +74,7 @@ public class CompositionServiceImpl implements CompositionService{
             comp = hipieService.getComposition(userId,dashboard.getCompositionName());
             hipieService.runComposition(comp, dashboard.getHpccConnection(), userId);
         } catch (Exception e) {
-            e.printStackTrace();
+            LOGGER.error(Constants.EXCEPTION, e);
         }
     }
     
@@ -141,8 +142,8 @@ public class CompositionServiceImpl implements CompositionService{
             pluginInstance.setProperty(propertyName,propertyValue)
         );
       
-        if(LOG.isDebugEnabled()) {
-            LOG.debug("Visuslisation plugin - " + pluginInstance.toCompositionString());
+        if(LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Visuslisation plugin - " + pluginInstance.toCompositionString());
         }
         return  pluginInstance;
     }
