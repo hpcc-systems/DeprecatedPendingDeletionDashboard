@@ -3,7 +3,7 @@ package org.hpccsystems.dashboard.manage.widget;
 import org.hpcc.HIPIE.utils.HPCCConnection;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.widget.LogicalFile;
-import org.hpccsystems.dashboard.entity.widget.WidgetConfiguration;
+import org.hpccsystems.dashboard.manage.WidgetConfiguration;
 import org.hpccsystems.dashboard.model.widget.LogicalFileTreeModel;
 import org.hpccsystems.dashboard.service.HPCCFileService;
 import org.slf4j.Logger;
@@ -17,6 +17,7 @@ import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Tree;
@@ -51,12 +52,11 @@ public class FileBrowserController extends SelectorComposer<Component> {
         hpccConnection = widgetConfiguration.getDashboard().getHpccConnection();
         
         comp.addEventListener(ON_LOADING, Event -> {
-            if(LOGGER.isDebugEnabled()) {
-                LOGGER.debug("inside event..!!");
-            }
             constructFileBrowser();
+            Clients.clearBusy(FileBrowserController.this.getSelf());
         });
         
+        Clients.showBusy(this.getSelf(), "Loading file list");
         Events.echoEvent(ON_LOADING, comp, null);
     }
 

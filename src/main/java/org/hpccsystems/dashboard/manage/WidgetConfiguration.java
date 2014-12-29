@@ -1,6 +1,8 @@
-package org.hpccsystems.dashboard.entity.widget;
+package org.hpccsystems.dashboard.manage;
 
 import org.hpccsystems.dashboard.entity.Dashboard;
+import org.hpccsystems.dashboard.entity.widget.ChartConfiguration;
+import org.hpccsystems.dashboard.entity.widget.Widget;
 import org.zkoss.zk.ui.Component;
 
 public class WidgetConfiguration {
@@ -10,9 +12,9 @@ public class WidgetConfiguration {
     private Dashboard dashboard;
     private Component holder;
     private Widget widget;
-
-    public WidgetConfiguration(Component holder) {
-        this.holder = holder;
+    
+    public WidgetConfiguration(Dashboard dashboard) {
+        this.dashboard = dashboard;
     }
 
     public Widget getWidget() {
