@@ -1,6 +1,6 @@
 <zk xmlns="http://www.zkoss.org/2005/zul">
 	<vlayout id="editWindowLayout"
-		apply="org.hpccsystems.dashboard.manage.PieChartController"
+		apply="org.hpccsystems.dashboard.manage.widget.PieChartController"
 		style="background-color: white;">
 		<hlayout id="editLayout">
 			<vbox spacing="0em">

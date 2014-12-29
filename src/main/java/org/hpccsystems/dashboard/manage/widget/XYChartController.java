@@ -1,4 +1,4 @@
-package org.hpccsystems.dashboard.manage;
+package org.hpccsystems.dashboard.manage.widget;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -16,7 +16,7 @@ import org.zkoss.zul.Tabbox;
  * 
  */
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public class USMapController extends SelectorComposer<Component> {
+public class XYChartController extends SelectorComposer<Component> {
     private static final long serialVersionUID = 1L;
     
     @Wire
