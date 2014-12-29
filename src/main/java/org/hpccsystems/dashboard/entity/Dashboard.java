@@ -9,13 +9,20 @@ public class Dashboard {
     private String name;
     private String applicationId;    
     private int visiblity;   
-    private String hpccId;   
+    private String hpccId;
+    private String compositionName;
     
     public int getId() {
         return id;
     }
     public void setId(int id) {
         this.id = id;
+    }
+    public String getCompositionName() {
+        return compositionName;
+    }
+    public void setCompositionName(String compositionName) {
+        this.compositionName = compositionName;
     }
     public String getName() {
         return name;
