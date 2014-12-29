@@ -77,6 +77,7 @@ public class ChartListController extends SelectorComposer<Grid>{
     @Listen("onClick = #add")
     public void addChart() {
         widgetConfiguration.setChartConfiguration(Constants.CHART_CONFIGURATIONS.get(CHART_TYPES.PIE));
+        widgetConfiguration.setWidget(new Pie());
         Events.postEvent(WidgetConfiguration.ON_CHART_TYPE_SELECT, widgetConfiguration.getHolder(), null);
     }
 }

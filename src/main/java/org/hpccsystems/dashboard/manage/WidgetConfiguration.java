@@ -7,6 +7,7 @@ import org.zkoss.zk.ui.Component;
 
 public class WidgetConfiguration {
     public static final String ON_CHART_TYPE_SELECT = "onChartTypeSelect";
+    public static final String ON_FILE_SELECT = "onFileSelect";
     
     private ChartConfiguration chartConfiguration;
     private Dashboard dashboard;

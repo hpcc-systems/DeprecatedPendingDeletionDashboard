@@ -3,6 +3,8 @@ package org.hpccsystems.dashboard.manage.widget;
 import org.hpcc.HIPIE.utils.HPCCConnection;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.widget.LogicalFile;
+import org.hpccsystems.dashboard.entity.widget.Widget;
+import org.hpccsystems.dashboard.entity.widget.charts.Pie;
 import org.hpccsystems.dashboard.manage.WidgetConfiguration;
 import org.hpccsystems.dashboard.model.widget.LogicalFileTreeModel;
 import org.hpccsystems.dashboard.service.HPCCFileService;
@@ -14,6 +16,7 @@ import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.select.SelectorComposer;
+import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
@@ -101,6 +104,12 @@ public class FileBrowserController extends SelectorComposer<Component> {
                 treeitem.setSelected(false);
             }
         }
+    }
+    
+    @Listen("onClick = #visualize") 
+    public void onVisualize() {
+        widgetConfiguration.getWidget().setLogicalFile(selectedFile.getText());
+        Events.postEvent(WidgetConfiguration.ON_FILE_SELECT, widgetConfiguration.getHolder(), null);
     }
 
 }

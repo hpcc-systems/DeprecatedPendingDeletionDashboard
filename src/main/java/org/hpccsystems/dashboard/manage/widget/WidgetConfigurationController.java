@@ -4,8 +4,6 @@ import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.manage.WidgetConfiguration;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
-import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zul.Include;
@@ -26,12 +24,11 @@ public class WidgetConfigurationController extends SelectorComposer<Component> {
         
         holder.setDynamicProperty(Constants.WIDGET_CONFIG, configuration);
         holder.setSrc("widget/chartList.zul");
-        holder.addEventListener(WidgetConfiguration.ON_CHART_TYPE_SELECT, new EventListener<Event>() {
-
-            @Override
-            public void onEvent(Event event) throws Exception {
+        holder.addEventListener(WidgetConfiguration.ON_CHART_TYPE_SELECT, Event -> {
                 holder.setSrc("widget/fileBrowser.zul");
-            }
+        });
+        holder.addEventListener(WidgetConfiguration.ON_FILE_SELECT, Event -> {
+            holder.setSrc("widget/pie.zul");
         });
     }
 

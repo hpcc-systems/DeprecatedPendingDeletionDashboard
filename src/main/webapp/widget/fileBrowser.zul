@@ -23,7 +23,7 @@
 					</vbox>
 					<div width="150px" align="center">
 						<button label="${labels.visualize}"
-							zclass="btn btn-success" id="visualizeBtn">
+							zclass="btn btn-success" id="visualize">
 						</button>
 					</div>
 				</hbox>
