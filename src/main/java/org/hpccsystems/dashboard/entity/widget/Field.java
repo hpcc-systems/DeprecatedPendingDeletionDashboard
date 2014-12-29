@@ -1,5 +1,7 @@
 package org.hpccsystems.dashboard.entity.widget;
 
+import java.util.Optional;
+
 
 public class Field {
 
@@ -7,16 +9,18 @@ public class Field {
 	private String dataType;
 	private String file;
 	
+	public Field() {
+	}
+	
 	public Field(String column, String dataType) {
 	    this.column = column;
 	    this.dataType = dataType;
     }
 	
-	public Field() {
-        super();
+    public Field(Field field) {
+        this.column = field.column;
+        this.dataType = field.dataType;
     }
-
-
 
     public String getColumn() {
 		return column;
@@ -32,7 +36,14 @@ public class Field {
 	}
 
 	public boolean isNumeric() {
-	    //TODO implement
+	    Optional<String> optionalDatatype = Optional.ofNullable(dataType);
+	    if(optionalDatatype.isPresent()) {
+	        String lowerCaseType = optionalDatatype.get().trim().toLowerCase();
+	        if(lowerCaseType.contains("integer") || lowerCaseType.contains("real") 
+	                || lowerCaseType.contains("decimal") || lowerCaseType.contains("unsigned")) {
+	            return true;
+	        }
+	    }
 	    return false;
 	}
 	public String getFile() {

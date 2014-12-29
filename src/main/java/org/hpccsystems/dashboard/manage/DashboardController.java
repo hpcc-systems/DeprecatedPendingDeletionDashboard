@@ -18,7 +18,7 @@ public class DashboardController extends SelectorComposer<Component>{
     @Listen("onClick = #addWidget")
     public void onAddWidget() {
         //TODO Remove instantiation
-        Dashboard dashboard = new Dashboard();
+        dashboard = new Dashboard();
         dashboard.setHpccId("dev-dashboard");
         
         Window window = (Window)Executions.createComponents(

@@ -24,10 +24,11 @@ public class WidgetConfigurationController extends SelectorComposer<Component> {
         
         holder.setDynamicProperty(Constants.WIDGET_CONFIG, configuration);
         holder.setSrc("widget/chartList.zul");
-        holder.addEventListener(WidgetConfiguration.ON_CHART_TYPE_SELECT, Event -> {
+        holder.addEventListener(WidgetConfiguration.ON_CHART_TYPE_SELECT, event -> {
                 holder.setSrc("widget/fileBrowser.zul");
         });
-        holder.addEventListener(WidgetConfiguration.ON_FILE_SELECT, Event -> {
+        
+        holder.addEventListener(WidgetConfiguration.ON_FILE_SELECT, event -> {
             holder.setSrc("widget/pie.zul");
         });
     }

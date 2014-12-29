@@ -3,8 +3,6 @@ package org.hpccsystems.dashboard.manage.widget;
 import org.hpcc.HIPIE.utils.HPCCConnection;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.widget.LogicalFile;
-import org.hpccsystems.dashboard.entity.widget.Widget;
-import org.hpccsystems.dashboard.entity.widget.charts.Pie;
 import org.hpccsystems.dashboard.manage.WidgetConfiguration;
 import org.hpccsystems.dashboard.model.widget.LogicalFileTreeModel;
 import org.hpccsystems.dashboard.service.HPCCFileService;

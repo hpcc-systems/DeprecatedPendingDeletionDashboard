@@ -1,7 +1,6 @@
 package org.hpccsystems.dashboard.manage;
 
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 import org.hpccsystems.dashboard.Constants;

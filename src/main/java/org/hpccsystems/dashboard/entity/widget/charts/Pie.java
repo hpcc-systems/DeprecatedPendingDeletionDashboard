@@ -11,33 +11,34 @@ import org.hpccsystems.dashboard.entity.widget.Measure;
 import org.hpccsystems.dashboard.entity.widget.Widget;
 
 public class Pie extends Widget {
-    private Attribute weight;
-    private Measure label;
     private static final String DOT = ".";
     private static final String COMMA = " , ";
-    private static StringBuilder sql=new StringBuilder();
+    
+    private Attribute labels;
+    private Measure weight;
 
     @Override
     public String generateSQL() {        
+        StringBuilder sql=new StringBuilder();
         sql.append("SELECT ")
-        .append(weight.getFile())
+        .append(labels.getFile())
         .append(DOT)
-        .append(weight.getColumn())
+        .append(labels.getColumn())
         .append(COMMA);
-        if(label.getAggregation()!=null && label.getAggregation()!= AGGREGATION.NONE){
-            sql.append(label.getAggregation())
+        if(weight.getAggregation()!=null && weight.getAggregation()!= AGGREGATION.NONE){
+            sql.append(weight.getAggregation())
             .append("(")
-            .append(label.getFile())
+            .append(weight.getFile())
             .append(DOT)
-            .append(label.getColumn())
+            .append(weight.getColumn())
             .append(")");
         }else{
-            sql.append(label.getFile())
+            sql.append(weight.getFile())
             .append(DOT)
-            .append(label.getColumn());
+            .append(weight.getColumn());
         }
         sql.append(" FROM ")
-        .append(weight.getFile());
+        .append(labels.getFile());
         
         if((this.getFilters()!=null)&&(!this.getFilters().isEmpty())){
                 sql.append(" WHERE ");
@@ -57,19 +58,19 @@ public class Pie extends Widget {
     }
 
     public Attribute getWeight() {
-        return weight;
+        return labels;
     }
 
     public void setWeight(Attribute weight) {
-        this.weight = weight;
+        this.labels = weight;
     }
 
     public Measure getLabel() {
-        return label;
+        return weight;
     }
 
     public void setLabel(Measure label) {
-        this.label = label;
+        this.weight = label;
     }
 
     @Override

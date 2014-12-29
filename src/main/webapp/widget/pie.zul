@@ -1,45 +1,44 @@
-<zk xmlns="http://www.zkoss.org/2005/zul">
-	<vlayout id="editWindowLayout"
-		apply="org.hpccsystems.dashboard.manage.widget.PieChartController"
-		style="background-color: white;">
-		<hlayout id="editLayout">
-			<vbox spacing="0em">
-				<listbox width="200px" height="270px" id="measureListbox">
-					<listhead>
-						<listheader label="${labels.measures}"></listheader>
-					</listhead>
-				</listbox>
-				<listbox width="200px" height="270px" id="attributeListbox">
-					<listhead>
-						<listheader label="${labels.attributes}"></listheader>
-					</listhead>
-				</listbox>
-			</vbox>
+<vlayout id="editWindowLayout"
+	apply="org.hpccsystems.dashboard.manage.widget.PieChartController"
+	style="background-color: white;"
+	vflex="1">
+	<hlayout id="editLayout" vflex="1">
+		<vbox spacing="0em" vflex="1">
+			<listbox width="200px" id="measureListbox" vflex="1">
+				<listhead>
+					<listheader label="${labels.measures}"></listheader>
+				</listhead>
+			</listbox>
+			<listbox width="200px" id="attributeListbox" vflex="1">
+				<listhead>
+					<listheader label="${labels.attributes}"></listheader>
+				</listhead>
+			</listbox>
+		</vbox>
 
-			<vbox spacing="0em">	
-				
-				<listbox width="200px" height="270px" id="chartMeasureListbox">
-					<listhead>
-						<listheader label="${labels.weight}"></listheader>
-					</listhead>
-				</listbox>
-				<listbox width="200px" height="270px" id="chartAttributeListbox">
-					<listhead>
-						<listheader label="${labels.label}"></listheader>
-					</listhead>
-				</listbox>
-				<include id="filterHolder"></include>
-				
-			</vbox>
+		<vbox spacing="0em" vflex="1">	
+			
+			<listbox width="200px" vflex="1" id="weightListbox" droppable="true">
+				<listhead>
+					<listheader label="${labels.weight}"></listheader>
+				</listhead>
+			</listbox>
+			<listbox width="200px" vflex="1" id="labelListbox" droppable="true">
+				<listhead>
+					<listheader label="${labels.label}"></listheader>
+				</listhead>
+			</listbox>
+			
+			<include id="filterHolder"></include>
+			
+		</vbox>
 
-			<div vflex="1" hflex="1"
-				style="border: 1px solid; border-color: rgb(184, 177, 177);"
-				id="chart">
+		<div vflex="1" hflex="1"
+			style="border: 1px solid; border-color: rgb(184, 177, 177);"
+			id="chart">
 
-			</div>
+		</div>
 
-		</hlayout>
-	</vlayout>
-
-</zk>
+	</hlayout>
+</vlayout>
 

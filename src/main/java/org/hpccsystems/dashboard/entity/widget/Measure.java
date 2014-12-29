@@ -7,6 +7,14 @@ public class Measure extends Field {
     private AGGREGATION aggregation;
     private String displayName;
 
+    public Measure() {
+    }
+    
+    public Measure(Field field) {
+        super(field);
+        this.setDisplayName(field.getColumn());
+    }
+
     public String getDisplayName() {
         return displayName;
     }
