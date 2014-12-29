@@ -31,7 +31,7 @@ public class WidgetConfigurationController extends SelectorComposer<Component> {
 
             @Override
             public void onEvent(Event event) throws Exception {
-                holder.setSrc("widget/pie.zul");
+                holder.setSrc("widget/fileBrowser.zul");
             }
         });
     }

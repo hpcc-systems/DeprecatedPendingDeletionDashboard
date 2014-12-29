@@ -3,11 +3,12 @@
 	width="700px"
 	height="700px" 
 	closable="true"
+	sizable="true"
 	apply="org.hpccsystems.dashboard.manage.widget.WidgetConfigurationController">
 	<caption iconSclass="glyphicon glyphicon-cog">
 		<button iconSclass="z-icon-check" id="configOkButton" /> 
 	</caption>	
 	
-	<include id="holder"></include>
+	<include id="holder" vflex="1"></include>
 </window>
 </zk>

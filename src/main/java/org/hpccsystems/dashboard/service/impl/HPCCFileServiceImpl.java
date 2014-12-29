@@ -40,8 +40,6 @@ public class HPCCFileServiceImpl implements HPCCFileService{
             resultsArray = hpccConnection.getFilenames(scope);
             LogicalFile logicalFile;
             for (HPCCLogicalFile hpccLogicalFile : resultsArray) {
-                LOGGER.debug("File - {}", hpccLogicalFile);
-
                 logicalFile = new LogicalFile();
                 if (hpccLogicalFile.isDirectory()) {
                     logicalFile.setDirectory(true);

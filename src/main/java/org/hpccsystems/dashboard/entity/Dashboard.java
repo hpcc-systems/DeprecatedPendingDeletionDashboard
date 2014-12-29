@@ -43,8 +43,7 @@ public class Dashboard {
     }
     
     /**
-     * @return Returns HPCCConnection from HIPIE based on the Hpcc server type
-     * selected from UI 
+     * @return HPCCConnection corresponding to this.hpccId
      */
     public HPCCConnection getHpccConnection() {
         if(getHpccId() != null){

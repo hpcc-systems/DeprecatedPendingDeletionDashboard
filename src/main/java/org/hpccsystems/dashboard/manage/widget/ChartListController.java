@@ -4,24 +4,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-
-
-
-
-
-
-
-
-import javax.security.auth.login.Configuration;
-
-
-
-
-
-
-
-
-
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.Constants.CHART_TYPES;
 import org.hpccsystems.dashboard.entity.widget.ChartConfiguration;
@@ -94,13 +76,7 @@ public class ChartListController extends SelectorComposer<Grid>{
     
     @Listen("onClick = #add")
     public void addChart() {
-        Widget widget = new Pie();
-        widget.setType(CHART_TYPES.PIE);
-        widgetConfiguration.setWidget(widget);
-        
-        if(LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Posting event to {}", widgetConfiguration.getHolder());
-        }
+        widgetConfiguration.setChartConfiguration(Constants.CHART_CONFIGURATIONS.get(CHART_TYPES.PIE));
         Events.postEvent(WidgetConfiguration.ON_CHART_TYPE_SELECT, widgetConfiguration.getHolder(), null);
     }
 }
