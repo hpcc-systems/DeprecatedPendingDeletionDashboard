@@ -1,18 +1,13 @@
 package org.hpccsystems.dashboard.entity;
 
-import java.time.LocalDateTime;
-
 import org.hpcc.HIPIE.utils.HPCCConnection;
 import org.hpccsystems.dashboard.util.HipieSingleton;
 
 
 public class Dashboard {
-
-
     private int id;
     private String name;
     private String applicationId;    
-    private LocalDateTime lastUpDateTime;
     private int visiblity;   
     private String hpccId;   
     
@@ -33,13 +28,7 @@ public class Dashboard {
     }
     public void setApplicationId(String applicationId) {
         this.applicationId = applicationId;
-    }    
-    public LocalDateTime getLastUpDateTime() {
-        return lastUpDateTime;
-    }
-    public void setLastUpDateTime(LocalDateTime lastUpDateTime) {
-        this.lastUpDateTime = lastUpDateTime;
-    }    
+    }       
     public int getVisiblity() {
         return visiblity;
     }

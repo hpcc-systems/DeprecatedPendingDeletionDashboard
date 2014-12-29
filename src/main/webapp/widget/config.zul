@@ -1,10 +1,13 @@
 <zk>
-<window title="Widget Configuration" border="normal" 
+<window title="Widget Configuration" border="normal"
+	width="700px"
+	height="700px" 
 	closable="true"
 	apply="org.hpccsystems.dashboard.manage.widget.WidgetConfigurationController">
 	<caption iconSclass="glyphicon glyphicon-cog">
 		<button iconSclass="z-icon-check" id="configOkButton" /> 
 	</caption>	
 	
+	<include id="holder"></include>
 </window>
 </zk>

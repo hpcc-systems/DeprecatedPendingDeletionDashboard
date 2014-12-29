@@ -17,12 +17,14 @@ public class Constants {
     public static final String UNABLE_TO_FETCH_DATA = "Unable to fetch Hpcc data";
     public static final String HPCC_CONNECTION = "hpccConnection";
     
-    public static enum CHARTS {PIE, DONUT, LINE, BAR, COLUMN, US_MAP}; 
-
-    public static final Map<CHARTS, ChartConfiguration> CHART_CONFIGURATIONS = new HashMap<CHARTS, ChartConfiguration>(){
+    public static final String WIDGET_CONFIG = "widgetWrapper";
+    
+    public static enum CHART_TYPES {PIE, DONUT, LINE, BAR, COLUMN, US_MAP};
+    
+    public static final Map<CHART_TYPES, ChartConfiguration> CHART_CONFIGURATIONS = new HashMap<CHART_TYPES, ChartConfiguration>(){
         private static final long serialVersionUID = 1L;
         {
-            put(CHARTS.PIE, new ChartConfiguration("pie", "pie.png", "pie"));
+            put(CHART_TYPES.PIE, new ChartConfiguration(CHART_TYPES.PIE, "pie", "pie.png", "pie"));
         }
     };
     

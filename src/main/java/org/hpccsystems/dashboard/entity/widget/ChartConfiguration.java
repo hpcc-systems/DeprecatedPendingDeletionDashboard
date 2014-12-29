@@ -1,11 +1,15 @@
 package org.hpccsystems.dashboard.entity.widget;
 
+import org.hpccsystems.dashboard.Constants.CHART_TYPES;
+
 public class ChartConfiguration {
+    private CHART_TYPES type;
     private String name;
     private String staticImage;
     private String editLayout;
     
-    public ChartConfiguration(String name, String image, String layout) {
+    public ChartConfiguration(CHART_TYPES type, String name, String image, String layout) {
+        this.setType(type);
         this.name = name;
         this.staticImage = image;
         this.editLayout = layout;
@@ -28,5 +32,13 @@ public class ChartConfiguration {
     }
     public void setEditLayout(String editLayout) {
         this.editLayout = editLayout;
+    }
+
+    public CHART_TYPES getType() {
+        return type;
+    }
+
+    public void setType(CHART_TYPES type) {
+        this.type = type;
     }
 }

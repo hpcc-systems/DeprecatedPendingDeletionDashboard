@@ -1,0 +1,16 @@
+<vlayout>
+	<grid 
+		apply="org.hpccsystems.dashboard.manage.widget.ChartListController">
+		<columns>
+			<column></column>
+			<column></column>
+			<column></column>
+			<column></column>
+		</columns>
+		<foot>
+			<footer>
+				<button id="add">Chart</button>
+			</footer>
+		</foot>
+	</grid>
+</vlayout>

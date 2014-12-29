@@ -41,6 +41,7 @@ public class FileBrowserController extends SelectorComposer<Component> {
     private Textbox selectedFile;
     
     private HPCCConnection hpccConnection;
+    
     @Override
     public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
