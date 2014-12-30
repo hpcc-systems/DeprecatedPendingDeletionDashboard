@@ -20,6 +20,7 @@ import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.ListitemRenderer;
 import org.zkoss.zul.Window;
@@ -54,6 +55,9 @@ public class NavigationController extends SelectorComposer<Component> {
             @Override
             public void render(Listitem listitem, Dashboard dashboard, int index)
                     throws Exception {
+                Listcell iconChild = new Listcell();
+                iconChild.setIconSclass("z-icon-bar-chart-o");
+                listitem.appendChild(iconChild);
                 listitem.setLabel(dashboard.getName());
                 listitem.setAttribute(Constants.DASHBOARD, dashboard);
             }
