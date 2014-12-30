@@ -184,4 +184,8 @@ public class XYChart extends Widget{
         return inputs;
     }
 
+    @Override
+    public boolean isConfigured() {
+        return (this.getAttribute()!=null)&&(this.getMeasures()!=null)&&(!this.getMeasures().isEmpty());
+    }
 }

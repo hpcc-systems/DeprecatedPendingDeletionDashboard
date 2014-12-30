@@ -155,5 +155,10 @@ public class USMap extends Widget{
         return inputs;
 
     }
+    
+    @Override
+    public boolean isConfigured() {
+        return (this.getState()!=null)&&(this.getMeasure()!=null);
+    }
 
 }
