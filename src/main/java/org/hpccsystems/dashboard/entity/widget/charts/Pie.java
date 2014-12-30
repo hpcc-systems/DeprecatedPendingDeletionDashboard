@@ -153,4 +153,9 @@ public class Pie extends Widget {
         return inputs;
     
     }
+
+    @Override
+    public boolean isConfigured() {
+        return (this.weight!=null)&&(this.labels!=null);
+    }
 }

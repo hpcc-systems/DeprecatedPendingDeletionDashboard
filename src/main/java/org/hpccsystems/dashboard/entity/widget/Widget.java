@@ -13,6 +13,8 @@ public abstract class Widget {
     private String title;
     private ChartConfiguration chartConfiguration;   
     
+    public abstract boolean isConfigured();
+    
     public abstract List<String> getColumns();
     public abstract String generateSQL();
     public abstract VisualElement generateVisualElement();

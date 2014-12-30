@@ -3,13 +3,17 @@ package org.hpccsystems.dashboard.manage.widget;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.hpcc.HIPIE.utils.HPCCConnection;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.widget.Attribute;
+import org.hpccsystems.dashboard.entity.widget.ChartdataJSON;
 import org.hpccsystems.dashboard.entity.widget.Field;
 import org.hpccsystems.dashboard.entity.widget.Measure;
 import org.hpccsystems.dashboard.entity.widget.charts.Pie;
 import org.hpccsystems.dashboard.manage.WidgetConfiguration;
 import org.hpccsystems.dashboard.service.HPCCFileService;
+import org.hpccsystems.dashboard.service.WSSQLService;
+import org.zkoss.zhtml.Div;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.DropEvent;
@@ -26,6 +30,8 @@ import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.ListitemRenderer;
+
+import com.google.gson.Gson;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class PieChartController extends SelectorComposer<Component> {
@@ -51,14 +57,22 @@ public class PieChartController extends SelectorComposer<Component> {
     @WireVariable
     private HPCCFileService hpccFileService;
     
+    @WireVariable
+    private WSSQLService wssqlService;
+    private HPCCConnection hpccConnection;
+    @Wire
+    private Div chart;
+    
     private ListitemRenderer<Field> measureRenderer = (listitem, field, index) -> {
         listitem.setLabel(field.getColumn());
         listitem.setDraggable(Constants.TRUE);
+        listitem.setValue(field);
     };
     
     private ListitemRenderer<Field> attributeRenderer = (listitem, field, index) -> {
         listitem.setLabel(field.getColumn());
         listitem.setDraggable(Constants.TRUE);
+        listitem.setValue(field);
     };
     
     private ListitemRenderer<Measure> weightRenderer = (listitem, measure, index) -> {
@@ -93,7 +107,7 @@ public class PieChartController extends SelectorComposer<Component> {
         super.doAfterCompose(comp);
         widgetConfiguration = (WidgetConfiguration) Executions.getCurrent().getArg().get(Constants.WIDGET_CONFIG);
         pie = (Pie) widgetConfiguration.getWidget();
-        
+        hpccConnection = widgetConfiguration.getDashboard().getHpccConnection();
         comp.addEventListener(ON_LOADING, loadingListener);
         
         Clients.showBusy(comp, "Fetching fields");
@@ -110,15 +124,45 @@ public class PieChartController extends SelectorComposer<Component> {
         Listitem draggedItem = (Listitem) event.getDragged();
         Field field = draggedItem.getValue();
         Measure measure = new Measure(field);
-        weights.add(measure);
+        if(event.getDragged().getParent().equals(attributeListbox)){
+            Clients.showNotification("Only measure objects can be dropped","warning",weightListbox,"end_center", 5000, true);
+        }else{
+            weights.add(measure);
+            weightListbox.setDroppable("false");
+        }
+        if(pie.isConfigured()) {            
+            try {
+                drawChart();
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
     }
-    
+
     @Listen("onDrop = #labelListbox")
     public void onDropLabel(DropEvent event) {
         Listitem draggedItem = (Listitem) event.getDragged();
         Field field = draggedItem.getValue();
         Attribute attribute = new Attribute(field);
         labels.add(attribute);
+        labelListbox.setDroppable("false");
+        if(pie.isConfigured()) {            
+            try {
+                drawChart();
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
     }
+    
+    private void drawChart() throws Exception {
+        
+        ChartdataJSON chartData = wssqlService.getChartdata(pie, hpccConnection);
+        Clients.evalJavaScript("visualize('"+chart.getUuid()+"','pie','"+new Gson().toJson(new ChartdataJSON())+")");
+    }
+    
+    
 }
 
