@@ -26,7 +26,7 @@ public class Constants {
     public static final Map<CHART_TYPES, ChartConfiguration> CHART_CONFIGURATIONS = new HashMap<CHART_TYPES, ChartConfiguration>(){
         private static final long serialVersionUID = 1L;
         {
-            put(CHART_TYPES.PIE, new ChartConfiguration(CHART_TYPES.PIE, "pie", "pie.png", "widget/pie.zul"));
+            put(CHART_TYPES.PIE, new ChartConfiguration(CHART_TYPES.PIE, "pie", "pie.png", "widget/pie.zul", "PIE", "C3_PIE"));
         }
     };
     
