@@ -1,0 +1,26 @@
+.menu {
+}
+
+.menu .faChar {
+    fill: white;
+    cursor: pointer;
+}
+
+.menu.disabled .faChar {
+    visibility: hidden;
+    cursor: inherit;
+}
+
+.menu .list .textbox .shape {
+    fill: #1f77b4;
+    stroke: #1f77b4;
+}
+
+.menu .list .textbox .text {
+    fill: white;
+}
+
+.menu .list .textbox .shape:hover {
+    fill: #ff7f0e;
+    stroke: #ff7f0e;
+}

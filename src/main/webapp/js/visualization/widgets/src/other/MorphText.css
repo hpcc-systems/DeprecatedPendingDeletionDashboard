@@ -1,0 +1,14 @@
+.demoText {
+}
+
+.demoText .enter {
+  fill: green;
+}
+
+.demoText .update {
+  fill: #333;
+}
+
+.demoText .exit {
+  fill: brown;
+}

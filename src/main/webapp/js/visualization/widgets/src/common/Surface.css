@@ -1,0 +1,25 @@
+.surface .container {
+    fill: #f9fcff;
+    stroke: #1f77b4;
+    stroke-width: 1.0px;
+}
+
+.surface .title {
+    cursor: move;
+}
+
+.surface .title rect {
+    fill: #1f77b4;
+    stroke: #1f77b4;
+    stroke-width: 1.0px;
+}
+
+.surface .title text {
+    fill: white;
+    stroke: none;
+}
+
+.surface .more {
+    fill: white;
+    stroke: none;
+}

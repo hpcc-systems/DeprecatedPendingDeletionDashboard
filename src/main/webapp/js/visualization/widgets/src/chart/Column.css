@@ -1,0 +1,24 @@
+.column .columnRect {
+  fill: steelblue;
+  cursor: pointer;
+}
+
+.column .columnRect:hover {
+  fill: #ff7f0e;
+}
+
+.column .axis {
+  fill: black;
+  font: 10px sans-serif;
+}
+
+.column .axis path,
+.column .axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.column .x.axis path {
+  display: none;
+}
