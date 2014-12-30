@@ -31,6 +31,9 @@ import org.hpccsystems.dashboard.exception.HpccConnectionException;
 import org.hpccsystems.dashboard.service.WSSQLService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.stereotype.Service;
 import org.xml.sax.SAXException;
 
 import ws_sql.ws.hpccsystems.ExecuteSQLRequest;
@@ -38,7 +41,8 @@ import ws_sql.ws.hpccsystems.Ws_sqlLocator;
 import ws_sql.ws.hpccsystems.Ws_sqlServiceSoap;
 
 import com.mysql.jdbc.Field;
-
+@Service("wssqlService")
+@Scope(value = "singleton", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class WSSQLServiceImpl implements WSSQLService{
 	  private static final Logger LOGGER =LoggerFactory
 	            .getLogger(WSSQLServiceImpl.class);
