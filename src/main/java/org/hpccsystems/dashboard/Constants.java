@@ -38,6 +38,7 @@ public class Constants {
             put(CHART_TYPES.TABLE, new ChartConfiguration(CHART_TYPES.TABLE, "Table", "assets/img/table.png", "widget/xyChart.zul", "TABLE", "C3_TABLE"));
         }
     };
+    public static final String ACTIVE_DASHBOARD = "ActiveDashboard";
     
     public enum AGGREGATION {
         SUM ("SUM"),

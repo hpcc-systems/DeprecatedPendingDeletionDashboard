@@ -11,13 +11,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
+import org.zkoss.zk.ui.event.SerializableEventListener;
 import org.zkoss.zk.ui.select.SelectorComposer;
+import org.zkoss.zk.ui.select.Selectors;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zul.Include;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listcell;
@@ -30,7 +34,7 @@ public class NavigationController extends SelectorComposer<Component> {
 
     private static final long serialVersionUID = 1L;
     private static final Logger LOG = LoggerFactory.getLogger(NavigationController.class);
-    
+    Page dashboardContainer = NavigationController.this.getPage();
     
     @Wire
     private Listbox dashboardListbox;
@@ -47,7 +51,6 @@ public class NavigationController extends SelectorComposer<Component> {
     @Override
     public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
-        
         dashboardModel.addAll(getDashboards());
         dashboardListbox.setModel(dashboardModel);
         dashboardListbox.setItemRenderer(new ListitemRenderer<Dashboard>() {
@@ -102,6 +105,27 @@ public class NavigationController extends SelectorComposer<Component> {
                 "/dashboard/config.zul", this.getSelf(),
                 null);
         window.doModal();
+    }
+    EventListener<Event> navItemSelectLisnr = new SerializableEventListener<Event>() {
+        /**
+         * 
+         */
+        private static final long serialVersionUID = 1L;
+
+        public void onEvent(final Event event) {
+            final Include include = (Include) Selectors.iterable(dashboardContainer, "#dashboardInclude").iterator().next();
+            includeDashboard(event,include);
+        }
+        
+    };
+    
+    private void includeDashboard(Event event, Include include) {
+        final Component component = include.getParent();
+        include.detach();
+        final Include newInclude = new Include("/dashboard/container.zul");
+        newInclude.setId("dashboardInclude");
+        newInclude.setDynamicProperty(Constants.ACTIVE_DASHBOARD, event.getTarget().getAttribute(Constants.DASHBOARD));
+        component.appendChild(newInclude);        
     }
 
 }
