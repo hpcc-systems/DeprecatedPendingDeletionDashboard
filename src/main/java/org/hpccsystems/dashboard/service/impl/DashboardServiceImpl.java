@@ -8,6 +8,7 @@ import org.hpccsystems.dashboard.service.DashboardService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.dao.DataAccessException;
 import org.springframework.stereotype.Service;
 
 
@@ -30,6 +31,10 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     public List<Dashboard> getDashboards(String userId, String applicationId) {
         return dashboardDao.getDashboards(userId,applicationId);
+    }
+    
+    public void deleteDashboard(Integer dashboardId) throws DataAccessException{
+        dashboardDao.deleteDashboard(dashboardId);
     }
 
 }

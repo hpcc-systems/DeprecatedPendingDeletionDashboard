@@ -16,7 +16,10 @@ public class Constants {
     public static final Integer FILTER_MAXIMUM = 1;
     public static final String UNABLE_TO_FETCH_DATA = "Unable to fetch Hpcc data";
     public static final String HPCC_CONNECTION = "hpccConnection";
-    
+    // Notification Types
+    public static final String ERROR_NOTIFICATION = "error";
+    // Notification positions
+    public static final String POSITION_CENTER = "middle_center";
     public static final String TRUE = "true";
     
     public static final String WIDGET_CONFIG = "widgetWrapper";

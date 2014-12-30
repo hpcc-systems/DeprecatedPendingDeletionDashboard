@@ -134,7 +134,7 @@
 		</west>
 		<center vflex="1" hflex="1">			
 			<div zclass="content" vflex="1" hflex="1">
-				<include src="dashboard/container.zul"></include>
+				<include src="dashboard/container.zul" id="dashboardInclude"></include>
 			</div>
 		</center>
 	</borderlayout>	

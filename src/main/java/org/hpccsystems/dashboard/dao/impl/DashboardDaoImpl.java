@@ -3,15 +3,14 @@ package org.hpccsystems.dashboard.dao.impl;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import javax.sql.DataSource;
-
 import org.hpccsystems.dashboard.dao.DashboardDao;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.rowmapper.DashboardRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
+import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Service;
@@ -51,6 +50,12 @@ public class DashboardDaoImpl implements DashboardDao {
         
         String sql="SELECT * FROM dashboard WHERE user_id = ? AND application_id = ?";
         return jdbcTemplate.query(sql, new Object[]{userId,applicationId}, new DashboardRowMapper());
+    }
+    
+    public void deleteDashboard(final Integer dashboardId) throws DataAccessException {
+       jdbcTemplate.update("delete from dashboard_details where dashboard_id=?", new Object[] { 
+                dashboardId
+        });
     }
 
 }
