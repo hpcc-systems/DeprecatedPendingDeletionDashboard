@@ -3,14 +3,25 @@ package org.hpccsystems.dashboard.entity.widget.charts;
 import java.util.List;
 import java.util.Map;
 
+import org.hpcc.HIPIE.dude.Element;
+import org.hpcc.HIPIE.dude.ElementOption;
+import org.hpcc.HIPIE.dude.FieldInstance;
 import org.hpcc.HIPIE.dude.InputElement;
+import org.hpcc.HIPIE.dude.RecordInstance;
 import org.hpcc.HIPIE.dude.VisualElement;
 import org.hpccsystems.dashboard.Constants.AGGREGATION;
 import org.hpccsystems.dashboard.entity.widget.Attribute;
 import org.hpccsystems.dashboard.entity.widget.Measure;
 import org.hpccsystems.dashboard.entity.widget.Widget;
+import org.hpccsystems.dashboard.util.DashboardUtil;
+import org.zkoss.zul.ListModelList;
 
 public class Pie extends Widget {
+<<<<<<< Upstream, based on origin/dashboard_2.0
+=======
+    private Attribute label;
+    private Measure weight;
+>>>>>>> 2988a64 creating visualElement/InputElement
     private static final String DOT = ".";
     private static final String COMMA = " , ";
     
@@ -21,9 +32,17 @@ public class Pie extends Widget {
     public String generateSQL() {        
         StringBuilder sql=new StringBuilder();
         sql.append("SELECT ")
+<<<<<<< Upstream, based on origin/dashboard_2.0
         .append(labels.getFile())
+=======
+        .append(label.getFile())
+>>>>>>> 2988a64 creating visualElement/InputElement
         .append(DOT)
+<<<<<<< Upstream, based on origin/dashboard_2.0
         .append(labels.getColumn())
+=======
+        .append(label.getColumn())
+>>>>>>> 2988a64 creating visualElement/InputElement
         .append(COMMA);
         if(weight.getAggregation()!=null && weight.getAggregation()!= AGGREGATION.NONE){
             sql.append(weight.getAggregation())
@@ -38,7 +57,11 @@ public class Pie extends Widget {
             .append(weight.getColumn());
         }
         sql.append(" FROM ")
+<<<<<<< Upstream, based on origin/dashboard_2.0
         .append(labels.getFile());
+=======
+        .append(label.getFile());
+>>>>>>> 2988a64 creating visualElement/InputElement
         
         if((this.getFilters()!=null)&&(!this.getFilters().isEmpty())){
                 sql.append(" WHERE ");
@@ -51,12 +74,28 @@ public class Pie extends Widget {
         return sql.toString();
     }
 
+    public Attribute getLabel() {
+        return label;
+    }
+
+    public void setLabel(Attribute label) {
+        this.label = label;
+    }
+
+    public Measure getWeight() {
+        return weight;
+    }
+
+    public void setWeight(Measure weight) {
+        this.weight = weight;
+    }
     @Override
     public List<String> getColumns() {
         // TODO Auto-generated method stub
         return null;
     }
 
+<<<<<<< Upstream, based on origin/dashboard_2.0
     public Attribute getWeight() {
         return labels;
     }
@@ -72,11 +111,48 @@ public class Pie extends Widget {
     public void setLabel(Measure label) {
         this.weight = label;
     }
+=======
+>>>>>>> 2988a64 creating visualElement/InputElement
 
     @Override
     public VisualElement generateVisualElement() {
-        // TODO Auto-generated method stub
-        return null;
+
+        StringBuilder builder = null;
+        VisualElement visualElement = new VisualElement();
+        // TODO:Need to set chart type using Hipie's 'Element' class
+        visualElement.setType(this.getChartConfiguration().getHipieChartId());
+        visualElement.addCustomOption(new ElementOption("_chartType",
+                new FieldInstance(null, this.getChartConfiguration()
+                        .getHipieChartName())));
+
+        visualElement.setName(DashboardUtil.removeSpaceSplChar(this.getName()));
+        visualElement.setBasis(output);
+
+        RecordInstance ri = new RecordInstance();
+        visualElement.setBasisQualifier(ri);
+
+        // Attribute settings
+        builder = new StringBuilder();
+        builder.append("Attribute").append("_").append(this.getName());
+        ri.add(new FieldInstance(null, builder.toString()));
+        visualElement.addOption(new ElementOption(VisualElement.LABEL,
+                new FieldInstance(null, builder.toString())));
+
+        // Measures settings
+        builder = new StringBuilder();
+        // generates Name as 'Measure1_chartName[ie: getName()]'
+        builder.append("Measure").append("_").append(this.getName());
+        ri.add(new FieldInstance((getWeight().getAggregation() != null) ? getWeight()
+                .getAggregation().toString() : null, builder.toString()));
+
+        visualElement.addOption(new ElementOption(VisualElement.WEIGHT,
+                new FieldInstance(null, builder.toString())));
+
+        // Setting Tittle for chart
+        visualElement.addOption(new ElementOption(VisualElement.TITLE,
+                new FieldInstance(null, this.getTitle())));
+
+        return visualElement;
     }
 
     @Override
@@ -87,7 +163,31 @@ public class Pie extends Widget {
 
     @Override
     public List<InputElement> generateInputElement() {
-        // TODO Auto-generated method stub
-        return null;
+
+        List<InputElement> inputs = new ListModelList<InputElement>();
+
+        StringBuilder attributeName = null;
+        attributeName = new StringBuilder();
+        // generates Name as 'Attribute_chartName(ie: getName())'
+        attributeName.append("Attribute").append("_").append(this.getName());
+        InputElement attributeInput = new InputElement();
+        attributeInput.setName(attributeName.toString());
+        attributeInput.addOption(new ElementOption(Element.LABEL,
+                new FieldInstance(null,getLabel().getColumn())));
+        attributeInput.setType(InputElement.TYPE_FIELD);
+        inputs.add(attributeInput);
+
+        StringBuilder measureName = new StringBuilder();
+        // generates Name as 'Measure1_chartName(ie: getName())'
+        measureName.append("Measure").append("_").append(this.getName());
+        InputElement measureInput = new InputElement();
+        measureInput.setName(measureName.toString());
+        measureInput.addOption(new ElementOption(Element.LABEL,
+                new FieldInstance(null,getWeight().getColumn())));
+        measureInput.setType(InputElement.TYPE_FIELD);
+        inputs.add(measureInput);
+
+        return inputs;
+    
     }
 }

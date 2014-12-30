@@ -7,12 +7,17 @@ public class ChartConfiguration {
     private String name;
     private String staticImage;
     private String editLayout;
+    private String hipieChartId;
+    private String hipieChartName;
     
-    public ChartConfiguration(CHART_TYPES type, String name, String image, String layout) {
+    public ChartConfiguration(CHART_TYPES type, String name, String image,
+            String layout, String hipieChartId, String hipieChartName) {
         this.setType(type);
         this.name = name;
         this.staticImage = image;
         this.editLayout = layout;
+        this.hipieChartId = hipieChartId;
+        this.hipieChartName = hipieChartName;
     }
     
     public String getName() {
@@ -40,5 +45,20 @@ public class ChartConfiguration {
 
     public void setType(CHART_TYPES type) {
         this.type = type;
+    }
+    public String getHipieChartId() {
+        return hipieChartId;
+    }
+
+    public void setHipieChartId(String hipieChartId) {
+        this.hipieChartId = hipieChartId;
+    }
+
+    public String getHipieChartName() {
+        return hipieChartName;
+    }
+
+    public void setHipieChartName(String hipieChartName) {
+        this.hipieChartName = hipieChartName;
     }
 }

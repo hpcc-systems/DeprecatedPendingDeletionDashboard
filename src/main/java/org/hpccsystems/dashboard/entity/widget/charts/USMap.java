@@ -3,16 +3,22 @@ package org.hpccsystems.dashboard.entity.widget.charts;
 import java.util.List;
 import java.util.Map;
 
+import org.hpcc.HIPIE.dude.Element;
+import org.hpcc.HIPIE.dude.ElementOption;
+import org.hpcc.HIPIE.dude.FieldInstance;
 import org.hpcc.HIPIE.dude.InputElement;
+import org.hpcc.HIPIE.dude.RecordInstance;
 import org.hpcc.HIPIE.dude.VisualElement;
 import org.hpccsystems.dashboard.Constants.AGGREGATION;
 import org.hpccsystems.dashboard.entity.widget.Attribute;
 import org.hpccsystems.dashboard.entity.widget.Measure;
 import org.hpccsystems.dashboard.entity.widget.Widget;
+import org.hpccsystems.dashboard.util.DashboardUtil;
+import org.zkoss.zul.ListModelList;
 
 public class USMap extends Widget{
 
-    private Attribute states;
+    private Attribute state;
     private Measure measure;
     private static final String DOT=".";
     private static final String COMMA=" , ";
@@ -27,9 +33,9 @@ public class USMap extends Widget{
     public String generateSQL() {
         StringBuilder sql=new StringBuilder();        
         sql.append("SELECT ")
-        .append(states.getFile())
+        .append(state.getFile())
         .append(DOT)
-        .append(states.getColumn())
+        .append(state.getColumn())
         .append(COMMA);
         if(measure.getAggregation()!=null && measure.getAggregation()!= AGGREGATION.NONE){
         sql.append(measure.getAggregation())
@@ -44,7 +50,7 @@ public class USMap extends Widget{
             .append(measure.getColumn());
         }
         sql.append(" FROM ")
-        .append(states.getFile());
+        .append(state.getFile());
         
         if((this.getFilters()!=null)&&(!this.getFilters().isEmpty())){
                 sql.append(" WHERE ");
@@ -57,12 +63,12 @@ public class USMap extends Widget{
         return sql.toString();
     }
 
-    public Attribute getStates() {
-        return states;
+    public Attribute getState() {
+        return state;
     }
 
-    public void setStates(Attribute states) {
-        this.states = states;
+    public void setState(Attribute state) {
+        this.state = state;
     }
 
     public Measure getMeasure() {
@@ -75,8 +81,44 @@ public class USMap extends Widget{
 
     @Override
     public VisualElement generateVisualElement() {
-        // TODO Auto-generated method stub
-        return null;
+
+        StringBuilder builder = null;
+        VisualElement visualElement = new VisualElement();
+        // TODO:Need to set chart type using Hipie's 'Element' class
+        visualElement.setType(this.getChartConfiguration().getHipieChartId());
+        visualElement.addCustomOption(new ElementOption("_chartType",
+                new FieldInstance(null, this.getChartConfiguration()
+                        .getHipieChartName())));
+
+        visualElement.setName(DashboardUtil.removeSpaceSplChar(this.getName()));
+        visualElement.setBasis(output);
+
+        RecordInstance ri = new RecordInstance();
+        visualElement.setBasisQualifier(ri);
+
+        // Attribute settings
+        builder = new StringBuilder();
+        builder.append("Attribute").append("_").append(this.getName());
+        ri.add(new FieldInstance(null, builder.toString()));
+        visualElement.addOption(new ElementOption(VisualElement.LABEL,
+                new FieldInstance(null, builder.toString())));
+
+        // Measures settings
+        builder = new StringBuilder();
+        // generates Name as 'Measure1_chartName[ie: getName()]'
+        builder.append("Measure").append("_").append(this.getName());
+        ri.add(new FieldInstance((getMeasure().getAggregation() != null) ? getMeasure()
+                .getAggregation().toString() : null, builder.toString()));
+
+        visualElement.addOption(new ElementOption(VisualElement.WEIGHT,
+                new FieldInstance(null, builder.toString())));
+
+        // Setting Tittle for chart
+        visualElement.addOption(new ElementOption(VisualElement.TITLE,
+                new FieldInstance(null, this.getTitle())));
+
+        return visualElement;
+
     }
 
     @Override
@@ -87,8 +129,32 @@ public class USMap extends Widget{
 
     @Override
     public List<InputElement> generateInputElement() {
-        // TODO Auto-generated method stub
-        return null;
+
+        List<InputElement> inputs = new ListModelList<InputElement>();
+
+        StringBuilder attributeName = null;
+        attributeName = new StringBuilder();
+        // generates Name as 'Attribute_chartName(ie: getName())'
+        attributeName.append("Attribute").append("_").append(this.getName());
+        InputElement attributeInput = new InputElement();
+        attributeInput.setName(attributeName.toString());
+        attributeInput.addOption(new ElementOption(Element.LABEL,
+                new FieldInstance(null, getState().getColumn())));
+        attributeInput.setType(InputElement.TYPE_FIELD);
+        inputs.add(attributeInput);
+
+        StringBuilder measureName = new StringBuilder();
+        // generates Name as 'Measure1_chartName(ie: getName())'
+        measureName.append("Measure").append("_").append(this.getName());
+        InputElement measureInput = new InputElement();
+        measureInput.setName(measureName.toString());
+        measureInput.addOption(new ElementOption(Element.LABEL,
+                new FieldInstance(null, getMeasure().getColumn())));
+        measureInput.setType(InputElement.TYPE_FIELD);
+        inputs.add(measureInput);
+
+        return inputs;
+
     }
 
 }
