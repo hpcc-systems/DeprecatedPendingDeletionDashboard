@@ -27,24 +27,24 @@ public class Pie extends Widget {
     public String generateSQL() {        
         StringBuilder sql=new StringBuilder();
         sql.append("SELECT ")
-        .append(label.getFile())
+        .append(getLogicalFile())
         .append(DOT)
         .append(label.getColumn())
         .append(COMMA);
         if(weight.getAggregation()!=null && weight.getAggregation()!= AGGREGATION.NONE){
             sql.append(weight.getAggregation())
             .append("(")
-            .append(weight.getFile())
+            .append(getLogicalFile())
             .append(DOT)
             .append(weight.getColumn())
             .append(")");
         }else{
-            sql.append(weight.getFile())
+            sql.append(getLogicalFile())
             .append(DOT)
             .append(weight.getColumn());
         }
         sql.append(" FROM ")
-        .append(label.getFile());
+        .append(getLogicalFile());
         
         if((this.getFilters()!=null)&&(!this.getFilters().isEmpty())){
                 sql.append(" WHERE ");

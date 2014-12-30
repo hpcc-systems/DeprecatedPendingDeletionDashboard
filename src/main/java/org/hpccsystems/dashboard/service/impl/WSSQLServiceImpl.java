@@ -141,7 +141,10 @@ public class WSSQLServiceImpl implements WSSQLService{
 				dataJSON=new ChartdataJSON();
 				dataJSON.setColumns(columns);
 				dataJSON.setData(dataList);
-				LOGGER.info("data list {}",dataList);
+				if(LOGGER.isDebugEnabled()){
+				    LOGGER.info("data list {}",dataList);
+				}
+				
 			} catch (XMLStreamException e) {
 				LOGGER.error(Constants.EXCEPTION, e);
 			}
@@ -291,6 +294,7 @@ public class WSSQLServiceImpl implements WSSQLService{
             final String queryTxt = widget.generateSQL();
 
             if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("wssql -->"+widget.getLogicalFile());
             	LOGGER.debug("WS_SQL Query ->" + queryTxt);
             }
 

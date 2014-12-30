@@ -107,7 +107,7 @@ public class FileBrowserController extends SelectorComposer<Component> {
     @Listen("onClick = #visualize") 
     public void onVisualize() {
         widgetConfiguration.getWidget().setLogicalFile(selectedFile.getText());
-        Events.postEvent(WidgetConfiguration.ON_FILE_SELECT, widgetConfiguration.getHolder(), null);
+        Events.postEvent(WidgetConfiguration.ON_FILE_SELECT, widgetConfiguration.getHolder(), widgetConfiguration);
     }
 
 }
