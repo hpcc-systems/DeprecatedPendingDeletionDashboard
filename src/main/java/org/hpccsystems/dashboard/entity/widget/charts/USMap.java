@@ -91,7 +91,6 @@ public class USMap extends Widget{
                         .getHipieChartName())));
 
         visualElement.setName(DashboardUtil.removeSpaceSplChar(this.getName()));
-        visualElement.setBasis(output);
 
         RecordInstance ri = new RecordInstance();
         visualElement.setBasisQualifier(ri);

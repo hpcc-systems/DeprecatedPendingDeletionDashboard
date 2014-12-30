@@ -129,7 +129,7 @@ public class CompositionServiceImpl implements CompositionService{
         visualization.setName(compName);
         visualization.setType(VisualElement.VISUALIZE);
         //TODO:set title for visualization
-        
+        widget.generateVisualElement().setBasis(output);
         visualization.addChildElement(widget.generateVisualElement());
         
         contract.getVisualElements().add(visualization);

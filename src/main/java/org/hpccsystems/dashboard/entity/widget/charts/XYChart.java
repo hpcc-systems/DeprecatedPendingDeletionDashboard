@@ -99,9 +99,11 @@ public class XYChart extends Widget{
     @Override
     public VisualElement generateVisualElement() {
 
-        StringBuilder builder = null;
-        StringBuilder meaureLabels = null;
+        StringBuilder attributeName = new StringBuilder();
+        StringBuilder meaureLabels = new StringBuilder();
+        StringBuilder  measureName = new StringBuilder();
         VisualElement visualElement = new VisualElement();
+        
         // TODO:Need to set chart type using Hipie's 'Element' class
         visualElement.setType(this.getChartConfiguration().getHipieChartId());
         visualElement.addCustomOption(new ElementOption("_chartType",
@@ -109,29 +111,26 @@ public class XYChart extends Widget{
                         .getHipieChartName())));
 
         visualElement.setName(DashboardUtil.removeSpaceSplChar(this.getName()));
-        visualElement.setBasis(output);
 
         RecordInstance ri = new RecordInstance();
         visualElement.setBasisQualifier(ri);
 
         // Attribute settings
-        builder = new StringBuilder();
-        builder.append("Attribute").append("_").append(this.getName());
-        ri.add(new FieldInstance(null, builder.toString()));
+        attributeName.append("Attribute").append("_").append(this.getName());
+        ri.add(new FieldInstance(null, attributeName.toString()));
         visualElement.addOption(new ElementOption(VisualElement.LABEL,
-                new FieldInstance(null, builder.toString())));
+                new FieldInstance(null, attributeName.toString())));
 
         // Measures settings
-        getMeasures().listIterator().forEachRemaining(measure -> {
-            builder = new StringBuilder();
+        getMeasures().listIterator().forEachRemaining(measure -> {           
             // generates Name as 'Measure1_chartName[ie: getName()]'
-                builder.append("Measure")
+            measureName.append("Measure")
                         .append(getMeasures().indexOf(measure) + 1).append("_")
                         .append(this.getName());
-                meaureLabels.append(builder.toString()).append(",");
+                meaureLabels.append(measureName.toString()).append(",");
                 ri.add(new FieldInstance(
                         (measure.getAggregation() != null) ? measure
-                                .getAggregation().toString() : null, builder
+                                .getAggregation().toString() : null, measureName
                                 .toString()));
             });
 

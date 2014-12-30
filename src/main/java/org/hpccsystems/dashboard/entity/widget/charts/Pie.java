@@ -17,32 +17,19 @@ import org.hpccsystems.dashboard.util.DashboardUtil;
 import org.zkoss.zul.ListModelList;
 
 public class Pie extends Widget {
-<<<<<<< Upstream, based on origin/dashboard_2.0
-=======
     private Attribute label;
     private Measure weight;
->>>>>>> 2988a64 creating visualElement/InputElement
     private static final String DOT = ".";
     private static final String COMMA = " , ";
     
-    private Attribute labels;
-    private Measure weight;
 
     @Override
     public String generateSQL() {        
         StringBuilder sql=new StringBuilder();
         sql.append("SELECT ")
-<<<<<<< Upstream, based on origin/dashboard_2.0
-        .append(labels.getFile())
-=======
         .append(label.getFile())
->>>>>>> 2988a64 creating visualElement/InputElement
         .append(DOT)
-<<<<<<< Upstream, based on origin/dashboard_2.0
-        .append(labels.getColumn())
-=======
         .append(label.getColumn())
->>>>>>> 2988a64 creating visualElement/InputElement
         .append(COMMA);
         if(weight.getAggregation()!=null && weight.getAggregation()!= AGGREGATION.NONE){
             sql.append(weight.getAggregation())
@@ -57,11 +44,7 @@ public class Pie extends Widget {
             .append(weight.getColumn());
         }
         sql.append(" FROM ")
-<<<<<<< Upstream, based on origin/dashboard_2.0
-        .append(labels.getFile());
-=======
         .append(label.getFile());
->>>>>>> 2988a64 creating visualElement/InputElement
         
         if((this.getFilters()!=null)&&(!this.getFilters().isEmpty())){
                 sql.append(" WHERE ");
@@ -95,25 +78,6 @@ public class Pie extends Widget {
         return null;
     }
 
-<<<<<<< Upstream, based on origin/dashboard_2.0
-    public Attribute getWeight() {
-        return labels;
-    }
-
-    public void setWeight(Attribute weight) {
-        this.labels = weight;
-    }
-
-    public Measure getLabel() {
-        return weight;
-    }
-
-    public void setLabel(Measure label) {
-        this.weight = label;
-    }
-=======
->>>>>>> 2988a64 creating visualElement/InputElement
-
     @Override
     public VisualElement generateVisualElement() {
 
@@ -126,7 +90,6 @@ public class Pie extends Widget {
                         .getHipieChartName())));
 
         visualElement.setName(DashboardUtil.removeSpaceSplChar(this.getName()));
-        visualElement.setBasis(output);
 
         RecordInstance ri = new RecordInstance();
         visualElement.setBasisQualifier(ri);
