@@ -109,8 +109,9 @@
 	background-color: #434343;
 	color:#fff;
 }
-.left-sidebar .z-button{
- margin:10px 10px 10px 40px;
+.left-sidebar .btn{ 
+ display:block;
+ margin:0 auto;
 }
 </style>
 <div vflex="1" hflex="1" sclass="wrapper" style="">
