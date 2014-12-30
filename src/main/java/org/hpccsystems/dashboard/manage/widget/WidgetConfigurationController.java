@@ -29,8 +29,10 @@ public class WidgetConfigurationController extends SelectorComposer<Component> {
         });
         
         holder.addEventListener(WidgetConfiguration.ON_FILE_SELECT, event -> {
-            holder.setSrc("widget/pie.zul");
+            holder.setSrc(configuration.getChartConfiguration().getEditLayout());
         });
     }
+    
+    
 
 }
