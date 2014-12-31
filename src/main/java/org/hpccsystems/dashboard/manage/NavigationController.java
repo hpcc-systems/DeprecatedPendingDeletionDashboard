@@ -51,7 +51,7 @@ public class NavigationController extends SelectorComposer<Component> {
 
     private ListitemRenderer<Dashboard> navRenderer = (listitem, dashboard, index) -> {
         Listcell iconChild = new Listcell();
-        iconChild.setIconSclass("z-icon-bar-chart");
+        iconChild.setIconSclass("glyphicon glyphicon-stats");
         listitem.appendChild(iconChild);
         listitem.setLabel(dashboard.getName());
         listitem.setAttribute(Constants.DASHBOARD, dashboard);
