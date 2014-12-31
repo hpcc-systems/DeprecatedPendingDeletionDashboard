@@ -9,7 +9,6 @@ public class WidgetConfiguration {
     public static final String ON_CHART_TYPE_SELECT = "onChartTypeSelect";
     public static final String ON_FILE_SELECT = "onFileSelect";
     
-    private ChartConfiguration chartConfiguration;
     private Dashboard dashboard;
     private Component holder;
     private Widget widget;
@@ -40,13 +39,5 @@ public class WidgetConfiguration {
 
     public void setDashboard(Dashboard dashboard) {
         this.dashboard = dashboard;
-    }
-
-    public ChartConfiguration getChartConfiguration() {
-        return chartConfiguration;
-    }
-
-    public void setChartConfiguration(ChartConfiguration chartConfiguration) {
-        this.chartConfiguration = chartConfiguration;
     }
 }

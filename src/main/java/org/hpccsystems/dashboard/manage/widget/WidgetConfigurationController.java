@@ -49,7 +49,7 @@ public class WidgetConfigurationController extends SelectorComposer<Component> {
         });
         
         holder.addEventListener(WidgetConfiguration.ON_FILE_SELECT, event -> {
-            holder.setSrc(configuration.getChartConfiguration().getEditLayout());
+            holder.setSrc(configuration.getWidget().getChartConfiguration().getEditLayout());
         });
     }
     

@@ -2,11 +2,12 @@ package org.hpccsystems.dashboard.entity.widget;
 
 import java.util.List;
 import java.util.Map;
+
 import org.hpcc.HIPIE.dude.InputElement;
 import org.hpcc.HIPIE.dude.VisualElement;
 
 public abstract class Widget {
-    private String name;
+    private String name = "samplechart";
     private String logicalFile;
     private List<Filter> filters;
     private String title;
