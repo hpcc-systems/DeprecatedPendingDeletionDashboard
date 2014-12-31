@@ -9,6 +9,7 @@ import org.hpccsystems.dashboard.service.AuthenticationService;
 import org.hpccsystems.dashboard.service.DashboardService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.select.SelectorComposer;
@@ -19,6 +20,7 @@ import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Comboitem;
 import org.zkoss.zul.ComboitemRenderer;
+import org.zkoss.zul.Label;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Radiogroup;
 import org.zkoss.zul.Textbox;
@@ -43,6 +45,8 @@ public class DashboardConfigurationController extends
     private Radiogroup visiblityRadiogroup;
     @Wire
     private Combobox connectionList;
+    @Wire
+    private Label message;
     
     ListModelList<String> connectionModel = new ListModelList<String>();
     @Override
@@ -72,6 +76,16 @@ public class DashboardConfigurationController extends
 
     @Listen("onClick = #configOkButton")
     public void onClickOkButton() {
+        
+        if(nameTextbox.getText() == null || nameTextbox.getText().isEmpty()){
+            message.setVisible(true);
+            message.setValue(Labels.getLabel("emptyDashboardName"));
+            return;
+        }else if(connectionList.getSelectedItem() == null){
+            message.setVisible(true);
+            message.setValue(Labels.getLabel("chooseConnection"));
+            return;
+        }   
         
         //Creating new dashboard
         if(parent instanceof Vbox){

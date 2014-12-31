@@ -8,7 +8,7 @@
 	</caption>	
 	
 	<vbox spacing="0px" hflex="1">		
-		
+		<label id="message" zclass="label" sclass="warn" style="color: red;" value=" " visible="false"/>
 		<hlayout zclass="form-group">
 			<label zclass="h5">${labels.dashBoardName}</label>
 			<textbox id="nameTextbox"  zclass="form-control"></textbox>
