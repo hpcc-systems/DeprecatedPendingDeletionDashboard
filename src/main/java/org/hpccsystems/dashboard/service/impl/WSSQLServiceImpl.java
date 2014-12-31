@@ -41,11 +41,12 @@ import ws_sql.ws.hpccsystems.Ws_sqlLocator;
 import ws_sql.ws.hpccsystems.Ws_sqlServiceSoap;
 
 import com.mysql.jdbc.Field;
+
 @Service("wssqlService")
 @Scope(value = "singleton", proxyMode = ScopedProxyMode.TARGET_CLASS)
 public class WSSQLServiceImpl implements WSSQLService{
-	  private static final Logger LOGGER =LoggerFactory
-	            .getLogger(WSSQLServiceImpl.class);
+	private static final Logger LOGGER =LoggerFactory.getLogger(WSSQLServiceImpl.class);
+	
     private static final String SELECT = "select ";
     private static final String WHERE = "where";
     private static final String WHERE_WITH_SPACES = " where ";
@@ -54,8 +55,6 @@ public class WSSQLServiceImpl implements WSSQLService{
     private static final String HTTPS = "https://";
     
     private static final String UNAUTHORIZED = "Unauthorized";  
-
-    private static final String DFU_ENDPOINT = "/WsDfu?ver_=1.2";
 	
 	private String executeSQL(HPCCConnection hpccConnection, String sql)
 			throws Exception {
@@ -68,14 +67,20 @@ public class WSSQLServiceImpl implements WSSQLService{
 		} else {
 			endpoint.append(HTTP);
 		}
-		// TO DO add the IP and  port number in HIPIE  and then implement
 		
-		endpoint.append("https://216.105.19.2:18009"); 
+		// TO DO add the IP and  port number in HIPIE  and then implement
+		endpoint.append("216.19.105.2:18009"); 
 		endpoint.append("/ws_sql?ver_=1");
 
+		if(LOGGER.isDebugEnabled()) {
+		    LOGGER.debug("WS SQL End point - {}", endpoint.toString());
+		    LOGGER.debug("Connection name - {}, Password - {}", hpccConnection.getUserName(), hpccConnection.getPwd());
+		}
+		
 		locator.setWs_sqlServiceSoapAddress(endpoint.toString());
 		locator.setWs_sqlServiceSoap_userName(hpccConnection.getUserName());
-		locator.setWs_sqlServiceSoap_password(hpccConnection.getPwd());
+		//TODO Find out the way to get unencryped password from HIPIE
+		locator.setWs_sqlServiceSoap_password("Lexis123!");
 
 		ExecuteSQLRequest req = new ExecuteSQLRequest();
 		req.setSqlText(sql);
@@ -105,10 +110,8 @@ public class WSSQLServiceImpl implements WSSQLService{
 	 * <Dataset name='WsSQLResult'> <Row><productcode>S10_1678</productcode><quantityinstock>7933</quantityinstock><buyprice>48.81</buyprice></Row></Dataset>
 	 * 
 	 */
-	
-    @SuppressWarnings("unused")
 	private static ChartdataJSON parseChartdataResponse(List<String> columns, String responseXML){
-    	ChartdataJSON dataJSON=null;
+        ChartdataJSON dataJSON = null;
     	if (responseXML != null && responseXML.length() > 0) {
     		XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
     		try {
@@ -142,11 +145,12 @@ public class WSSQLServiceImpl implements WSSQLService{
 				dataJSON.setColumns(columns);
 				dataJSON.setData(dataList);
 				if(LOGGER.isDebugEnabled()){
-				    LOGGER.info("data list {}",dataList);
+				    LOGGER.info("Columns {}", columns);
 				}
 				
 			} catch (XMLStreamException e) {
 				LOGGER.error(Constants.EXCEPTION, e);
+				//TODO Throw
 			}
     	}
         return dataJSON;
@@ -288,18 +292,17 @@ public class WSSQLServiceImpl implements WSSQLService{
     }
 
     @Override
-    public ChartdataJSON getChartdata(Widget widget, HPCCConnection connection) throws  Exception{
-    	
-            ChartdataJSON dataObj = null;
-            final String queryTxt = widget.generateSQL();
+    public ChartdataJSON getChartdata(Widget widget, HPCCConnection connection) throws Exception {
 
-            if (LOGGER.isDebugEnabled()) {
-                LOGGER.debug("wssql -->"+widget.getLogicalFile());
-            	LOGGER.debug("WS_SQL Query ->" + queryTxt);
-            }
+        final String queryTxt = widget.generateSQL();
 
-            final String resultString = executeSQL(connection, queryTxt);
-            return   parseChartdataResponse(widget.getColumns(), resultString);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("wssql -->" + widget.getLogicalFile());
+            LOGGER.debug("WS_SQL Query ->" + queryTxt);
+        }
+
+        final String resultString = executeSQL(connection, queryTxt);
+        return parseChartdataResponse(widget.getColumns(), resultString);
     }
    
     private String constructWhereClause(List<Filter> filters, String fileName) {

@@ -158,4 +158,10 @@ public class Pie extends Widget {
     public boolean isConfigured() {
         return (this.weight!=null)&&(this.label!=null);
     }
+
+    @Override
+    public List<String> getSQLColumns() {
+        // TODO Auto-generated method stub
+        return null;
+    }
 }

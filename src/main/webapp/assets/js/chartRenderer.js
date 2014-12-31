@@ -1,12 +1,16 @@
-function visualize(target, chartType, data) {
+function createPreview(target, chartType, data) {
 
-	require([ "js/visualization/widgets/config" ], function() {
+	require([ "assets/js/Visualization/widgets/config" ], function() {
 
 		requirejs.config({
-			baseUrl : "js/visualization/widgets"
+			baseUrl : "assets/js/Visualization/widgets"
 		});
 
 		var actualData = JSON.parse(data);
+		console.log(actualData);
+		actualData = [["Geography", 75, 68],["English", 45, 55],["Math", 98, 92],["Science", 66, 60]];
+		console.log(actualData);
+		
 		require([ "src/c3/Pie", "src/c3/Line", "src/c3/Column" ], function(
 				C3Pie, C3Line, C3Column) {
 

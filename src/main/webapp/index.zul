@@ -2,6 +2,8 @@
 
 <zk>
 <?style src="assets/bootstrap/css/bootstrap.css"?>
+<?script src="assets/js/Visualization/widgets/lib/requirejs/require.js"?>
+<?script src="assets/js/chartRenderer.js"?>
 <style>
 .wrapper {
   background-color: #3c3c3c;

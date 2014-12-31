@@ -3,21 +3,17 @@ package org.hpccsystems.dashboard.entity.widget.charts;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 import org.hpcc.HIPIE.dude.Element;
 import org.hpcc.HIPIE.dude.ElementOption;
 import org.hpcc.HIPIE.dude.FieldInstance;
 import org.hpcc.HIPIE.dude.InputElement;
 import org.hpcc.HIPIE.dude.RecordInstance;
 import org.hpcc.HIPIE.dude.VisualElement;
-import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.Constants.AGGREGATION;
 import org.hpccsystems.dashboard.entity.widget.Attribute;
-import org.hpccsystems.dashboard.entity.widget.ChartConfiguration;
 import org.hpccsystems.dashboard.entity.widget.Measure;
 import org.hpccsystems.dashboard.entity.widget.Widget;
 import org.hpccsystems.dashboard.util.DashboardUtil;
-import org.zkoss.zkplus.spring.SpringUtil;
 import org.zkoss.zul.ListModelList;
 
 public class XYChart extends Widget{
@@ -187,5 +183,11 @@ public class XYChart extends Widget{
     @Override
     public boolean isConfigured() {
         return (this.getAttribute()!=null)&&(this.getMeasures()!=null)&&(!this.getMeasures().isEmpty());
+    }
+
+    @Override
+    public List<String> getSQLColumns() {
+        // TODO Auto-generated method stub
+        return null;
     }
 }

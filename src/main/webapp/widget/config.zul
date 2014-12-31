@@ -1,7 +1,7 @@
 <zk>
 <window title="Widget Configuration" border="normal"
-	width="700px"
-	height="700px" 
+	width="1000px"
+	height="600px" 
 	closable="true"
 	sizable="true"
 	apply="org.hpccsystems.dashboard.manage.widget.WidgetConfigurationController">

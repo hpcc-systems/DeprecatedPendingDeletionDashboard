@@ -161,4 +161,10 @@ public class USMap extends Widget{
         return (this.getState()!=null)&&(this.getMeasure()!=null);
     }
 
+    @Override
+    public List<String> getSQLColumns() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }

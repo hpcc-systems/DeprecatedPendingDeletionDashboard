@@ -1,4 +1,4 @@
-package org.hpccsystems.dashboard.model.widget;
+package org.hpccsystems.dashboard.manage.widget;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;

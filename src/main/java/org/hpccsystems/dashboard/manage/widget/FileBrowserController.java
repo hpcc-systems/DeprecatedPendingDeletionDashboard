@@ -4,7 +4,6 @@ import org.hpcc.HIPIE.utils.HPCCConnection;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.widget.LogicalFile;
 import org.hpccsystems.dashboard.manage.WidgetConfiguration;
-import org.hpccsystems.dashboard.model.widget.LogicalFileTreeModel;
 import org.hpccsystems.dashboard.service.HPCCFileService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -91,8 +90,7 @@ public class FileBrowserController extends SelectorComposer<Component> {
                 Treerow treerow = (Treerow) treeitem.getLastChild();
                 Treecell treecell = (Treecell) treerow.getLastChild();
                 Label label = (Label) treecell.getLastChild();
-                String logicalFileName = "~" + label.getValue();
-                selectedFile.setText(logicalFileName);
+                selectedFile.setText(label.getValue());
             } else {
                 if (treeitem.isOpen()) {
                     treeitem.setOpen(false);

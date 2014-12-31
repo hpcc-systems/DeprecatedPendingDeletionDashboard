@@ -16,6 +16,7 @@ public abstract class Widget {
     public abstract boolean isConfigured();
     
     public abstract List<String> getColumns();
+    public abstract List<String> getSQLColumns();
     public abstract String generateSQL();
     public abstract VisualElement generateVisualElement();
     public abstract List<InputElement> generateInputElement();

@@ -3,6 +3,7 @@ package org.hpccsystems.dashboard.manage.widget;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.hpcc.HIPIE.utils.HPCCConnection;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.widget.Attribute;
@@ -13,7 +14,8 @@ import org.hpccsystems.dashboard.entity.widget.charts.Pie;
 import org.hpccsystems.dashboard.manage.WidgetConfiguration;
 import org.hpccsystems.dashboard.service.HPCCFileService;
 import org.hpccsystems.dashboard.service.WSSQLService;
-import org.zkoss.zhtml.Div;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.DropEvent;
@@ -26,17 +28,20 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
+import org.zkoss.zul.Div;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.ListitemRenderer;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class PieChartController extends SelectorComposer<Component> {
     private static final String ON_LOADING = "onLoading";
     private static final long serialVersionUID = 1L;
+    private static final Logger LOGGER = LoggerFactory.getLogger(PieChartController.class);
     
     private WidgetConfiguration widgetConfiguration;
     private Pie pie;
@@ -60,6 +65,7 @@ public class PieChartController extends SelectorComposer<Component> {
     @WireVariable
     private WSSQLService wssqlService;
     private HPCCConnection hpccConnection;
+    
     @Wire
     private Div chart;
     
@@ -160,9 +166,11 @@ public class PieChartController extends SelectorComposer<Component> {
     }
     
     private void drawChart() throws Exception {
-        
         ChartdataJSON chartData = wssqlService.getChartdata(pie, hpccConnection);
-        Clients.evalJavaScript("visualize('"+chart.getUuid()+"','pie','"+new Gson().toJson(new ChartdataJSON())+")");
+        if(LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Div id -{}\nJSON - {}", chart.getUuid(), new GsonBuilder().setPrettyPrinting().create().toJson(chartData));
+        }
+        Clients.evalJavaScript("createPreview('"+ chart.getUuid()+"','pie','"+ StringEscapeUtils.escapeJavaScript(new Gson().toJson(chartData))+"')");
     }
     
     

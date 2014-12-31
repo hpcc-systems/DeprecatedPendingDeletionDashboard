@@ -1,6 +1,6 @@
 package org.hpccsystems.dashboard;
 
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import org.hpccsystems.dashboard.entity.widget.ChartConfiguration;
@@ -26,7 +26,7 @@ public class Constants {
     
     public static enum CHART_TYPES {PIE, DONUT, LINE, BAR, COLUMN, US_MAP, TABLE};
     
-    public static final Map<CHART_TYPES, ChartConfiguration> CHART_CONFIGURATIONS = new HashMap<CHART_TYPES, ChartConfiguration>(){
+    public static final Map<CHART_TYPES, ChartConfiguration> CHART_CONFIGURATIONS = new LinkedHashMap<CHART_TYPES, ChartConfiguration>(){
         private static final long serialVersionUID = 1L;
         {
             put(CHART_TYPES.PIE, new ChartConfiguration(CHART_TYPES.PIE, "Pie", "assets/img/pie.png", "widget/pie.zul" ,"PIE", "C3_PIE"));
