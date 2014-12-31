@@ -41,12 +41,12 @@ public class Constants {
     public static final String ACTIVE_DASHBOARD = "ActiveDashboard";
     
     public enum AGGREGATION {
-        SUM ("SUM"),
-        COUNT ("COUNT"),
-        MIN ("MIN"),
-        MAX ("MAX"),
-        AVG ("AVG"),
-        NONE ("NONE");
+        SUM ("sum"),
+        COUNT ("count"),
+        MIN ("min"),
+        MAX ("max"),
+        AVG ("avg"),
+        NONE ("none");
 
         private final String name;       
 

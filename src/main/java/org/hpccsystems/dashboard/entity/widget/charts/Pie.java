@@ -1,5 +1,6 @@
 package org.hpccsystems.dashboard.entity.widget.charts;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -74,8 +75,10 @@ public class Pie extends Widget {
     }
     @Override
     public List<String> getColumns() {
-        // TODO Auto-generated method stub
-        return null;
+        List<String> columnList=new ArrayList<String>();
+        columnList.add(label.getDisplayName());
+        columnList.add(weight.getDisplayName());
+        return columnList;
     }
 
     @Override
@@ -161,7 +164,13 @@ public class Pie extends Widget {
 
     @Override
     public List<String> getSQLColumns() {
-        // TODO Auto-generated method stub
-        return null;
+        List<String> sqlColumnList=new ArrayList<String>();
+        sqlColumnList.add(label.getDisplayName());
+        if((weight.getAggregation()!=null)&&(weight.getAggregation()!=AGGREGATION.NONE)){
+            sqlColumnList.add(weight.getAggregation().toString()+"out1");
+        }else{
+            sqlColumnList.add(weight.getDisplayName());
+        }        
+        return sqlColumnList;
     }
 }

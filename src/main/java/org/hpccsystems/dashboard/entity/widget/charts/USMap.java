@@ -1,5 +1,6 @@
 package org.hpccsystems.dashboard.entity.widget.charts;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -25,8 +26,10 @@ public class USMap extends Widget{
     
     @Override
     public List<String> getColumns() {
-        // TODO Auto-generated method stub
-        return null;
+        List<String> columnList=new ArrayList<String>();
+        columnList.add(state.getDisplayName());
+        columnList.add(measure.getDisplayName());
+        return columnList;
     }
 
     @Override
@@ -163,8 +166,14 @@ public class USMap extends Widget{
 
     @Override
     public List<String> getSQLColumns() {
-        // TODO Auto-generated method stub
-        return null;
+        List<String> sqlColumnList=new ArrayList<String>();
+        sqlColumnList.add(state.getDisplayName());
+        if((measure.getAggregation()!=null)&&(measure.getAggregation()!=AGGREGATION.NONE)){
+            sqlColumnList.add(measure.getAggregation().toString()+"out1");
+        }else{
+            sqlColumnList.add(measure.getDisplayName());
+        }        
+        return sqlColumnList;
     }
 
 }
