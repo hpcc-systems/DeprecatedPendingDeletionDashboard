@@ -36,5 +36,10 @@ public class DashboardServiceImpl implements DashboardService {
     public void deleteDashboard(Integer dashboardId) throws DataAccessException{
         dashboardDao.deleteDashboard(dashboardId);
     }
-
+    
+   
+    public void updateDashboard(Dashboard dashboard,String userId ) throws DataAccessException {
+            dashboardDao.updateDashboard(dashboard,userId);
+       
+       }
 }

@@ -1,9 +1,12 @@
 package org.hpccsystems.dashboard.dao.impl;
 
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+
 import javax.sql.DataSource;
+
 import org.hpccsystems.dashboard.dao.DashboardDao;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.rowmapper.DashboardRowMapper;
@@ -34,7 +37,9 @@ public class DashboardDaoImpl implements DashboardDao {
         parameters.put("name", dashboard.getName());
         parameters.put("user_id", userId);
         parameters.put("application_id", dashboard.getApplicationId());
+        parameters.put("visibility", dashboard.getVisiblity());
         parameters.put("hpcc_id", dashboard.getHpccId());
+        parameters.put("composition_name", dashboard.getCompositionName());
 
         Number dashboardId = new SimpleJdbcInsert(jdbcTemplate.getDataSource())
                 .withTableName("dashboard")
@@ -53,9 +58,24 @@ public class DashboardDaoImpl implements DashboardDao {
     }
     
     public void deleteDashboard(final Integer dashboardId) throws DataAccessException {
-       jdbcTemplate.update("delete from dashboard_details where dashboard_id=?", new Object[] { 
-                dashboardId
-        });
+        jdbcTemplate.update("delete from dashboard_details where dashboard_id=?", new Object[] { 
+                 dashboardId
+         });
+     }
+    
+    @Override
+    public void updateDashboard(final Dashboard dashboard ,String userId) throws DataAccessException {
+    	jdbcTemplate.update("update dashboard_details set name=?, user_id=?, visibility=?,last_updated_date=?, hpcc_id=? where dashboard_id=?;", new Object[] { 
+    			dashboard.getName(),
+    			userId,
+    			dashboard.getVisiblity(),
+    			new java.sql.Date(new Date().getTime()),
+    			dashboard.getHpccId(),
+    			dashboard.getId()
+            });
     }
-
+   
 }
+
+
+

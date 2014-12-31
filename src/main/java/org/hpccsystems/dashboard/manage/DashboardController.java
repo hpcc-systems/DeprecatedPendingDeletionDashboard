@@ -1,6 +1,8 @@
 package org.hpccsystems.dashboard.manage;
 
 import java.util.HashMap;
+import java.util.Map;
+
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.authentication.LoginController;
 import org.hpccsystems.dashboard.entity.Dashboard;
@@ -23,8 +25,8 @@ import org.zkoss.zul.Include;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Messagebox;
-import org.zkoss.zul.Window;
 import org.zkoss.zul.Messagebox.ClickEvent;
+import org.zkoss.zul.Window;
 
 public class DashboardController extends SelectorComposer<Component>{
     private static final long serialVersionUID = 1L;
@@ -52,6 +54,14 @@ public class DashboardController extends SelectorComposer<Component>{
         window.doModal();
     }
     
+    
+    @Listen("onClick = #configureDashboard")
+    public void onConfigureDashboard() {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put(Constants.DASHBOARD, dashboard);
+        Window window  = (Window) Executions.createComponents("dashboard/config.zul",  null, parameters);
+        window.doModal();
+    }
     /**
      * deleteDashboard() is used to delete the selected Dashboard in the sidebar page.
      */

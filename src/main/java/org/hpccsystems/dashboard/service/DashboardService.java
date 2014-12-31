@@ -12,4 +12,14 @@ public interface DashboardService {
     List<Dashboard> getDashboards(String userId, String applicationId);
     
     void deleteDashboard(Integer dashboardId) throws DataAccessException; 
+    
+    /**
+     * Service to update dashboard details into DB
+     * @param dashboard
+     * @param userId 
+     * @throws Exception
+     */
+    void updateDashboard(Dashboard dashboard, String userId);
+
+	
 }
