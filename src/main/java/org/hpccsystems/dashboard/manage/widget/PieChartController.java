@@ -28,9 +28,11 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
+import org.zkoss.zul.Button;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.ListitemRenderer;
 
@@ -82,10 +84,34 @@ public class PieChartController extends SelectorComposer<Component> {
     };
     
     private ListitemRenderer<Measure> weightRenderer = (listitem, measure, index) -> {
-        listitem.setLabel(measure.getColumn());
+        //listitem
+        Listcell listItemCell=new Listcell();
+        listItemCell.setLabel(measure.getColumn());
+        listItemCell.setParent(listitem);
+        Button closeButton=new Button();
+        closeButton.setParent(listItemCell);
+        closeButton.setIconSclass("z-icon-times");
+        listitem.appendChild(listItemCell);
+        closeButton.addEventListener("onClick", event -> {
+            weights.remove(measure);    
+            pie.setWeight(null);
+            weightListbox.setDroppable(Constants.TRUE);
+        });
     };
     private ListitemRenderer<Attribute> labelRenderer = (listitem, attribute, index) -> {
-        listitem.setLabel(attribute.getColumn());
+        //listitem
+        Listcell listItemCell=new Listcell();
+        listItemCell.setLabel(attribute.getColumn());
+        listItemCell.setParent(listitem);
+        Button closeButton=new Button();
+        closeButton.setParent(listItemCell);
+        closeButton.setIconSclass("z-icon-times");
+        listitem.appendChild(listItemCell);
+        closeButton.addEventListener("onClick", event -> {
+            labels.remove(attribute);    
+            pie.setLabel(null);
+            labelListbox.setDroppable(Constants.TRUE);
+        });
     };
     
     private EventListener<Event> loadingListener = event -> {
