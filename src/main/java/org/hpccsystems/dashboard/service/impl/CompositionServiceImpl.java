@@ -53,7 +53,7 @@ public class CompositionServiceImpl implements CompositionService{
             String compName = label.replaceAll("[^a-zA-Z0-9]+", "");
             composition.setName(compName);
             updateRawDataset(composition, "~" + widget.getLogicalFile(),dashboard.getHpccConnection());
-            ContractInstance pluginContract = createPlugin(label,composition,widget);       
+            ContractInstance pluginContract = createPlugin(label,widget);       
             //refreshes the plugins
             hipieService.refreshData();
             ContractInstance datasource=composition.getContractInstanceByName(HIPIE_RAW_DATASET);
@@ -65,7 +65,20 @@ public class CompositionServiceImpl implements CompositionService{
             LOGGER.error(Constants.EXCEPTION, e);
         }
     }
-
+    
+    public void updateComposition(Dashboard dashboard, Widget widget) {
+        HIPIEService hipieService = HipieSingleton.getHipie();
+        Composition composition;
+        try {
+            composition = hipieService.getComposition(authenticationService.getUserCredential().getId(), dashboard.getCompositionName());
+            //
+            appendOnPlugin(composition,widget,composition.getName());       
+            HipieSingleton.getHipie().saveComposition(authenticationService.getUserCredential().getId(), composition);
+        } catch (Exception e) {
+            LOGGER.error(Constants.EXCEPTION, e);
+        }
+    }
+    
     @Override
     public void runComposition(Dashboard dashboard) {
         HIPIEService hipieService=HipieSingleton.getHipie();
@@ -92,8 +105,26 @@ public class CompositionServiceImpl implements CompositionService{
         rawDatasetContract.setAllProperties(paramMap);
         //TODO:Need to set FieldSeparator & other info for NON-THOR files
     }
-    
-    private ContractInstance createPlugin(String compName,Composition composition,Widget widget) throws Exception {   
+    private void appendOnPlugin(Composition composition,Widget widget,String contractName) throws Exception {
+        Contract contract = composition.getContractInstanceByName(contractName).getContract();
+        HIPIEService hipieService=HipieSingleton.getHipie();
+        Element input=contract.getInputElements().iterator().next();
+        widget.generateInputElement().stream().forEach(inputElement->
+            input.addChildElement(inputElement)
+        );
+        
+        VisualElement visualization=contract.getVisualElements().iterator().next();
+        visualization.addChildElement(widget.generateVisualElement());
+        hipieService.saveContract(authenticationService.getUserCredential().getId(), contract);
+        
+        hipieService.refreshData();
+        ContractInstance pluginInstance = composition.getContractInstanceByName(contractName);
+        
+        widget.getInstanceProperties().forEach((propertyName,propertyValue)->
+            pluginInstance.setProperty(propertyName,propertyValue)
+        );
+    }
+    private ContractInstance createPlugin(String compName,Widget widget) throws Exception {   
         
         Contract contract = new Contract();
         HIPIEService hipieService = HipieSingleton.getHipie();

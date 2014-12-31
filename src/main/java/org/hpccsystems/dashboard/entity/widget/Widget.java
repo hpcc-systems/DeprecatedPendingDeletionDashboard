@@ -2,7 +2,6 @@ package org.hpccsystems.dashboard.entity.widget;
 
 import java.util.List;
 import java.util.Map;
-
 import org.hpcc.HIPIE.dude.InputElement;
 import org.hpcc.HIPIE.dude.VisualElement;
 
