@@ -1,6 +1,7 @@
 package org.hpccsystems.dashboard.entity.widget.charts;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -84,7 +85,6 @@ public class Pie extends Widget {
     @Override
     public VisualElement generateVisualElement() {
 
-        StringBuilder builder = null;
         VisualElement visualElement = new VisualElement();
         // TODO:Need to set chart type using Hipie's 'Element' class
         visualElement.setType(this.getChartConfiguration().getHipieChartId());
@@ -97,22 +97,17 @@ public class Pie extends Widget {
         RecordInstance ri = new RecordInstance();
         visualElement.setBasisQualifier(ri);
 
-        // Attribute settings
-        builder = new StringBuilder();
-        builder.append("Attribute").append("_").append(this.getName());
-        ri.add(new FieldInstance(null, builder.toString()));
+        // Attribute settings       
+        ri.add(new FieldInstance(null, getPluginAttribute()));
         visualElement.addOption(new ElementOption(VisualElement.LABEL,
-                new FieldInstance(null, builder.toString())));
+                new FieldInstance(null, getPluginAttribute())));
 
         // Measures settings
-        builder = new StringBuilder();
-        // generates Name as 'Measure1_chartName[ie: getName()]'
-        builder.append("Measure").append("_").append(this.getName());
         ri.add(new FieldInstance((getWeight().getAggregation() != null) ? getWeight()
-                .getAggregation().toString() : null, builder.toString()));
+                .getAggregation().toString() : null, getPluginMeasure()));
 
         visualElement.addOption(new ElementOption(VisualElement.WEIGHT,
-                new FieldInstance(null, builder.toString())));
+                new FieldInstance(null, getPluginMeasure())));
 
         // Setting Tittle for chart
         visualElement.addOption(new ElementOption(VisualElement.TITLE,
@@ -123,8 +118,10 @@ public class Pie extends Widget {
 
     @Override
     public Map<String, String> getInstanceProperties() {
-        // TODO Auto-generated method stub
-        return null;
+        Map<String, String> fieldNames = new HashMap<String, String>();
+        fieldNames.put(getPluginAttribute(), this.getLabel().getColumn());
+        fieldNames.put(getPluginMeasure(), this.getWeight().getColumn());
+        return fieldNames;
     }
 
     @Override
@@ -132,22 +129,15 @@ public class Pie extends Widget {
 
         List<InputElement> inputs = new ListModelList<InputElement>();
 
-        StringBuilder attributeName = null;
-        attributeName = new StringBuilder();
-        // generates Name as 'Attribute_chartName(ie: getName())'
-        attributeName.append("Attribute").append("_").append(this.getName());
         InputElement attributeInput = new InputElement();
-        attributeInput.setName(attributeName.toString());
+        attributeInput.setName(getPluginAttribute());
         attributeInput.addOption(new ElementOption(Element.LABEL,
                 new FieldInstance(null,getLabel().getColumn())));
         attributeInput.setType(InputElement.TYPE_FIELD);
         inputs.add(attributeInput);
 
-        StringBuilder measureName = new StringBuilder();
-        // generates Name as 'Measure1_chartName(ie: getName())'
-        measureName.append("Measure").append("_").append(this.getName());
         InputElement measureInput = new InputElement();
-        measureInput.setName(measureName.toString());
+        measureInput.setName(getPluginMeasure());
         measureInput.addOption(new ElementOption(Element.LABEL,
                 new FieldInstance(null,getWeight().getColumn())));
         measureInput.setType(InputElement.TYPE_FIELD);
@@ -173,4 +163,26 @@ public class Pie extends Widget {
         }        
         return sqlColumnList;
     }
+
+    /**
+     * generates Name as 'Attribute_chartName(ie: getName())'
+     * @return String
+     */
+    public String getPluginAttribute() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Attribute").append("_").append(this.getName());
+        return builder.toString();
+    }
+
+    /**
+     * generates Name as 'Measure1_chartName[ie: getName()]'
+     * @return String
+     */
+    public String getPluginMeasure() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Measure").append("_").append(this.getName());
+        return builder.toString();
+    }
+    
+    
 }

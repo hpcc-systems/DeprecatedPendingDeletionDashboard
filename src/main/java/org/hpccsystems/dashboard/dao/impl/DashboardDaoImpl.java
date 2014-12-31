@@ -67,19 +67,20 @@ public class DashboardDaoImpl implements DashboardDao {
     }
     
     public void deleteDashboard(final Integer dashboardId) throws DataAccessException {
-        jdbcTemplate.update("delete from dashboard_details where dashboard_id=?", new Object[] { 
+        jdbcTemplate.update("delete from dashboard where dashboard_id=?", new Object[] { 
                  dashboardId
          });
      }
     
     @Override
     public void updateDashboard(final Dashboard dashboard ,String userId) throws DataAccessException {
-    	jdbcTemplate.update("update dashboard_details set name=?, user_id=?, visibility=?,last_updated_date=?, hpcc_id=? where dashboard_id=?;", new Object[] { 
+    	jdbcTemplate.update("update dashboard set name=?, user_id=?, visibility=?,last_updated_date=?, hpcc_id=? composition_name=? where dashboard_id=?", new Object[] { 
     			dashboard.getName(),
     			userId,
     			dashboard.getVisiblity(),
     			new java.sql.Date(new Date().getTime()),
     			dashboard.getHpccId(),
+    			dashboard.getCompositionName(),
     			dashboard.getId()
             });
     }
