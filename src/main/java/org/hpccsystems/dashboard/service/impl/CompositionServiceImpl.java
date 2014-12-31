@@ -60,6 +60,7 @@ public class CompositionServiceImpl implements CompositionService{
             pluginContract.addPrecursor(datasource);    
             composition = HipieSingleton.getHipie().saveCompositionAs(authenticationService.getUserCredential().getId(), composition,
                      compName + ".cmp");
+            dashboard.setCompositionName( composition.getCanonicalName());           
         } catch (Exception e) {
             LOGGER.error(Constants.EXCEPTION, e);
         }

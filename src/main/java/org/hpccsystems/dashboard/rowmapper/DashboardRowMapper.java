@@ -16,6 +16,7 @@ public class DashboardRowMapper implements RowMapper<Dashboard> {
         dashboard.setHpccId(rs.getString("hpcc_id"));
         dashboard.setName(rs.getString("name"));
         dashboard.setVisiblity(rs.getInt("visibility"));
+        dashboard.setCompositionName(rs.getString("composition_name"));
         return dashboard;
     }
 
