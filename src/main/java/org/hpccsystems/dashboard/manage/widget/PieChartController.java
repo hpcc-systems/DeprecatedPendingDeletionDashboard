@@ -84,7 +84,6 @@ public class PieChartController extends SelectorComposer<Component> {
     };
     
     private ListitemRenderer<Measure> weightRenderer = (listitem, measure, index) -> {
-        //listitem
         Listcell listItemCell=new Listcell();
         listItemCell.setLabel(measure.getColumn());
         listItemCell.setParent(listitem);
@@ -99,7 +98,6 @@ public class PieChartController extends SelectorComposer<Component> {
         });
     };
     private ListitemRenderer<Attribute> labelRenderer = (listitem, attribute, index) -> {
-        //listitem
         Listcell listItemCell=new Listcell();
         listItemCell.setLabel(attribute.getColumn());
         listItemCell.setParent(listitem);

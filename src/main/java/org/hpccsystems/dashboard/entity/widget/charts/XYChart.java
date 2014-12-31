@@ -90,6 +90,19 @@ public class XYChart extends Widget{
     public void setMeasure(List<Measure> measures) {
         this.measures = measures;
     }
+    
+    public void addMeasure(Measure measure){
+        if(this.measures!=null){
+            this.measures.add(measure);
+    }else{
+            this.measures=new ArrayList<Measure>();
+            this.measures.add(measure);
+        }
+    }
+    
+    public void removeMeasure(Measure measure){
+        this.measures.remove(measure);
+    }
 
     public Attribute getGroupAttribute() {
         return groupAttribute;
