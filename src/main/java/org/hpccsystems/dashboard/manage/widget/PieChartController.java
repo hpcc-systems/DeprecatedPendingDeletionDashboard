@@ -128,6 +128,7 @@ public class PieChartController extends SelectorComposer<Component> {
             Clients.showNotification("Only measure objects can be dropped","warning",weightListbox,"end_center", 5000, true);
         }else{
             pie.setWeight(measure);
+            weights.add(measure);
             weightListbox.setDroppable("false");
         }
         if(pie.isConfigured()) {            
@@ -146,6 +147,7 @@ public class PieChartController extends SelectorComposer<Component> {
         Field field = draggedItem.getValue();
         Attribute attribute = new Attribute(field);
         pie.setLabel(attribute);
+        labels.add(attribute);
         labelListbox.setDroppable("false");
         if(pie.isConfigured()) {            
             try {
