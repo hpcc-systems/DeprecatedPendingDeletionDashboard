@@ -63,6 +63,7 @@ public class NavigationController extends SelectorComposer<Component> {
                 listitem.appendChild(iconChild);
                 listitem.setLabel(dashboard.getName());
                 listitem.setAttribute(Constants.DASHBOARD, dashboard);
+                listitem.addEventListener("onClick", navItemSelectLisnr);
             }
         });
         //Selecting first dashboard
@@ -107,11 +108,7 @@ public class NavigationController extends SelectorComposer<Component> {
         window.doModal();
     }
     EventListener<Event> navItemSelectLisnr = new SerializableEventListener<Event>() {
-        /**
-         * 
-         */
         private static final long serialVersionUID = 1L;
-
         public void onEvent(final Event event) {
             final Include include = (Include) Selectors.iterable(dashboardContainer, "#dashboardInclude").iterator().next();
             includeDashboard(event,include);

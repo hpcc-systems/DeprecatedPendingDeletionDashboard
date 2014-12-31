@@ -63,7 +63,7 @@ public class DashboardController extends SelectorComposer<Component>{
              public void onEvent(ClickEvent event) {
                  
                  if(Messagebox.Button.YES.equals(event.getButton())) {
-                    final Listbox navBar  = (Listbox) Selectors.iterable(DashboardController.this.getSelf().getPage(), "dashboardListbox").iterator().next();
+                    final Listbox navBar  = (Listbox) Selectors.iterable(DashboardController.this.getSelf().getPage(), "#dashboardListbox").iterator().next();
                        
                     navBar.getSelectedItem().setVisible(false);
                        
