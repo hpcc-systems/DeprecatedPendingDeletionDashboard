@@ -1,5 +1,7 @@
 package org.hpccsystems.dashboard.entity.widget.charts;
 
+import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -26,8 +28,12 @@ public class XYChart extends Widget{
     
     @Override
     public List<String> getColumns() {
-        // TODO Auto-generated method stub
-        return null;
+        List<String> columnList=new ArrayList<String>();
+        columnList.add(attribute.getDisplayName());
+        measures.stream().forEach(measure->{
+            columnList.add(measure.getDisplayName());
+        });        
+        return columnList;
     }
 
     @Override
@@ -187,7 +193,20 @@ public class XYChart extends Widget{
 
     @Override
     public List<String> getSQLColumns() {
-        // TODO Auto-generated method stub
-        return null;
+        List<String> sqlColumnList=new ArrayList<String>();
+        int listSize=0;
+        sqlColumnList.add(attribute.getDisplayName());
+        listSize++;
+        Iterator<Measure> measureIterator=measures.iterator();
+        while(measureIterator.hasNext()){
+            Measure measure=measureIterator.next();            
+        if((measure.getAggregation()!=null)&&(measure.getAggregation()!=AGGREGATION.NONE)){
+            sqlColumnList.add(measure.getAggregation().toString()+"out"+listSize);
+        }else{
+            sqlColumnList.add(measure.getDisplayName());
+        }   
+        listSize++;
+        }
+        return sqlColumnList;
     }
 }
