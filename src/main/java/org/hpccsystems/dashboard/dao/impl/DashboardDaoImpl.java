@@ -75,7 +75,7 @@ public class DashboardDaoImpl implements DashboardDao {
     
     @Override
     public void updateDashboard(final Dashboard dashboard ,String userId) throws DataAccessException {
-    	jdbcTemplate.update("update dashboard set name=?, user_id=?, visibility=?,last_updated_date=?, hpcc_id=? AND composition_name=? where id=?", new Object[] { 
+    	jdbcTemplate.update("update dashboard set name=?, user_id=?, visibility=?,last_updated_date=?, hpcc_id=?,composition_name=? where id=?", new Object[] { 
     			dashboard.getName(),
     			userId,
     			dashboard.getVisiblity(),
