@@ -22,8 +22,7 @@ public class MeasureRenderer implements ListitemRenderer<Measure> {
     @Override
     public void render(Listitem listitem, Measure measure, int index) throws Exception {
         listitem.setValue(measure);
-        Listcell listcell = new Listcell();
-        listitem.setLabel(measure.getColumn());
+        Listcell listcell = new Listcell(measure.getColumn());
         listitem.setDraggable(Constants.TRUE);
         
         final Popup popup = new Popup();
@@ -33,7 +32,6 @@ public class MeasureRenderer implements ListitemRenderer<Measure> {
         final Button button = new Button("sum");
         measure.setAggregation(AGGREGATION.SUM);
         button.setZclass("btn btn-xs");
-        button.setStyle("font-size: 10px; float: right;");
         button.setPopup(popup);
 
         Listbox listbox = new Listbox();

@@ -29,7 +29,11 @@
 				</listhead>
 			</listbox>
 			
-			<include id="filterHolder" vflex="1"></include>
+			<listbox width="200px" vflex="1" id="filterbox" droppable="true">
+				<listhead>
+					<listheader label="${labels.filter}"></listheader>
+				</listhead>
+			</listbox>
 			
 		</vbox>
 

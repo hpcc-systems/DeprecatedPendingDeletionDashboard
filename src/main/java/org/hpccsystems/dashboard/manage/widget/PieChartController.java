@@ -52,14 +52,11 @@ public class PieChartController extends ConfigurationComposer<Component> {
     private Div chart;
     
     private ListitemRenderer<Measure> weightRenderer = (listitem, measure, index) -> {
-        Listcell listcellOne = new Listcell();
-    	Listcell listcellTwo = new Listcell();
-    	Listcell listcellThree = new Listcell();
-    	listcellOne.setLabel(measure.getColumn());
+        Listcell listcell = new Listcell(measure.getColumn());
     	Button button = new Button();
     	button.setLabel(measure.getAggregation().toString());
 		button.setZclass("btn btn-xs");
-		button.setStyle("font-size: 10px; float: right;");
+		
 		Button closeButton=new Button();
 	    closeButton.setIconSclass("z-icon-times");
 	    closeButton.addEventListener("onClick", event -> {
@@ -67,12 +64,12 @@ public class PieChartController extends ConfigurationComposer<Component> {
             pie.setWeight(null);
             weightListbox.setDroppable(Constants.TRUE);
         });
-    	listcellTwo.appendChild(button);
-    	listcellThree.appendChild(closeButton);
-    	listcellOne.setParent(listitem);
-    	listcellTwo.setParent(listitem);
-    	listcellThree.setParent(listitem);
+	    
+    	listcell.appendChild(button);
+    	listcell.appendChild(closeButton);
+    	listitem.appendChild(listcell);
     };
+    
     private ListitemRenderer<Attribute> labelRenderer = (listitem, attribute, index) -> {
         Listcell listItemCell=new Listcell();
         listItemCell.setLabel(attribute.getColumn());
@@ -110,19 +107,15 @@ public class PieChartController extends ConfigurationComposer<Component> {
             Clients.showNotification("Only measure objects can be dropped","warning",weightListbox,"end_center", 5000, true);
             return;
         }
-            Listitem draggedItem = (Listitem) event.getDragged();
-            Measure measure = draggedItem.getValue();
-            pie.setWeight(measure);
-            weights.add(measure);
-            weightListbox.setDroppable(Constants.FALSE);
+        
+        Listitem draggedItem = (Listitem) event.getDragged();
+        Measure measure = draggedItem.getValue();
+        pie.setWeight(measure);
+        weights.add(measure);
+        weightListbox.setDroppable(Constants.FALSE);
         
         if(pie.isConfigured()) {            
-            try {
-                drawChart();
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+            drawChart();
         }
     }
 
@@ -135,21 +128,21 @@ public class PieChartController extends ConfigurationComposer<Component> {
         labels.add(attribute);
         labelListbox.setDroppable(Constants.FALSE);
         if(pie.isConfigured()) {            
-            try {
-                drawChart();
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+           drawChart();
         }
     }
     
-    private void drawChart() throws Exception {
-        ChartdataJSON chartData = wssqlService.getChartdata(pie, hpccConnection);
-        if(LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Div id -{}\nJSON - {}", chart.getUuid(), new GsonBuilder().setPrettyPrinting().create().toJson(chartData));
+    private void drawChart() {
+        ChartdataJSON chartData;
+        try {
+            chartData = wssqlService.getChartdata(pie, hpccConnection);
+            if(LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Div id -{}\nJSON - {}", chart.getUuid(), new GsonBuilder().setPrettyPrinting().create().toJson(chartData));
+            }
+            Clients.evalJavaScript("createPreview('"+ chart.getUuid()+"','pie','"+ StringEscapeUtils.escapeJavaScript(new Gson().toJson(chartData))+"')");
+        } catch (Exception e) {
+            //TODO: Show error using JS
         }
-        Clients.evalJavaScript("createPreview('"+ chart.getUuid()+"','pie','"+ StringEscapeUtils.escapeJavaScript(new Gson().toJson(chartData))+"')");
     }
     
     

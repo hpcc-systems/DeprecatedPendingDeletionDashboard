@@ -6,6 +6,13 @@ public class StringFilter extends Filter {
 
     private List<String> values;
     
+    public StringFilter() {
+    }
+    
+    public StringFilter(Field field) {
+        super(field);
+    }
+    
     public List<String> getValues() {
         return values;
     }

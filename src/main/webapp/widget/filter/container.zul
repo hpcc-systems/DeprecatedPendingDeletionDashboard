@@ -1,7 +1,0 @@
-<listbox 
-	apply="org.hpccsystems.dashboard.manage.widget.filters.FilterController"
-	width="200px" vflex="1" id="listbox" droppable="true">
-	<listhead>
-		<listheader label="${labels.filter}"></listheader>
-	</listhead>
-</listbox>

@@ -5,6 +5,13 @@ public class NumericFilter extends Filter {
     private Number maxValue;
     private static final String DOT=".";
     
+    public NumericFilter() {
+    }
+    
+    public NumericFilter(Field field) {
+        super(field);
+    }
+    
     public Number getMinValue() {
         return minValue;
     }

@@ -1,5 +1,6 @@
 package org.hpccsystems.dashboard.entity.widget;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -51,6 +52,17 @@ public abstract class Widget {
     }
     public void setChartConfiguration(ChartConfiguration chartConfiguration) {
         this.chartConfiguration = chartConfiguration;
+    }
+    
+    public void addFilter(Filter filter) {
+        if(filters == null) {
+            filters = new ArrayList<Filter>();
+        }
+        filters.add(filter);
+    }
+    
+    public void removeFilter(Filter filter) {
+        filters.remove(filter);
     }
     
 }
