@@ -94,6 +94,11 @@ public class XYChartController extends ConfigurationComposer<Component> {
         chartMeasureListbox.setItemRenderer(chartMeasureRenderer);
         chartAttributeListbox.setModel(attributes);
         chartAttributeListbox.setItemRenderer(chartAttributeRenderer);
+        if(xyChart.isConfigured()){
+            measures.addAll(xyChart.getMeasures());
+            attributes.add(xyChart.getAttribute());
+            drawChart();
+        }
     }    
     
     @Listen("onDrop = #chartMeasureListbox")

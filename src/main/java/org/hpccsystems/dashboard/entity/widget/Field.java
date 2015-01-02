@@ -52,5 +52,21 @@ public class Field {
     public void setFile(String file) {
         this.file = file;
     }
+    
+    @Override
+    public boolean equals(Object o){
+        final Field thisField=(Field) o;
+        if(this.column==thisField.column&&this.dataType==thisField.dataType)
+            return true;
+        else
+            return false;
+    }
+    
+    @Override    
+    public int hashCode(){
+        int hash = 3;
+        hash = 53 * hash + (this.column != null ? this.column.hashCode() : 0);
+        return hash;
+    }
 
 }

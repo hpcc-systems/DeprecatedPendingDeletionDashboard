@@ -122,7 +122,12 @@ public class USMapController extends ConfigurationComposer<Component> {
         chartMeasureListbox.setModel(measures);
         chartMeasureListbox.setItemRenderer(chartMeasureRenderer);
         chartAttributeListbox.setModel(states);
-        chartAttributeListbox.setItemRenderer(chartAttributeRenderer);        
+        chartAttributeListbox.setItemRenderer(chartAttributeRenderer);      
+        if(usMap.isConfigured()){
+            measures.add(usMap.getMeasure());
+            states.add(usMap.getState());
+            drawChart();
+        }
     }
     
     @Listen("onDrop = #chartMeasureListbox")

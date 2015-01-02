@@ -99,6 +99,11 @@ public class PieChartController extends ConfigurationComposer<Component> {
         weightListbox.setItemRenderer(weightRenderer);
         labelListbox.setModel(labels);
         labelListbox.setItemRenderer(labelRenderer);
+        if(pie.isConfigured()){
+            weights.add(pie.getWeight());
+            labels.add(pie.getLabel());
+            drawChart();
+        }
     }
     
     @Listen("onDrop = #weightListbox")
@@ -127,7 +132,7 @@ public class PieChartController extends ConfigurationComposer<Component> {
         pie.setLabel(attribute);
         labels.add(attribute);
         labelListbox.setDroppable(Constants.FALSE);
-        if(pie.isConfigured()) {            
+        if(pie.isConfigured()) {   
            drawChart();
         }
     }

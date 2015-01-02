@@ -3,10 +3,6 @@ package org.hpccsystems.dashboard.manage.widget;
 import java.util.List;
 import java.util.stream.Collectors;
 
-
-
-
-
 import org.hpcc.HIPIE.utils.HPCCConnection;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.widget.Field;
@@ -14,7 +10,6 @@ import org.hpccsystems.dashboard.entity.widget.Filter;
 import org.hpccsystems.dashboard.entity.widget.Measure;
 import org.hpccsystems.dashboard.entity.widget.NumericFilter;
 import org.hpccsystems.dashboard.entity.widget.StringFilter;
-import org.hpccsystems.dashboard.entity.widget.Widget;
 import org.hpccsystems.dashboard.manage.WidgetConfiguration;
 import org.hpccsystems.dashboard.service.HPCCFileService;
 import org.slf4j.Logger;
@@ -95,6 +90,9 @@ public class ConfigurationComposer<T> extends SelectorComposer<Component>{
         widget=widgetConfiguration.getWidget();
         filterbox.setModel(filterModel);
         filterbox.setItemRenderer(filterRenderer);
+        if(widgetConfiguration.getWidget().isConfigured()){
+        filterModel.addAll(widgetConfiguration.getWidget().getFilters());
+        }
     }
     
     
@@ -104,8 +102,12 @@ public class ConfigurationComposer<T> extends SelectorComposer<Component>{
         Field field = draggedItem.getValue();
         
         Filter filter = field.isNumeric() ? new NumericFilter(field) : new StringFilter(field);
+        if(widgetConfiguration.getWidget().getFilters()!=null&&widgetConfiguration.getWidget().getFilters().contains(filter)){
+            Clients.showNotification("Filter already exists","warning",filterbox,"end_center", 5000, true);
+        }else{
         widgetConfiguration.getWidget().addFilter(filter);
         filterModel.add(filter);
+        }
     }
     
     private void renderFilter(Listitem item, Filter filter) {
