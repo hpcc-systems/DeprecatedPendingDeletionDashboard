@@ -11,18 +11,15 @@ import org.hpccsystems.dashboard.entity.widget.ChartdataJSON;
 import org.hpccsystems.dashboard.entity.widget.Field;
 import org.hpccsystems.dashboard.entity.widget.Measure;
 import org.hpccsystems.dashboard.entity.widget.charts.Pie;
-import org.hpccsystems.dashboard.manage.WidgetConfiguration;
 import org.hpccsystems.dashboard.service.HPCCFileService;
 import org.hpccsystems.dashboard.service.WSSQLService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.DropEvent;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
-import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
@@ -40,12 +37,11 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public class PieChartController extends SelectorComposer<Component> {
+public class PieChartController extends ConfigurationComposer<Component> {
     private static final String ON_LOADING = "onLoading";
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(PieChartController.class);
     
-    private WidgetConfiguration widgetConfiguration;
     private Pie pie;
     
     @Wire
@@ -139,7 +135,6 @@ public class PieChartController extends SelectorComposer<Component> {
     @Override
     public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
-        widgetConfiguration = (WidgetConfiguration) Executions.getCurrent().getArg().get(Constants.WIDGET_CONFIG);
         pie = (Pie) widgetConfiguration.getWidget();
         hpccConnection = widgetConfiguration.getDashboard().getHpccConnection();
         comp.addEventListener(ON_LOADING, loadingListener);

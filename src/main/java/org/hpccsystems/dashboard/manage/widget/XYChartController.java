@@ -11,18 +11,15 @@ import org.hpccsystems.dashboard.entity.widget.ChartdataJSON;
 import org.hpccsystems.dashboard.entity.widget.Field;
 import org.hpccsystems.dashboard.entity.widget.Measure;
 import org.hpccsystems.dashboard.entity.widget.charts.XYChart;
-import org.hpccsystems.dashboard.manage.WidgetConfiguration;
 import org.hpccsystems.dashboard.service.HPCCFileService;
 import org.hpccsystems.dashboard.service.WSSQLService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.DropEvent;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
-import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
@@ -40,18 +37,12 @@ import org.zkoss.zul.Tabbox;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 
-/**
- * EditChartController class is used to handle the edit page of the Dashboard
- * project and controller class for edit_portlet.zul file.
- * 
- */
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public class XYChartController extends SelectorComposer<Component> {
+public class XYChartController extends ConfigurationComposer<Component> {
     private static final String ON_LOADING = "onLoading";
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(XYChartController.class);
     
-    private WidgetConfiguration widgetConfiguration;
     private XYChart xyChart;
     
     @Wire
@@ -137,27 +128,9 @@ public class XYChartController extends SelectorComposer<Component> {
         Clients.clearBusy(XYChartController.this.getSelf());
     };
     
-    /*    
-    final Map<String, Object> parameters = new HashMap<String, Object>();
-    
-    @Override
-    public ComponentInfo doBeforeCompose(Page page, Component parent, ComponentInfo compInfo) {
-        return super.doBeforeCompose(page, parent, compInfo);
-    }
-    
-    @Override
-    public void doBeforeComposeChildren(Component comp) throws Exception {
-        super.doBeforeComposeChildren(comp);
-    }
-    
-    public boolean getShowGroupPanel() {
-        return false;
-    }*/
-    
     @Override
     public void doAfterCompose(final Component comp) throws Exception {
         super.doAfterCompose(comp);
-        widgetConfiguration = (WidgetConfiguration) Executions.getCurrent().getArg().get(Constants.WIDGET_CONFIG);
         xyChart = (XYChart) widgetConfiguration.getWidget();
         hpccConnection = widgetConfiguration.getDashboard().getHpccConnection();
         comp.addEventListener(ON_LOADING, loadingListener);
