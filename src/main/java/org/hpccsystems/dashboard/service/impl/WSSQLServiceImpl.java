@@ -163,18 +163,18 @@ public  class WSSQLServiceImpl implements WSSQLService{
              final StringBuilder queryTxt = new StringBuilder(SELECT);
              queryTxt.append(fileName);
              queryTxt.append(".");
-             queryTxt.append(field);
+             queryTxt.append(field.getColumn());
              queryTxt.append(" from ");
              queryTxt.append(fileName);
 
-             if (!filters.isEmpty()) {            	 
+             if (filters != null && !filters.isEmpty()) {            	 
                 queryTxt.append(constructWhereClause(filters ,fileName));
              }
 
              queryTxt.append(" group by ");
              queryTxt.append(fileName);
              queryTxt.append(".");
-             queryTxt.append(field);
+             queryTxt.append(field.getColumn());
 
              if (LOGGER.isDebugEnabled()) {
             	 LOGGER.debug("Query for Distinct values -> " + queryTxt.toString());
@@ -312,6 +312,9 @@ public  class WSSQLServiceImpl implements WSSQLService{
             Iterator<Filter> iterator = filters.iterator();
             while (iterator.hasNext()) {
                 Filter filter = iterator.next();
+                if(!filter.hasValues()) {
+                    continue;
+                }
 
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("Contructing where clause " + filter.toString());
@@ -329,12 +332,12 @@ public  class WSSQLServiceImpl implements WSSQLService{
                     queryTxt.append(filter.getColumn());
                     queryTxt.append(" in ");
                     queryTxt.append(" (");
-
-                    for (int i = 1; i <= sfilter.getValues().size(); i++) {
-
-                        queryTxt.append(" '").append(sfilter.getValues().get(i - 1)).append("'");
+                    
+                    sfilter.getValues().forEach(value -> {
+                        queryTxt.append(" '").append(value).append("'");
                         queryTxt.append(",");
-                    }
+                    });
+                    
                     queryTxt.deleteCharAt(queryTxt.length()-1);
                     queryTxt.append(" )");
                 } else if(filter instanceof NumericFilter){
@@ -360,6 +363,6 @@ public  class WSSQLServiceImpl implements WSSQLService{
             }
         
     
-        return queryTxt.toString();
+        return queryTxt.length() <= WHERE_WITH_SPACES.length() ? "" : queryTxt.toString();
     }
 }

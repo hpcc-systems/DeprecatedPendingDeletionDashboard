@@ -19,17 +19,25 @@ public class StringFilter extends Filter {
     public void setValues(List<String> values) {
         this.values = values;
     }
+    
     @Override
     public String generateFilterSQL() {
         StringBuilder stringSql=new StringBuilder();
         stringSql.append("IN [");
+        
         values.stream().forEach(value->{
             stringSql.append("'")
             .append(value)
             .append("', ");
         });
+        
         stringSql.substring(0, stringSql.length()-4);
         stringSql.append("]");
         return stringSql.toString();
+    }
+
+    @Override
+    public boolean hasValues() {
+        return values != null && !values.isEmpty();
     }
 }

@@ -45,4 +45,9 @@ public class NumericFilter extends Filter {
         
         return numFilterSql.toString();
     }
+
+    @Override
+    public boolean hasValues() {
+        return minValue != null || maxValue != null;
+    }
 }
