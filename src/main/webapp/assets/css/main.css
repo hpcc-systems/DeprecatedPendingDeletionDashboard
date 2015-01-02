@@ -104,9 +104,11 @@
 	background-color: #434343;
 	color:#fff;
 }
-.left-sidebar .btn{ 
- display:block;
- margin:0 auto;
+.left-sidebar .btn.btn-info {
+	display:block;
+    background-color: #434343;
+    border-color:#434343;
+    width:100%;
 }
 
 .left-sidebar .glyphicon-stats{
@@ -162,17 +164,19 @@
 .config-caption .z-window-close{
 	float: right;
     margin: 5px 10px 5px 10px; 
-    color:red;
-    font-size:12px;  
+    color:red;    
+    border:none;
+	box-shadow:none;
+	background:none;
+	font-size:14px;  
 }
 
 .config-ok-button.z-button{
 	color:green;
-}
-
-.left-sidebar .btn.btn-info {
-    background-color: #868686;
-    border-color:#868686;
+	border:none;
+	box-shadow:none;
+	background:none;
+	font-size:14px;
 }
 
 .config-panel .z-window-content { 
@@ -206,6 +210,10 @@
 	border-color:#000;
 }
 
-.widget-panel .z-listbox-body,.widget-panel .z-listheader{
+.widget-panel .z-listbox-body,.widget-panel .z-listhead th:first-child {
 	border:1px solid #ccc;
+}
+
+.widget-panel.z-window{
+	background: none repeat scroll 0 0 #fff;
 }
