@@ -84,6 +84,7 @@ public class DashboardDaoImpl implements DashboardDao {
     			dashboard.getCompositionName(),
     			dashboard.getId()
             });
+    	
     }
    
 }
