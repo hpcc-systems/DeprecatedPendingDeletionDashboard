@@ -87,6 +87,8 @@ public class NavigationController extends SelectorComposer<Component> {
             int index = dashboardModel.indexOf(dashboard);
             dashboardService.deleteDashboard(dashboard.getId());
             dashboardModel.remove(dashboard);
+            Include include = (Include) getSelf().getFellow("container");
+            include.setSrc(null);
             select(index);
         });
     }
