@@ -5,6 +5,8 @@ import java.util.stream.Collectors;
 
 
 
+
+
 import org.hpcc.HIPIE.utils.HPCCConnection;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.widget.Field;
@@ -28,11 +30,13 @@ import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
+import org.zkoss.zul.Include;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.ListitemRenderer;
+import org.zkoss.zul.Popup;
 
 public class ConfigurationComposer<T> extends SelectorComposer<Component>{
     private static final long serialVersionUID = 1L;
@@ -81,21 +85,9 @@ public class ConfigurationComposer<T> extends SelectorComposer<Component>{
     };
     
     private  ListitemRenderer<Filter> filterRenderer = (item, filter, index) -> {
-        Listcell listcell = new Listcell(filter.getColumn());
-        
-        Button closeButton = new Button();
-        closeButton.setIconSclass("z-icon-times");
-        closeButton.addEventListener("onClick", event -> widget.removeFilter(filter));
-        
-        Button playButton = new Button();
-        playButton.setIconSclass("z-icon-play");
-        
-        listcell.appendChild(playButton);
-        listcell.appendChild(closeButton);
-        
-        item.appendChild(listcell);
+        renderFilter(item, filter);
     };
-    
+
     @Override
     public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
@@ -113,5 +105,36 @@ public class ConfigurationComposer<T> extends SelectorComposer<Component>{
         Filter filter = field.isNumeric() ? new NumericFilter(field) : new StringFilter(field);
         widgetConfiguration.getWidget().addFilter(filter);
         filterModel.add(filter);
+    }
+    
+    private void renderFilter(Listitem item, Filter filter) {
+        Listcell listcell = new Listcell(filter.getColumn());
+        
+        Button closeButton = new Button();
+        closeButton.setIconSclass("z-icon-times");
+        closeButton.addEventListener("onClick", event -> widget.removeFilter(filter));
+        
+        Button playButton = new Button();
+        playButton.setIconSclass("z-icon-play");
+        
+        Popup popup = new Popup(){
+            private static final long serialVersionUID = 1L;
+            
+            @Override
+            public void open(Component ref, String position) {
+                open(playButton, "end_center");
+            };
+            
+        };
+        Include include = new Include(filter.isNumeric() ? "widget/filter/numericPopup.zul" : "widget/filter/stringPopup.zul");
+        popup.appendChild(include);
+        
+        listcell.appendChild(playButton);
+        listcell.appendChild(closeButton);
+        listcell.appendChild(popup);
+        
+        playButton.setPopup(popup);
+        
+        item.appendChild(listcell);
     }
 }
