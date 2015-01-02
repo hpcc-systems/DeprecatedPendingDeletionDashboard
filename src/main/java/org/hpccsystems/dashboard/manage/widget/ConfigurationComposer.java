@@ -51,6 +51,7 @@ public class ConfigurationComposer<T> extends SelectorComposer<Component>{
         super.doAfterCompose(comp);
         widgetConfiguration = (WidgetConfiguration) Executions.getCurrent().getArg().get(Constants.WIDGET_CONFIG);
         filterHolder.setDynamicProperty(Constants.WIDGET_CONFIG, widgetConfiguration);
+        filterHolder.setSrc("widget/filter/container.zul");
     }
     
     protected EventListener<Event> loadingListener = event -> {
