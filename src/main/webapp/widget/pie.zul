@@ -29,7 +29,7 @@
 				</listhead>
 			</listbox>
 			
-			<include id="filterHolder"></include>
+			<include id="filterHolder" src="widget/filter/container.zul" vflex="1"></include>
 			
 		</vbox>
 
