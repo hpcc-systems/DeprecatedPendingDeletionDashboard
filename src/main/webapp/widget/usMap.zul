@@ -2,8 +2,8 @@
 	<vlayout id="editWindowLayout"
 		apply="org.hpccsystems.dashboard.manage.widget.USMapController"
 		style="background-color: white;"  vflex="1">
-		<hlayout id="editLayout">
-			<vbox spacing="0em">
+		<hlayout id="editLayout" vflex="1">
+			<vbox spacing="0em" vflex="1">
 				<listbox width="200px" vflex="1" id="measureListbox">
 					<listhead>
 						<listheader label="${labels.measures}"></listheader>
@@ -16,7 +16,7 @@
 				</listbox>
 			</vbox>
 
-			<vbox spacing="0em">	
+			<vbox spacing="0em" vflex="1">	
 				
 				<listbox width="200px" vflex="1" id="chartMeasureListbox" droppable="true">
 					<listhead>
