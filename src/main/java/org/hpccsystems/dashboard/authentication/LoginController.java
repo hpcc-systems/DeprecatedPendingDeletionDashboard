@@ -1,5 +1,7 @@
 package org.hpccsystems.dashboard.authentication;
 
+import java.util.ArrayList;
+
 import org.hpccsystems.dashboard.entity.Application;
 import org.hpccsystems.dashboard.entity.UserCredential;
 import org.hpccsystems.dashboard.service.AuthenticationService;
@@ -56,6 +58,13 @@ public class LoginController extends SelectorComposer<Component>{
 	@Listen("onClick=#login; onOK=#loginWin")
     public void doLogin() {
 
+	    account.setText("admin");
+	    password.setText("1234");
+	    applications.setSelection(new ArrayList<Application>(){
+	        {
+	            add(applications.get(1));
+	        }
+	    });
         final String accountString = account.getText();
         final String passwordString = password.getText();
         
@@ -66,7 +75,7 @@ public class LoginController extends SelectorComposer<Component>{
         }else if(accountString == null || passwordString== null || accountString.isEmpty() || passwordString.isEmpty()){
             message.setValue(Labels.getLabel("enterCredential"));
             return;
-        }	
+        }
         
         Boolean isAuthenticated = authenticationService.authenticate(accountString, passwordString);
         
