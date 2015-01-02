@@ -1,8 +1,10 @@
 package org.hpccsystems.dashboard.entity.widget;
 
+import java.math.BigDecimal;
+
 public class NumericFilter extends Filter {
-    private Number minValue;
-    private Number maxValue;
+    private BigDecimal minValue;
+    private BigDecimal maxValue;
     private static final String DOT=".";
     
     public NumericFilter() {
@@ -12,16 +14,16 @@ public class NumericFilter extends Filter {
         super(field);
     }
     
-    public Number getMinValue() {
+    public BigDecimal getMinValue() {
         return minValue;
     }
-    public void setMinValue(Number minValue) {
+    public void setMinValue(BigDecimal minValue) {
         this.minValue = minValue;
     }
-    public Number getMaxValue() {
+    public BigDecimal getMaxValue() {
         return maxValue;
     }
-    public void setMaxValue(Number maxValue) {
+    public void setMaxValue(BigDecimal maxValue) {
         this.maxValue = maxValue;
     }
     @Override

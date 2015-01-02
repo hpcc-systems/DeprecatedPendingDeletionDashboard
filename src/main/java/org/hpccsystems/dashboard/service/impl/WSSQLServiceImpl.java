@@ -49,7 +49,6 @@ public  class WSSQLServiceImpl implements WSSQLService{
 	private static final Logger LOGGER =LoggerFactory.getLogger(WSSQLServiceImpl.class);
 	
     private static final String SELECT = "select ";
-    private static final String WHERE = "where";
     private static final String WHERE_WITH_SPACES = " where ";
     
     private static final String HTTP = "http://";
@@ -223,8 +222,8 @@ public  class WSSQLServiceImpl implements WSSQLService{
     }
 
     @Override
-    public Map<String, Number> getMinMax(Field field, HPCCConnection connection, String fileName, List<Filter> filters) throws Exception {
-    	Map<String, Number> resultMap = null;
+    public Map<String, BigDecimal> getMinMax(Field field, HPCCConnection connection, String fileName, List<Filter> filters) throws Exception {
+    	Map<String, BigDecimal> resultMap = null;
 
           try {
         	  
@@ -249,7 +248,7 @@ public  class WSSQLServiceImpl implements WSSQLService{
             	  
             	 XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
             	 XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(new StringReader(resultString));
-            	 resultMap=new HashMap<String, Number>();
+            	 resultMap=new HashMap<String, BigDecimal>();
   				while(xmlEventReader.hasNext()){
   					XMLEvent xmlEvent = xmlEventReader.nextEvent();
   					if (xmlEvent.isStartElement()){
@@ -260,7 +259,7 @@ public  class WSSQLServiceImpl implements WSSQLService{
   	                       else if(startElement.getName().getLocalPart().equals("minout1")){
   	                           xmlEvent = xmlEventReader.nextEvent();
   	                         if(xmlEvent.isCharacters())
-  	                        	resultMap.put("min",new BigDecimal(xmlEvent.asCharacters().getData()));
+  	                        	resultMap.put("min", new BigDecimal((xmlEvent.asCharacters().getData())));
   	                        else
   	                        	resultMap.put("min",new BigDecimal(0));
   	                       }
