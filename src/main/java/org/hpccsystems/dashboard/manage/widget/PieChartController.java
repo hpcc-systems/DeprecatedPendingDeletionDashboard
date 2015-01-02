@@ -28,9 +28,11 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
+import org.zkoss.zul.Button;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.ListitemRenderer;
 
@@ -69,11 +71,6 @@ public class PieChartController extends SelectorComposer<Component> {
     @Wire
     private Div chart;
     
-    private ListitemRenderer<Field> measureRenderer = (listitem, field, index) -> {
-        listitem.setLabel(field.getColumn());
-        listitem.setDraggable(Constants.TRUE);
-        listitem.setValue(field);
-    };
     
     private ListitemRenderer<Field> attributeRenderer = (listitem, field, index) -> {
         listitem.setLabel(field.getColumn());
@@ -82,7 +79,16 @@ public class PieChartController extends SelectorComposer<Component> {
     };
     
     private ListitemRenderer<Measure> weightRenderer = (listitem, measure, index) -> {
-        listitem.setLabel(measure.getColumn());
+        Listcell listcellOne = new Listcell();
+    	Listcell listcellTwo = new Listcell();
+    	listcellOne.setLabel(measure.getColumn());
+    	Button button = new Button();
+    	button.setLabel(measure.getAggregation().toString());
+		button.setZclass("btn btn-xs");
+		button.setStyle("font-size: 10px; float: right;");
+    	listcellTwo.appendChild(button);
+    	listcellOne.setParent(listitem);
+    	listcellTwo.setParent(listitem);
     };
     private ListitemRenderer<Attribute> labelRenderer = (listitem, attribute, index) -> {
         listitem.setLabel(attribute.getColumn());
@@ -92,10 +98,11 @@ public class PieChartController extends SelectorComposer<Component> {
         List<Field> fields = 
                 hpccFileService.getFields(pie.getLogicalFile(), widgetConfiguration.getDashboard().getHpccConnection());
         measureListbox.setModel(
-                new ListModelList<Field>(
+                new ListModelList<Measure>(
                         fields.stream().filter(field -> field.isNumeric())
+                        .map(field -> new Measure(field))
                         .collect(Collectors.toList())));
-        measureListbox.setItemRenderer(measureRenderer);
+        measureListbox.setItemRenderer(new MeasureRenderer());
         
         attributeListbox.setModel(
                 new ListModelList<Field>(
@@ -128,8 +135,8 @@ public class PieChartController extends SelectorComposer<Component> {
     @Listen("onDrop = #weightListbox")
     public void onDropWeight(DropEvent event) {
         Listitem draggedItem = (Listitem) event.getDragged();
-        Field field = draggedItem.getValue();
-        Measure measure = new Measure(field);
+        Measure measure = draggedItem.getValue();
+      
         if(event.getDragged().getParent().equals(attributeListbox)){
             Clients.showNotification("Only measure objects can be dropped","warning",weightListbox,"end_center", 5000, true);
         }else{

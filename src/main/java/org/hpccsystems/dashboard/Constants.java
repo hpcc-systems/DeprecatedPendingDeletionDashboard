@@ -16,6 +16,7 @@ public class Constants {
     public static final Integer FILTER_MAXIMUM = 1;
     public static final String UNABLE_TO_FETCH_DATA = "Unable to fetch Hpcc data";
     public static final String HPCC_CONNECTION = "hpccConnection";
+    public static final String MEASURE = "measure";
     // Notification Types
     public static final String ERROR_NOTIFICATION = "error";
     // Notification positions
@@ -23,6 +24,7 @@ public class Constants {
     public static final String TRUE = "true";
     
     public static final String WIDGET_CONFIG = "widgetWrapper";
+    public static final String ON_SELECT = "onSelect";
     
     public static enum CHART_TYPES {PIE, DONUT, LINE, BAR, COLUMN, US_MAP, TABLE};
     
@@ -58,5 +60,9 @@ public class Constants {
         }
 
     }
+    
+ // Style class names
+    public static final String STYLE_POPUP = "popup";
+    
 }
 
