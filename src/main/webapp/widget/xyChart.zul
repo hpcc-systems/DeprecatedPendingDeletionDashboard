@@ -18,12 +18,12 @@
 
 			<vbox spacing="0em">	
 				
-				<listbox width="200px" height="270px" id="chartMeasureListbox">
+				<listbox width="200px" height="270px" id="chartMeasureListbox" droppable="true">
 					<listhead>
 						<listheader label="${labels.chartMeasures}"></listheader>
 					</listhead>
 				</listbox>
-				<listbox width="200px" height="270px" id="chartAttributeListbox">
+				<listbox width="200px" height="270px" id="chartAttributeListbox" droppable="true">
 					<listhead>
 						<listheader label="${labels.chartAttributes}"></listheader>
 					</listhead>

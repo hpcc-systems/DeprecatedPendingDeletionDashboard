@@ -9,12 +9,12 @@ import javax.sql.DataSource;
 
 import org.hpccsystems.dashboard.dao.DashboardDao;
 import org.hpccsystems.dashboard.entity.Dashboard;
-import org.hpccsystems.dashboard.rowmapper.DashboardRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.RowMapper;
 import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 import org.springframework.stereotype.Service;
 
@@ -24,6 +24,17 @@ import org.springframework.stereotype.Service;
 public class DashboardDaoImpl implements DashboardDao {
     
     private JdbcTemplate jdbcTemplate;
+    
+    private RowMapper<Dashboard> dahboardRowMapper = (rs, index) -> {
+        Dashboard dashboard = new Dashboard();
+        dashboard.setId(rs.getInt("id"));
+        dashboard.setApplicationId(rs.getString("application_id"));
+        dashboard.setHpccId(rs.getString("hpcc_id"));
+        dashboard.setName(rs.getString("name"));
+        dashboard.setVisiblity(rs.getInt("visibility"));
+        dashboard.setCompositionName(rs.getString("composition_name"));
+        return dashboard;
+    };
 
     @Autowired
     public void setJdbcTemplate(DataSource dataSource) {
@@ -47,30 +58,30 @@ public class DashboardDaoImpl implements DashboardDao {
                 .executeAndReturnKey(parameters);
 
         dashboard.setId(dashboardId.intValue());
-        
     }
 
     @Override
     public List<Dashboard> getDashboards(String userId, String applicationId) {
         
         String sql="SELECT * FROM dashboard WHERE user_id = ? AND application_id = ?";
-        return jdbcTemplate.query(sql, new Object[]{userId,applicationId}, new DashboardRowMapper());
+        return jdbcTemplate.query(sql, new Object[]{userId,applicationId}, dahboardRowMapper);
     }
     
     public void deleteDashboard(final Integer dashboardId) throws DataAccessException {
-        jdbcTemplate.update("delete from dashboard_details where dashboard_id=?", new Object[] { 
+        jdbcTemplate.update("delete from dashboard where id=?", new Object[] { 
                  dashboardId
          });
      }
     
     @Override
     public void updateDashboard(final Dashboard dashboard ,String userId) throws DataAccessException {
-    	jdbcTemplate.update("update dashboard_details set name=?, user_id=?, visibility=?,last_updated_date=?, hpcc_id=? where dashboard_id=?;", new Object[] { 
+    	jdbcTemplate.update("update dashboard set name=?, user_id=?, visibility=?,last_updated_date=?, hpcc_id=? AND composition_name=? where id=?", new Object[] { 
     			dashboard.getName(),
     			userId,
     			dashboard.getVisiblity(),
     			new java.sql.Date(new Date().getTime()),
     			dashboard.getHpccId(),
+    			dashboard.getCompositionName(),
     			dashboard.getId()
             });
     }

@@ -7,7 +7,7 @@ import org.hpcc.HIPIE.dude.InputElement;
 import org.hpcc.HIPIE.dude.VisualElement;
 
 public abstract class Widget {
-    private String name;
+    private String name = "samplechart";
     private String logicalFile;
     private List<Filter> filters;
     private String title;

@@ -70,8 +70,7 @@ public class ChartListController extends SelectorComposer<Component>{
         @Override
         public void onEvent(Event event) throws Exception {
         	Image img=(Image) event.getTarget();
-        	 ChartConfiguration configuration= (ChartConfiguration) img.getAttribute("config");
-        	 widgetConfiguration.setChartConfiguration(configuration);
+        	 ChartConfiguration configuration= (ChartConfiguration) img.getAttribute("config");        
         	 if(configuration.getType()==CHART_TYPES.PIE || configuration.getType()==CHART_TYPES.DONUT){
         		 widgetConfiguration.setWidget(new Pie()); 
         	 }else if(configuration.getType()==CHART_TYPES.BAR ||configuration.getType()==CHART_TYPES.COLUMN ||configuration.getType()==CHART_TYPES.LINE){
@@ -79,7 +78,7 @@ public class ChartListController extends SelectorComposer<Component>{
         	 }else if(configuration.getType()==CHART_TYPES.US_MAP ){
         		 widgetConfiguration.setWidget(new USMap());
         	 }
-       
+        	  widgetConfiguration.getWidget().setChartConfiguration(configuration);
         	 Events.postEvent(WidgetConfiguration.ON_CHART_TYPE_SELECT, widgetConfiguration.getHolder(), null);
            
         }

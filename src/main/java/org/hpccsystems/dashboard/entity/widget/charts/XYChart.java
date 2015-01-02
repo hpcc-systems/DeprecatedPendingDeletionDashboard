@@ -1,6 +1,7 @@
 package org.hpccsystems.dashboard.entity.widget.charts;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -89,6 +90,19 @@ public class XYChart extends Widget{
     public void setMeasure(List<Measure> measures) {
         this.measures = measures;
     }
+    
+    public void addMeasure(Measure measure){
+        if(this.measures!=null){
+            this.measures.add(measure);
+    }else{
+            this.measures=new ArrayList<Measure>();
+            this.measures.add(measure);
+        }
+    }
+    
+    public void removeMeasure(Measure measure){
+        this.measures.remove(measure);
+    }
 
     public Attribute getGroupAttribute() {
         return groupAttribute;
@@ -101,9 +115,7 @@ public class XYChart extends Widget{
     @Override
     public VisualElement generateVisualElement() {
 
-        StringBuilder attributeName = new StringBuilder();
         StringBuilder meaureLabels = new StringBuilder();
-        StringBuilder  measureName = new StringBuilder();
         VisualElement visualElement = new VisualElement();
         
         // TODO:Need to set chart type using Hipie's 'Element' class
@@ -118,22 +130,16 @@ public class XYChart extends Widget{
         visualElement.setBasisQualifier(ri);
 
         // Attribute settings
-        attributeName.append("Attribute").append("_").append(this.getName());
-        ri.add(new FieldInstance(null, attributeName.toString()));
+        ri.add(new FieldInstance(null, getPluginAttribute()));
         visualElement.addOption(new ElementOption(VisualElement.LABEL,
-                new FieldInstance(null, attributeName.toString())));
+                new FieldInstance(null, getPluginAttribute())));
 
         // Measures settings
         getMeasures().listIterator().forEachRemaining(measure -> {           
-            // generates Name as 'Measure1_chartName[ie: getName()]'
-            measureName.append("Measure")
-                        .append(getMeasures().indexOf(measure) + 1).append("_")
-                        .append(this.getName());
-                meaureLabels.append(measureName.toString()).append(",");
+                meaureLabels.append(getPluginMeasure(measure)).append(",");
                 ri.add(new FieldInstance(
                         (measure.getAggregation() != null) ? measure
-                                .getAggregation().toString() : null, measureName
-                                .toString()));
+                                .getAggregation().toString() : null,getPluginMeasure(measure) ));
             });
 
         // TODO:Need to check how behaves for multiple measures
@@ -150,33 +156,30 @@ public class XYChart extends Widget{
 
     @Override
     public Map<String, String> getInstanceProperties() {
-        // TODO Auto-generated method stub
-        return null;
+        Map<String, String> fieldNames = new HashMap<String, String>();
+        fieldNames.put(getPluginAttribute(), this.getAttribute().getColumn());
+        getMeasures().stream().forEach(
+                measure -> {
+                    fieldNames.put(this.getPluginMeasure(measure),
+                            measure.getColumn());
+                });
+        return fieldNames;
     }
 
     @Override
     public List<InputElement> generateInputElement() {
         List<InputElement> inputs = new ListModelList<InputElement>();
         
-        StringBuilder attributeName = null;
-        attributeName = new StringBuilder();
-        // generates Name as 'Attribute_chartName(ie: getName())'
-        attributeName.append("Attribute").append("_").append(this.getName());
         InputElement attributeInput = new InputElement();
-        attributeInput.setName(attributeName.toString());
+        attributeInput.setName(getPluginAttribute());
         attributeInput.addOption(new ElementOption(Element.LABEL,
                 new FieldInstance(null, getAttribute().getColumn())));
         attributeInput.setType(InputElement.TYPE_FIELD);
         inputs.add(attributeInput);
         
         getMeasures().listIterator().forEachRemaining(measure -> {
-            StringBuilder measureName = new StringBuilder();
-            // generates Name as 'Measure1_chartName(ie: getName())'
-                measureName.append("Measure")
-                        .append(getMeasures().indexOf(measure) + 1).append("_")
-                        .append(this.getName());
                 InputElement measureInput = new InputElement();
-                measureInput.setName(measureName.toString());
+                measureInput.setName(getPluginMeasure(measure));
                 measureInput.addOption(new ElementOption(Element.LABEL,
                         new FieldInstance(null, measure.getColumn())));
                 measureInput.setType(InputElement.TYPE_FIELD);
@@ -208,5 +211,28 @@ public class XYChart extends Widget{
         listSize++;
         }
         return sqlColumnList;
+    }
+    
+    
+    /**
+     * generates Name as 'Attribute_chartName(ie: getName())'
+     * @return String
+     */
+    public String getPluginAttribute() {
+        StringBuilder builder = new StringBuilder();
+        builder.append("Attribute").append("_").append(this.getName());
+        return builder.toString();
+    }
+
+    /**
+     * generates Name as 'Measure1_chartName(ie: getName())'
+     * @return String
+     */
+    public String getPluginMeasure(Measure measure) {
+        StringBuilder measureName = new StringBuilder();
+        measureName.append("Measure")
+                .append(getMeasures().indexOf(measure) + 1).append("_")
+                .append(this.getName());
+        return measureName.toString();
     }
 }

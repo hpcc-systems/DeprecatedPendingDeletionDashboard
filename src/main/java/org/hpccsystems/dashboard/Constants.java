@@ -8,6 +8,10 @@ import org.hpccsystems.dashboard.entity.widget.ChartConfiguration;
 public class Constants {
 
 	public static final String EXCEPTION = "EXCEPTION - {}";
+	
+	//Events
+	public static final String ON_DELTE_DASHBOARD = "onDeleteDashboard";
+	
 	public static final String HIPIE_RAW_DATASET = "RawDataset";
 	public static final String USER_CREDENTIAL = "userCredential";
     public static final String ON_ADD_DASHBOARD = "onAddDashboard";
@@ -17,11 +21,12 @@ public class Constants {
     public static final String UNABLE_TO_FETCH_DATA = "Unable to fetch Hpcc data";
     public static final String HPCC_CONNECTION = "hpccConnection";
     public static final String MEASURE = "measure";
+    public static final String TRUE = "true";
+
     // Notification Types
     public static final String ERROR_NOTIFICATION = "error";
     // Notification positions
     public static final String POSITION_CENTER = "middle_center";
-    public static final String TRUE = "true";
     
     public static final String WIDGET_CONFIG = "widgetWrapper";
     public static final String ON_SELECT = "onSelect";

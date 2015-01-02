@@ -2,7 +2,7 @@
 
 <zk>
 <?style src="assets/bootstrap/css/bootstrap.css"?>
-<?style src="assets/bootstrap/css/main.css"?>
+<?style src="assets/css/main.css"?>
 
 <?script src="assets/js/Visualization/widgets/lib/requirejs/require.js"?>
 <?script src="assets/js/chartRenderer.js"?>
@@ -13,7 +13,7 @@
 			<include src="banner.zul"></include>
 		</north>
 		<west width="205px">
-			<vbox vflex="1" zclass="left-sidebar" apply="org.hpccsystems.dashboard.manage.NavigationController">				
+			<vbox vflex="1" zclass="left-sidebar" id="navHolder" apply="org.hpccsystems.dashboard.manage.NavigationController">				
 				<div zclass="empty-space">
 					<space></space>					
 				</div>				
@@ -27,7 +27,7 @@
 		</west>
 		<center vflex="1" hflex="1">			
 			<div zclass="content" vflex="1" hflex="1">
-				<include src="dashboard/container.zul" id="dashboardInclude"></include>
+				<include id="container"></include>
 			</div>
 		</center>
 	</borderlayout>	

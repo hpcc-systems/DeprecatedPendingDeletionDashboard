@@ -86,12 +86,31 @@ public class PieChartController extends SelectorComposer<Component> {
     	button.setLabel(measure.getAggregation().toString());
 		button.setZclass("btn btn-xs");
 		button.setStyle("font-size: 10px; float: right;");
+		Button closeButton=new Button();
+		closeButton.setParent(listcellTwo);
+	    closeButton.setIconSclass("z-icon-times");
+	    closeButton.addEventListener("onClick", event -> {
+            weights.remove(measure);    
+            pie.setWeight(null);
+            weightListbox.setDroppable(Constants.TRUE);
+        });
     	listcellTwo.appendChild(button);
     	listcellOne.setParent(listitem);
     	listcellTwo.setParent(listitem);
     };
     private ListitemRenderer<Attribute> labelRenderer = (listitem, attribute, index) -> {
-        listitem.setLabel(attribute.getColumn());
+        Listcell listItemCell=new Listcell();
+        listItemCell.setLabel(attribute.getColumn());
+        listItemCell.setParent(listitem);
+        Button closeButton=new Button();
+        closeButton.setParent(listItemCell);
+        closeButton.setIconSclass("z-icon-times");
+        listitem.appendChild(listItemCell);
+        closeButton.addEventListener("onClick", event -> {
+            labels.remove(attribute);    
+            pie.setLabel(null);
+            labelListbox.setDroppable(Constants.TRUE);
+        });
     };
     
     private EventListener<Event> loadingListener = event -> {

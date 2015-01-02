@@ -88,7 +88,7 @@
 .sidebar-list .z-listitem.z-listitem-selected .z-listcell-content {
 	background-color: #434343;	
 	color:#fff;
-	background-image: url("assets/img/menu-active.png");
+	background-image: url("../img/menu-active.png");
 	background-repeat:no-repeat;
 	background-position:right center;	
 }	
