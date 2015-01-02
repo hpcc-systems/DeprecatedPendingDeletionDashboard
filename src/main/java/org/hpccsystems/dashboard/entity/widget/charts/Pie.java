@@ -5,6 +5,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.apache.commons.lang.StringUtils;
 import org.hpcc.HIPIE.dude.Element;
 import org.hpcc.HIPIE.dude.ElementOption;
 import org.hpcc.HIPIE.dude.FieldInstance;
@@ -91,7 +92,6 @@ public class Pie extends Widget {
         visualElement.addCustomOption(new ElementOption("_chartType",
                 new FieldInstance(null, this.getChartConfiguration()
                         .getHipieChartName())));
-
         visualElement.setName(DashboardUtil.removeSpaceSplChar(this.getName()));
 
         RecordInstance ri = new RecordInstance();

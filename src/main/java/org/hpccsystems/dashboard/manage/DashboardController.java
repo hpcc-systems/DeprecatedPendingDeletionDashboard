@@ -16,7 +16,9 @@ import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
+import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zul.Div;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Messagebox.ClickEvent;
 import org.zkoss.zul.Window;
@@ -29,6 +31,8 @@ public class DashboardController extends SelectorComposer<Component>{
     private AuthenticationService authenticationService;
     @WireVariable
     private DashboardService dashboardService;
+    @Wire
+    private Div chartDiv;
     
     private Dashboard dashboard;
     
@@ -44,7 +48,7 @@ public class DashboardController extends SelectorComposer<Component>{
                 "widget/config.zul", null, new HashMap<String, Object>() {
                     private static final long serialVersionUID = 1L;
                     {
-                        put(Constants.WIDGET_CONFIG, new WidgetConfiguration(dashboard));
+                        put(Constants.WIDGET_CONFIG, new WidgetConfiguration(dashboard,chartDiv));
                     }
                 });
         

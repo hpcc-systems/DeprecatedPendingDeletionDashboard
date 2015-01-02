@@ -6,6 +6,7 @@
 
 <?script src="assets/js/Visualization/widgets/lib/requirejs/require.js"?>
 <?script src="assets/js/chartRenderer.js"?>
+<?script src="assets/js/ddlChartRenderer.js"?>
 
 <div vflex="1" hflex="1" sclass="wrapper" style="">
 	<borderlayout>

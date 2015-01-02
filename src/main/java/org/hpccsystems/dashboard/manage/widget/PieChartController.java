@@ -53,21 +53,21 @@ public class PieChartController extends ConfigurationComposer<Component> {
     
     private ListitemRenderer<Measure> weightRenderer = (listitem, measure, index) -> {
         Listcell listcell = new Listcell(measure.getColumn());
-    	Button button = new Button();
-    	button.setLabel(measure.getAggregation().toString());
-		button.setZclass("btn btn-xs");
-		
-		Button closeButton=new Button();
-	    closeButton.setIconSclass("z-icon-times");
-	    closeButton.addEventListener("onClick", event -> {
+        Button button = new Button();
+        button.setLabel(measure.getAggregation().toString());
+        button.setZclass("btn btn-xs");
+        
+        Button closeButton=new Button();
+        closeButton.setIconSclass("z-icon-times");
+        closeButton.addEventListener("onClick", event -> {
             weights.remove(measure);    
             pie.setWeight(null);
             weightListbox.setDroppable(Constants.TRUE);
         });
-	    
-    	listcell.appendChild(button);
-    	listcell.appendChild(closeButton);
-    	listitem.appendChild(listcell);
+        
+        listcell.appendChild(button);
+        listcell.appendChild(closeButton);
+        listitem.appendChild(listcell);
     };
     
     private ListitemRenderer<Attribute> labelRenderer = (listitem, attribute, index) -> {
@@ -109,8 +109,8 @@ public class PieChartController extends ConfigurationComposer<Component> {
     @Listen("onDrop = #weightListbox")
     public void onDropWeight(DropEvent event) {
         if(event.getDragged().getParent().equals(attributeListbox)){
-            Clients.showNotification("Only measure objects can be dropped","warning",weightListbox,"end_center", 5000, true);
-            return;
+            Clients.showNotification("Only measure objects can be dropped",Clients.NOTIFICATION_TYPE_ERROR,weightListbox,"end_center", 5000, true);
+            return;            
         }
         
         Listitem draggedItem = (Listitem) event.getDragged();
@@ -132,7 +132,7 @@ public class PieChartController extends ConfigurationComposer<Component> {
         pie.setLabel(attribute);
         labels.add(attribute);
         labelListbox.setDroppable(Constants.FALSE);
-        if(pie.isConfigured()) {   
+        if(pie.isConfigured()) {            
            drawChart();
         }
     }
@@ -146,7 +146,8 @@ public class PieChartController extends ConfigurationComposer<Component> {
             }
             Clients.evalJavaScript("createPreview('"+ chart.getUuid()+"','pie','"+ StringEscapeUtils.escapeJavaScript(new Gson().toJson(chartData))+"')");
         } catch (Exception e) {
-            //TODO: Show error using JS
+           LOGGER.error(Constants.EXCEPTION,e);
+           //TODO: Show error using JS
         }
     }
     

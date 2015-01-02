@@ -4,6 +4,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 import org.hpcc.HIPIE.Composition;
+import org.hpcc.HIPIE.CompositionInstance;
 import org.hpcc.HIPIE.Contract;
 import org.hpcc.HIPIE.ContractInstance;
 import org.hpcc.HIPIE.HIPIEService;
@@ -80,16 +81,18 @@ public class CompositionServiceImpl implements CompositionService{
     }
     
     @Override
-    public void runComposition(Dashboard dashboard) {
+    public CompositionInstance runComposition(Dashboard dashboard) {
         HIPIEService hipieService=HipieSingleton.getHipie();
         String userId=authenticationService.getUserCredential().getId();
         Composition comp;
+        CompositionInstance compositionInstance = null;
         try {
             comp = hipieService.getComposition(userId,dashboard.getCompositionName());
-            hipieService.runComposition(comp, dashboard.getHpccConnection(), userId);
+            compositionInstance = hipieService.runComposition(comp, dashboard.getHpccConnection(), userId);
         } catch (Exception e) {
             LOGGER.error(Constants.EXCEPTION, e);
         }
+        return compositionInstance;
     }
     
     private void updateRawDataset(Composition composition,String filename,HPCCConnection hpccConnection) throws Exception {
@@ -160,9 +163,11 @@ public class CompositionServiceImpl implements CompositionService{
         VisualElement visualization = new VisualElement();
         visualization.setName(compName);
         visualization.setType(VisualElement.VISUALIZE);
+        
         //TODO:set title for visualization
-        widget.generateVisualElement().setBasis(output);
-        visualization.addChildElement(widget.generateVisualElement());
+        VisualElement ve = widget.generateVisualElement();
+        ve.setBasis(output);
+        visualization.addChildElement(ve);
         
         contract.getVisualElements().add(visualization);
         
@@ -178,5 +183,31 @@ public class CompositionServiceImpl implements CompositionService{
             LOGGER.debug("Visuslisation plugin - " + pluginInstance.toCompositionString());
         }
         return  pluginInstance;
+    }
+
+    /* 
+     * Gets the composition's latest workuntit ID
+     */
+    @Override
+    public String getWorkunitId(Dashboard dashboard) throws Exception {
+        Composition composition = null;
+        CompositionInstance latestInstance = null;
+        composition =  HipieSingleton.getHipie().getComposition(
+                authenticationService.getUserCredential().getId(),
+                dashboard.getCompositionName());
+        
+        if(composition != null) {
+            latestInstance = composition.getMostRecentInstance(
+                    authenticationService.getUserCredential().getId(), true);
+            if(latestInstance == null){
+                latestInstance = runComposition(dashboard);
+            } 
+            
+            if(latestInstance.getWorkunitStatus().contains("failed")) {
+               return null;
+            }
+        }
+        
+        return latestInstance.getWorkunitId();
     }
 }

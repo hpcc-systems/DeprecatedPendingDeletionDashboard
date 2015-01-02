@@ -1,9 +1,9 @@
 package org.hpccsystems.dashboard.manage;
 
 import org.hpccsystems.dashboard.entity.Dashboard;
-import org.hpccsystems.dashboard.entity.widget.ChartConfiguration;
 import org.hpccsystems.dashboard.entity.widget.Widget;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zul.Div;
 
 public class WidgetConfiguration {
     public static final String ON_CHART_TYPE_SELECT = "onChartTypeSelect";
@@ -12,9 +12,20 @@ public class WidgetConfiguration {
     private Dashboard dashboard;
     private Component holder;
     private Widget widget;
-    
-    public WidgetConfiguration(Dashboard dashboard) {
+    private Div chartDiv;
+   
+
+    public Div getChartDiv() {
+        return chartDiv;
+    }
+
+    public void setChartDiv(Div chartDiv) {
+        this.chartDiv = chartDiv;
+    }
+
+    public WidgetConfiguration(Dashboard dashboard,Div chartDiv) {
         this.dashboard = dashboard;
+        this.chartDiv = chartDiv;
     }
 
     public Widget getWidget() {

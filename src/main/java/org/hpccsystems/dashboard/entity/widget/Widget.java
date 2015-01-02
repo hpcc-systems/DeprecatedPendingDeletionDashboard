@@ -8,11 +8,11 @@ import org.hpcc.HIPIE.dude.InputElement;
 import org.hpcc.HIPIE.dude.VisualElement;
 
 public abstract class Widget {
-	private String name = "samplechart";
-	private String logicalFile;
-	private List<Filter> filters;
-	private String title;
-	private ChartConfiguration chartConfiguration;
+    private String name = "samplechart";
+    private String logicalFile;
+    private List<Filter> filters;
+    private String title = "sample chart";
+    private ChartConfiguration chartConfiguration;  
 
 	public abstract boolean isConfigured();
 
@@ -74,7 +74,6 @@ public abstract class Widget {
         }
         filters.add(filter);
     }
-    
     public void removeFilter(Filter filter) {
         filters.remove(filter);
     }

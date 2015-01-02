@@ -1,7 +1,12 @@
 package org.hpccsystems.dashboard.entity;
 
+import org.apache.commons.lang.StringUtils;
+import org.hpcc.HIPIE.Composition;
 import org.hpcc.HIPIE.utils.HPCCConnection;
+import org.hpccsystems.dashboard.service.AuthenticationService;
+import org.hpccsystems.dashboard.service.CompositionService;
 import org.hpccsystems.dashboard.util.HipieSingleton;
+import org.zkoss.zkplus.spring.SpringUtil;
 
 
 public class Dashboard {
@@ -59,5 +64,38 @@ public class Dashboard {
             return connection;
         }
         return null;
+    }
+    
+    /**
+     * It generates the chart visualization URL to create the chart
+     * @return String
+     * @throws Exception
+     */
+    public String generateVisualizationURL() throws Exception {
+        CompositionService compositionService = (CompositionService) SpringUtil.getBean("compositionService");
+        AuthenticationService authenticationService = (AuthenticationService) SpringUtil.getBean("authenticationService");
+        String workunitId = compositionService.getWorkunitId(this);
+        Composition composition = HipieSingleton.getHipie().getComposition(
+                authenticationService.getUserCredential().getId(), this.getCompositionName());
+        if (workunitId != null) {
+            String resultName = composition
+                    .getVisualizationDDLs(
+                            authenticationService.getUserCredential().getId(),
+                            false).values().iterator().next().keySet().iterator().next();
+            resultName = !StringUtils.substringBeforeLast(resultName, "admin").isEmpty()?
+                    "admin" + StringUtils.substringAfterLast(resultName, "admin"):
+                        resultName;
+            StringBuilder url = new StringBuilder(getHpccConnection()
+                    .getESPUrl()).append("WsWorkunits/WUResult.json?")
+                    .append("Wuid=")
+                    .append(compositionService.getWorkunitId(this))
+                    .append("&ResultName=").append(resultName)
+                    .append("&SuppressXmlSchema=true");
+            return url.toString();
+
+        } else {
+            return null;
+        }
+
     }
 }

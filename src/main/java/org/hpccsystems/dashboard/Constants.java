@@ -50,12 +50,12 @@ public class Constants {
     public static final String ACTIVE_DASHBOARD = "ActiveDashboard";
     
     public enum AGGREGATION {
-        SUM ("sum"),
-        COUNT ("count"),
-        MIN ("min"),
-        MAX ("max"),
-        AVG ("avg"),
-        NONE ("none");
+        SUM ("SUM"),
+        COUNT ("COUNT"),
+        MIN ("MIN"),
+        MAX ("MAX"),
+        AVG ("AVG"),
+        NONE ("NONE");
 
         private final String name;       
 
@@ -70,6 +70,10 @@ public class Constants {
     
  // Style class names
     public static final String STYLE_POPUP = "popup";
+
+    public static final String URL = "url";
+
+    public static final String TARGET = "target";
     
 }
 
