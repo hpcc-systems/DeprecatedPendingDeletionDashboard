@@ -23,6 +23,7 @@ import org.apache.commons.lang.StringUtils;
 import org.hpcc.HIPIE.utils.HPCCConnection;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.widget.ChartdataJSON;
+import org.hpccsystems.dashboard.entity.widget.Field;
 import org.hpccsystems.dashboard.entity.widget.Filter;
 import org.hpccsystems.dashboard.entity.widget.NumericFilter;
 import org.hpccsystems.dashboard.entity.widget.StringFilter;
@@ -40,11 +41,11 @@ import ws_sql.ws.hpccsystems.ExecuteSQLRequest;
 import ws_sql.ws.hpccsystems.Ws_sqlLocator;
 import ws_sql.ws.hpccsystems.Ws_sqlServiceSoap;
 
-import com.mysql.jdbc.Field;
+
 
 @Service("wssqlService")
 @Scope(value = "singleton", proxyMode = ScopedProxyMode.TARGET_CLASS)
-public class WSSQLServiceImpl implements WSSQLService{
+public  class WSSQLServiceImpl implements WSSQLService{
 	private static final Logger LOGGER =LoggerFactory.getLogger(WSSQLServiceImpl.class);
 	
     private static final String SELECT = "select ";

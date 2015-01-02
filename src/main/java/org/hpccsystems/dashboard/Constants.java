@@ -23,6 +23,7 @@ public class Constants {
     public static final String MEASURE = "measure";
     public static final String TRUE = "true";
     public static final String FALSE = "false";
+    public static final String FILTER = "filter";
 
     // Notification Types
     public static final String ERROR_NOTIFICATION = "error";

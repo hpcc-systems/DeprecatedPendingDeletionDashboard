@@ -6,9 +6,9 @@ import java.util.Map;
 import org.hpcc.HIPIE.utils.HPCCConnection;
 import org.hpccsystems.dashboard.entity.widget.ChartdataJSON;
 import org.hpccsystems.dashboard.entity.widget.Filter;
+import org.hpccsystems.dashboard.entity.widget.Field ;
 import org.hpccsystems.dashboard.entity.widget.Widget;
 
-import com.mysql.jdbc.Field;
 
 public interface WSSQLService {
     List<String> getDistinctValues(Field field, HPCCConnection connection, String fileName, List<Filter> filters) throws Exception;
