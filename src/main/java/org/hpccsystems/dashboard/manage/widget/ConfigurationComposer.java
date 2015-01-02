@@ -92,6 +92,7 @@ public class ConfigurationComposer<T> extends SelectorComposer<Component>{
     public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
         widgetConfiguration = (WidgetConfiguration) Executions.getCurrent().getArg().get(Constants.WIDGET_CONFIG);
+        widget=widgetConfiguration.getWidget();
         filterbox.setModel(filterModel);
         filterbox.setItemRenderer(filterRenderer);
     }
@@ -127,6 +128,8 @@ public class ConfigurationComposer<T> extends SelectorComposer<Component>{
             
         };
         Include include = new Include(filter.isNumeric() ? "widget/filter/numericPopup.zul" : "widget/filter/stringPopup.zul");
+        include.setDynamicProperty(Constants.WIDGET_CONFIG, widgetConfiguration);
+        include.setDynamicProperty(Constants.FILTER, filter);
         popup.appendChild(include);
         
         listcell.appendChild(playButton);

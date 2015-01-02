@@ -51,12 +51,7 @@ public class StringFilterContoller extends SelectorComposer<Component>{
 	       filter = (StringFilter) Executions.getCurrent().getAttribute(Constants.FILTER);
 	       
 	        List<String> valueList = null;
-	        try    {
 	        	 valueList = WSSQLService.getDistinctValues(field,widgetconfig.getDashboard().getHpccConnection(), widgetconfig.getWidget().getLogicalFile().toString(), widgetconfig.getWidget().getFilters());
-	        	
-	        }catch(Exception e){
-	        	
-	        }
 	        if(!valueList.isEmpty()){
 	        	 listOfvalues = new ListModelList<String>(valueList);
 	        	 filterListBox.setModel(listOfvalues);
@@ -67,7 +62,6 @@ public class StringFilterContoller extends SelectorComposer<Component>{
 	 @Listen("onClick = button#filtersSelectedBtn")
 	    public void onfiltersSelected() { 
 		   List<String> selectedValues = (List<String>) listOfvalues.getSelection();
-	       
 	        // Check for no values selected
 	        if(selectedValues.isEmpty()) {
 	            Clients.showNotification(Labels.getLabel("noFilterareSelected"), "error", 
