@@ -6,20 +6,30 @@ function visualizeDDLChart(data){
 	var visualizeRoxie = false;
 	var layout = "Hierarchy";
 	
-	require(["src/marshaller/Graph"], function (GraphMarshaller) {			
+	require(["assets/js/Visualization/widgets/config"], function () {			
 		
-        GraphMarshaller
-		.createSingle(url, proxymappings, visualizeRoxie, function (graphDashboard, json) {				
-            graphDashboard
-                .target(target)
-                .layout(layout)
-                .renderDashboards()
-            ;			
-			//chart persistence code
-            window.addEventListener("beforeunload", function () {
-                graphDashboard.save();
-            });
-        });			
+		requirejs.config({
+            baseUrl: "assets/js/Visualization/widgets"
+        });
+		
+		require(["src/marshaller/Graph"
+	             ], function (GraphMarshaller
+	                 ) {
+					 
+					 GraphMarshaller
+			.createSingle(url, proxymappings, visualizeRoxie, function (graphDashboard, json) {				
+	            graphDashboard
+	                .target(target)
+	                .layout(layout)
+	                .renderDashboards()
+	            ;			
+				//chart persistence code
+	            window.addEventListener("beforeunload", function () {
+	                graphDashboard.save();
+	            });
+	        });	
+					 
+		 });		
 		
     });
 }
