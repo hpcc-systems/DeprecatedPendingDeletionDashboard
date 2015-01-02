@@ -5,7 +5,8 @@ function visualizeDDLChart(data){
 	var proxymappings = null;
 	var visualizeRoxie = false;
 	var layout = "Hierarchy";
-    require(["src/marshaller/Graph"], function (GraphMarshaller) {			
+	
+	require(["src/marshaller/Graph"], function (GraphMarshaller) {			
 		
         GraphMarshaller
 		.createSingle(url, proxymappings, visualizeRoxie, function (graphDashboard, json) {				

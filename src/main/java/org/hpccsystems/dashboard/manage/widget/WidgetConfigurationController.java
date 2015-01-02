@@ -83,6 +83,7 @@ public class WidgetConfigurationController extends SelectorComposer<Component> {
     /**
      * Renders chart in dashboard container
      */
+    //TODO:Need to render the new chart alone instead of creating all the charts in dashboard
     private void drawChart() {
         try {
            
