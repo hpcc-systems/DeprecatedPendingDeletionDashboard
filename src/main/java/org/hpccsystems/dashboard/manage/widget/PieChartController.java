@@ -81,13 +81,13 @@ public class PieChartController extends SelectorComposer<Component> {
     private ListitemRenderer<Measure> weightRenderer = (listitem, measure, index) -> {
         Listcell listcellOne = new Listcell();
     	Listcell listcellTwo = new Listcell();
+    	Listcell listcellThree = new Listcell();
     	listcellOne.setLabel(measure.getColumn());
     	Button button = new Button();
     	button.setLabel(measure.getAggregation().toString());
 		button.setZclass("btn btn-xs");
 		button.setStyle("font-size: 10px; float: right;");
 		Button closeButton=new Button();
-		closeButton.setParent(listcellTwo);
 	    closeButton.setIconSclass("z-icon-times");
 	    closeButton.addEventListener("onClick", event -> {
             weights.remove(measure);    
@@ -95,8 +95,10 @@ public class PieChartController extends SelectorComposer<Component> {
             weightListbox.setDroppable(Constants.TRUE);
         });
     	listcellTwo.appendChild(button);
+    	listcellThree.appendChild(closeButton);
     	listcellOne.setParent(listitem);
     	listcellTwo.setParent(listitem);
+    	listcellThree.setParent(listitem);
     };
     private ListitemRenderer<Attribute> labelRenderer = (listitem, attribute, index) -> {
         Listcell listItemCell=new Listcell();
