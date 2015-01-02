@@ -10,6 +10,7 @@ import org.hpccsystems.dashboard.entity.widget.Filter;
 import org.hpccsystems.dashboard.entity.widget.Measure;
 import org.hpccsystems.dashboard.entity.widget.NumericFilter;
 import org.hpccsystems.dashboard.entity.widget.StringFilter;
+import org.hpccsystems.dashboard.entity.widget.Widget;
 import org.hpccsystems.dashboard.manage.WidgetConfiguration;
 import org.hpccsystems.dashboard.service.HPCCFileService;
 import org.slf4j.Logger;
