@@ -22,6 +22,7 @@ public class Constants {
     public static final String HPCC_CONNECTION = "hpccConnection";
     public static final String MEASURE = "measure";
     public static final String TRUE = "true";
+    public static final String FALSE = "false";
 
     // Notification Types
     public static final String ERROR_NOTIFICATION = "error";

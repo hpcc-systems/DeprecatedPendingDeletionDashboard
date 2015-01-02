@@ -1,24 +1,17 @@
 package org.hpccsystems.dashboard.manage.widget;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.apache.commons.lang.StringEscapeUtils;
-import org.hpcc.HIPIE.utils.HPCCConnection;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.widget.Attribute;
 import org.hpccsystems.dashboard.entity.widget.ChartdataJSON;
 import org.hpccsystems.dashboard.entity.widget.Field;
 import org.hpccsystems.dashboard.entity.widget.Measure;
 import org.hpccsystems.dashboard.entity.widget.charts.Pie;
-import org.hpccsystems.dashboard.service.HPCCFileService;
 import org.hpccsystems.dashboard.service.WSSQLService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.DropEvent;
-import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
@@ -43,12 +36,7 @@ public class PieChartController extends ConfigurationComposer<Component> {
     private static final Logger LOGGER = LoggerFactory.getLogger(PieChartController.class);
     
     private Pie pie;
-    
-    @Wire
-    private Listbox measureListbox;
-    @Wire
-    private Listbox attributeListbox;
-    
+        
     @Wire
     private Listbox weightListbox;
     private ListModelList<Measure> weights = new ListModelList<Measure>();
@@ -56,23 +44,12 @@ public class PieChartController extends ConfigurationComposer<Component> {
     @Wire
     private Listbox labelListbox;
     private ListModelList<Attribute> labels = new ListModelList<Attribute>();
-    
-    @WireVariable
-    private HPCCFileService hpccFileService;
-    
+        
     @WireVariable
     private WSSQLService wssqlService;
-    private HPCCConnection hpccConnection;
     
     @Wire
     private Div chart;
-    
-    
-    private ListitemRenderer<Field> attributeRenderer = (listitem, field, index) -> {
-        listitem.setLabel(field.getColumn());
-        listitem.setDraggable(Constants.TRUE);
-        listitem.setValue(field);
-    };
     
     private ListitemRenderer<Measure> weightRenderer = (listitem, measure, index) -> {
         Listcell listcellOne = new Listcell();
@@ -110,28 +87,7 @@ public class PieChartController extends ConfigurationComposer<Component> {
             labelListbox.setDroppable(Constants.TRUE);
         });
     };
-    
-    private EventListener<Event> loadingListener = event -> {
-        List<Field> fields = 
-                hpccFileService.getFields(pie.getLogicalFile(), widgetConfiguration.getDashboard().getHpccConnection());
-        measureListbox.setModel(
-                new ListModelList<Measure>(
-                        fields.stream().filter(field -> field.isNumeric())
-                        .map(field -> new Measure(field))
-                        .collect(Collectors.toList())));
-        measureListbox.setItemRenderer(new MeasureRenderer());
         
-        attributeListbox.setModel(
-                new ListModelList<Field>(
-                        fields.stream().filter(field -> !field.isNumeric())
-                        .collect(Collectors.toList())));
-        attributeListbox.setItemRenderer(attributeRenderer);
-        
-        Clients.clearBusy(PieChartController.this.getSelf());
-    };
-    
-    
-    
     @Override
     public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
@@ -150,16 +106,16 @@ public class PieChartController extends ConfigurationComposer<Component> {
     
     @Listen("onDrop = #weightListbox")
     public void onDropWeight(DropEvent event) {
-        Listitem draggedItem = (Listitem) event.getDragged();
-        Measure measure = draggedItem.getValue();
-      
         if(event.getDragged().getParent().equals(attributeListbox)){
             Clients.showNotification("Only measure objects can be dropped","warning",weightListbox,"end_center", 5000, true);
-        }else{
+            return;
+        }
+            Listitem draggedItem = (Listitem) event.getDragged();
+            Measure measure = draggedItem.getValue();
             pie.setWeight(measure);
             weights.add(measure);
-            weightListbox.setDroppable("false");
-        }
+            weightListbox.setDroppable(Constants.FALSE);
+        
         if(pie.isConfigured()) {            
             try {
                 drawChart();
@@ -177,7 +133,7 @@ public class PieChartController extends ConfigurationComposer<Component> {
         Attribute attribute = new Attribute(field);
         pie.setLabel(attribute);
         labels.add(attribute);
-        labelListbox.setDroppable("false");
+        labelListbox.setDroppable(Constants.FALSE);
         if(pie.isConfigured()) {            
             try {
                 drawChart();

@@ -1,24 +1,17 @@
 package org.hpccsystems.dashboard.manage.widget;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 import org.apache.commons.lang.StringEscapeUtils;
-import org.hpcc.HIPIE.utils.HPCCConnection;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.widget.Attribute;
 import org.hpccsystems.dashboard.entity.widget.ChartdataJSON;
 import org.hpccsystems.dashboard.entity.widget.Field;
 import org.hpccsystems.dashboard.entity.widget.Measure;
 import org.hpccsystems.dashboard.entity.widget.charts.XYChart;
-import org.hpccsystems.dashboard.service.HPCCFileService;
 import org.hpccsystems.dashboard.service.WSSQLService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.DropEvent;
-import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
@@ -32,7 +25,6 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.ListitemRenderer;
-import org.zkoss.zul.Tabbox;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -46,10 +38,6 @@ public class XYChartController extends ConfigurationComposer<Component> {
     private XYChart xyChart;
     
     @Wire
-    private Listbox measureListbox;
-    @Wire
-    private Listbox attributeListbox;
-    @Wire
     private Listbox chartMeasureListbox;
     private ListModelList<Measure> measures = new ListModelList<Measure>();
     
@@ -58,29 +46,10 @@ public class XYChartController extends ConfigurationComposer<Component> {
     private ListModelList<Attribute> attributes = new ListModelList<Attribute>();
     
     @WireVariable
-    private HPCCFileService hpccFileService;
-    
-    @WireVariable
     private WSSQLService wssqlService;
-    private HPCCConnection hpccConnection;
-    
-    @Wire
-    private Tabbox measureTabbox;
     
     @Wire
     private Div chart;
-    
-    private ListitemRenderer<Field> measureRenderer = (listitem, field, index) -> {
-        listitem.setLabel(field.getColumn());
-        listitem.setDraggable(Constants.TRUE);
-        listitem.setValue(field);
-    };
-    
-    private ListitemRenderer<Field> attributeRenderer = (listitem, field, index) -> {
-        listitem.setLabel(field.getColumn());
-        listitem.setDraggable(Constants.TRUE);
-        listitem.setValue(field);
-    };
     
     private ListitemRenderer<Measure> chartMeasureRenderer = (listitem, measure, index) -> {
         Listcell listItemCell=new Listcell();
@@ -110,23 +79,6 @@ public class XYChartController extends ConfigurationComposer<Component> {
         });
     };
     
-    private EventListener<Event> loadingListener = event -> {
-        List<Field> fields = 
-                hpccFileService.getFields(xyChart.getLogicalFile(), widgetConfiguration.getDashboard().getHpccConnection());
-        measureListbox.setModel(
-                new ListModelList<Field>(
-                        fields.stream().filter(field -> field.isNumeric())
-                        .collect(Collectors.toList())));
-        measureListbox.setItemRenderer(measureRenderer);
-        
-        attributeListbox.setModel(
-                new ListModelList<Field>(
-                        fields.stream().filter(field -> !field.isNumeric())
-                        .collect(Collectors.toList())));
-        attributeListbox.setItemRenderer(attributeRenderer);
-        
-        Clients.clearBusy(XYChartController.this.getSelf());
-    };
     
     @Override
     public void doAfterCompose(final Component comp) throws Exception {
@@ -154,7 +106,6 @@ public class XYChartController extends ConfigurationComposer<Component> {
         }else{
             xyChart.addMeasure(measure);
             measures.add(measure);
-            //chartMeasureListbox.setDroppable("false");
         }
         if(xyChart.isConfigured()) {            
             try {
@@ -173,7 +124,7 @@ public class XYChartController extends ConfigurationComposer<Component> {
         Attribute attribute = new Attribute(field);
         xyChart.setAttribute(attribute);
         attributes.add(attribute);
-        chartAttributeListbox.setDroppable("false");
+        chartAttributeListbox.setDroppable(Constants.FALSE);
         if(xyChart.isConfigured()) {            
             try {
                 drawChart();

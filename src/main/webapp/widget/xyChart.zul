@@ -1,15 +1,15 @@
 <zk xmlns="http://www.zkoss.org/2005/zul">
 	<vlayout id="editWindowLayout"
 		apply="org.hpccsystems.dashboard.manage.widget.XYChartController"
-		style="background-color: white;">
+		style="background-color: white;"  vflex="1">
 		<hlayout id="editLayout">
 			<vbox spacing="0em">
-				<listbox width="200px" height="270px" id="measureListbox">
+				<listbox width="200px" vflex="1" id="measureListbox">
 					<listhead>
 						<listheader label="${labels.measures}"></listheader>
 					</listhead>
 				</listbox>
-				<listbox width="200px" height="270px" id="attributeListbox">
+				<listbox width="200px" vflex="1" id="attributeListbox">
 					<listhead>
 						<listheader label="${labels.attributes}"></listheader>
 					</listhead>
@@ -18,18 +18,18 @@
 
 			<vbox spacing="0em">	
 				
-				<listbox width="200px" height="270px" id="chartMeasureListbox" droppable="true">
+				<listbox width="200px" vflex="1" id="chartMeasureListbox" droppable="true">
 					<listhead>
 						<listheader label="${labels.chartMeasures}"></listheader>
 					</listhead>
 				</listbox>
-				<listbox width="200px" height="270px" id="chartAttributeListbox" droppable="true">
+				<listbox width="200px" vflex="1" id="chartAttributeListbox" droppable="true">
 					<listhead>
 						<listheader label="${labels.chartAttributes}"></listheader>
 					</listhead>
 				</listbox>
 				
-				<include id="filterHolder" src="widget/filter/container.zul" vflex="1"></include>
+				<include id="filterHolder"></include>
 				
 			</vbox>
 
