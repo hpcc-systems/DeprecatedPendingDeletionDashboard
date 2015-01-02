@@ -109,6 +109,103 @@
  margin:0 auto;
 }
 
-.left-sidebar .z-icon-bar-chart-o{
+.left-sidebar .glyphicon-stats{
 	margin-right:5px;
+}
+
+.content .configmenu{
+	float:right;
+}
+
+/*.config-ok-button.z-button {
+	margin-left:110px;
+}*/
+
+.z-window-modal.z-window-shadow, .z-window-highlighted.z-window-shadow {
+	border-radius:0;
+	box-shadow:none;	
+}
+
+.z-window {
+	border:1px solid #ccc;
+	padding:0;
+}
+
+.config-caption .z-caption-content, .z-caption .z-label {
+	line-height:0;
+}	
+
+.z-window-header {
+	padding:0;
+}
+.config-caption i.glyphicon{
+	float:left;
+	padding:10px;
+	margin-left:5px;
+}
+
+.config-caption .configCaptionLabel{
+	float:left;
+	padding:10px;
+	border-left:1px solid #ccc;
+	margin-left:5px;
+}
+
+.config-caption .configCaptionokButton{	
+    float: left;
+    margin-left:40px;
+    border-left:1px solid #ccc;
+    border-right:1px solid #ccc;
+    padding: 5px 10px 5px 10px;    
+}
+
+.config-caption .z-window-close{
+	float: right;
+    margin: 5px 10px 5px 10px; 
+    color:red;
+    font-size:12px;  
+}
+
+.config-ok-button.z-button{
+	color:green;
+}
+
+.left-sidebar .btn.btn-info {
+    background-color: #868686;
+    border-color:#868686;
+}
+
+.config-panel .z-window-content { 
+ border: 0; 
+ margin:5px;
+} 
+
+.config-panel .z-window-header{
+	border-bottom: 1px solid #cfcfcf;
+}
+
+.form-control{
+	border-radius:0;	
+	height: 30px;
+}
+
+.form-control:focus {
+	border-color:#000;
+	 box-shadow:none;
+}
+
+.widget-panel .config-caption .configCaptionokButton {
+	margin-left:690px;
+}
+
+.widget-panel .z-textbox{
+	border-radius:0;
+	height:30px;	
+}
+.widget-panel .z-textbox:focus{	
+	border-color:#000;
+}
+
+.widget-panel .z-listbox-body,.widget-panel .z-listheader{
+	border:1px solid #ccc;
 }

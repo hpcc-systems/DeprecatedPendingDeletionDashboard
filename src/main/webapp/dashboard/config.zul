@@ -1,12 +1,11 @@
 <window border="normal"
 	width="350px"
 	apply="org.hpccsystems.dashboard.manage.DashboardConfigurationController"
-	closable="true" sclass="panel">
-	<caption iconSclass="glyphicon glyphicon-cog">
-		<label zclass="h5">${labels.configureDashboard}</label>
-		<button iconSclass="z-icon-check" id="configOkButton" /> 
+	closable="true" sclass="panel config-panel">	
+	<caption iconSclass="glyphicon glyphicon-cog" sclass="config-caption">
+		<div zclass="configCaptionLabel"><label zclass="h5">${labels.configureDashboard}</label></div>
+		<div zclass="configCaptionokButton"><button iconSclass="z-icon-check" id="configOkButton" sclass="config-ok-button"/></div> 
 	</caption>	
-	
 	<vbox spacing="0px" hflex="1">		
 		<label id="message" zclass="label" sclass="warn" style="color: red;" value=" " visible="false"/>
 		<hlayout zclass="form-group">
