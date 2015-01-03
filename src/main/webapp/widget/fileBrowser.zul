@@ -1,5 +1,8 @@
 <window apply="org.hpccsystems.dashboard.manage.widget.FileBrowserController" vflex="1">
-	<tree id="fileTree" multiple="false" vflex="1" checkmark="true">
+	<div width="150px">
+		<textbox id="chartname" placeholder="${labels.chartName}" />
+	</div>
+	<tree id="fileTree" multiple="false" vflex="1" checkmark="false" >
 		<treecols>
 			<treecol id="treeColumn"
 				label="${labels.chooseFile}" />

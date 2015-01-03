@@ -1,8 +1,10 @@
 <vlayout apply="org.hpccsystems.dashboard.manage.DashboardController" hflex="1" vflex="1">
+	<vbox>
 	<hbox sclass="configmenu">
 		<button id="addWidget" iconSclass="glyphicon glyphicon-plus" zclass="btn btn-sm btn-primary" label="${labels.addWidget}" />
 		<button id="configureDashboard" iconSclass="glyphicon glyphicon-cog" zclass="btn btn-sm btn-primary" label="${labels.configureDashboard}" />
 		<button id="deleteDashboard" iconSclass="glyphicon glyphicon-trash" zclass="btn btn-sm btn-danger" label=" ${labels.deleteDashboard}" />
 	</hbox>
 	<div id="chartDiv" hflex="1" vflex="1">Click 'Add Widget' to create a chart</div>
+	</vbox>
 </vlayout>
