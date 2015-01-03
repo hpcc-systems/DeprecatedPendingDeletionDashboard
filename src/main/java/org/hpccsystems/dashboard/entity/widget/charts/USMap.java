@@ -11,6 +11,7 @@ import org.hpcc.HIPIE.dude.FieldInstance;
 import org.hpcc.HIPIE.dude.InputElement;
 import org.hpcc.HIPIE.dude.RecordInstance;
 import org.hpcc.HIPIE.dude.VisualElement;
+import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.Constants.AGGREGATION;
 import org.hpccsystems.dashboard.entity.widget.Attribute;
 import org.hpccsystems.dashboard.entity.widget.Measure;
@@ -22,8 +23,6 @@ public class USMap extends Widget{
 
     private Attribute state;
     private Measure measure;
-    private static final String DOT=".";
-    private static final String COMMA=" , ";
     
     @Override
     public List<String> getColumns() {
@@ -38,19 +37,19 @@ public class USMap extends Widget{
         StringBuilder sql=new StringBuilder();        
         sql.append("SELECT ")
         .append(state.getFile())
-        .append(DOT)
+        .append(Constants.DOT)
         .append(state.getColumn())
-        .append(COMMA);
+        .append(Constants.COMMA);
         if(measure.getAggregation()!=null && measure.getAggregation()!= AGGREGATION.NONE){
         sql.append(measure.getAggregation())
         .append("(")
         .append(measure.getFile())
-        .append(DOT)
+        .append(Constants.DOT)
         .append(measure.getColumn())
         .append(")");
         }else{
             sql.append(measure.getFile())
-            .append(DOT)
+            .append(Constants.DOT)
             .append(measure.getColumn());
         }
         sql.append(" FROM ")

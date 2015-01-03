@@ -12,6 +12,7 @@ import org.hpcc.HIPIE.dude.FieldInstance;
 import org.hpcc.HIPIE.dude.InputElement;
 import org.hpcc.HIPIE.dude.RecordInstance;
 import org.hpcc.HIPIE.dude.VisualElement;
+import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.Constants.AGGREGATION;
 import org.hpccsystems.dashboard.entity.widget.Attribute;
 import org.hpccsystems.dashboard.entity.widget.Measure;
@@ -24,9 +25,7 @@ public class XYChart extends Widget{
     private Attribute attribute;
     private List<Measure> measures;
     private Attribute groupAttribute;
-    private static final String DOT=".";
-    private static final String COMMA=" , ";
-    
+        
     @Override
     public List<String> getColumns() {
         List<String> columnList=new ArrayList<String>();
@@ -42,23 +41,23 @@ public class XYChart extends Widget{
         StringBuilder sql=new StringBuilder();
         sql.append("SELECT ")
         .append(attribute.getFile())
-        .append(DOT)
+        .append(Constants.DOT)
         .append(attribute.getColumn())
-        .append(COMMA);
+        .append(Constants.COMMA);
         measures.stream().forEach(everyMeasure->{
             if(everyMeasure.getAggregation()!=null && everyMeasure.getAggregation()!= AGGREGATION.NONE){
             sql.append(everyMeasure.getAggregation())
             .append("(")
             .append(everyMeasure.getFile())
-            .append(DOT)
+            .append(Constants.DOT)
             .append(everyMeasure.getColumn())
             .append(")");
             } else {
                 sql.append(everyMeasure.getFile())
-                .append(DOT)
+                .append(Constants.DOT)
                 .append(everyMeasure.getColumn());                
             }
-            sql.append(COMMA);
+            sql.append(Constants.COMMA);
         });
         sql.substring(0, sql.length()-4);
         sql.append(" FROM ")

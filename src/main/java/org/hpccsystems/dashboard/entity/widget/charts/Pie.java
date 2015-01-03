@@ -5,13 +5,13 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import org.apache.commons.lang.StringUtils;
 import org.hpcc.HIPIE.dude.Element;
 import org.hpcc.HIPIE.dude.ElementOption;
 import org.hpcc.HIPIE.dude.FieldInstance;
 import org.hpcc.HIPIE.dude.InputElement;
 import org.hpcc.HIPIE.dude.RecordInstance;
 import org.hpcc.HIPIE.dude.VisualElement;
+import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.Constants.AGGREGATION;
 import org.hpccsystems.dashboard.entity.widget.Attribute;
 import org.hpccsystems.dashboard.entity.widget.Measure;
@@ -21,29 +21,26 @@ import org.zkoss.zul.ListModelList;
 
 public class Pie extends Widget {
     private Attribute label;
-    private Measure weight;
-    private static final String DOT = ".";
-    private static final String COMMA = " , ";
-    
+    private Measure weight;    
 
     @Override
     public String generateSQL() {        
         StringBuilder sql=new StringBuilder();
         sql.append("SELECT ")
         .append(getLogicalFile())
-        .append(DOT)
+        .append(Constants.DOT)
         .append(label.getColumn())
-        .append(COMMA);
+        .append(Constants.COMMA);
         if(weight.getAggregation()!=null && weight.getAggregation()!= AGGREGATION.NONE){
             sql.append(weight.getAggregation())
             .append("(")
             .append(getLogicalFile())
-            .append(DOT)
+            .append(Constants.DOT)
             .append(weight.getColumn())
             .append(")");
         }else{
             sql.append(getLogicalFile())
-            .append(DOT)
+            .append(Constants.DOT)
             .append(weight.getColumn());
         }
         sql.append(" FROM ")

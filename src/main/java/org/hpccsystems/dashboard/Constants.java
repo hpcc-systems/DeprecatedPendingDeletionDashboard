@@ -24,6 +24,8 @@ public class Constants {
     public static final String TRUE = "true";
     public static final String FALSE = "false";
     public static final String FILTER = "filter";
+    public static final String DOT=".";
+    public static final String COMMA=" , ";
 
     // Notification Types
     public static final String ERROR_NOTIFICATION = "error";
