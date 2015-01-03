@@ -29,7 +29,7 @@ public class MeasureRenderer implements ListitemRenderer<Measure> {
         popup.setWidth("100px");
         popup.setZclass(Constants.STYLE_POPUP);
         
-        final Button button = new Button("sum");
+        final Button button = new Button("SUM");
         measure.setAggregation(AGGREGATION.SUM);
         button.setZclass("btn btn-xs");
         button.setPopup(popup);

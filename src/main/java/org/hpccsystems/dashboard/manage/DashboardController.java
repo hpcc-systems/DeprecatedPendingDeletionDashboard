@@ -29,7 +29,7 @@ import com.google.gson.JsonObject;
 
 public class DashboardController extends SelectorComposer<Component>{
     private static final long serialVersionUID = 1L;
-    private static final Logger LOGGER = LoggerFactory.getLogger(LoginController.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger(DashboardController.class);
     
     @WireVariable
     private AuthenticationService authenticationService;
@@ -44,7 +44,11 @@ public class DashboardController extends SelectorComposer<Component>{
     public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
         dashboard = (Dashboard) Executions.getCurrent().getAttribute(Constants.ACTIVE_DASHBOARD);
-        drawChart();
+        
+        if(dashboard.getCompositionName() != null){
+            drawChart();
+        }
+       
     }
     /**
      * Renders chart in dashboard container
