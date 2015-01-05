@@ -2,10 +2,11 @@ package org.hpccsystems.dashboard.entity.widget;
 
 import java.math.BigDecimal;
 
+import org.hpccsystems.dashboard.Constants;
+
 public class NumericFilter extends Filter {
     private BigDecimal minValue;
     private BigDecimal maxValue;
-    private static final String DOT=".";
     
     public NumericFilter() {
     }
@@ -27,17 +28,17 @@ public class NumericFilter extends Filter {
         this.maxValue = maxValue;
     }
     @Override
-    public String generateFilterSQL() {
+    public String generateFilterSQL(String fileName) {
         StringBuilder numFilterSql=new StringBuilder();
         numFilterSql.append("[")
-        .append(this.getFile())
-        .append(DOT)
+        .append(fileName)
+        .append(Constants.DOT)
         .append(this.getColumn())
         .append(" <=")
         .append(maxValue)
         .append(" AND ")
-        .append(this.getFile())
-        .append(DOT)
+        .append(fileName)
+        .append(Constants.DOT)
         .append(this.getColumn())
         .append(" >=")
         .append(minValue)

@@ -15,6 +15,7 @@ import org.hpcc.HIPIE.dude.VisualElement;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.Constants.AGGREGATION;
 import org.hpccsystems.dashboard.entity.widget.Attribute;
+import org.hpccsystems.dashboard.entity.widget.Filter;
 import org.hpccsystems.dashboard.entity.widget.Measure;
 import org.hpccsystems.dashboard.entity.widget.Widget;
 import org.hpccsystems.dashboard.util.DashboardUtil;
@@ -39,8 +40,9 @@ public class XYChart extends Widget{
     @Override
     public String generateSQL() {
         StringBuilder sql=new StringBuilder();
+        String temp=new String();
         sql.append("SELECT ")
-        .append(attribute.getFile())
+        .append(getLogicalFile())
         .append(Constants.DOT)
         .append(attribute.getColumn())
         .append(Constants.COMMA);
@@ -48,28 +50,30 @@ public class XYChart extends Widget{
             if(everyMeasure.getAggregation()!=null && everyMeasure.getAggregation()!= AGGREGATION.NONE){
             sql.append(everyMeasure.getAggregation())
             .append("(")
-            .append(everyMeasure.getFile())
+            .append(getLogicalFile())
             .append(Constants.DOT)
             .append(everyMeasure.getColumn())
             .append(")");
             } else {
-                sql.append(everyMeasure.getFile())
+                sql.append(getLogicalFile())
                 .append(Constants.DOT)
                 .append(everyMeasure.getColumn());                
             }
+            if(measures.indexOf(everyMeasure)!=measures.size()-1)
             sql.append(Constants.COMMA);
         });
-        sql.substring(0, sql.length()-4);
         sql.append(" FROM ")
-        .append(attribute.getFile());
+        .append(getLogicalFile());
         
         if((this.getFilters()!=null)&&(!this.getFilters().isEmpty())){
             sql.append(" WHERE ");
-            this.getFilters().stream().forEach(eachFilter->{
-                sql.append(eachFilter.generateFilterSQL())
-                .append(" AND ");
-            });                
-            sql.substring(0, sql.length()-6);
+            Iterator<Filter> filters=this.getFilters().iterator();
+            while(filters.hasNext()){
+                sql.append(filters.next().generateFilterSQL(getLogicalFile()));
+                if(filters.hasNext()){
+                    sql.append(" AND ");
+                }
+            }            
         }
         return sql.toString();
     }

@@ -68,6 +68,7 @@ public class USMapController extends ConfigurationComposer<Component> {
             measures.remove(measure);    
             usMap.setMeasure(null);
             chartMeasureListbox.setDroppable(Constants.TRUE);
+            clearChart();
         });
     };
     
@@ -83,6 +84,7 @@ public class USMapController extends ConfigurationComposer<Component> {
             states.remove(attribute);    
             usMap.setState(null);
             chartAttributeListbox.setDroppable(Constants.TRUE);
+            clearChart();
         });
     };
     
@@ -163,6 +165,10 @@ public class USMapController extends ConfigurationComposer<Component> {
                 e.printStackTrace();
             }
         }
+    }
+    
+    private void clearChart() {
+        Clients.evalJavaScript("clearChart('"+ chart.getUuid()+"')");
     }
     
 }

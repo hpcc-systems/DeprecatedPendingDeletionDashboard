@@ -37,3 +37,7 @@ function createPreview(target, chartType, data) {
 		});
 	});
 }
+
+function clearChart(target){
+	jq('#'+target).empty();
+}

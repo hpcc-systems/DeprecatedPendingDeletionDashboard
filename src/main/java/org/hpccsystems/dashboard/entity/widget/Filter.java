@@ -9,7 +9,7 @@ public abstract class Filter extends Field {
         super(field);
     }
     
-    public abstract String generateFilterSQL();
+    public abstract String generateFilterSQL(String fileName);
     
     public abstract boolean hasValues();
     

@@ -1,6 +1,9 @@
 package org.hpccsystems.dashboard.entity.widget;
 
+import java.util.Iterator;
 import java.util.List;
+
+import org.hpccsystems.dashboard.Constants;
 
 public class StringFilter extends Filter {
 
@@ -21,17 +24,23 @@ public class StringFilter extends Filter {
     }
     
     @Override
-    public String generateFilterSQL() {
+    public String generateFilterSQL(String fileName) {
         StringBuilder stringSql=new StringBuilder();
-        stringSql.append("IN [");
+        stringSql.append(fileName)
+        .append(Constants.DOT)
+        .append(this.getColumn())
+        .append("IN [");
         
-        values.stream().forEach(value->{
+        Iterator<String> valueIterator=values.iterator();
+        while(valueIterator.hasNext()){
             stringSql.append("'")
-            .append(value)
-            .append("', ");
-        });
-        
-        stringSql.substring(0, stringSql.length()-4);
+            .append(valueIterator.next());
+            if(valueIterator.hasNext()){
+                stringSql.append("', ");
+            }else{
+                stringSql.append("' ");
+            }
+        }
         stringSql.append("]");
         return stringSql.toString();
     }

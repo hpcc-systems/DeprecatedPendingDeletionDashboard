@@ -53,6 +53,7 @@ public class PieChartController extends ConfigurationComposer<Component> {
             weights.remove(measure);    
             pie.setWeight(null);
             weightListbox.setDroppable(Constants.TRUE);
+            clearChart();
         });
         
         listcell.appendChild(button);
@@ -72,6 +73,7 @@ public class PieChartController extends ConfigurationComposer<Component> {
             labels.remove(attribute);    
             pie.setLabel(null);
             labelListbox.setDroppable(Constants.TRUE);
+             clearChart();
         });
     };
         
@@ -125,5 +127,8 @@ public class PieChartController extends ConfigurationComposer<Component> {
         drawChart();
     }
     
+    private void clearChart() {
+        Clients.evalJavaScript("clearChart('"+ chart.getUuid()+"')");
+    }
 }
 

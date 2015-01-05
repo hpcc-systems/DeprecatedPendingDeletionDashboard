@@ -7,7 +7,6 @@ public class Field {
 
 	private String column;
 	private String dataType;
-	private String file;
 	
 	public Field() {
 	}
@@ -46,13 +45,7 @@ public class Field {
 	    }
 	    return false;
 	}
-	public String getFile() {
-        return file;
-    }
-    public void setFile(String file) {
-        this.file = file;
-    }
-    
+   
     @Override
     public boolean equals(Object o){
         final Field thisField=(Field) o;

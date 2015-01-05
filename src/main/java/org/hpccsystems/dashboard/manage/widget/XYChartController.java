@@ -57,6 +57,11 @@ public class XYChartController extends ConfigurationComposer<Component> {
         closeButton.addEventListener("onClick", event -> {
             measures.remove(measure);    
             xyChart.removeMeasure(measure);
+            if(!xyChart.isConfigured()){
+                clearChart();
+            }else{
+                drawChart();
+            }
         });
     };
     private ListitemRenderer<Attribute> chartAttributeRenderer = (listitem, attribute, index) -> {
@@ -71,6 +76,7 @@ public class XYChartController extends ConfigurationComposer<Component> {
             attributes.remove(attribute);    
             xyChart.setAttribute(null);
             chartAttributeListbox.setDroppable(Constants.TRUE);
+            clearChart();
         });
     };
     
@@ -133,6 +139,9 @@ public class XYChartController extends ConfigurationComposer<Component> {
                 e.printStackTrace();
             }
         }
+    }
+    private void clearChart() {
+        Clients.evalJavaScript("clearChart('"+ chart.getUuid()+"')");
     }
     
 }

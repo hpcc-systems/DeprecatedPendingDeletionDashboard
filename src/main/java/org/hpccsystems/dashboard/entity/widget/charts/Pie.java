@@ -2,6 +2,7 @@ package org.hpccsystems.dashboard.entity.widget.charts;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -14,6 +15,7 @@ import org.hpcc.HIPIE.dude.VisualElement;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.Constants.AGGREGATION;
 import org.hpccsystems.dashboard.entity.widget.Attribute;
+import org.hpccsystems.dashboard.entity.widget.Filter;
 import org.hpccsystems.dashboard.entity.widget.Measure;
 import org.hpccsystems.dashboard.entity.widget.Widget;
 import org.hpccsystems.dashboard.util.DashboardUtil;
@@ -48,11 +50,14 @@ public class Pie extends Widget {
         
         if((this.getFilters()!=null)&&(!this.getFilters().isEmpty())){
                 sql.append(" WHERE ");
-                this.getFilters().stream().forEach(eachFilter->{
-                    sql.append(eachFilter.generateFilterSQL())
-                    .append(" AND ");
-                });                
-                sql.substring(0, sql.length()-6);
+                Iterator<Filter> filters=this.getFilters().iterator();
+                
+                while(filters.hasNext()){
+                    sql.append(filters.next().generateFilterSQL(getLogicalFile()));
+                    if(filters.hasNext()){
+                        sql.append(" AND ");
+                    }
+                }           
             }
         return sql.toString();
     }
