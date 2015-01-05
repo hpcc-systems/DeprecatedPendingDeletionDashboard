@@ -5,7 +5,6 @@ import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.widget.LogicalFile;
 import org.hpccsystems.dashboard.manage.WidgetConfiguration;
 import org.hpccsystems.dashboard.service.HPCCFileService;
-import org.hpccsystems.dashboard.util.DashboardUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zkoss.zk.ui.Component;
@@ -42,10 +41,7 @@ public class FileBrowserController extends SelectorComposer<Component> {
     @Wire
     private Tree fileTree;
     @Wire
-    private Textbox selectedFile;
-    
-    @Wire
-    private Textbox chartname;
+    private Textbox selectedFile;    
     
     private HPCCConnection hpccConnection;
     
@@ -75,7 +71,9 @@ public class FileBrowserController extends SelectorComposer<Component> {
         LogicalFileTreeModel fileTreeModel = new LogicalFileTreeModel(logicalFile,
                 hpccConnection);
 
+        fileTreeModel.setMultiple(false);
         fileTree.setModel(fileTreeModel);
+        
 
         fileTree.addEventListener(Events.ON_SELECT, new EventListener<Event>() {
 
@@ -108,15 +106,11 @@ public class FileBrowserController extends SelectorComposer<Component> {
     
     @Listen("onClick = #visualize") 
     public void onVisualize() {
-        final String charnam = DashboardUtil.removeSpaceSplChar(chartname.getText());
+        
         final String emptyString="";
-        if(emptyString.equals(chartname.getText())||emptyString.equals(charnam)){
-            Clients.showNotification("Enter a valid chart name", "warning", chartname, "end_center", 5000);
-        }else if(emptyString.equals(selectedFile.getText())){
+        if(emptyString.equals(selectedFile.getText())){
             Clients.showNotification("Please choose a file", "warning", fileTree, "middle_center", 5000);
-        }else{            
-        widgetConfiguration.getWidget().setTitle(chartname.getText());
-        widgetConfiguration.getWidget().setName(charnam);
+        }else{        
         widgetConfiguration.getWidget().setLogicalFile(selectedFile.getText());
         Events.postEvent(WidgetConfiguration.ON_FILE_SELECT, widgetConfiguration.getHolder(), widgetConfiguration);
         }

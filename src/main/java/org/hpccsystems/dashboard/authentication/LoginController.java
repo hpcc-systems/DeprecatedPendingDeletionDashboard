@@ -53,18 +53,18 @@ public class LoginController extends SelectorComposer<Component>{
 		
 		applications =  new ListModelList<Application>(authenticationService.getAllApplications());
 		apps.setModel(applications);
+		account.setText("admin");
+        password.setText("1234");
+        applications.setSelection(new ArrayList<Application>(){
+            {
+                add(applications.get(1));
+            }
+        });
 	}
 	
 	@Listen("onClick=#login; onOK=#loginWin")
     public void doLogin() {
-
-	    account.setText("admin");
-	    password.setText("1234");
-	    applications.setSelection(new ArrayList<Application>(){
-	        {
-	            add(applications.get(1));
-	        }
-	    });
+	    
         final String accountString = account.getText();
         final String passwordString = password.getText();
         

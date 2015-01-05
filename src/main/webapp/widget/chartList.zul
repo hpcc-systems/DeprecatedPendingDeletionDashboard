@@ -1,4 +1,10 @@
 <window  width="100%" height="100%">
+	<div width="150px">	
+	<hbox>
+		<label value="${labels.chartNameCaption}" />
+		<textbox id="chartname" placeholder="${labels.chartName}" />
+	</hbox>
+	</div>	
 	<anchorlayout id="chartList"  width="100%" height="100%" apply="org.hpccsystems.dashboard.manage.widget.ChartListController">
 	</anchorlayout>
 </window>

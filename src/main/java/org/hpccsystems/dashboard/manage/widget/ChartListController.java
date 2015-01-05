@@ -10,6 +10,7 @@ import org.hpccsystems.dashboard.entity.widget.charts.Pie;
 import org.hpccsystems.dashboard.entity.widget.charts.USMap;
 import org.hpccsystems.dashboard.entity.widget.charts.XYChart;
 import org.hpccsystems.dashboard.manage.WidgetConfiguration;
+import org.hpccsystems.dashboard.util.DashboardUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zkoss.zk.ui.Component;
@@ -20,10 +21,12 @@ import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
+import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Anchorchildren;
 import org.zkoss.zul.Anchorlayout;
 import org.zkoss.zul.Image;
 import org.zkoss.zul.Label;
+import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Vbox;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
@@ -36,6 +39,8 @@ public class ChartListController extends SelectorComposer<Component>{
     
     @Wire
     private Anchorlayout chartList;
+    @Wire
+    private Textbox chartname;
     @Override
     public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
@@ -79,7 +84,15 @@ public class ChartListController extends SelectorComposer<Component>{
         		 widgetConfiguration.setWidget(new USMap());
         	 }
         	  widgetConfiguration.getWidget().setChartConfiguration(configuration);
-        	 Events.postEvent(WidgetConfiguration.ON_CHART_TYPE_SELECT, widgetConfiguration.getHolder(), null);
+        	  final String charnam = DashboardUtil.removeSpaceSplChar(chartname.getText());
+        	  final String emptyString="";
+        	  if(emptyString.equals(chartname.getText())||emptyString.equals(charnam)){
+                  Clients.showNotification("Enter a valid chart name", "warning", chartname, "end_center", 5000);
+              }else{
+                  widgetConfiguration.getWidget().setTitle(chartname.getText());
+                  widgetConfiguration.getWidget().setName(charnam);
+                  Events.postEvent(WidgetConfiguration.ON_CHART_TYPE_SELECT, widgetConfiguration.getHolder(), null);
+              } 	 
            
         }
     }; 
