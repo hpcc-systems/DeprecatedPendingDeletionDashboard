@@ -96,7 +96,7 @@
 	</servlet-mapping>
 	 
 	<!--Spring DispatcherServlet to make Dashboard interact with other appln -->	
-	<!--  <servlet>
+	<servlet>
         <servlet-name>dispatcher</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
    		 <load-on-startup>2</load-on-startup>        
@@ -106,7 +106,8 @@
         <servlet-name>dispatcher</servlet-name>
         <url-pattern>*.do</url-pattern>
     </servlet-mapping>
-	 -->
+    
+	
 	<!-- Richlet filters for API -->
 	<!-- <filter>
 	    <filter-name>RichletFilter</filter-name>

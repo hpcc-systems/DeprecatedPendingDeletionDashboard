@@ -10,6 +10,7 @@ import org.hpccsystems.dashboard.service.AuthenticationService;
 import org.hpccsystems.dashboard.service.DashboardService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.zkoss.json.JSONObject;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
@@ -64,6 +65,11 @@ public class DashboardController extends SelectorComposer<Component>{
             chartObj.addProperty(Constants.URL, viaualizationURL);
             chartObj.addProperty(Constants.TARGET, chartDiv.getUuid());
             chartObj.addProperty(Constants.HPCC_ID, dashboard.getHpccId());
+            final String wsWork = "WsWorkunits";
+            final String wsEcl = "WsEcl";
+            chartObj.addProperty(wsWork, dashboard.getHpccConnection().getESPUrl() + wsWork);
+            chartObj.addProperty(wsEcl, dashboard.getHpccConnection().getRoxieServiceUrl() + wsEcl);
+            
             String data = StringEscapeUtils.escapeJavaScript(chartObj.toString());
             Clients.evalJavaScript("visualizeDDLChart('"+ data+"')");
         } catch (Exception e) {
