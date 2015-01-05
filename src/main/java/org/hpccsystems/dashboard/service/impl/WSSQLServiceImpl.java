@@ -6,7 +6,6 @@ import java.math.BigDecimal;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
@@ -26,8 +25,6 @@ import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.widget.ChartdataJSON;
 import org.hpccsystems.dashboard.entity.widget.Field;
 import org.hpccsystems.dashboard.entity.widget.Filter;
-import org.hpccsystems.dashboard.entity.widget.NumericFilter;
-import org.hpccsystems.dashboard.entity.widget.StringFilter;
 import org.hpccsystems.dashboard.entity.widget.Widget;
 import org.hpccsystems.dashboard.exception.HpccConnectionException;
 import org.hpccsystems.dashboard.service.WSSQLService;
@@ -315,6 +312,7 @@ public  class WSSQLServiceImpl implements WSSQLService{
         queryTxt.append(WHERE_WITH_SPACES);
 
             ListIterator<Filter> iterator = filters.listIterator();
+            boolean firstTime=true;
             while (iterator.hasNext()) {
                 Filter filter = iterator.next();
                 if(!filter.hasValues()) {
@@ -324,18 +322,18 @@ public  class WSSQLServiceImpl implements WSSQLService{
                 if (LOGGER.isDebugEnabled()) {
                     LOGGER.debug("Contructing where clause " + filter.toString());
                 }
+                if(!firstTime){
+                    queryTxt.append(" AND ");
+                }
 
                 queryTxt.append("(");
 
                 queryTxt.append(filter.generateFilterSQL(fileName));
 
                 queryTxt.append(")");
-
-                if (iterator.hasNext() && iterator.next().hasValues()) {
-                    queryTxt.append(" AND ");
-                    iterator.previous();
+                
+                firstTime=false;
                 }
-            }
         
     
         return queryTxt.length() <= WHERE_WITH_SPACES.length() ? "" : queryTxt.toString();
