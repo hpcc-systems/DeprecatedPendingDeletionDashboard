@@ -34,7 +34,8 @@ public class Constants {
     
     public static final String WIDGET_CONFIG = "widgetWrapper";
     public static final String ON_SELECT = "onSelect";
-    
+    public static final String HPCC_ID = "hpccID";
+ 
     public static enum CHART_TYPES {PIE, DONUT, LINE, BAR, COLUMN, US_MAP, TABLE};
     
     public static final Map<CHART_TYPES, ChartConfiguration> CHART_CONFIGURATIONS = new LinkedHashMap<CHART_TYPES, ChartConfiguration>(){
@@ -76,6 +77,8 @@ public class Constants {
     public static final String URL = "url";
 
     public static final String TARGET = "target";
+
+	
     
 }
 

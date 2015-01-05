@@ -63,6 +63,7 @@ public class DashboardController extends SelectorComposer<Component>{
             JsonObject chartObj = new JsonObject();
             chartObj.addProperty(Constants.URL, viaualizationURL);
             chartObj.addProperty(Constants.TARGET, chartDiv.getUuid());
+            chartObj.addProperty(Constants.HPCC_ID, dashboard.getHpccId());
             String data = StringEscapeUtils.escapeJavaScript(chartObj.toString());
             Clients.evalJavaScript("visualizeDDLChart('"+ data+"')");
         } catch (Exception e) {
