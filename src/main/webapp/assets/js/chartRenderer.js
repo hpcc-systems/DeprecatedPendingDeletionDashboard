@@ -1,4 +1,5 @@
 function createPreview(target, chartType, data) {
+	clearChart(target);
 
 	require([ "assets/js/Visualization/widgets/config" ], function() {
 

@@ -15,7 +15,6 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
-import org.zkoss.zul.Div;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listcell;
@@ -37,9 +36,6 @@ public class PieChartController extends ConfigurationComposer<Component> {
     @Wire
     private Listbox labelListbox;
     private ListModelList<Attribute> labels = new ListModelList<Attribute>();
-        
-    @Wire
-    private Div chart;
     
     private ListitemRenderer<Measure> weightRenderer = (listitem, measure, index) -> {
         Listcell listcell = new Listcell(measure.getColumn());
@@ -125,10 +121,6 @@ public class PieChartController extends ConfigurationComposer<Component> {
         labelListbox.setDroppable(Constants.FALSE);
         
         drawChart();
-    }
-    
-    private void clearChart() {
-        Clients.evalJavaScript("clearChart('"+ chart.getUuid()+"')");
     }
 }
 

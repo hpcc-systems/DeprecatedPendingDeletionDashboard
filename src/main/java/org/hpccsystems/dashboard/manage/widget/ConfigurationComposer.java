@@ -191,4 +191,8 @@ public class ConfigurationComposer<T> extends SelectorComposer<Component>{
             Events.echoEvent(Constants.ON_DRAW_CHART, chart, null);
         }
     }
+    
+    protected void clearChart() {
+        Clients.evalJavaScript("clearChart('"+ chart.getUuid()+"')");
+    }
 }

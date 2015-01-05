@@ -17,7 +17,6 @@ import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
-import org.zkoss.zul.Div;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listcell;
@@ -42,9 +41,6 @@ public class XYChartController extends ConfigurationComposer<Component> {
     
     @WireVariable
     private WSSQLService wssqlService;
-    
-    @Wire
-    private Div chart;
     
     private ListitemRenderer<Measure> chartMeasureRenderer = (listitem, measure, index) -> {
         Listcell listItemCell=new Listcell();
@@ -139,10 +135,6 @@ public class XYChartController extends ConfigurationComposer<Component> {
                 e.printStackTrace();
             }
         }
-    }
-    private void clearChart() {
-        Clients.evalJavaScript("clearChart('"+ chart.getUuid()+"')");
-    }
-    
+    }  
 }
 
