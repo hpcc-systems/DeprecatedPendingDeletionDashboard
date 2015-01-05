@@ -10,8 +10,8 @@ function createPreview(target, chartType, data) {
 		var actualData = JSON.parse(data);
 		console.log(actualData);		
 		
-		require([ "src/c3/Pie", "src/c3/Line", "src/c3/Column" ], function(
-				C3Pie, C3Line, C3Column) {
+		require([ "src/c3/Pie", "src/c3/Line", "src/c3/Column", "src/map/ChoroplethStates" ], function(
+				C3Pie, C3Line, C3Column,ChoroplethStates) {
 
 			console.log(actualData);
 			if (chartType == "PIE") {
@@ -33,6 +33,15 @@ function createPreview(target, chartType, data) {
 				.target(target)
 				.data(actualData.data)
 				.render();
+			}
+			
+			if (chartType == "CHORO") {
+				 new ChoroplethStates()
+				 .columns(actualData.columns)
+				 .data(actualData.data)
+                 .target(target)
+                 .render();
+				
 			}
 
 		});

@@ -3,8 +3,10 @@ package org.hpccsystems.dashboard.manage.widget;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.widget.Attribute;
+import org.hpccsystems.dashboard.entity.widget.ChartdataJSON;
 import org.hpccsystems.dashboard.entity.widget.Field;
 import org.hpccsystems.dashboard.entity.widget.Measure;
 import org.hpccsystems.dashboard.entity.widget.charts.USMap;
@@ -22,11 +24,15 @@ import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
+import org.zkoss.zul.Div;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.ListitemRenderer;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 /**
  * EditChartController class is used to handle the edit page of the Dashboard
@@ -51,6 +57,9 @@ public class USMapController extends ConfigurationComposer<Component> {
     
     @WireVariable
     private WSSQLService wssqlService;
+    
+    @Wire
+    private Div chart;
     
     private ListitemRenderer<Measure> chartMeasureRenderer = (listitem, measure, index) -> {
         Listcell listItemCell=new Listcell();
@@ -135,14 +144,7 @@ public class USMapController extends ConfigurationComposer<Component> {
             measures.add(measure);
             chartMeasureListbox.setDroppable(Constants.FALSE);
         }
-        if(usMap.isConfigured()) {            
-            try {
-                drawChart();
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
+        drawChart();
     }
 
     @Listen("onDrop = #chartAttributeListbox")
@@ -153,14 +155,7 @@ public class USMapController extends ConfigurationComposer<Component> {
         usMap.setState(attribute);
         states.add(attribute);
         chartAttributeListbox.setDroppable(Constants.FALSE);
-        if(usMap.isConfigured()) {            
-            try {
-                drawChart();
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
-        }
+        drawChart();
     }
     
 }

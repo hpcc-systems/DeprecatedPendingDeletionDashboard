@@ -45,7 +45,7 @@ public class Constants {
             put(CHART_TYPES.LINE, new ChartConfiguration(CHART_TYPES.LINE, "Line", "assets/img/line.png", "widget/xyChart.zul", "LINE", "C3_LINE"));
             put(CHART_TYPES.BAR, new ChartConfiguration(CHART_TYPES.BAR, "Bar", "assets/img/bar.png", "widget/xyChart.zul", "BAR", "C3_BAR"));
             put(CHART_TYPES.COLUMN, new ChartConfiguration(CHART_TYPES.COLUMN, "Column", "assets/img/bar.png", "widget/xyChart.zul", "COLUMN","C3_COLUMN"));
-            put(CHART_TYPES.US_MAP, new ChartConfiguration(CHART_TYPES.US_MAP, "US_Map", "assets/img/geo.png", "widget/usMap.zul","US_MAP" ,"C3_US_MAP"));
+            put(CHART_TYPES.US_MAP, new ChartConfiguration(CHART_TYPES.US_MAP, "US_Map", "assets/img/geo.png", "widget/usMap.zul","CHORO" ,"C3_US_MAP"));
             put(CHART_TYPES.TABLE, new ChartConfiguration(CHART_TYPES.TABLE, "Table", "assets/img/table.png", "widget/xyChart.zul", "TABLE", "C3_TABLE"));
         }
     };
