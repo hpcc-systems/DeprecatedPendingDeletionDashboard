@@ -11,4 +11,6 @@ public interface CompositionService {
     CompositionInstance runComposition(Dashboard dashboard);
     
     String getWorkunitId(Dashboard dashboard) throws Exception ;
+
+    void updateComposition(Dashboard dashboard, Widget widget);
 }

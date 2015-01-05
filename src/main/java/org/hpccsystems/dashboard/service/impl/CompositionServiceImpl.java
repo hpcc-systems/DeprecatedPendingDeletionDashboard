@@ -67,19 +67,76 @@ public class CompositionServiceImpl implements CompositionService{
         }
     }
     
+    @Override
     public void updateComposition(Dashboard dashboard, Widget widget) {
         HIPIEService hipieService = HipieSingleton.getHipie();
         Composition composition;
         try {
             composition = hipieService.getComposition(authenticationService.getUserCredential().getId(), dashboard.getCompositionName());
             //
-            appendOnPlugin(composition,widget,composition.getName());       
+            appendOnPlugin(composition,widget,composition.getName());   
+            addInputOutput(composition,"~" + widget.getLogicalFile(),widget,dashboard.getHpccConnection());
             HipieSingleton.getHipie().saveComposition(authenticationService.getUserCredential().getId(), composition);
         } catch (Exception e) {
             LOGGER.error(Constants.EXCEPTION, e);
         }
     }
     
+    private void addInputOutput(Composition composition, String fileName,Widget widget,HPCCConnection hpcc) throws Exception {
+        
+        Contract contract = composition.getContractInstanceByName(composition.getName()).getContract();
+        HIPIEService hipieService=HipieSingleton.getHipie();
+        
+        //Adding additional input
+        InputElement input2=new InputElement();
+        input2.setName("dsInput2");
+        input2.setType(InputElement.TYPE_DATASET);
+        input2.addOption(new ElementOption(Element.MAPBYNAME));
+        contract.getInputElements().add(input2);        
+        
+        widget.generateInputElement().stream().forEach(inputElement->
+            input2.addChildElement(inputElement)
+        );
+
+        //Adding additional output
+        OutputElement dsoutput2=new OutputElement();
+        dsoutput2.setName("dsOutput2");
+        dsoutput2.setType(OutputElement.TYPE_DATASET);
+        dsoutput2.setBase("dsInput2");
+        dsoutput2.addOption(new ElementOption("WUID"));
+        contract.getOutputElements().add(dsoutput2);
+        
+        VisualElement visualElement = widget.generateVisualElement();
+        visualElement.setBasis(dsoutput2);
+
+        VisualElement visualization=contract.getVisualElements().iterator().next();
+        visualization.addChildElement(visualElement);
+        
+        contract = hipieService.saveContractAs(authenticationService.getUserCredential().getId(), contract,contract.getName());
+        
+        ContractInstance pluginInstance = contract.createContractInstance();
+        
+        widget.getInstanceProperties().forEach((propertyName,propertyValue)->
+        pluginInstance.setProperty(propertyName,propertyValue)
+        );
+        hipieService.refreshData();
+        
+        ContractInstance datasource1=composition.getContractInstanceByName(HIPIE_RAW_DATASET);
+        ContractInstance datasource2 = new ContractInstance(datasource1.getContract());
+        datasource2.setFileName("");
+        Map<String,String[]> paramMap = new HashMap<String, String[]>();
+        paramMap.put("LogicalFilename", new String[]{fileName});
+        paramMap.put("Method", new String[]{"THOR"});
+        String fieldseparator=null;
+        RecordInstance recordInstance;
+        recordInstance = hpcc.getDatasetFields(fileName, fieldseparator);
+        datasource2.setProperty("Structure", recordInstance);        
+        datasource2.setAllProperties(paramMap);
+        
+        pluginInstance.addPrecursor(datasource2,"dsOutput2","dsInput2"); 
+    }
+
+
     @Override
     public CompositionInstance runComposition(Dashboard dashboard) {
         HIPIEService hipieService=HipieSingleton.getHipie();
@@ -108,8 +165,10 @@ public class CompositionServiceImpl implements CompositionService{
         rawDatasetContract.setAllProperties(paramMap);
         //TODO:Need to set FieldSeparator & other info for NON-THOR files
     }
+    
     private void appendOnPlugin(Composition composition,Widget widget,String contractName) throws Exception {
         Contract contract = composition.getContractInstanceByName(contractName).getContract();
+        
         HIPIEService hipieService=HipieSingleton.getHipie();
         Element input=contract.getInputElements().iterator().next();
         widget.generateInputElement().stream().forEach(inputElement->
@@ -117,16 +176,34 @@ public class CompositionServiceImpl implements CompositionService{
         );
         
         VisualElement visualization=contract.getVisualElements().iterator().next();
-        visualization.addChildElement(widget.generateVisualElement());
-        hipieService.saveContract(authenticationService.getUserCredential().getId(), contract);
+        VisualElement visualElement = widget.generateVisualElement();
+        //Sets basis for visual element
+        Element output = contract.getOutputElements().iterator().next();
+        visualElement.setBasis(output);
+        visualization.addChildElement(visualElement);
+        LOGGER.debug("visual 2 -->"+(VisualElement)visualization.getChildElements().iterator().next());
+        //TODO:Hipie throws NPE, need to check Hipie code
+        //hipieService.saveContract(authenticationService.getUserCredential().getId(), contract);
+        //TODO:Stack overflow error
+        //contract.save();
+        ContractInstance pluginContract = composition.getContractInstanceByName(contractName);
+        composition.removeContractInstance(pluginContract);
+        contract = hipieService.saveContractAs(authenticationService.getUserCredential().getId(), contract,contract.getName());
         
-        hipieService.refreshData();
-        ContractInstance pluginInstance = composition.getContractInstanceByName(contractName);
+        ContractInstance pluginInstance = contract.createContractInstance();
         
         widget.getInstanceProperties().forEach((propertyName,propertyValue)->
-            pluginInstance.setProperty(propertyName,propertyValue)
+        pluginInstance.setProperty(propertyName,propertyValue)
         );
+        pluginInstance.setAllProperties(pluginContract.getProps());
+        LOGGER.debug("pluginContract.getProps() -->"+pluginInstance.getProps());
+       // pluginInstance.setAllProperties(pluginContract.getProps());
+        hipieService.refreshData();
+        ContractInstance datasource=composition.getContractInstanceByName(HIPIE_RAW_DATASET);
+        pluginInstance.addPrecursor(datasource);   
+      
     }
+    
     private ContractInstance createPlugin(String compName,Widget widget) throws Exception {   
         
         Contract contract = new Contract();

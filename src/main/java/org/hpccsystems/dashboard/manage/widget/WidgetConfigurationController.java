@@ -69,16 +69,39 @@ public class WidgetConfigurationController extends SelectorComposer<Component> {
     @Listen("onClick = #configOkButton")
     public void onClickOk() {
         this.getSelf().detach();
+        if(configuration.getDashboard().getCompositionName() == null){
+            createComposition();
+        }else{
+            addOnCompositionCharts();
+        }
+       
+        drawChart();
         
+    }
+
+    /**
+     * Updates composition while adding new additional charts to
+     * dashboard 
+     */
+    private void addOnCompositionCharts() {
+        compositionService.updateComposition(configuration.getDashboard(), configuration.getWidget());
+        compositionService.runComposition(configuration.getDashboard());
+        dashboardService.updateDashboard(configuration.getDashboard(),
+                authenticationService.getUserCredential().getId());
+    }
+
+
+    /**
+     * Creates new composition while adding first chart
+     */
+    private void createComposition() {
         compositionService.createComposition(configuration.getDashboard(),
                 configuration.getWidget());
         compositionService.runComposition(configuration.getDashboard());
         dashboardService.updateDashboard(configuration.getDashboard(),
                 authenticationService.getUserCredential().getId());
-       
-        drawChart();
-        
     }
+
 
     /**
      * Renders chart in dashboard container
