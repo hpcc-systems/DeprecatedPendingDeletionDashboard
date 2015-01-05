@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -313,7 +314,7 @@ public  class WSSQLServiceImpl implements WSSQLService{
         StringBuilder queryTxt = new StringBuilder();
         queryTxt.append(WHERE_WITH_SPACES);
 
-            Iterator<Filter> iterator = filters.iterator();
+            ListIterator<Filter> iterator = filters.listIterator();
             while (iterator.hasNext()) {
                 Filter filter = iterator.next();
                 if(!filter.hasValues()) {
@@ -326,43 +327,13 @@ public  class WSSQLServiceImpl implements WSSQLService{
 
                 queryTxt.append("(");
 
-                NumericFilter nFilter = null;
-                StringFilter sfilter = null;
-                
-                if(filter instanceof StringFilter){
-                    sfilter = (StringFilter)filter;
-                    queryTxt.append(fileName);
-                    queryTxt.append(".");
-                    queryTxt.append(filter.getColumn());
-                    queryTxt.append(" in ");
-                    queryTxt.append(" (");
-                    
-                    sfilter.getValues().forEach(value -> {
-                        queryTxt.append(" '").append(value).append("'");
-                        queryTxt.append(",");
-                    });
-                    
-                    queryTxt.deleteCharAt(queryTxt.length()-1);
-                    queryTxt.append(" )");
-                } else if(filter instanceof NumericFilter){
-                    nFilter = (NumericFilter)filter;
-                    queryTxt.append(fileName);
-                    queryTxt.append(".");
-                    queryTxt.append(nFilter.getColumn());
-                    queryTxt.append(" >= ");
-                    queryTxt.append(nFilter.getMinValue());
-                    queryTxt.append(" and ");
-                    queryTxt.append(fileName);
-                    queryTxt.append(".");
-                    queryTxt.append(filter.getColumn());
-                    queryTxt.append(" <= ");
-                    queryTxt.append(((NumericFilter) filter).getMinValue());
-                }
+                queryTxt.append(filter.generateFilterSQL(fileName));
 
                 queryTxt.append(")");
 
-                if (iterator.hasNext()) {
+                if (iterator.hasNext() && iterator.next().hasValues()) {
                     queryTxt.append(" AND ");
+                    iterator.previous();
                 }
             }
         

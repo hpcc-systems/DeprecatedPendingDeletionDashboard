@@ -30,19 +30,17 @@ public class NumericFilter extends Filter {
     @Override
     public String generateFilterSQL(String fileName) {
         StringBuilder numFilterSql=new StringBuilder();
-        numFilterSql.append("[")
-        .append(fileName)
-        .append(Constants.DOT)
-        .append(this.getColumn())
-        .append(" <=")
-        .append(maxValue)
-        .append(" AND ")
-        .append(fileName)
-        .append(Constants.DOT)
-        .append(this.getColumn())
-        .append(" >=")
-        .append(minValue)
-        .append("]");
+        numFilterSql.append(fileName)
+            .append(Constants.DOT)
+            .append(this.getColumn())
+            .append(" <=")
+            .append(maxValue)
+            .append(" AND ")
+            .append(fileName)
+            .append(Constants.DOT)
+            .append(this.getColumn())
+            .append(" >=")
+            .append(minValue);
         
         return numFilterSql.toString();
     }
