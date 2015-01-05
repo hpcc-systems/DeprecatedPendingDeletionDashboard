@@ -199,7 +199,8 @@
 }
 
 .widget-panel .config-caption .configCaptionokButton {
-	margin-left:690px;
+	position: absolute;
+	right: 50px;
 }
 
 .widget-panel .z-textbox{
