@@ -1,15 +1,11 @@
 package org.hpccsystems.dashboard.manage.widget;
 
 import org.apache.commons.lang.StringEscapeUtils;
-import org.hpcc.HIPIE.Composition;
 import org.hpccsystems.dashboard.Constants;
-import org.hpccsystems.dashboard.authentication.LoginController;
-import org.hpccsystems.dashboard.entity.widget.ChartdataJSON;
 import org.hpccsystems.dashboard.manage.WidgetConfiguration;
 import org.hpccsystems.dashboard.service.AuthenticationService;
 import org.hpccsystems.dashboard.service.CompositionService;
 import org.hpccsystems.dashboard.service.DashboardService;
-import org.hpccsystems.dashboard.util.HipieSingleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zkoss.zk.ui.Component;
@@ -21,9 +17,6 @@ import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Include;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 import com.google.gson.JsonObject;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
@@ -84,8 +77,9 @@ public class WidgetConfigurationController extends SelectorComposer<Component> {
      * dashboard 
      */
     private void addOnCompositionCharts() {
-        compositionService.updateComposition(configuration.getDashboard(), configuration.getWidget());
-        compositionService.runComposition(configuration.getDashboard());
+        String user=authenticationService.getUserCredential().getId();
+        compositionService.updateComposition(configuration.getDashboard(), configuration.getWidget(),user);
+        compositionService.runComposition(configuration.getDashboard(),user);
         dashboardService.updateDashboard(configuration.getDashboard(),
                 authenticationService.getUserCredential().getId());
     }
@@ -95,9 +89,10 @@ public class WidgetConfigurationController extends SelectorComposer<Component> {
      * Creates new composition while adding first chart
      */
     private void createComposition() {
+        String user=authenticationService.getUserCredential().getId();
         compositionService.createComposition(configuration.getDashboard(),
-                configuration.getWidget());
-        compositionService.runComposition(configuration.getDashboard());
+                configuration.getWidget(),user);
+        compositionService.runComposition(configuration.getDashboard(),user);
         dashboardService.updateDashboard(configuration.getDashboard(),
                 authenticationService.getUserCredential().getId());
     }

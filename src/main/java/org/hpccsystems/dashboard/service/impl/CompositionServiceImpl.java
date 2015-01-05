@@ -23,7 +23,6 @@ import org.hpccsystems.dashboard.service.CompositionService;
 import org.hpccsystems.dashboard.util.HipieSingleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.stereotype.Service;
@@ -34,22 +33,16 @@ import org.zkoss.zkplus.spring.SpringUtil;
 public class CompositionServiceImpl implements CompositionService{
     
     private static final Logger LOGGER = LoggerFactory.getLogger(CompositionServiceImpl.class);
-    private AuthenticationService authenticationService;
     private static final String HIPIE_RAW_DATASET  = "RawDataset";
     
-    @Autowired
-    public void setAuthenticationService(AuthenticationService authenticationService) {
-        this.authenticationService = authenticationService;
-    }
-    
     @Override
-    public void createComposition(Dashboard dashboard, Widget widget) {
+    public void createComposition(Dashboard dashboard, Widget widget,String user) {
         String label = dashboard.getName();
         HIPIEService hipieService = HipieSingleton.getHipie();
         Composition composition;
         try {
             composition = hipieService.getCompositionTemplate(
-                    authenticationService.getUserCredential().getId(),"BasicTemplate");
+                    user,"BasicTemplate");
             composition.setLabel(label);
             String compName = label.replaceAll("[^a-zA-Z0-9]+", "");
             composition.setName(compName);
@@ -59,7 +52,7 @@ public class CompositionServiceImpl implements CompositionService{
             hipieService.refreshData();
             ContractInstance datasource=composition.getContractInstanceByName(HIPIE_RAW_DATASET);
             pluginContract.addPrecursor(datasource);    
-            composition = HipieSingleton.getHipie().saveCompositionAs(authenticationService.getUserCredential().getId(), composition,
+            composition = HipieSingleton.getHipie().saveCompositionAs(user, composition,
                      compName + ".cmp");
             dashboard.setCompositionName(composition.getCanonicalName());           
         } catch (Exception e) {
@@ -68,21 +61,21 @@ public class CompositionServiceImpl implements CompositionService{
     }
     
     @Override
-    public void updateComposition(Dashboard dashboard, Widget widget) {
+    public void updateComposition(Dashboard dashboard, Widget widget,String user) {
         HIPIEService hipieService = HipieSingleton.getHipie();
         Composition composition;
         try {
-            composition = hipieService.getComposition(authenticationService.getUserCredential().getId(), dashboard.getCompositionName());
+            composition = hipieService.getComposition(user, dashboard.getCompositionName());
             //
-            appendOnPlugin(composition,widget,composition.getName());   
-            addInputOutput(composition,"~" + widget.getLogicalFile(),widget,dashboard.getHpccConnection());
-            HipieSingleton.getHipie().saveComposition(authenticationService.getUserCredential().getId(), composition);
+            appendOnPlugin(composition,widget,composition.getName(),user);   
+            //addInputOutput(composition,"~" + widget.getLogicalFile(),widget,dashboard.getHpccConnection());
+            HipieSingleton.getHipie().saveComposition(user, composition);
         } catch (Exception e) {
             LOGGER.error(Constants.EXCEPTION, e);
         }
     }
     
-    private void addInputOutput(Composition composition, String fileName,Widget widget,HPCCConnection hpcc) throws Exception {
+    private void addInputOutput(Composition composition, String fileName,Widget widget,HPCCConnection hpcc,String user) throws Exception {
         
         Contract contract = composition.getContractInstanceByName(composition.getName()).getContract();
         HIPIEService hipieService=HipieSingleton.getHipie();
@@ -112,7 +105,7 @@ public class CompositionServiceImpl implements CompositionService{
         VisualElement visualization=contract.getVisualElements().iterator().next();
         visualization.addChildElement(visualElement);
         
-        contract = hipieService.saveContractAs(authenticationService.getUserCredential().getId(), contract,contract.getName());
+        contract = hipieService.saveContractAs(user, contract,contract.getName());
         
         ContractInstance pluginInstance = contract.createContractInstance();
         
@@ -138,14 +131,13 @@ public class CompositionServiceImpl implements CompositionService{
 
 
     @Override
-    public CompositionInstance runComposition(Dashboard dashboard) {
+    public CompositionInstance runComposition(Dashboard dashboard,String user) {
         HIPIEService hipieService=HipieSingleton.getHipie();
-        String userId=authenticationService.getUserCredential().getId();
         Composition comp;
         CompositionInstance compositionInstance = null;
         try {
-            comp = hipieService.getComposition(userId,dashboard.getCompositionName());
-            compositionInstance = hipieService.runComposition(comp, dashboard.getHpccConnection(), userId);
+            comp = hipieService.getComposition(user,dashboard.getCompositionName());
+            compositionInstance = hipieService.runComposition(comp, dashboard.getHpccConnection(), user);
         } catch (Exception e) {
             LOGGER.error(Constants.EXCEPTION, e);
         }
@@ -166,10 +158,9 @@ public class CompositionServiceImpl implements CompositionService{
         //TODO:Need to set FieldSeparator & other info for NON-THOR files
     }
     
-    private void appendOnPlugin(Composition composition,Widget widget,String contractName) throws Exception {
-        Contract contract = composition.getContractInstanceByName(contractName).getContract();
-        
+    private void appendOnPlugin(Composition composition,Widget widget,String contractName,String user) throws Exception {
         HIPIEService hipieService=HipieSingleton.getHipie();
+        Contract contract =hipieService.getContract(user, contractName);
         Element input=contract.getInputElements().iterator().next();
         widget.generateInputElement().stream().forEach(inputElement->
             input.addChildElement(inputElement)
@@ -188,7 +179,7 @@ public class CompositionServiceImpl implements CompositionService{
         //contract.save();
         ContractInstance pluginContract = composition.getContractInstanceByName(contractName);
         composition.removeContractInstance(pluginContract);
-        contract = hipieService.saveContractAs(authenticationService.getUserCredential().getId(), contract,contract.getName());
+        contract = hipieService.saveContractAs(user, contract,contract.getName());
         
         ContractInstance pluginInstance = contract.createContractInstance();
         
@@ -266,18 +257,18 @@ public class CompositionServiceImpl implements CompositionService{
      * Gets the composition's latest workuntit ID
      */
     @Override
-    public String getWorkunitId(Dashboard dashboard) throws Exception {
+    public String getWorkunitId(Dashboard dashboard,String user) throws Exception {
         Composition composition = null;
         CompositionInstance latestInstance = null;
         composition =  HipieSingleton.getHipie().getComposition(
-                authenticationService.getUserCredential().getId(),
+                user,
                 dashboard.getCompositionName());
         
         if(composition != null) {
             latestInstance = composition.getMostRecentInstance(
-                    authenticationService.getUserCredential().getId(), true);
+                    user, true);
             if(latestInstance == null){
-                latestInstance = runComposition(dashboard);
+                latestInstance = runComposition(dashboard,user);
             } 
             
             if(latestInstance.getWorkunitStatus().contains("failed")) {

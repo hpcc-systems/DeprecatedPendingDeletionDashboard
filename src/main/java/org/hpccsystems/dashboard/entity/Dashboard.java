@@ -74,7 +74,8 @@ public class Dashboard {
     public String generateVisualizationURL() throws Exception {
         CompositionService compositionService = (CompositionService) SpringUtil.getBean("compositionService");
         AuthenticationService authenticationService = (AuthenticationService) SpringUtil.getBean("authenticationService");
-        String workunitId = compositionService.getWorkunitId(this);
+        String user=authenticationService.getUserCredential().getId();
+        String workunitId = compositionService.getWorkunitId(this,user);
         Composition composition = HipieSingleton.getHipie().getComposition(
                 authenticationService.getUserCredential().getId(), this.getCompositionName());
         if (workunitId != null) {
@@ -88,7 +89,7 @@ public class Dashboard {
             StringBuilder url = new StringBuilder(getHpccConnection()
                     .getESPUrl()).append("WsWorkunits/WUResult.json?")
                     .append("Wuid=")
-                    .append(compositionService.getWorkunitId(this))
+                    .append(compositionService.getWorkunitId(this,user))
                     .append("&ResultName=").append(resultName)
                     .append("&SuppressXmlSchema=true");
             return url.toString();
