@@ -8,6 +8,9 @@
 <?script src="assets/js/chartRenderer.js"?>
 <?script src="assets/js/ddlChartRenderer.js"?>
 
+<?style src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/themes/base/jquery-ui.css" ?> 
+<?script src="assets/js/lib/jquery-ui.custom.js" ?>
+
 <div vflex="1" hflex="1" sclass="wrapper" style="">
 	<borderlayout>
 		<north sclass="header">

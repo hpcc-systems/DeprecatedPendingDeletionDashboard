@@ -11,13 +11,12 @@ public class Constants {
 	
 	//Events
 	public static final String ON_DELTE_DASHBOARD = "onDeleteDashboard";
+	public static final String ON_DRAW_CHART = "onDrawChart";
 	
 	public static final String HIPIE_RAW_DATASET = "RawDataset";
 	public static final String USER_CREDENTIAL = "userCredential";
     public static final String ON_ADD_DASHBOARD = "onAddDashboard";
     public static final String DASHBOARD = "dashboard";
-    public static final Integer FILTER_MINIMUM = 0;
-    public static final Integer FILTER_MAXIMUM = 1;
     public static final String UNABLE_TO_FETCH_DATA = "Unable to fetch Hpcc data";
     public static final String HPCC_CONNECTION = "hpccConnection";
     public static final String MEASURE = "measure";

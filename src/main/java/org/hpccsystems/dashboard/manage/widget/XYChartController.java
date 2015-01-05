@@ -1,9 +1,7 @@
 package org.hpccsystems.dashboard.manage.widget;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.widget.Attribute;
-import org.hpccsystems.dashboard.entity.widget.ChartdataJSON;
 import org.hpccsystems.dashboard.entity.widget.Field;
 import org.hpccsystems.dashboard.entity.widget.Measure;
 import org.hpccsystems.dashboard.entity.widget.charts.XYChart;
@@ -25,9 +23,6 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.ListitemRenderer;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class XYChartController extends ConfigurationComposer<Component> {
@@ -139,15 +134,6 @@ public class XYChartController extends ConfigurationComposer<Component> {
             }
         }
     }
-    
-    private void drawChart() throws Exception {
-        ChartdataJSON chartData = wssqlService.getChartdata(xyChart, hpccConnection);
-        if(LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Div id -{}\nJSON - {}", chart.getUuid(), new GsonBuilder().setPrettyPrinting().create().toJson(chartData));
-        }
-        Clients.evalJavaScript("createPreview('"+ chart.getUuid()+"','xyChart','"+ StringEscapeUtils.escapeJavaScript(new Gson().toJson(chartData))+"')");
-    }
-
     
 }
 

@@ -222,73 +222,77 @@ public  class WSSQLServiceImpl implements WSSQLService{
     }
 
     @Override
-    public Map<String, BigDecimal> getMinMax(Field field, HPCCConnection connection, String fileName, List<Filter> filters) throws Exception {
-    	Map<String, BigDecimal> resultMap = null;
+    public Map<String, BigDecimal> getMinMax(Field field, HPCCConnection connection, String fileName, List<Filter> filters)
+            throws Exception {
+        Map<String, BigDecimal> resultMap = null;
 
-          try {
-        	  
-              final StringBuilder queryTxt = new StringBuilder("select min(").append(fileName).append(".")
-                      .append(field).append("), max(").append(fileName).append(".").append(field)
-                      .append(") from ");
+        try {
 
-              if (!filters.isEmpty()) {
-                      queryTxt.append(fileName);
-                      queryTxt.append(constructWhereClause(filters ,fileName));
-                  }
-               else {
-                  queryTxt.append(fileName);
-              }
+            final StringBuilder queryTxt = new StringBuilder("select min(")
+                .append(fileName)
+                .append(".")
+                .append(field.getColumn())
+                .append("), max(")
+                    .append(fileName)
+                    .append(".")
+                    .append(field.getColumn())
+                    .append(") from ");
 
-              final String resultString = executeSQL(connection, queryTxt.toString());
+            if (!filters.isEmpty()) {
+                queryTxt.append(fileName);
+                queryTxt.append(constructWhereClause(filters, fileName));
+            } else {
+                queryTxt.append(fileName);
+            }
 
-              if (LOGGER.isDebugEnabled()) {
-                  LOGGER.debug("queryTxt in fetchFilterMinMax() -->" + queryTxt);
-              }
-              if (resultString != null && resultString.length() > 0) {
-            	  
-            	 XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
-            	 XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(new StringReader(resultString));
-            	 resultMap=new HashMap<String, BigDecimal>();
-  				while(xmlEventReader.hasNext()){
-  					XMLEvent xmlEvent = xmlEventReader.nextEvent();
-  					if (xmlEvent.isStartElement()){
-  	                       StartElement startElement = xmlEvent.asStartElement();
-  	                       if(startElement.getName().getLocalPart().equals("Row") || startElement.getName().getLocalPart().equals("Dataset")){
-  	                    	   continue;
-  	                       }
-  	                       else if(startElement.getName().getLocalPart().equals("minout1")){
-  	                           xmlEvent = xmlEventReader.nextEvent();
-  	                         if(xmlEvent.isCharacters())
-  	                        	resultMap.put("min", new BigDecimal((xmlEvent.asCharacters().getData())));
-  	                        else
-  	                        	resultMap.put("min",new BigDecimal(0));
-  	                       }
-  	                       else{
-	                           xmlEvent = xmlEventReader.nextEvent();
-							if (xmlEvent.isCharacters())
-								resultMap.put("max", new BigDecimal(xmlEvent
-										.asCharacters().getData()));
-							else
-								resultMap.put("max", new BigDecimal(0));
-						}
-  	                }
-  				}
-            	  
-              } else {
-            	  throw new HpccConnectionException(Constants.UNABLE_TO_FETCH_DATA);
-              }
+            final String resultString = executeSQL(connection, queryTxt.toString());
 
-          } catch (RemoteException e) {
-              if (e.getMessage().contains(UNAUTHORIZED)) {
-                 throw new HpccConnectionException("401 Unauthorized");
-              }
-              LOGGER.error(Constants.EXCEPTION, e);
-             throw e;
-          } catch (ServiceException | ParserConfigurationException | SAXException | IOException ex) {
-              LOGGER.error(Constants.EXCEPTION, ex);
-             throw new HpccConnectionException();
-          }
-          return resultMap;
+            if (LOGGER.isDebugEnabled()) {
+                LOGGER.debug("queryTxt in fetchFilterMinMax() -->" + queryTxt);
+            }
+            if (resultString != null && resultString.length() > 0) {
+
+                XMLInputFactory xmlInputFactory = XMLInputFactory.newInstance();
+                XMLEventReader xmlEventReader = xmlInputFactory.createXMLEventReader(new StringReader(resultString));
+                resultMap = new HashMap<String, BigDecimal>();
+                while (xmlEventReader.hasNext()) {
+                    XMLEvent xmlEvent = xmlEventReader.nextEvent();
+                    if (xmlEvent.isStartElement()) {
+                        StartElement startElement = xmlEvent.asStartElement();
+                        if (startElement.getName().getLocalPart().equals("Row")
+                                || startElement.getName().getLocalPart().equals("Dataset")) {
+                            continue;
+                        } else if (startElement.getName().getLocalPart().equals("minout1")) {
+                            xmlEvent = xmlEventReader.nextEvent();
+                            if (xmlEvent.isCharacters())
+                                resultMap.put("min", new BigDecimal((xmlEvent.asCharacters().getData())));
+                            else
+                                resultMap.put("min", new BigDecimal(0));
+                        } else {
+                            xmlEvent = xmlEventReader.nextEvent();
+                            if (xmlEvent.isCharacters())
+                                resultMap.put("max", new BigDecimal(xmlEvent.asCharacters().getData()));
+                            else
+                                resultMap.put("max", new BigDecimal(0));
+                        }
+                    }
+                }
+
+            } else {
+                throw new HpccConnectionException(Constants.UNABLE_TO_FETCH_DATA);
+            }
+
+        } catch (RemoteException e) {
+            if (e.getMessage().contains(UNAUTHORIZED)) {
+                throw new HpccConnectionException("401 Unauthorized");
+            }
+            LOGGER.error(Constants.EXCEPTION, e);
+            throw e;
+        } catch (ServiceException | ParserConfigurationException | SAXException | IOException ex) {
+            LOGGER.error(Constants.EXCEPTION, ex);
+            throw new HpccConnectionException();
+        }
+        return resultMap;
     }
 
     @Override

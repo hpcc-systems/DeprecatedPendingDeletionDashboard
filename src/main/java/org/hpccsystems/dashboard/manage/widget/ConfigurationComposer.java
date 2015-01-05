@@ -3,8 +3,10 @@ package org.hpccsystems.dashboard.manage.widget;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.hpcc.HIPIE.utils.HPCCConnection;
 import org.hpccsystems.dashboard.Constants;
+import org.hpccsystems.dashboard.entity.widget.ChartdataJSON;
 import org.hpccsystems.dashboard.entity.widget.Field;
 import org.hpccsystems.dashboard.entity.widget.Filter;
 import org.hpccsystems.dashboard.entity.widget.Measure;
@@ -13,6 +15,7 @@ import org.hpccsystems.dashboard.entity.widget.StringFilter;
 import org.hpccsystems.dashboard.entity.widget.Widget;
 import org.hpccsystems.dashboard.manage.WidgetConfiguration;
 import org.hpccsystems.dashboard.service.HPCCFileService;
+import org.hpccsystems.dashboard.service.WSSQLService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zkoss.zk.ui.Component;
@@ -20,12 +23,14 @@ import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.DropEvent;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
+import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
+import org.zkoss.zul.Div;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
@@ -33,6 +38,9 @@ import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.ListitemRenderer;
 import org.zkoss.zul.Popup;
+
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
 public class ConfigurationComposer<T> extends SelectorComposer<Component>{
     private static final long serialVersionUID = 1L;
@@ -48,11 +56,17 @@ public class ConfigurationComposer<T> extends SelectorComposer<Component>{
     protected Listbox attributeListbox;
     
     @Wire
+    private Div chart;
+    
+    @Wire
     private Listbox filterbox;
     private ListModelList<Filter> filterModel = new ListModelList<Filter>(); 
     
     @WireVariable
     private HPCCFileService hpccFileService;
+    @WireVariable
+    private WSSQLService wssqlService;
+    
     protected HPCCConnection hpccConnection;
     
     private ListitemRenderer<Field> attributeRenderer = (listitem, field, index) -> {
@@ -84,16 +98,42 @@ public class ConfigurationComposer<T> extends SelectorComposer<Component>{
         renderFilter(item, filter);
     };
 
+    private EventListener<Event> drawChartListener = event -> {
+        try {
+            ChartdataJSON chartData;
+            chartData = wssqlService.getChartdata(widget, hpccConnection);
+            if(LOGGER.isDebugEnabled()) {
+                LOGGER.debug("Div id -{}\nChart - {}\nJSON - {}", 
+                        chart.getUuid(), 
+                        widgetConfiguration.getWidget().getChartConfiguration().getHipieChartId(),
+                        new GsonBuilder().setPrettyPrinting().create().toJson(chartData));
+            }
+            Clients.evalJavaScript("createPreview('"+ chart.getUuid()+"', '" 
+                    + widgetConfiguration.getWidget().getChartConfiguration().getHipieChartId()
+                    + "','"+ StringEscapeUtils.escapeJavaScript(new Gson().toJson(chartData))+"')");
+        } catch (Exception e) {
+           LOGGER.error(Constants.EXCEPTION,e);
+           //TODO: Show error using JS
+        }
+        
+        Clients.clearBusy(getSelf());
+    };
+    
     @Override
     public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
         widgetConfiguration = (WidgetConfiguration) Executions.getCurrent().getArg().get(Constants.WIDGET_CONFIG);
-        widget=widgetConfiguration.getWidget();
+        widgetConfiguration.setComposer(this);
+        widget = widgetConfiguration.getWidget();
+        
         filterbox.setModel(filterModel);
         filterbox.setItemRenderer(filterRenderer);
+        
         if(widgetConfiguration.getWidget().isConfigured()){
-        filterModel.addAll(widgetConfiguration.getWidget().getFilters());
+            filterModel.addAll(widgetConfiguration.getWidget().getFilters());
         }
+        
+        chart.addEventListener(Constants.ON_DRAW_CHART, drawChartListener);
     }
     
     
@@ -103,11 +143,12 @@ public class ConfigurationComposer<T> extends SelectorComposer<Component>{
         Field field = draggedItem.getValue();
         
         Filter filter = field.isNumeric() ? new NumericFilter(field) : new StringFilter(field);
-        if(widgetConfiguration.getWidget().getFilters()!=null&&widgetConfiguration.getWidget().getFilters().contains(filter)){
+        if(widgetConfiguration.getWidget().getFilters() != null
+                && widgetConfiguration.getWidget().getFilters().contains(filter)){
             Clients.showNotification("Filter already exists","warning",filterbox,"end_center", 5000, true);
-        }else{
-        widgetConfiguration.getWidget().addFilter(filter);
-        filterModel.add(filter);
+        } else {
+            widgetConfiguration.getWidget().addFilter(filter);
+            filterModel.add(filter);
         }
     }
     
@@ -142,5 +183,12 @@ public class ConfigurationComposer<T> extends SelectorComposer<Component>{
         playButton.setPopup(popup);
         
         item.appendChild(listcell);
+    }
+    
+    public void drawChart() {
+        if(widget.isConfigured()) {
+            Clients.showBusy(getSelf(), "Retriving data");
+            Events.echoEvent(Constants.ON_DRAW_CHART, chart, null);
+        }
     }
 }

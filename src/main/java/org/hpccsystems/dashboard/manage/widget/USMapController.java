@@ -3,10 +3,8 @@ package org.hpccsystems.dashboard.manage.widget;
 import java.util.HashMap;
 import java.util.Map;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.widget.Attribute;
-import org.hpccsystems.dashboard.entity.widget.ChartdataJSON;
 import org.hpccsystems.dashboard.entity.widget.Field;
 import org.hpccsystems.dashboard.entity.widget.Measure;
 import org.hpccsystems.dashboard.entity.widget.charts.USMap;
@@ -30,9 +28,6 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.ListitemRenderer;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 /**
  * EditChartController class is used to handle the edit page of the Dashboard
@@ -168,14 +163,6 @@ public class USMapController extends ConfigurationComposer<Component> {
                 e.printStackTrace();
             }
         }
-    }
-    
-    private void drawChart() throws Exception {
-        ChartdataJSON chartData = wssqlService.getChartdata(usMap, hpccConnection);
-        if(LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Div id -{}\nJSON - {}", chart.getUuid(), new GsonBuilder().setPrettyPrinting().create().toJson(chartData));
-        }
-        Clients.evalJavaScript("createPreview('"+ chart.getUuid()+"','usMap','"+ StringEscapeUtils.escapeJavaScript(new Gson().toJson(chartData))+"')");
     }
     
 }

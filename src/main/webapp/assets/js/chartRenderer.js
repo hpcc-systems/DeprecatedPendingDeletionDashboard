@@ -13,21 +13,21 @@ function createPreview(target, chartType, data) {
 				C3Pie, C3Line, C3Column) {
 
 			console.log(actualData);
-			if (chartType == "pie") {
+			if (chartType == "PIE") {
 				new C3Pie()
 					.target(target)
 					.data(actualData.data)
 					.render();
 			}
 
-			if (chartType == "line") {
+			if (chartType == "LINE") {
 				new C3Line()
 				.target(target)
 				.data(actualData.data)
 				.render();
 			}
 
-			if (chartType == "column") {
+			if (chartType == "COLUMN") {
 				new C3Column()
 				.target(target)
 				.data(actualData.data)

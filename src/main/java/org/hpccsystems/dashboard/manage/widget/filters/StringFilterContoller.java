@@ -5,7 +5,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.hpccsystems.dashboard.Constants;
-import org.hpccsystems.dashboard.entity.widget.Field;
 import org.hpccsystems.dashboard.entity.widget.StringFilter;
 import org.hpccsystems.dashboard.manage.WidgetConfiguration;
 import org.hpccsystems.dashboard.service.AuthenticationService;
@@ -33,7 +32,6 @@ public class StringFilterContoller extends SelectorComposer<Component> {
     private static final Logger LOGGER = LoggerFactory.getLogger(StringFilterContoller.class);
     
     private StringFilter filter;
-    private Button doneButton;
     private ListModelList<String> listOfvalues;
 
     @WireVariable
@@ -48,18 +46,20 @@ public class StringFilterContoller extends SelectorComposer<Component> {
     @Wire
     Button filtersSelectedBtn;
 
+    private WidgetConfiguration widgetConfiguration;
+    
     @Override
     public void doAfterCompose(Component comp) throws Exception {
         super.doAfterCompose(comp);
-        WidgetConfiguration widgetconfig = (WidgetConfiguration) Executions.getCurrent().getAttribute(Constants.WIDGET_CONFIG);
+        widgetConfiguration = (WidgetConfiguration) Executions.getCurrent().getAttribute(Constants.WIDGET_CONFIG);
         filter = (StringFilter) Executions.getCurrent().getAttribute(Constants.FILTER);
         
         List<String> valueList = null;
         
         valueList = wssqlService.getDistinctValues(filter, 
-                widgetconfig.getDashboard().getHpccConnection(), 
-                widgetconfig.getWidget().getLogicalFile(), 
-                widgetconfig.getWidget().getFilters());
+                widgetConfiguration.getDashboard().getHpccConnection(), 
+                widgetConfiguration.getWidget().getLogicalFile(), 
+                widgetConfiguration.getWidget().getFilters());
         
         if (!valueList.isEmpty()) {
             listOfvalues = new ListModelList<String>(valueList);
@@ -73,8 +73,7 @@ public class StringFilterContoller extends SelectorComposer<Component> {
         
         // Check for no values selected
         if (selectedValues.isEmpty()) {
-            Clients.showNotification(Labels.getLabel("noFilterareSelected"), "error", doneButton.getParent().getParent()
-                    .getParent(), "middle_center", 3000, true);
+            Clients.showNotification(Labels.getLabel("noFilterareSelected"), "error", widgetConfiguration.getHolder(), "middle_center", 3000, true);
             return;
         }
         filter.setValues(new ArrayList<String>(selectedValues));
@@ -83,6 +82,7 @@ public class StringFilterContoller extends SelectorComposer<Component> {
         Popup popup = (Popup) this.getSelf().getParent().getParent();
         popup.close();
 
+        widgetConfiguration.getComposer().drawChart();
     }
 
 }

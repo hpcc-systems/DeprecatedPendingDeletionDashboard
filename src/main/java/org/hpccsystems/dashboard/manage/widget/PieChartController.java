@@ -1,13 +1,10 @@
 package org.hpccsystems.dashboard.manage.widget;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.widget.Attribute;
-import org.hpccsystems.dashboard.entity.widget.ChartdataJSON;
 import org.hpccsystems.dashboard.entity.widget.Field;
 import org.hpccsystems.dashboard.entity.widget.Measure;
 import org.hpccsystems.dashboard.entity.widget.charts.Pie;
-import org.hpccsystems.dashboard.service.WSSQLService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zkoss.zk.ui.Component;
@@ -16,7 +13,6 @@ import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
-import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Div;
@@ -25,9 +21,6 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.ListitemRenderer;
-
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class PieChartController extends ConfigurationComposer<Component> {
@@ -45,9 +38,6 @@ public class PieChartController extends ConfigurationComposer<Component> {
     private Listbox labelListbox;
     private ListModelList<Attribute> labels = new ListModelList<Attribute>();
         
-    @WireVariable
-    private WSSQLService wssqlService;
-    
     @Wire
     private Div chart;
     
@@ -99,7 +89,8 @@ public class PieChartController extends ConfigurationComposer<Component> {
         weightListbox.setItemRenderer(weightRenderer);
         labelListbox.setModel(labels);
         labelListbox.setItemRenderer(labelRenderer);
-        if(pie.isConfigured()){
+        
+        if(pie.isConfigured()) {
             weights.add(pie.getWeight());
             labels.add(pie.getLabel());
             drawChart();
@@ -119,9 +110,7 @@ public class PieChartController extends ConfigurationComposer<Component> {
         weights.add(measure);
         weightListbox.setDroppable(Constants.FALSE);
         
-        if(pie.isConfigured()) {            
-            drawChart();
-        }
+        drawChart();
     }
 
     @Listen("onDrop = #labelListbox")
@@ -132,25 +121,9 @@ public class PieChartController extends ConfigurationComposer<Component> {
         pie.setLabel(attribute);
         labels.add(attribute);
         labelListbox.setDroppable(Constants.FALSE);
-        if(pie.isConfigured()) {            
-           drawChart();
-        }
+        
+        drawChart();
     }
-    
-    private void drawChart() {
-        ChartdataJSON chartData;
-        try {
-            chartData = wssqlService.getChartdata(pie, hpccConnection);
-            if(LOGGER.isDebugEnabled()) {
-                LOGGER.debug("Div id -{}\nJSON - {}", chart.getUuid(), new GsonBuilder().setPrettyPrinting().create().toJson(chartData));
-            }
-            Clients.evalJavaScript("createPreview('"+ chart.getUuid()+"','pie','"+ StringEscapeUtils.escapeJavaScript(new Gson().toJson(chartData))+"')");
-        } catch (Exception e) {
-           LOGGER.error(Constants.EXCEPTION,e);
-           //TODO: Show error using JS
-        }
-    }
-    
     
 }
 

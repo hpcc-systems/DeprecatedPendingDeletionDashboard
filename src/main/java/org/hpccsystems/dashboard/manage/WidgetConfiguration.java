@@ -2,18 +2,20 @@ package org.hpccsystems.dashboard.manage;
 
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.widget.Widget;
+import org.hpccsystems.dashboard.manage.widget.ConfigurationComposer;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zul.Div;
 
 public class WidgetConfiguration {
     public static final String ON_CHART_TYPE_SELECT = "onChartTypeSelect";
     public static final String ON_FILE_SELECT = "onFileSelect";
-    
+
     private Dashboard dashboard;
     private Component holder;
     private Widget widget;
     private Div chartDiv;
-   
+
+    private ConfigurationComposer<?> composer;
 
     public Div getChartDiv() {
         return chartDiv;
@@ -23,7 +25,7 @@ public class WidgetConfiguration {
         this.chartDiv = chartDiv;
     }
 
-    public WidgetConfiguration(Dashboard dashboard,Div chartDiv) {
+    public WidgetConfiguration(Dashboard dashboard, Div chartDiv) {
         this.dashboard = dashboard;
         this.chartDiv = chartDiv;
     }
@@ -50,5 +52,13 @@ public class WidgetConfiguration {
 
     public void setDashboard(Dashboard dashboard) {
         this.dashboard = dashboard;
+    }
+
+    public ConfigurationComposer<?> getComposer() {
+        return composer;
+    }
+
+    public void setComposer(ConfigurationComposer<?> configurationComposer) {
+        this.composer = configurationComposer;
     }
 }

@@ -11,14 +11,7 @@
   </head>
 
   <body> 	
-	<zscript>
-    org.apache.commons.logging.LogFactory.getLog("Login page").error( 
-			"Arg : " + Executions.getCurrent().getArg() +
-			" Parameter Map : " + Executions.getCurrent().getParameterMap() +
-			" Attributes : " + Executions.getCurrent().getAttributes() + 
-			" User Principal: " +  Executions.getCurrent().getUserPrincipal() );
-    </zscript>
-     <zul:div apply="org.hpccsystems.dashboard.authentication.LoginController" id= "loginWin"> 
+    <zul:div apply="org.hpccsystems.dashboard.authentication.LoginController" id= "loginWin"> 
 	<div class="navbar navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
