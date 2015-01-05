@@ -3,10 +3,13 @@ package org.hpccsystems.dashboard.manage;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.hpcc.HIPIE.Composition;
+import org.hpcc.HIPIE.HIPIEService;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.service.AuthenticationService;
 import org.hpccsystems.dashboard.service.DashboardService;
+import org.hpccsystems.dashboard.util.HipieSingleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zkoss.zk.ui.Component;
@@ -42,6 +45,7 @@ public class NavigationController extends SelectorComposer<Component> {
     private DashboardService dashboardService;
     @WireVariable
     private AuthenticationService authenticationService;
+    private HIPIEService hipieService = HipieSingleton.getHipie();
 
     private ListModelList<Dashboard> dashboardModel = new ListModelList<Dashboard>();
     
@@ -84,8 +88,16 @@ public class NavigationController extends SelectorComposer<Component> {
         // Removes Dashboard
         this.getSelf().addEventListener(Constants.ON_DELTE_DASHBOARD, event -> {
             Dashboard dashboard = (Dashboard) event.getData();
+            
+            //Deleting composition from the HIPIE
+            Composition compositionToDelete = hipieService.getComposition(authenticationService.getUserCredential().getId(),dashboard.getName());
+            hipieService.deleteComposition(compositionToDelete);
+            hipieService.refreshData();
+            
+            // Removing the composition from DB
             int index = dashboardModel.indexOf(dashboard);
             dashboardService.deleteDashboard(dashboard.getId());
+            
             dashboardModel.remove(dashboard);
             Include include = (Include) getSelf().getFellow("container");
             include.setSrc(null);
