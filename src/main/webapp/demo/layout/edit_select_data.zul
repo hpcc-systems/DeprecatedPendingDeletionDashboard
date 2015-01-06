@@ -1,34 +1,120 @@
 <vbox apply="org.hpccsystems.dashboard.controller.SelectDataController">
-	<hbox hflex="1" spacing="0px" style="
-		background: rgba(170, 170, 170, 0.45);
-		width: 1000px;"
-		>
-		
-		<hlayout zclass="form-group">
-			<label zclass="label" value="${labels.userName}"></label>
-			<textbox id="username" value="generic_dashboard" zclass="form-control"></textbox>
-		</hlayout>
-		<hlayout zclass="form-group">
-			<label zclass="label" value="${labels.password}"></label>
-			<textbox id="password" type="password" value ="Lexis123!" zclass="form-control"></textbox>
-		</hlayout>
-		<hlayout zclass="form-group" hflex="1">
-			<label zclass="label" value="${labels.jdbcURL}"></label>
-			<textbox id="URL" constraint="no empty : Please enter valid HPCCSystems ip." value="216.19.105.2" zclass="form-control"></textbox>
-		</hlayout>
-		<hlayout zclass="form-group" hflex="0">
-			<label zclass="label" value="Connection Type"></label>
-			<checkbox style="margin-top: 4px; margin-left: 10px;" id="sslCheckbox" label="SSL" checked="true" ></checkbox>
-		</hlayout>
-		<hlayout zclass="form-group" >
-			<button id="submitBtn" label="${labels.fetchFields}" style="margin-top:10px;"	zclass="btn btn-primary" width="135px" />
-		</hlayout>
-		
-	</hbox>
 	
-	<tree id="tree" visible="false" height="462px">
+	<panel sclass="pagePanel" collapsible="true" width="1000px" id="formPanel">
+		<caption iconSclass="glyphicon glyphicon-globe">
+			<label sclass="h5"> HPCC Systems Connection Detail</label>
+		</caption>
+		<panelchildren>
+			<vbox id="viewHpccVbox" visible="false" hflex="1" spacing="0" style="background: rgba(170, 170, 170, 0.45);width: 1000px;">
+				<hbox sclass="form-group" hflex="1" align="center" spacing="15px">
+					<div width="250px" sclass="form-label-div" align="right">
+						<label zclass="control-label" value="HPCC Cluster"></label>
+					</div>
+					<label zclass="form-control" id="hpccUrl" ></label>
+				</hbox>
+				<hbox sclass="form-group" hflex="1" align="center" spacing="15px">
+					<div hflex="1" sclass="form-label-div" align="center">
+						<label zclass="control-label" value="${labels.commonFilterEnabled}"></label>
+					</div>
+				</hbox>
+			
+				<div zclass="form-actions">
+					<button id="proceedBtn" label="${labels.fetchFields}" style="margin-top:10px;"	zclass="btn btn-primary" width="135px" />
+				</div>
+			</vbox>
+			
+			<vbox id="defaultsContainer" spacing="0" style="background: rgba(170, 170, 170, 0.45); width: 1000px;">
+				<hbox sclass="form-group" hflex="1" align="center" spacing="15px">
+					<div width="250px" sclass="form-label-div" align="right">
+						<label zclass="control-label" value="HPCC Connection"></label>
+					</div>
+					<combobox id="defaultConnections" autodrop="true" placeholder="Choose a pre-defined Cluster" sclass="input-sm"/>
+		  			or
+		  			<button id="defineConnection" zclass="btn btn-sm btn-info" label="Define new connection" />
+				</hbox>
+			</vbox>
+			
+			
+			<vbox id="editHpccVbox" spacing="0" style="background: rgba(170, 170, 170, 0.45); width: 1000px;" visible="false">
+				
+				<hbox sclass="form-group" hflex="1" align="center" spacing="15px">
+					<div width="250px" sclass="form-label-div" align="right">
+						<label zclass="control-label" value="${labels.dataSource}"></label>
+					</div>
+					<combobox id="fileType" autodrop="true" >
+		    			<comboitem label="Logical Files"   value="logicalfile"/>
+		  			 	<comboitem label="Queries" value="query"/>
+		  			</combobox>	
+				</hbox>
+
+				<hbox sclass="form-group" hflex="1" align="center" spacing="15px" id="thorIpContainer">
+					<div width="250px" sclass="form-label-div" align="right">
+						<label zclass="control-label" value="${labels.clusterIp}"></label>
+					</div>
+					<textbox id="clusterIp"  zclass="form-control"></textbox>
+				</hbox>
+				
+				<hbox sclass="form-group" hflex="1" align="center" spacing="15px">
+					<div width="250px" sclass="form-label-div" align="right">
+						<label zclass="control-label" value="${labels.ports}"></label>
+					</div>
+									
+					<div width="80px" sclass="form-label-div" align="right">
+						<label zclass="control-label" value="${labels.espport}"></label>
+					</div>
+					<intbox width="80px" id="espport" zclass="form-control"></intbox>
+				
+					<div width="125px" sclass="form-label-div" align="right">
+						<label zclass="control-label" value="${labels.wssqlPort}"></label>
+					</div>
+					<intbox width="80px" id="wssqlport" zclass="form-control"></intbox>
+					
+					<div id="roxieportLabel" width="100px" sclass="form-label-div" align="right" visible="false">
+						<label zclass="control-label" value="${labels.roxieport}"></label>
+					</div>
+					<intbox width="80px" id="wsEclPort" zclass="form-control" visible="false"></intbox>
+				</hbox>
+				
+				<hbox sclass="form-group" hflex="1" align="center" spacing="15px">
+					<div width="250px" sclass="form-label-div" align="right">
+						<label zclass="control-label" value="${labels.connectionType}"></label>
+					</div>
+					<checkbox style="margin: 5px;" zclass="checkbox" id="sslCheckbox" label="SSL" width="80px"></checkbox>
+				</hbox>
+				
+				<hbox sclass="form-group" hflex="1" align="center" spacing="15px">
+					<div width="250px" sclass="form-label-div" align="right">
+						<label zclass="control-label" value="${labels.lblUserName}"></label>
+					</div>
+					<textbox zclass="form-control input-sm" id="username" ></textbox>
+				</hbox>
+			
+				<hbox sclass="form-group" hflex="1" align="center" spacing="15px">
+					<div width="250px" sclass="form-label-div" align="right">
+						<label zclass="control-label" value="${labels.lblPassword}"></label>
+					</div>
+					<textbox zclass="form-control input-sm" id="password" type="password" ></textbox>
+				</hbox>
+				
+				<hbox id="clusterNameHbox" sclass="form-group" hflex="1" align="center" spacing="15px" visible="false"> 
+				 	<div width="250px" sclass="form-label-div" align="right">
+						<label zclass="control-label" value="Cluster Type"></label>
+				 	</div>
+					<combobox id="clusters"  width="100px" visible="false"/>
+					<button id="getClustersBtn" zclass="btn btn-info btn-sm" label="Get clusters" />
+				</hbox>	
+				
+				<div zclass="form-actions" id="submitBtnDiv">
+					<button id="submitBtn"  label="${labels.fetchFields}" style="margin-top:10px;"	zclass="btn btn-primary" width="135px" />
+				</div>
+			
+			</vbox>
+		</panelchildren>
+	</panel>
+	
+	<tree id="tree" visible="false" height="504px" multiple="true" checkmark="true">
         <treecols>
-            <treecol label="Choose a file to Visualize"/>
+            <treecol id="treeColumn" label="Choose a file to Visualize"/>
         </treecols>
         
         <template name="model">
@@ -42,11 +128,15 @@
         </template>
         <treefoot>
         	<treefooter>
-				<hbox hflex="1" spacing="0px">
-					<box hflex="1" vflex="1" pack="center" align="center">
-						<label id="selectedFileName"> No file selected </label>
-					</box>
-					<button label="Visualise" zclass="btn btn-success" id="visualizeBtn" ></button>
+				<hbox hflex="1" spacing="0px" pack="center" align="center">
+					<vbox hflex="1" vflex="1" pack="center" align="center">
+						<listbox id="selectedFilesListbox" emptyMessage="${labels.noFileSelected}" height="100px">
+							
+						</listbox>
+					</vbox>
+					<div width="150px" align="center">
+						<button label="${labels.visualize}" zclass="btn btn-success" id="visualizeBtn"></button>
+					</div>
 				</hbox>        		
         	</treefooter>
         </treefoot>        

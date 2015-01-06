@@ -1,18 +1,21 @@
 <window zclass="container">
 	<style src="demo/css/bootstrap/css/bootstrap.min.css"/>
 	<style src="demo/css/flat.css"></style>
-	
-	<vbox hflex="1" vflex="1" align="center" pack="center">
+	<vlayout>
+		<include src="/demo/layout/banner.zul" />
+		<vbox hflex="1" vflex="1" align="center" pack="center">
 		<vbox align="center" pack="center" width="200px" style="margin-top:50px">
 			<image src="/demo/images/logo_white.png" width="180px"/>
 			<label style="color:white; font-size: larger;">Dashboard</label>
 		</vbox>
 		
 		<vbox align="center" pack="center" style="margin-top: 50px;">
-			<label zclass="h2" style="color:white">${requestScope['javax.servlet.error.status_code']} : Error occurred</label>
-			<label zclass="h4" style="color:white">Sorry, We are unable to process your request. Please try again.</label>
+			<label zclass="h2" style="color:white">${requestScope['javax.servlet.error.status_code']} : ${labels.errorOccurred}</label>
+			<label zclass="h4" style="color:white">${labels.unbaletoProcessYourRequest}</label>
 		</vbox>
 	</vbox>
+	</vlayout>
+	
 	
 	<zscript>
 		org.apache.commons.logging.LogFactory.getLog("Error Page").error( 

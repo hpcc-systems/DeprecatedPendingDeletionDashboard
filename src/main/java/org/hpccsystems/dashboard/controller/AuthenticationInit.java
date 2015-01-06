@@ -1,7 +1,6 @@
 package org.hpccsystems.dashboard.controller;
 
 import java.util.Map;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.services.AuthenticationService;
@@ -12,20 +11,22 @@ import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.util.Initiator;
 
 public class AuthenticationInit implements Initiator {
-	 //services
+     //services
     AuthenticationService authService = new AuthenticationServiceImpl();
     
-	private static final  Log LOG = LogFactory.getLog(AuthenticationInit.class); 
-	
-    public void doInit(Page page, Map<String, Object> args) throws Exception {
+    private static final  Log LOG = LogFactory.getLog(AuthenticationInit.class); 
+    
+    @Override
+    public void doInit(Page page, Map<String, Object> args) {
             UserCredential cre = authService.getUserCredential();
             if(cre==null || cre.isAnonymous()){
-            	if(LOG.isDebugEnabled()){
-            		LOG.debug("User Authentication failed.." );
-            		LOG.debug("Annonimity of user.." + cre.isAnonymous());
-            		LOG.debug("Credentials - Account ->" + cre.getUserId() );
-            		LOG.debug("Credentials - Name ->" + cre.getUserName() );
-            	}
+                if(LOG.isDebugEnabled()){
+                    LOG.debug("User Authentication failed.." );
+                    LOG.debug("Annonimity of user.." + cre.isAnonymous());
+                    LOG.debug("Credentials - Account ->" + cre.getUserId() );
+                    LOG.debug("Credentials - Name ->" + cre.getUserName() );
+                }
+                //Redirects to login page
                 Executions.sendRedirect("/login.zhtml");
                 return;
             }

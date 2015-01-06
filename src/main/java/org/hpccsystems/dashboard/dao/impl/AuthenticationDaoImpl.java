@@ -22,62 +22,55 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
  */
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class AuthenticationDaoImpl implements AuthenticationDao{
-	
-	public static final long serialVersionUID = 1L;
-	
-	private static final  Log LOG = LogFactory.getLog(AuthenticationDaoImpl.class); 
-	private JdbcTemplate jdbcTemplate;
-	
-	public JdbcTemplate getJdbcTemplate() {
-		return jdbcTemplate;
-	}
-	@Autowired
-	public void setDataSource(DataSource dataSource) {
-		this.jdbcTemplate = new JdbcTemplate(dataSource);
-	}
-	
-	//TODO:  Return UserCredential Instead of User
-	public User authendicateUser(String userName, String password) throws SQLException {
-		User user =null;			
-		String sql=Queries.GET_USER_DETAILS;
-		
-		try
-		{
-		user = getJdbcTemplate().queryForObject(sql, new Object[]{userName}, new UserRowMapper());
-		if(user != null)
-		{
-			String userId = user.getUserId();
-			String pwd = user.getPassword();
-			String flag = user.getActiveFlag();	
-			if(password.trim().equals(pwd))
-			{
-				user.setValidUser(true);
-				if(Constants.INACTIVE_FLAG.equals(flag))
-				{
-				user.setActiveFlag(flag);
-				String sqlQuery=Queries.RESET_USER_FLAG;
-				getJdbcTemplate().update(sqlQuery, new Object[]{Constants.ACTIVE_FLAG,userId});
-				}
-				else
-				{
-					user.setActiveFlag(Constants.ACTIVE_FLAG);
-				}
-				
-			}
-		}
-		}
-		catch(EmptyResultDataAccessException ex) {
-			LOG.error("authendicateUser failed to execute the query due to invalid user! Return an empty string", ex);
-			return null;
-		}
-		
-		return user;
-	}
-		
-	
-	public void updateActiveFlag(User user)  throws SQLException{
-		String sqlQuery=Queries.RESET_USER_FLAG;
-		getJdbcTemplate().update(sqlQuery, new Object[]{Constants.INACTIVE_FLAG,user.getUserId()});
-	}
+    
+    public static final long serialVersionUID = 1L;
+    
+    private static final  Log LOG = LogFactory.getLog(AuthenticationDaoImpl.class); 
+    private JdbcTemplate jdbcTemplate;
+    
+    public JdbcTemplate getJdbcTemplate() {
+        return jdbcTemplate;
+    }
+    @Autowired
+    public void setDataSource(DataSource dataSource) {
+        this.jdbcTemplate = new JdbcTemplate(dataSource);
+    }
+    
+    //TODO:  Return UserCredential Instead of User
+    public User authendicateUser(String userName, String password) throws SQLException {
+        User user =null;            
+        String sql=Queries.GET_USER_DETAILS;
+        
+        try    {
+            user = getJdbcTemplate().queryForObject(sql, new Object[]{userName}, new UserRowMapper());
+            if(user != null) {
+                String userId = user.getUserId();
+                String pwd = user.getPassword();
+                String flag = user.getActiveFlag();    
+                if(password.trim().equals(pwd))    {
+                    user.setValidUser(true);
+                    if(Constants.INACTIVE_FLAG.equals(flag)) {
+                        user.setActiveFlag(flag);
+                        String sqlQuery=Queries.RESET_USER_FLAG;
+                        getJdbcTemplate().update(sqlQuery, new Object[]{Constants.ACTIVE_FLAG,userId});
+                    } else {
+                        user.setActiveFlag(Constants.ACTIVE_FLAG);
+                    }
+                    
+                }
+            }
+        } catch(EmptyResultDataAccessException ex) {
+            LOG.error(Constants.EXCEPTION, ex);
+            return null;
+        }
+        
+        return user;
+    }
+        
+    
+    public void updateActiveFlag(User user)  throws SQLException{
+        String sqlQuery=Queries.RESET_USER_FLAG;
+        getJdbcTemplate().update(sqlQuery, new Object[]{Constants.INACTIVE_FLAG,user.getUserId()});
+    }
 
 }

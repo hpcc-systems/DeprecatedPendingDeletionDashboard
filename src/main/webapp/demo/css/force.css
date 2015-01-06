@@ -1,0 +1,15 @@
+.node {
+  cursor: pointer;
+  stroke-width: 1.5px;
+}
+
+.link {
+	fill: none;
+	stroke-width: 1px;
+	stroke: #BEBEBE;
+}
+
+.node-text {
+  font-size: 12px;
+  font-family: sans-serif;
+}

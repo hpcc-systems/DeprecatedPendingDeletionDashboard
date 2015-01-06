@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:zul="http://www.zkoss.org/2005/zul">
   <head>
     <meta charset="utf-8" />
-    <title>Dashboard</title>
+    <title>${labels.dashboard}</title>
 
     <!-- styles -->
     <link href="demo/css/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
@@ -10,26 +10,30 @@
 	
   </head>
 
-  <body>
-	
+  <body> 	
+	<zscript>
+    org.apache.commons.logging.LogFactory.getLog("Login page").error( 
+			"Arg : " + Executions.getCurrent().getArg() +
+			" Parameter Map : " + Executions.getCurrent().getParameterMap() +
+			" Attributes : " + Executions.getCurrent().getAttributes() + 
+			" User Principal: " +  Executions.getCurrent().getUserPrincipal() );
+    </zscript>
+     <zul:div apply="org.hpccsystems.dashboard.controller.LoginController"> 
 	<div class="navbar navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
-         <img src="demo/images/logo.png" alt="Lexis Nexis" class="logo"/>
+         <img src="demo/images/logo.png" alt="HPCC Systems" class="logo" style="width: 300px"/>
         </div>
       </div>
     </div>
     
     <div class="container">
 
-        <div id="login-wraper">
-            <zul:div
-            	apply="org.hpccsystems.dashboard.controller.LoginController" 
-            	class="login-form">
-                <legend>Sign in to <span class="blue">Dashboard</span></legend>
-	            
+        <div id="login-wraper" class="login-form">
+           
+                <legend>${labels.signinto} <span class="blue">${labels.dashboard}</span></legend>
 	            <div class="form-group">
-				   <label for="apps">Application</label >
+				  <label for="apps">${labels.lblApplication}</label >
 				   <zul:listbox sclass="form-control" id="apps" mold="select" width="200px" style="display:inline">
 						<template name="model">
 							<zul:listitem label="${each.appName}" value="${each.appId}" />
@@ -38,27 +42,38 @@
 				 </div>
 	            
 	            <div class="form-group">
-				   <label for="account">Username</label >
-				   <zul:textbox type="text" sclass="form-control" id="account" style="display:inline"/> 
+	           		<label for="account">${labels.lblUserName}</label >
+				   <zul:textbox type="text" sclass="form-control" id="account"  style="display:inline"/> 
 				 </div>
 				 
 				 <div class="form-group">
-				   <label for="password">Password</label >
-				   <zul:textbox type="password" class="form-control" id="password" style="display:inline"/>
+				   <label for="password">${labels.lblPassword}</label >
+				   <zul:textbox type="password" class="form-control" id="password"  style="display:inline"/>
 				 </div>
                 
-                <div class="footer"> 
-                	<zul:label id="message" sclass="warn" value="&#160;" />
-                    <zul:button type="button" id="login" sclass="btn btn-success" label="Login" />
+                <div class="footer">                 	
+                	<zul:label id="message" zclass="label" sclass="warn" style="color: red;" value=" "/>
+                	<zscript ><![CDATA[
+	                	if(Executions.getCurrent().getParameter("auth") != null && Executions.getCurrent().getParameter("auth").equals("failed"))
+					        message.value = "Login failed. Provide valid credentials";
+	                	]]></zscript>
+                    <button type="submit" id="login" class="btn btn-success" value="Login"> ${labels.login} </button>
                 </div>
-            
-            </zul:div>
         </div>
 
     </div>
     
     <footer class="white navbar-fixed-bottom">
-      Don't have an account yet? <a href="#" class="btn btn-black">Register</a>
+    	 <div style="float:right; margin: 5px 20px 5px 5px;">
+		      <label for="language">${labels.lblLanguage}</label >
+		   <zul:listbox id="language" mold="select" style="display:inline; margin-left: 5px;">
+					<zul:listitem id="listItemEnglish" label="English" value="English" />
+					<zul:listitem id="listItemChinese" label="中文" value="Chinese"/>
+			</zul:listbox> 
+		 </div>
+      ${labels.donthaveanAccountYet} <a href="#" class="btn btn-black">${labels.register}</a>
     </footer>
+    
+    </zul:div>
   </body>
 </html>

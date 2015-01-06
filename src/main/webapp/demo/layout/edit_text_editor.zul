@@ -1,0 +1,8 @@
+<zk xmlns="http://www.zkoss.org/2005/zul">	
+	<div align="center" apply="org.hpccsystems.dashboard.controller.EditTextController" hflex="1" vflex="1" >
+	<ckeditor  id="editor"		
+		customConfigurationsPath="/demo/js/editor/config.js">
+	</ckeditor>
+	
+	</div>
+</zk>

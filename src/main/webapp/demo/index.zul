@@ -1,16 +1,94 @@
-<!-- protect page by the authentication init  -->
+<!-- protect page by the authentication init  --> 
 <?init class="org.hpccsystems.dashboard.controller.AuthenticationInit"?>
+
 <!-- authentication init have to locate before composition -->
 <?init class="org.zkoss.zk.ui.util.Composition" arg0="/demo/layout/template.zul"?>
 
-<?script src="js/barchart.js"?>
-<?script src="js/piechart.js"?>
-<?style src="css/c3.css"?>
-
 <?style src="css/bootstrap/css/bootstrap.min.css"?>
-<?style src="css/flat.css"?>
-<?style src="css/dashboard.css"?>
+<?script src="js/lib/jquery-ui.custom.js"?>
+<?style src="css/jquery-ui.css"?>
+<?script src="js/common.js"?>
 
-<zk>
-	<include  id="mainInclude" self="@define(content)" src="layout/dashboard.zul" />
+<?script src="http://www.google.com/jsapi"?>
+
+<?style src="css/dashboard.css"?>
+<?style src="css/flat.css"?>
+
+<zk >
+	<script type="text/javascript">
+		function showCreationError(divId) {
+			var divElement = jq('$'+divId).empty();
+			var container = jq("#" + divElement.attr("id"));
+			
+			container.append("Error");
+			
+			console.log(container);
+			jq('$'+divId).append("Error occurred while creating this chart");
+		}
+	</script>
+	<style>
+		.glyphicon {
+			margin-right: 3px;
+		}
+		.glyphicon-numeric {
+			width: 14px;
+		    content: url("css/images/numeric.png");
+		}
+		.glyphicon-string {
+			width: 14px;
+		    content: url("css/images/string.png");
+		}
+		
+		.error-label {
+			display: table-cell;
+			text-align: center;
+			vertical-align: middle;
+			color: crimson;
+			font-size: 16px;
+			line-height: normal;
+		}
+		.error-div {
+			display: table;
+			width: 100%;
+			height: 100%;
+			background: whitesmoke;
+		}
+		.fine-print {
+			font-size: 11px;
+			color: black;
+		}
+		.dark-vbox {
+			background: whitesmoke;
+		}
+		.input-parmbox {
+			display: block;
+			width: 100% !important;
+			min-height: 50px;			
+		}
+		.clear-text-btn {
+			float: right;
+			text-decoration: none !important;
+			outline: none !important;
+			color: black;
+		}
+		
+		
+		.html-container > .z-html {
+		    display: inline-block;
+		    margin: 5px;
+		}
+		
+		.close-btn {
+			float: right;
+		}
+		.close-btn:hover {
+			color: red;
+		}
+		
+		.html-container {
+			overflow: auto;
+		}
+		
+	</style>
+	<include id="mainInclude" self="@define(content)" src="layout/dashboard.zul" />
 </zk> 

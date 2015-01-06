@@ -9,11 +9,11 @@ import org.hpccsystems.dashboard.entity.User;
  *
  */
 public interface  AuthenticationDao {
-	
-	public static final long serialVersionUID = 1L;
-	
-	User authendicateUser(String userName,String password) throws SQLException;
-	
-	void updateActiveFlag(User user) throws SQLException;
+    
+    public static final long serialVersionUID = 1L;
+    
+    User authendicateUser(String userName,String password) throws SQLException;
+    
+    void updateActiveFlag(User user) throws SQLException;
 
 }

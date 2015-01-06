@@ -1,0 +1,23 @@
+@CHARSET "ISO-8859-1";
+
+.power-gauge g.arc {
+	fill: steelblue;
+}
+
+.power-gauge g.pointer {
+	fill: #B1B1B1;
+	stroke: #000000;
+}
+
+.power-gauge g.label text {
+	text-anchor: middle;
+	font-size: 14px;
+	font-weight: bold;
+	fill: #666;
+}
+
+.power-gauge-select {
+	right: 10px;
+	top: 10px;
+	position: absolute;
+}

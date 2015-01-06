@@ -1,3 +1,10 @@
+.grayscale-image {  
+   -webkit-filter: grayscale(0.9); /* Webkit */  
+   filter: gray; /* IE6-9 */  
+   filter: grayscale(0.9); /* W3C */ 
+   filter: url("data:image/svg+xml;utf8,<svg xmlns=\'http://www.w3.org/2000/svg\'><filter id=\'grayscale\'><feColorMatrix type=\'matrix\' values=\'0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0.3333 0.3333 0.3333 0 0 0 0 0 1 0\'/></filter></svg>#grayscale"); /* Firefox 10+, Firefox on Android */  
+} 
+
 .z-menuitem-image, z-menupopup-separator{
 display:none;
 }
@@ -60,119 +67,113 @@ display:none;
 background: #91C3E0;
 }
 
-.bar {
-  fill: steelblue;
-}
-.bar:hover {
-  fill: brown;
-}
-.axis {
-  font: 10px sans-serif;
-}
-.axis path,
-.axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
+/*
+ * Edit Screen Panel styles 
+ */ 
+.editPanel > .z-panel-head {
+	border-radius: 0px;
+	border: 1px solid rgb(185, 185, 185);
+	border-bottom: none;
 }
 
-.axis path,
-.axis line {
-    fill: none;
-    stroke: grey;
-    stroke-width: 1;
-    shape-rendering: crispEdges;
+.editPanel > .z-panel-head > .z-panel-header {
+	background: rgb(204, 204, 204);
+	padding: 3px;
+	padding-left: 10px;
+	font-weight: bold;
+	color: rgb(24, 24, 24);
+}
+.collapsiblePanel {
+	border: none !important;
+	padding: 0px !important;
 }
 
-.x.axis.lineChart path {
-  display: block;
+/*
+ * Panel styling - Created for plugin config page
+ */
+.form {
+	border: 1px solid #CDCDCD;
+	border-top: none;
 }
 
-.arc path {
-  stroke: #fff;
+.form-inner {
+	padding-bottom: 0px !important;
 }
 
-div.tooltip {   
-  position: absolute;           
-  text-align: center;           
-  width: 120px;                  
-  height: 40px;                 
-  padding: 2px;             
-  font: 12px sans-serif;        
-  background: lightsteelblue;   
-  border: 0px;      
-  border-radius: 8px;           
-  pointer-events: none;         
+.form-actions {
+	background-color: #f4f4f4;
+	padding: 10px 40px 20px 250px;
+	border-bottom: 1px rgb(167, 167, 167) solid;
 }
 
-
-
-/* New Line chart style */
-.chartHolder {
-  font-size: 10px;
+.form-group {
+	min-height: 0px;
 }
 
-.linechart_axis path,
-.linechart_axis line {
-  fill: none;
-  stroke: #000;
-  shape-rendering: crispEdges;
+.pagePanel>.z-panel-head {
+	border-radius: 0px;
+	border-color: #CDCDCD;
 }
 
-.x.linechart_axis.mini_axis text{
-  display: none;
+.pagePanel>.z-panel-head>.z-panel-header {
+	background: #fafafa;
 }
 
-.line {
-  stroke: black;
-  fill: none;
-  stroke-width: 1px;
+.pagePanel>.z-panel-head>.z-panel-header>.z-caption>.z-caption-content {
+	border-right: 1px solid #cdcdcd;
+	padding: 8px 10px 8px 11px;
+	float: left;
+	opacity: 0.7;
+	filter: alpha(opacity = 70);
+	-webkit-box-shadow: 1px 0 0 0 #ffffff;
+	box-shadow: 1px 0 0 0 #ffffff;
 }
 
-.line.line0 {
-  stroke: steelblue;
+.pagePanel>.z-panel-head>.z-panel-header>.z-caption>.h5 {
+	color: #666666;
+	text-shadow: 0 1px 0 #ffffff;
+	float: left;
+	font-size: 12px;
+	font-weight: bold;
+	padding: 10px;
+	line-height: 12px;
+	margin: 0;
 }
 
-.line.line1 {
-  stroke: indianred;
+.pagePanel>.z-panel-head>.z-panel-header>.z-caption>.z-panel-icon {
+	background: none;
+	border: none;
+	border-left: 1px solid #cdcdcd;
+	border-radius: 0px;
+	height: 32px;
+	padding: 3px 12px 0px 10px;
+	filter: alpha(opacity = 70);
+	-webkit-box-shadow: 1px 0 0 0 #ffffff;
 }
 
-.overlay {
-  fill: none;
-  pointer-events: all;
+.pagePanel>.z-panel-head>.z-panel-header>.z-caption>.z-panel-close {
+	margin-right: 4px;
 }
 
-.focus circle {
-  fill: none;
+.pluginName {
+	color: rgb(85, 85, 85);
+	font-size: 14px;
+	font-weight: bold;
+	padding-left: 15px;
+	padding-right: 15px;
+	padding-top: 7px;
 }
 
-.focus circle.y0 {
-  stroke: blue;
+.pluginList>.z-row-inner {
+	border: none;
 }
 
-.focus circle.y1 {
-  stroke: red;
+.form-label-div {
+	width: 250px;
+	padding-right: 20px;
 }
 
-.focus line {
-  stroke: purple;
-  shape-rendering: crispEdges;
-}
-
-.focus line.y0 {
-  stroke: steelblue;
-  stroke-dasharray: 3 3;
-  opacity: .5;
-}
-
-.focus line.y1 {
-  stroke: indianred;
-  stroke-dasharray: 3 3;
-  opacity: .5;
-}
-
-.brush .extent {
-  stroke: #fff;
-  fill-opacity: .125;
-  shape-rendering: crispEdges;
+.z-grid-emptybody>tr>td {
+	padding: 10px;
+	font-size: larger;
 }
