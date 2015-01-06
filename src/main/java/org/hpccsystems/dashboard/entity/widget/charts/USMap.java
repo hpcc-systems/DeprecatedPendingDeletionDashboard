@@ -92,9 +92,7 @@ public class USMap extends Widget{
         VisualElement visualElement = new VisualElement();
         // TODO:Need to set chart type using Hipie's 'Element' class
         visualElement.setType(this.getChartConfiguration().getHipieChartId());
-        visualElement.addCustomOption(new ElementOption("_chartType",
-                new FieldInstance(null, this.getChartConfiguration()
-                        .getHipieChartName())));
+        
 
         visualElement.setName(DashboardUtil.removeSpaceSplChar(this.getName()));
 
@@ -103,7 +101,7 @@ public class USMap extends Widget{
 
         // Attribute settings
         ri.add(new FieldInstance(null,getPluginAttribute()));
-        visualElement.addOption(new ElementOption(VisualElement.LABEL,
+        visualElement.addOption(new ElementOption(VisualElement.STATE,
                 new FieldInstance(null, getPluginAttribute())));
 
         // Measures settings
@@ -116,6 +114,10 @@ public class USMap extends Widget{
         // Setting Tittle for chart
         visualElement.addOption(new ElementOption(VisualElement.TITLE,
                 new FieldInstance(null, this.getTitle())));
+        
+      //Setting color
+        visualElement.addOption(new ElementOption(VisualElement.COLOR,
+                new FieldInstance(null, "Red_Yellow_Blue")));
 
         return visualElement;
 
