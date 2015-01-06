@@ -28,86 +28,94 @@ import org.zkoss.zul.Window;
 
 import com.google.gson.JsonObject;
 
-public class DashboardController extends SelectorComposer<Component>{
-    private static final long serialVersionUID = 1L;
-    private static final Logger LOGGER = LoggerFactory.getLogger(DashboardController.class);
-    
-    @WireVariable
-    private AuthenticationService authenticationService;
-    @WireVariable
-    private DashboardService dashboardService;
-    @Wire
-    private Div chartDiv;
-    
-    private Dashboard dashboard;
-    
-    @Override
-    public void doAfterCompose(Component comp) throws Exception {
-        super.doAfterCompose(comp);
-        dashboard = (Dashboard) Executions.getCurrent().getAttribute(Constants.ACTIVE_DASHBOARD);
-        
-        if(dashboard.getCompositionName() != null){
-            drawChart();
-        }
-       
-    }
-    /**
-     * Renders chart in dashboard container
-     */
-    private void drawChart() {
-        try {
-           
-            String viaualizationURL = dashboard.generateVisualizationURL();
-            if(LOGGER.isDebugEnabled()){
-                LOGGER.debug("viaualizationURL -->"+viaualizationURL);
-            }
-            JsonObject chartObj = new JsonObject();
-            chartObj.addProperty(Constants.URL, viaualizationURL);
-            chartObj.addProperty(Constants.TARGET, chartDiv.getUuid());
-            chartObj.addProperty(Constants.HPCC_ID, dashboard.getHpccId());
-            final String wsWork = "WsWorkunits";
-            final String wsEcl = "WsEcl";
-            chartObj.addProperty(wsWork, dashboard.getHpccConnection().getESPUrl() + wsWork);
-            chartObj.addProperty(wsEcl, dashboard.getHpccConnection().getRoxieServiceUrl() + wsEcl);
-            
-            String data = StringEscapeUtils.escapeJavaScript(chartObj.toString());
-            Clients.evalJavaScript("visualizeDDLChart('"+ data+"')");
-        } catch (Exception e) {
-            LOGGER.error(Constants.EXCEPTION,e);
-            Clients.showNotification("Unable to recreate chart",Clients.NOTIFICATION_TYPE_ERROR,chartDiv,"middle_center", 5000, true);
-        }
-    }
-    
-    @Listen("onClick = #addWidget")
-    public void onAddWidget() {        
-        Window window = (Window)Executions.createComponents(
-                "widget/config.zul", null, new HashMap<String, Object>() {
-                    private static final long serialVersionUID = 1L;
-                    {
-                        put(Constants.WIDGET_CONFIG, new WidgetConfiguration(dashboard,chartDiv));
-                    }
-                });
-        
-        window.doModal();
-    }
-    
-    @Listen("onClick = #deleteDashboard")
-    public void deleteDashboard() {
-        EventListener<ClickEvent> clickListener = event -> {
-            if (Messagebox.Button.YES.equals(event.getButton())) {
-                Component component = DashboardController.this.getSelf().getParent().getParent().getFellow("navHolder");
-                Events.postEvent(Constants.ON_DELTE_DASHBOARD, component, dashboard);
-            }
+public class DashboardController extends SelectorComposer<Component> {
+	private static final long serialVersionUID = 1L;
+	private static final Logger LOGGER = LoggerFactory
+			.getLogger(DashboardController.class);
 
-        };
-           
-        Messagebox.show(
-                Labels.getLabel("deletedashboard"), 
-                Labels.getLabel("deletedashboardtitle"), 
-                new Messagebox.Button[] {
-                    Messagebox.Button.YES, Messagebox.Button.NO 
-                }, 
-                Messagebox.QUESTION, 
-                clickListener);
-    }    
+	@WireVariable
+	private AuthenticationService authenticationService;
+	@WireVariable
+	private DashboardService dashboardService;
+	@Wire
+	private Div chartDiv;
+
+	private Dashboard dashboard;
+
+	@Override
+	public void doAfterCompose(Component comp) throws Exception {
+		super.doAfterCompose(comp);
+		dashboard = (Dashboard) Executions.getCurrent().getAttribute(
+				Constants.ACTIVE_DASHBOARD);
+
+		if (dashboard.getCompositionName() != null) {
+			drawChart();
+		}
+
+	}
+
+	/**
+	 * Renders chart in dashboard container
+	 */
+	private void drawChart() {
+		try {
+
+			String viaualizationURL = dashboard.generateVisualizationURL();
+			if (LOGGER.isDebugEnabled()) {
+				LOGGER.debug("viaualizationURL -->" + viaualizationURL);
+			}
+			JsonObject chartObj = new JsonObject();
+			chartObj.addProperty(Constants.URL, viaualizationURL);
+			chartObj.addProperty(Constants.TARGET, chartDiv.getUuid());
+			chartObj.addProperty(Constants.HPCC_ID, dashboard.getHpccId());
+			final String wsWork = "WsWorkunits";
+			final String wsEcl = "WsEcl";
+			chartObj.addProperty(wsWork, dashboard.getHpccConnection()
+					.getESPUrl() + wsWork);
+			chartObj.addProperty(wsEcl, dashboard.getHpccConnection()
+					.getRoxieServiceUrl() + wsEcl);
+
+			String data = StringEscapeUtils.escapeJavaScript(chartObj
+					.toString());
+			Clients.evalJavaScript("visualizeDDLChart('" + data + "')");
+		} catch (Exception e) {
+			LOGGER.error(Constants.EXCEPTION, e);
+			Clients.showNotification("Unable to recreate chart",
+					Clients.NOTIFICATION_TYPE_ERROR, chartDiv, "middle_center",
+					5000, true);
+		}
+	}
+
+	@Listen("onClick = #addWidget")
+	public void onAddWidget() {
+		Window window = (Window) Executions.createComponents(
+				"widget/config.zul", null, new HashMap<String, Object>() {
+					private static final long serialVersionUID = 1L;
+					{
+						put(Constants.WIDGET_CONFIG, new WidgetConfiguration(
+								dashboard, chartDiv));
+					}
+				});
+
+		window.doModal();
+	}
+
+	@Listen("onClick = #deleteDashboard")
+	public void deleteDashboard() {
+		EventListener<ClickEvent> clickListener = event -> {
+			if (Messagebox.Button.YES.equals(event.getButton())) {
+				Component component = DashboardController.this.getSelf()
+						.getParent().getParent().getFellow("navHolder");
+				Events.postEvent(Constants.ON_DELTE_DASHBOARD, component,
+						dashboard);
+			}
+
+		};
+
+		Messagebox.show(Labels.getLabel("deletedashboard"),
+				Labels.getLabel("deletedashboardtitle"),
+				new Messagebox.Button[] { Messagebox.Button.YES,
+						Messagebox.Button.NO }, Messagebox.QUESTION,
+				clickListener);
+	}
 }

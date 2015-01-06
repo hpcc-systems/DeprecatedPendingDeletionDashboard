@@ -33,13 +33,13 @@ public class NumericFilter extends Filter {
         numFilterSql.append(fileName)
             .append(Constants.DOT)
             .append(this.getColumn())
-            .append(" <=")
+            .append(" <= ")
             .append(maxValue)
             .append(" AND ")
             .append(fileName)
             .append(Constants.DOT)
             .append(this.getColumn())
-            .append(" >=")
+            .append(" >= ")
             .append(minValue);
         
         return numFilterSql.toString();

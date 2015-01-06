@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.widget.StringFilter;
 import org.hpccsystems.dashboard.manage.WidgetConfiguration;
@@ -23,6 +24,7 @@ import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Popup;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
@@ -32,7 +34,6 @@ public class StringFilterContoller extends SelectorComposer<Component> {
     private static final Logger LOGGER = LoggerFactory.getLogger(StringFilterContoller.class);
     
     private StringFilter filter;
-    private ListModelList<String> listOfvalues;
 
     @WireVariable
     AuthenticationService authenticationService;
@@ -62,21 +63,31 @@ public class StringFilterContoller extends SelectorComposer<Component> {
                 widgetConfiguration.getWidget().getFilters());
         
         if (!valueList.isEmpty()) {
-            listOfvalues = new ListModelList<String>(valueList);
-            filterListBox.setModel(listOfvalues);
+            valueList.forEach(value->{
+            	Listitem item = new Listitem(value);
+            	item.setParent(filterListBox);
+            });
         }
     }
 
     @Listen("onClick = #filtersSelectedBtn")
     public void onfiltersSelected() {
-        Set<String> selectedValues = listOfvalues.getSelection();
+        Set<Listitem> selectedValues = filterListBox.getSelectedItems();
         
         // Check for no values selected
         if (selectedValues.isEmpty()) {
             Clients.showNotification(Labels.getLabel("noFilterareSelected"), "error", widgetConfiguration.getHolder(), "middle_center", 3000, true);
             return;
         }
-        filter.setValues(new ArrayList<String>(selectedValues));
+        List<String> listOfLabels = new ArrayList<String>();
+        
+        selectedValues.forEach(value->{
+        	String label = value.getLabel();
+        	listOfLabels.add(label);
+        });
+       
+       
+       filter.setValues(new ArrayList<String>(listOfLabels));
 
         // Detaching the filter's popup window
         Popup popup = (Popup) this.getSelf().getParent().getParent();

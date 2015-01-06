@@ -157,7 +157,12 @@ public class ConfigurationComposer<T> extends SelectorComposer<Component>{
         
         Button closeButton = new Button();
         closeButton.setIconSclass("z-icon-times");
-        closeButton.addEventListener("onClick", event -> widget.removeFilter(filter));
+        closeButton.addEventListener("onClick", event -> {
+        	widget.removeFilter(filter);    
+        	item.getChildren().clear();
+        	drawChart();
+          
+        });
         
         Button playButton = new Button();
         playButton.setIconSclass("z-icon-play");

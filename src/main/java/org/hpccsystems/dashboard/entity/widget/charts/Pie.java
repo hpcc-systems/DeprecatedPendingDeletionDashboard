@@ -50,14 +50,16 @@ public class Pie extends Widget {
         
         if((this.getFilters()!=null)&&(!this.getFilters().isEmpty())){
                 sql.append(" WHERE ");
-                Iterator<Filter> filters=this.getFilters().iterator();
+                getFilterQuery(sql);
+                
+               /* Iterator<Filter> filters=this.getFilters().iterator();
                 
                 while(filters.hasNext()){
                     sql.append(filters.next().generateFilterSQL(getLogicalFile()));
                     if(filters.hasNext()){
                         sql.append(" AND ");
                     }
-                }           
+                }         */  
             }
         return sql.toString();
     }
@@ -98,6 +100,8 @@ public class Pie extends Widget {
 
         RecordInstance ri = new RecordInstance();
         visualElement.setBasisQualifier(ri);
+        StringBuilder builder = new StringBuilder();
+        visualElement.setBasisFilter(getFilterQuery(builder));
 
         // Attribute settings       
         ri.add(new FieldInstance(null, getPluginAttribute()));
@@ -186,5 +190,18 @@ public class Pie extends Widget {
         return builder.toString();
     }
     
+    public String getFilterQuery(StringBuilder sql){
+    	
+    	 Iterator<Filter> filters=this.getFilters().iterator();
+         
+         while(filters.hasNext()){
+             sql.append(filters.next().generateFilterSQL(getLogicalFile()));
+             if(filters.hasNext()){
+                 sql.append(" AND ");
+             }
+         }     
+		return sql.toString();
+    	
+    }
     
 }

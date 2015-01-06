@@ -304,6 +304,9 @@ public  class WSSQLServiceImpl implements WSSQLService{
         }
 
         final String resultString = executeSQL(connection, queryTxt);
+        if (LOGGER.isDebugEnabled()) {
+            LOGGER.debug("resultString -->" +resultString);
+        }
         return parseChartdataResponse(widget.getColumns(), resultString);
     }
    

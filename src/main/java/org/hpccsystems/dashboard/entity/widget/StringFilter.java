@@ -29,7 +29,7 @@ public class StringFilter extends Filter {
         stringSql.append(fileName)
         .append(Constants.DOT)
         .append(this.getColumn())
-        .append("IN [");
+        .append(" IN (");
         
         Iterator<String> valueIterator=values.iterator();
         while(valueIterator.hasNext()){
@@ -41,7 +41,7 @@ public class StringFilter extends Filter {
                 stringSql.append("' ");
             }
         }
-        stringSql.append("]");
+        stringSql.append(")");
         return stringSql.toString();
     }
 

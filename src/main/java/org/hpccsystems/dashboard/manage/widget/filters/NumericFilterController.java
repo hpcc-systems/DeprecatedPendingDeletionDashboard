@@ -64,17 +64,17 @@ public class NumericFilterController extends SelectorComposer<Component> {
         widgetconfig = (WidgetConfiguration) Executions.getCurrent().getAttribute(
                 org.hpccsystems.dashboard.Constants.WIDGET_CONFIG);
         filter = (NumericFilter) Executions.getCurrent().getAttribute(Constants.FILTER);
-
+        
         map = wssqlService.getMinMax(filter, 
                 widgetconfig.getDashboard().getHpccConnection(), widgetconfig.getWidget().
                 getLogicalFile().toString(), 
                 widgetconfig.getWidget().getFilters());
+        	  min = map.get("min");
+              max = map.get("max");
+              minimumLabel.setValue(min.toString());
+              maximumLabel.setValue(max.toString());
 
-        min = map.get("min");
-        max = map.get("max");
-
-        minimumLabel.setValue(min.toString());
-        maximumLabel.setValue(max.toString());
+      
 
         // Initializing Slider positions
         Integer sliderStart = 0;
