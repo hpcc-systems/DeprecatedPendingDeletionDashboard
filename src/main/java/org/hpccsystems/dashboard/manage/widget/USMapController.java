@@ -1,8 +1,5 @@
 package org.hpccsystems.dashboard.manage.widget;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.widget.Attribute;
 import org.hpccsystems.dashboard.entity.widget.Field;
@@ -12,10 +9,8 @@ import org.hpccsystems.dashboard.service.WSSQLService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zkoss.zk.ui.Component;
-import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.event.DropEvent;
 import org.zkoss.zk.ui.event.Events;
-import org.zkoss.zk.ui.metainfo.ComponentInfo;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
@@ -57,19 +52,22 @@ public class USMapController extends ConfigurationComposer<Component> {
     private Div chart;
     
     private ListitemRenderer<Measure> chartMeasureRenderer = (listitem, measure, index) -> {
-        Listcell listItemCell=new Listcell();
-        listItemCell.setLabel(measure.getColumn());
-        listItemCell.setParent(listitem);
-        Button closeButton=new Button();
-        closeButton.setParent(listItemCell);
-        closeButton.setIconSclass("z-icon-times");
-        listitem.appendChild(listItemCell);
+        Listcell listCell=new Listcell(measure.getColumn());
+        Button button = new Button();
+        button.setLabel(measure.getAggregation().toString());
+        button.setZclass("btn btn-xs");        
+        
+        Button closeButton=new Button();              
+        closeButton.setIconSclass("z-icon-times");        
         closeButton.addEventListener("onClick", event -> {
             measures.remove(measure);    
             usMap.setMeasure(null);
             chartMeasureListbox.setDroppable(Constants.TRUE);
             clearChart();
         });
+        button.setParent(listCell);
+        closeButton.setParent(listCell);
+        listitem.appendChild(listCell);
     };
     
     private ListitemRenderer<Attribute> chartAttributeRenderer = (listitem, attribute, index) -> {
@@ -87,24 +85,6 @@ public class USMapController extends ConfigurationComposer<Component> {
             clearChart();
         });
     };
-    
-    
-        
-    final Map<String, Object> parameters = new HashMap<String, Object>();
-    
-    @Override
-    public ComponentInfo doBeforeCompose(Page page, Component parent, ComponentInfo compInfo) {
-        return super.doBeforeCompose(page, parent, compInfo);
-    }
-    
-    @Override
-    public void doBeforeComposeChildren(Component comp) throws Exception {
-        super.doBeforeComposeChildren(comp);
-    }
-    
-    public boolean getShowGroupPanel() {
-        return false;
-    }
     
     @Override
     public void doAfterCompose(final Component comp) throws Exception {
@@ -128,22 +108,21 @@ public class USMapController extends ConfigurationComposer<Component> {
     }
     
     @Listen("onDrop = #chartMeasureListbox")
-    public void onDropWeight(DropEvent event) {
+    public void onDropChartMeasure(DropEvent event) {
         Listitem draggedItem = (Listitem) event.getDragged();
-        Field field = draggedItem.getValue();
-        Measure measure = new Measure(field);
+        Measure measure = draggedItem.getValue();        
         if(event.getDragged().getParent().equals(attributeListbox)){
             Clients.showNotification("Only measure objects can be dropped","warning",chartMeasureListbox,"end_center", 5000, true);
         }else{
             usMap.setMeasure(measure);
             measures.add(measure);
             chartMeasureListbox.setDroppable(Constants.FALSE);
+            drawChart();
         }
-        drawChart();
     }
 
     @Listen("onDrop = #chartAttributeListbox")
-    public void onDropLabel(DropEvent event) {
+    public void onDropChartAttribute(DropEvent event) {
         Listitem draggedItem = (Listitem) event.getDragged();
         Field field = draggedItem.getValue();
         Attribute attribute = new Attribute(field);

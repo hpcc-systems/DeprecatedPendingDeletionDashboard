@@ -43,13 +43,13 @@ public class XYChartController extends ConfigurationComposer<Component> {
     private WSSQLService wssqlService;
     
     private ListitemRenderer<Measure> chartMeasureRenderer = (listitem, measure, index) -> {
-        Listcell listItemCell=new Listcell();
-        listItemCell.setLabel(measure.getColumn());
-        listItemCell.setParent(listitem);
-        Button closeButton=new Button();
-        closeButton.setParent(listItemCell);
-        closeButton.setIconSclass("z-icon-times");
-        listitem.appendChild(listItemCell);
+        Listcell listCell=new Listcell(measure.getColumn());
+        Button button = new Button();
+        button.setLabel(measure.getAggregation().toString());
+        button.setZclass("btn btn-xs"); 
+                
+        Button closeButton=new Button();        
+        closeButton.setIconSclass("z-icon-times");        
         closeButton.addEventListener("onClick", event -> {
             measures.remove(measure);    
             xyChart.removeMeasure(measure);
@@ -59,6 +59,9 @@ public class XYChartController extends ConfigurationComposer<Component> {
                 drawChart();
             }
         });
+        button.setParent(listCell);
+        closeButton.setParent(listCell);
+        listitem.appendChild(listCell);
     };
     private ListitemRenderer<Attribute> chartAttributeRenderer = (listitem, attribute, index) -> {
         Listcell listItemCell=new Listcell();
@@ -99,41 +102,30 @@ public class XYChartController extends ConfigurationComposer<Component> {
     }    
     
     @Listen("onDrop = #chartMeasureListbox")
-    public void onDropWeight(DropEvent event) {
+    public void onDropChartMeasure(DropEvent event) {
         Listitem draggedItem = (Listitem) event.getDragged();
-        Field field = draggedItem.getValue();
-        Measure measure = new Measure(field);
+        Measure measure = draggedItem.getValue();         
         if(event.getDragged().getParent().equals(attributeListbox)){
             Clients.showNotification("Only measure objects can be dropped","warning",chartMeasureListbox,"end_center", 5000, true);
         }else{
             xyChart.addMeasure(measure);
             measures.add(measure);
         }
-        if(xyChart.isConfigured()) {            
-            try {
-                drawChart();
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+        if(xyChart.isConfigured()) {     
+            drawChart();            
         }
     }
 
     @Listen("onDrop = #chartAttributeListbox")
-    public void onDropLabel(DropEvent event) {
+    public void onDropChartAttribute(DropEvent event) {
         Listitem draggedItem = (Listitem) event.getDragged();
         Field field = draggedItem.getValue();
         Attribute attribute = new Attribute(field);
         xyChart.setAttribute(attribute);
         attributes.add(attribute);
         chartAttributeListbox.setDroppable(Constants.FALSE);
-        if(xyChart.isConfigured()) {            
-            try {
-                drawChart();
-            } catch (Exception e) {
-                // TODO Auto-generated catch block
-                e.printStackTrace();
-            }
+        if(xyChart.isConfigured()) {
+                drawChart();           
         }
     }  
 }
