@@ -21,11 +21,11 @@
 					<space></space>					
 				</div>				
 				<listbox vflex="1" zclass="sidebar-list" id="dashboardListbox">
-					<listitem label="Dashbaord 1" selected="true"></listitem>
-					<listitem label="Dashbaord 2"></listitem>
-					<listitem label="Dashbaord 3"></listitem> 
+					<listitem label="${labels.dashboard1}" selected="true"></listitem>
+					<listitem label="${labels.dashboard2}"></listitem>
+					<listitem label="${labels.dashboard3}"></listitem> 
 				</listbox>
-				<button id="addDashboard" zclass="btn btn-info" iconSclass="z-icon-plus">Add Dashboard</button>
+				<button id="addDashboard" zclass="btn btn-info" iconSclass="z-icon-plus">${labels.addDashboard}</button>
 			</vbox>
 		</west>
 		<center vflex="1" hflex="1">			

@@ -60,7 +60,7 @@
     	 <div style="float:right; margin: 5px 20px 5px 5px;">
 		      <label for="language">${labels.lblLanguage}</label >
 		   <zul:listbox id="language" mold="select" style="display:inline; margin-left: 5px;">
-					<zul:listitem id="listItemEnglish" label="English" value="English" />
+					<zul:listitem id="listItemEnglish" label="${labels.english}" value="English" />
 					<zul:listitem id="listItemChinese" label="中文" value="Chinese"/>
 			</zul:listbox> 
 		 </div>
