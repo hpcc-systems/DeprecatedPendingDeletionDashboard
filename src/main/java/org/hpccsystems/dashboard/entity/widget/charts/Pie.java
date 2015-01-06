@@ -51,15 +51,6 @@ public class Pie extends Widget {
         if((this.getFilters()!=null)&&(!this.getFilters().isEmpty())){
                 sql.append(" WHERE ");
                 getFilterQuery(sql);
-                
-               /* Iterator<Filter> filters=this.getFilters().iterator();
-                
-                while(filters.hasNext()){
-                    sql.append(filters.next().generateFilterSQL(getLogicalFile()));
-                    if(filters.hasNext()){
-                        sql.append(" AND ");
-                    }
-                }         */  
             }
         return sql.toString();
     }
