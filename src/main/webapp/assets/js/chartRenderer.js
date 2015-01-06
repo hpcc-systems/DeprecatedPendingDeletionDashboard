@@ -10,8 +10,8 @@ function createPreview(target, chartType, data) {
 		var actualData = JSON.parse(data);
 		console.log(actualData);		
 		
-		require([ "src/c3/Pie", "src/c3/Line", "src/c3/Column", "src/map/ChoroplethStates" ], function(
-				C3Pie, C3Line, C3Column,ChoroplethStates) {
+		require([ "src/c3/Pie", "src/c3/Line", "src/c3/Column", "src/map/ChoroplethStates", "src/c3/Donut", "src/c3/Bar", "src/c3/Area", "src/c3/Scatter", "src/c3/Step" ], function(
+				C3Pie, C3Line, C3Column, ChoroplethStates, C3Donut, C3Bar, C3Area, C3Scatter, C3Step) {
 
 			console.log(actualData);
 			if (chartType == "PIE") {
@@ -42,6 +42,41 @@ function createPreview(target, chartType, data) {
                  .target(target)
                  .render();
 				
+			}
+			
+			if (chartType == "DONUT") {
+				new C3Donut()
+				.target(target)
+				.data(actualData.data)
+				.render();
+			}
+			
+			if (chartType == "BAR") {
+				new C3Bar()
+				.target(target)
+				.data(actualData.data)
+				.render();
+			}
+			
+			if (chartType == "AREA") {
+				new C3Area()
+				.target(target)
+				.data(actualData.data)
+				.render();
+			}
+			
+			if (chartType == "SCATTER") {
+				new C3Scatter()
+				.target(target)
+				.data(actualData.data)
+				.render();
+			}
+			
+			if (chartType == "STEP") {
+				new C3Step()
+				.target(target)
+				.data(actualData.data)
+				.render();
 			}
 
 		});

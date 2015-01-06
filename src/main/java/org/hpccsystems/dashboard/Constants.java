@@ -35,7 +35,7 @@ public class Constants {
     public static final String ON_SELECT = "onSelect";
     public static final String HPCC_ID = "hpccID";
  
-    public static enum CHART_TYPES {PIE, DONUT, LINE, BAR, COLUMN, US_MAP, TABLE};
+    public static enum CHART_TYPES {PIE, DONUT, LINE, BAR, COLUMN, US_MAP, TABLE, STEP, SCATTER, AREA};
     
     public static final Map<CHART_TYPES, ChartConfiguration> CHART_CONFIGURATIONS = new LinkedHashMap<CHART_TYPES, ChartConfiguration>(){
         private static final long serialVersionUID = 1L;
@@ -44,9 +44,12 @@ public class Constants {
             put(CHART_TYPES.DONUT, new ChartConfiguration(CHART_TYPES.DONUT, "Donut", "assets/img/donut.png", "widget/pie.zul" , "DONUT", "C3_DONUT"));
             put(CHART_TYPES.LINE, new ChartConfiguration(CHART_TYPES.LINE, "Line", "assets/img/line.png", "widget/xyChart.zul", "LINE", "C3_LINE"));
             put(CHART_TYPES.BAR, new ChartConfiguration(CHART_TYPES.BAR, "Bar", "assets/img/bar.png", "widget/xyChart.zul", "BAR", "C3_BAR"));
-            put(CHART_TYPES.COLUMN, new ChartConfiguration(CHART_TYPES.COLUMN, "Column", "assets/img/bar.png", "widget/xyChart.zul", "COLUMN","C3_COLUMN"));
+            put(CHART_TYPES.COLUMN, new ChartConfiguration(CHART_TYPES.COLUMN, "Column", "assets/img/column.png", "widget/xyChart.zul", "COLUMN","C3_COLUMN"));
             put(CHART_TYPES.US_MAP, new ChartConfiguration(CHART_TYPES.US_MAP, "US_Map", "assets/img/geo.png", "widget/usMap.zul","CHORO" ,"C3_US_MAP"));
             put(CHART_TYPES.TABLE, new ChartConfiguration(CHART_TYPES.TABLE, "Table", "assets/img/table.png", "widget/xyChart.zul", "TABLE", "C3_TABLE"));
+            put(CHART_TYPES.STEP, new ChartConfiguration(CHART_TYPES.STEP, "Step", "assets/img/bar.png", "widget/xyChart.zul", "STEP","C3_STEP"));
+            put(CHART_TYPES.SCATTER, new ChartConfiguration(CHART_TYPES.SCATTER, "Scatter", "assets/img/bar.png", "widget/xyChart.zul", "SCATTER","C3_SCATTER"));
+            put(CHART_TYPES.AREA, new ChartConfiguration(CHART_TYPES.AREA, "Area", "assets/img/bar.png", "widget/xyChart.zul", "AREA","C3_AREA"));
         }
     };
     public static final String ACTIVE_DASHBOARD = "ActiveDashboard";

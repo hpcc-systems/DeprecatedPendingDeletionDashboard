@@ -78,7 +78,7 @@ public class ChartListController extends SelectorComposer<Component>{
         	 ChartConfiguration configuration= (ChartConfiguration) img.getAttribute("config");        
         	 if(configuration.getType()==CHART_TYPES.PIE || configuration.getType()==CHART_TYPES.DONUT){
         		 widgetConfiguration.setWidget(new Pie()); 
-        	 }else if(configuration.getType()==CHART_TYPES.BAR ||configuration.getType()==CHART_TYPES.COLUMN ||configuration.getType()==CHART_TYPES.LINE){
+        	 }else if(configuration.getType()==CHART_TYPES.BAR ||configuration.getType()==CHART_TYPES.COLUMN ||configuration.getType()==CHART_TYPES.LINE ||configuration.getType()==CHART_TYPES.SCATTER ||configuration.getType()==CHART_TYPES.STEP ||configuration.getType()==CHART_TYPES.AREA){
         		 widgetConfiguration.setWidget(new XYChart());
         	 }else if(configuration.getType()==CHART_TYPES.US_MAP ){
         		 widgetConfiguration.setWidget(new USMap());
