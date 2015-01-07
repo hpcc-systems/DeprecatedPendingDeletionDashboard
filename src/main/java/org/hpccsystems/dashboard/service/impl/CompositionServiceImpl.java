@@ -50,6 +50,7 @@ public class CompositionServiceImpl implements CompositionService{
             updateRawDataset(datasource, "~" + widget.getLogicalFile(),dashboard.getHpccConnection());
             
             Contract visualContract = createVisualContract(compName,widget);    
+            
             visualContract = hipieService.saveContractAs(user, visualContract, visualContract.getName());
                         
             ContractInstance visualContractInstance = visualContract.createContractInstance();
@@ -73,8 +74,8 @@ public class CompositionServiceImpl implements CompositionService{
         Composition composition;
         try {
             composition = hipieService.getComposition(user, dashboard.getCompositionName());
-            appendOnPlugin(composition,widget,user);   
-            //addInputOutput(composition,"~" + widget.getLogicalFile(),widget,dashboard.getHpccConnection(),user);
+            appendOnVisualElement(composition,widget,user);   
+            //addOnRawdataset(composition,"~" + widget.getLogicalFile(),widget,dashboard.getHpccConnection(),user);
             HipieSingleton.getHipie().saveComposition(user, composition);
         } catch (Exception e) {
             LOGGER.error(Constants.EXCEPTION, e);
@@ -90,7 +91,7 @@ public class CompositionServiceImpl implements CompositionService{
      * @throws Exception
      * Adds additional input,output and rawdataset to the plugin
      */
-    private void addInputOutput(Composition composition, String fileName,Widget widget,HPCCConnection hpcc,String user) throws Exception {
+    private void addOnRawdataset(Composition composition, String fileName,Widget widget,HPCCConnection hpcc,String user) throws Exception {
         
         Contract contract = composition.getContractInstanceByName(composition.getName()).getContract();
         HIPIEService hipieService=HipieSingleton.getHipie();
@@ -132,21 +133,29 @@ public class CompositionServiceImpl implements CompositionService{
         pluginInstance.setProperty(propertyName,propertyValue)
         );
         //Adding additional Rawdataset
-        ContractInstance datasource1=composition.getContractInstanceByName(HIPIE_RAW_DATASET);
-        ContractInstance datasource2 = new ContractInstance(datasource1.getContract());
-        datasource2.setFileName("");
-        Map<String,String[]> paramMap = new HashMap<String, String[]>();
-        paramMap.put("LogicalFilename", new String[]{fileName});
-        paramMap.put("Method", new String[]{"THOR"});
-        String fieldseparator=null;
-        RecordInstance recordInstance;
-        recordInstance = hpcc.getDatasetFields(fileName, fieldseparator);
-        datasource2.setProperty("Structure", recordInstance);        
-        datasource2.setAllProperties(paramMap);
+        ContractInstance datasource2 = cloneRawdataset(composition,fileName,hpcc);        
         
         pluginInstance.addPrecursor(datasource2,"dsOutput","dsInput2"); 
     }
 
+
+    private ContractInstance cloneRawdataset(Composition composition,
+            String fileName, HPCCConnection hpcc) throws Exception {
+        ContractInstance datasource1 = composition
+                .getContractInstanceByName(HIPIE_RAW_DATASET);
+        ContractInstance datasource2 = new ContractInstance(
+                datasource1.getContract());
+        datasource2.setFileName("");
+        Map<String, String[]> paramMap = new HashMap<String, String[]>();
+        paramMap.put("LogicalFilename", new String[] { fileName });
+        paramMap.put("Method", new String[] { "THOR" });
+        String fieldseparator = null;
+        RecordInstance recordInstance;
+        recordInstance = hpcc.getDatasetFields(fileName, fieldseparator);
+        datasource2.setProperty("Structure", recordInstance);
+        datasource2.setAllProperties(paramMap);
+        return datasource2;
+    }
 
     @Override
     public CompositionInstance runComposition(Dashboard dashboard,String user) throws Exception {
@@ -183,7 +192,7 @@ public class CompositionServiceImpl implements CompositionService{
      * @throws Exception
      * Adds additional visual element to the plugin file,with single(existing) input/output
      */
-    private void appendOnPlugin(Composition composition,Widget widget,String user) throws Exception {
+    private void appendOnVisualElement(Composition composition,Widget widget,String user) throws Exception {
         
         HIPIEService hipieService=HipieSingleton.getHipie();
         Contract contract = composition.getContractInstanceByName(composition.getName()).getContract();
@@ -195,15 +204,18 @@ public class CompositionServiceImpl implements CompositionService{
         
         VisualElement visualization=contract.getVisualElements().iterator().next();
         VisualElement visualElement = widget.generateVisualElement();
+        
         //Sets basis for visual element
         Element output = contract.getOutputElements().iterator().next();
         visualElement.setBasis(output);
         visualization.addChildElement(visualElement);
-        LOGGER.debug("visual 2 -->"+(VisualElement)visualization.getChildElements().iterator().next());
+        
+        if(LOGGER.isDebugEnabled()){
+            LOGGER.debug("visual 2 -->"+(VisualElement)visualization.getChildElements().iterator().next());
+        }
         
         contract.setRepository(hipieService.getRepositoryManager().getDefaultRepository());
         hipieService.saveContract(user, contract);
-        //contract.save();
         
         hipieService.refreshData();
         
@@ -213,7 +225,6 @@ public class CompositionServiceImpl implements CompositionService{
         widget.getInstanceProperties().forEach((propertyName,propertyValue)->
             pluginContract.setProperty(propertyName,propertyValue)
         );
-        LOGGER.debug("pluginContract.getProps() -->"+pluginContract.getProps());
       
     }
     
@@ -260,23 +271,7 @@ public class CompositionServiceImpl implements CompositionService{
         
         contract.getVisualElements().add(visualization);
         
-<<<<<<< Upstream, based on origin/dashboard_2.0
-        return  contract;
-=======
-        contract = hipieService.saveContractAs(authenticationService.getUserCredential().getId(), contract,contract.getName());
-        LOGGER.debug("contract"+contract.toString());
-        
-        ContractInstance pluginInstance = contract.createContractInstance();
-        
-        widget.getInstanceProperties().forEach((propertyName,propertyValue)->
-            pluginInstance.setProperty(propertyName,propertyValue)
-        );
-      
-        if(LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Visuslisation plugin - " + pluginInstance.toCompositionString());
-        }
-        return  pluginInstance;
->>>>>>> 1db7e4c Notifications changed to notification balloons
+        return contract;
     }
 
     /* 
