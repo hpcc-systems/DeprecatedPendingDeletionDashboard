@@ -6,9 +6,9 @@ import org.hpccsystems.dashboard.entity.widget.Widget;
 
 public interface CompositionService {
     
-    void createComposition(Dashboard dashboard, Widget widget,String user);
+    void createComposition(Dashboard dashboard, Widget widget,String user) throws Exception;
     
-    CompositionInstance runComposition(Dashboard dashboard,String user);
+    CompositionInstance runComposition(Dashboard dashboard,String user) throws Exception;
     
     String getWorkunitId(Dashboard dashboard,String user) throws Exception ;
 

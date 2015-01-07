@@ -109,7 +109,7 @@ public class ConfigurationComposer<T> extends SelectorComposer<Component>{
                         new GsonBuilder().setPrettyPrinting().create().toJson(chartData));
             }
             Clients.evalJavaScript("createPreview('"+ chart.getUuid()+"', '" 
-                    + widgetConfiguration.getWidget().getChartConfiguration().getHipieChartId()
+                    + widgetConfiguration.getWidget().getChartConfiguration().getHipieChartName()
                     + "','"+ StringEscapeUtils.escapeJavaScript(new Gson().toJson(chartData))+"')");
         } catch (Exception e) {
            LOGGER.error(Constants.EXCEPTION,e);

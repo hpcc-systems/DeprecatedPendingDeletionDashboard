@@ -33,30 +33,37 @@ import org.zkoss.zkplus.spring.SpringUtil;
 public class CompositionServiceImpl implements CompositionService{
     
     private static final Logger LOGGER = LoggerFactory.getLogger(CompositionServiceImpl.class);
+    private static final String BASIC_TEMPLATE = "BasicTemplate";
     private static final String HIPIE_RAW_DATASET  = "RawDataset";
     
     @Override
-    public void createComposition(Dashboard dashboard, Widget widget,String user) {
-        String label = dashboard.getName();
+    public void createComposition(Dashboard dashboard, Widget widget,String user) throws Exception {
         HIPIEService hipieService = HipieSingleton.getHipie();
         Composition composition;
         try {
-            composition = hipieService.getCompositionTemplate(
-                    user,"BasicTemplate");
-            composition.setLabel(label);
-            String compName = label.replaceAll("[^a-zA-Z0-9]+", "");
+            composition = hipieService.getCompositionTemplate(user,BASIC_TEMPLATE);
+            composition.setLabel(dashboard.getName());
+            String compName = dashboard.getName().replaceAll("[^a-zA-Z0-9]+", "");
             composition.setName(compName);
-            updateRawDataset(composition, "~" + widget.getLogicalFile(),dashboard.getHpccConnection());
-            ContractInstance pluginContract = createPlugin(label,widget);       
-            //refreshes the plugins
-            hipieService.refreshData();
-            ContractInstance datasource=composition.getContractInstanceByName(HIPIE_RAW_DATASET);
-            pluginContract.addPrecursor(datasource);    
-            composition = HipieSingleton.getHipie().saveCompositionAs(user, composition,
-                     compName + ".cmp");
+            
+            ContractInstance datasource = composition.getContractInstanceByName(HIPIE_RAW_DATASET);
+            updateRawDataset(datasource, "~" + widget.getLogicalFile(),dashboard.getHpccConnection());
+            
+            Contract visualContract = createVisualContract(compName,widget);    
+            visualContract = hipieService.saveContractAs(user, visualContract, visualContract.getName());
+                        
+            ContractInstance visualContractInstance = visualContract.createContractInstance();
+            widget.getInstanceProperties().forEach((propertyName,propertyValue)->
+                visualContractInstance.setProperty(propertyName,propertyValue)
+            );
+            
+            visualContractInstance.addPrecursor(datasource);
+            
+            composition = HipieSingleton.getHipie().saveCompositionAs(user, composition, compName + ".cmp");
             dashboard.setCompositionName(composition.getCanonicalName());           
         } catch (Exception e) {
             LOGGER.error(Constants.EXCEPTION, e);
+            throw e;
         }
     }
     
@@ -131,30 +138,30 @@ public class CompositionServiceImpl implements CompositionService{
 
 
     @Override
-    public CompositionInstance runComposition(Dashboard dashboard,String user) {
+    public CompositionInstance runComposition(Dashboard dashboard,String user) throws Exception {
         HIPIEService hipieService=HipieSingleton.getHipie();
-        Composition comp;
         CompositionInstance compositionInstance = null;
         try {
-            comp = hipieService.getComposition(user,dashboard.getCompositionName());
+            Composition comp = hipieService.getComposition(user,dashboard.getCompositionName());
             compositionInstance = hipieService.runComposition(comp, dashboard.getHpccConnection(), user);
         } catch (Exception e) {
             LOGGER.error(Constants.EXCEPTION, e);
+            throw e;
         }
         return compositionInstance;
     }
     
-    private void updateRawDataset(Composition composition,String filename,HPCCConnection hpccConnection) throws Exception {
-        ContractInstance rawDatasetContract = composition.getContractInstanceByName(HIPIE_RAW_DATASET);
-        rawDatasetContract.setFileName("");
+    private void updateRawDataset(ContractInstance rawDatasetIns, String filename, HPCCConnection hpccConnection) throws Exception {
         Map<String,String[]> paramMap = new HashMap<String, String[]>();
         paramMap.put("LogicalFilename", new String[]{filename});
         paramMap.put("Method", new String[]{"THOR"});
         String fieldseparator=null;
+        
         RecordInstance recordInstance;
         recordInstance = hpccConnection.getDatasetFields(filename, fieldseparator);
-        rawDatasetContract.setProperty("Structure", recordInstance);        
-        rawDatasetContract.setAllProperties(paramMap);
+        
+        rawDatasetIns.setProperty("Structure", recordInstance);        
+        rawDatasetIns.setAllProperties(paramMap);
         //TODO:Need to set FieldSeparator & other info for NON-THOR files
     }
     
@@ -195,13 +202,12 @@ public class CompositionServiceImpl implements CompositionService{
       
     }
     
-    private ContractInstance createPlugin(String compName,Widget widget) throws Exception {   
+    private Contract createVisualContract(String compName,Widget widget) throws Exception {   
         
         Contract contract = new Contract();
         HIPIEService hipieService = HipieSingleton.getHipie();
         contract.setRepository(hipieService.getRepositoryManager().getDefaultRepository());     
         contract.setLabel(compName);
-        compName = compName.replaceAll("[^a-zA-Z0-9]+", "");
         contract.setName(compName);
         AuthenticationService authenticationService =(AuthenticationService) SpringUtil.getBean("authenticationService");
         contract.setAuthor(authenticationService.getUserCredential().getId());      
@@ -239,18 +245,7 @@ public class CompositionServiceImpl implements CompositionService{
         
         contract.getVisualElements().add(visualization);
         
-        contract = hipieService.saveContractAs(authenticationService.getUserCredential().getId(), contract,contract.getName());
-        
-        ContractInstance pluginInstance = contract.createContractInstance();
-        
-        widget.getInstanceProperties().forEach((propertyName,propertyValue)->
-            pluginInstance.setProperty(propertyName,propertyValue)
-        );
-      
-        if(LOGGER.isDebugEnabled()) {
-            LOGGER.debug("Visuslisation plugin - " + pluginInstance.toCompositionString());
-        }
-        return  pluginInstance;
+        return  contract;
     }
 
     /* 

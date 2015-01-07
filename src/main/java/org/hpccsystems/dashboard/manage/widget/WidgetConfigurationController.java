@@ -1,6 +1,5 @@
 package org.hpccsystems.dashboard.manage.widget;
 
-import org.apache.commons.lang.StringEscapeUtils;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.manage.WidgetConfiguration;
 import org.hpccsystems.dashboard.service.AuthenticationService;
@@ -18,8 +17,6 @@ import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Include;
-
-import com.google.gson.JsonObject;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class WidgetConfigurationController extends SelectorComposer<Component> {
@@ -59,77 +56,43 @@ public class WidgetConfigurationController extends SelectorComposer<Component> {
     
     
     /**
-     * once chart is rendered, Hipie composition and plugin is created/updated
+     * Saves/Updates Composition
+     * Runs the composition
+     * Pushes the preview chart to dashboard view
+     * @throws Exception 
      */
-	@Listen("onClick = #configOkButton")
-	public void onClickOk() {
-		if (configuration.getWidget()==null || !configuration.getWidget().isConfigured()) {
-			Clients.showNotification(Labels.getLabel("widgetNotConfigured"),
-					Clients.NOTIFICATION_TYPE_ERROR,
-					configuration.getChartDiv(), "middle_center", 5000, true);
-			return;
-		}
-			this.getSelf().detach();
-			if (configuration.getDashboard().getCompositionName() == null) {
-				createComposition();
-			} else {
-				addOnCompositionCharts();
-			}
-			drawChart();
-	}
-
-    /**
-     * Updates composition while adding new additional charts to
-     * dashboard 
-     */
-    private void addOnCompositionCharts() {
-        String user=authenticationService.getUserCredential().getId();
-        compositionService.updateComposition(configuration.getDashboard(), configuration.getWidget(),user);
-        compositionService.runComposition(configuration.getDashboard(),user);
-        dashboardService.updateDashboard(configuration.getDashboard(),
-                authenticationService.getUserCredential().getId());
+    @Listen("onClick = #configOkButton")
+    public void onClickOk() throws Exception {
+        if (configuration.getWidget() == null || !configuration.getWidget().isConfigured()) {
+            Clients.showNotification(Labels.getLabel("widgetNotConfigured"), 
+                    Clients.NOTIFICATION_TYPE_ERROR,
+                    configuration.getChartDiv(), "middle_center", 5000, true);
+            return;
+        }
+        
+        String userId = authenticationService.getUserCredential().getId();
+        if (configuration.getDashboard().getCompositionName() == null) {
+            compositionService.createComposition(configuration.getDashboard(), configuration.getWidget(), userId);
+        } else {
+            compositionService.updateComposition(configuration.getDashboard(), configuration.getWidget(), userId);
+        }
+        
+        compositionService.runComposition(configuration.getDashboard(), userId);
+        dashboardService.updateDashboard(configuration.getDashboard(), userId);
+        
+        if(LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Composition {}, Run sucessfully", configuration.getDashboard().getCompositionName());
+        }
+        
+        this.getSelf().detach();
+        drawChart();
     }
-
-
-    /**
-     * Creates new composition while adding first chart
-     */
-    private void createComposition() {
-        String user=authenticationService.getUserCredential().getId();
-        compositionService.createComposition(configuration.getDashboard(),
-                configuration.getWidget(),user);
-        compositionService.runComposition(configuration.getDashboard(),user);
-        dashboardService.updateDashboard(configuration.getDashboard(),
-                authenticationService.getUserCredential().getId());
-    }
-
 
     /**
      * Renders chart in dashboard container
      */
-    //TODO:Need to render the new chart alone instead of creating all the charts in dashboard
 	private void drawChart() {
-		try {
-
-			String viaualizationURL = configuration.getDashboard()
-					.generateVisualizationURL();
-			if (LOGGER.isDebugEnabled()) {
-				LOGGER.debug("viaualizationURL -->" + viaualizationURL);
-			}
-			JsonObject chartObj = new JsonObject();
-			chartObj.addProperty(Constants.URL, viaualizationURL);
-			chartObj.addProperty(Constants.TARGET, configuration.getChartDiv()
-					.getUuid());
-			String data = StringEscapeUtils.escapeJavaScript(chartObj
-					.toString());
-			Clients.evalJavaScript("visualizeDDLChart('" + data + "')");
-		} catch (Exception e) {
-			LOGGER.error(Constants.EXCEPTION, e);
-			Clients.showNotification(Labels.getLabel("unableToRecreate"),
-					Clients.NOTIFICATION_TYPE_ERROR,
-					configuration.getChartDiv(), "middle_center", 5000, true);
-		}
+	    Clients.evalJavaScript("injectPreviewChart()");
 	}
-    
 
 }

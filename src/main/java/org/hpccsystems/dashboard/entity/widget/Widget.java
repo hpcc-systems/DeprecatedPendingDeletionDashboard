@@ -8,10 +8,10 @@ import org.hpcc.HIPIE.dude.InputElement;
 import org.hpcc.HIPIE.dude.VisualElement;
 
 public abstract class Widget {
-    private String name = "samplechart";
+    private String name;
     private String logicalFile;
     private List<Filter> filters;
-    private String title = "sample chart";
+    private String title;
     private ChartConfiguration chartConfiguration;  
 
 	public abstract boolean isConfigured();

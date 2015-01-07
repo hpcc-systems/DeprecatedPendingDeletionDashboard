@@ -1,3 +1,6 @@
+var dashboardViz = {};
+var previewData = {};
+
 function createPreview(target, chartType, data) {
 	clearChart(target);
 
@@ -10,25 +13,28 @@ function createPreview(target, chartType, data) {
 		var actualData = JSON.parse(data);
 		console.log(actualData);		
 		
+		previewData.data = actualData;
+		previewData.type = chartType;
+		
 		require([ "src/c3/Pie", "src/c3/Line", "src/c3/Column", "src/map/ChoroplethStates", "src/c3/Donut", "src/c3/Bar", "src/c3/Area", "src/c3/Scatter", "src/c3/Step" ], function(
 				C3Pie, C3Line, C3Column, ChoroplethStates, C3Donut, C3Bar, C3Area, C3Scatter, C3Step) {
 
 			console.log(actualData);
-			if (chartType == "PIE") {
+			if (chartType == "C3_PIE") {
 				new C3Pie()
 					.target(target)
 					.data(actualData.data)
 					.render();
 			}
 
-			if (chartType == "LINE") {
+			if (chartType == "C3_LINE") {
 				new C3Line()
 				.target(target)
 				.data(actualData.data)
 				.render();
 			}
 
-			if (chartType == "COLUMN") {
+			if (chartType == "C3_COLUMN") {
 				new C3Column()
 				.target(target)
 				.data(actualData.data)
@@ -44,35 +50,35 @@ function createPreview(target, chartType, data) {
 				
 			}
 			
-			if (chartType == "DONUT") {
+			if (chartType == "C3_DONUT") {
 				new C3Donut()
 				.target(target)
 				.data(actualData.data)
 				.render();
 			}
 			
-			if (chartType == "BAR") {
+			if (chartType == "C3_BAR") {
 				new C3Bar()
 				.target(target)
 				.data(actualData.data)
 				.render();
 			}
 			
-			if (chartType == "AREA") {
+			if (chartType == "C3_AREA") {
 				new C3Area()
 				.target(target)
 				.data(actualData.data)
 				.render();
 			}
 			
-			if (chartType == "SCATTER") {
+			if (chartType == "C3_SCATTER") {
 				new C3Scatter()
 				.target(target)
 				.data(actualData.data)
 				.render();
 			}
 			
-			if (chartType == "STEP") {
+			if (chartType == "C3_STEP") {
 				new C3Step()
 				.target(target)
 				.data(actualData.data)
@@ -106,6 +112,8 @@ function visualizeDDLChart(data) {
 			+ chartData.WsWorkunits + '/WUInfo.json":"' + hostUrl + '/proxy-WUInfo.do","' 
 			+ chartData.WsEcl + '/submit/query/":"' + hostUrl + '/proxy-WsEcl.do"}');
 
+	clearChart(target);
+	
 	require([ "assets/js/Visualization/widgets/config" ], function() {
 
 		requirejs.config({
@@ -116,13 +124,44 @@ function visualizeDDLChart(data) {
 
 			GraphMarshaller.createSingle(url, proxyMappings, visualizeRoxie,
 					function(graphDashboard, json) {
-						graphDashboard
-							.target(target)
-							.layout(layout)
-							.renderDashboards();
+						dashboardViz.graph = graphDashboard;
+						
+						dashboardViz.graph.target(target)
+											.layout(layout)
+											.renderDashboards();
+						
+						console.log(dashboardViz.graph);
 					});
 		});
 
 	});
 
+}
+
+function injectPreviewChart() {
+	require([ "assets/js/Visualization/widgets/config" ], function() {
+
+		requirejs.config({
+			baseUrl : "assets/js/Visualization/widgets"
+		});
+		
+		require(["src/chart/MultiChartSurface"], function (MultiChartSurface) {	
+
+			var oldData = dashboardViz.graph._data;
+
+            oldData.vertices.push( 
+            	new MultiChartSurface()
+                    .data(previewData.data.data)
+                    .chartType(previewData.type)
+                    .title("Injected")
+                    .faChar("\uf080")
+                    .size({ width: 210, height: 210 })
+            );			
+
+            dashboardViz.graph
+            	.data(oldData)
+            	.render();
+
+		});
+	});
 }
