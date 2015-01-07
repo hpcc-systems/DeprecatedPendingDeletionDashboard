@@ -271,7 +271,7 @@ public class CompositionServiceImpl implements CompositionService{
         
         contract.getVisualElements().add(visualization);
         
-        return contract;
+        return  contract;
     }
 
     /* 

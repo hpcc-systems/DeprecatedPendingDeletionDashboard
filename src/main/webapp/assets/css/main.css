@@ -218,3 +218,9 @@
 .widget-panel.z-window{
 	background: none repeat scroll 0 0 #fff;
 }
+#NoChart{
+	color: red;
+	position: absolute;
+	top: 48%;
+	left: 40%;
+}

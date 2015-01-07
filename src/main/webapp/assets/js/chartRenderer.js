@@ -10,8 +10,9 @@ function createPreview(target, chartType, data) {
 			baseUrl : "assets/js/Visualization/widgets"
 		});
 		
-		if(data == "null")
-			jq('#'+target).html("Unable to render chart");
+		if(data == "null"){
+			jq('#'+target).append("<div id=\"NoChart\">Unable to render chart</div>");
+		}
 		var actualData = JSON.parse(data);
 		console.log(actualData);		
 		
