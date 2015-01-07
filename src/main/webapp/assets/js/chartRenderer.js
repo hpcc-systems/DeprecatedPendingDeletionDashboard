@@ -130,7 +130,20 @@ function visualizeDDLChart(data) {
 											.layout(layout)
 											.renderDashboards();
 						
-						console.log(dashboardViz.graph);
+
+		                dashboardViz.graph._data
+		                	.vertices
+		                	.forEach(function(multiChartSurface) {
+		                		multiChartSurface.menu(["Configure", "Delete"]);
+		                		multiChartSurface._menu.click = function(option) {
+		                			if(option == 'Configure') {
+		                				console.log('Configure ' + multiChartSurface._title);
+		                			} else if (option == 'Delete') {
+		                				console.log('Delete ' + multiChartSurface._title);
+		                			}
+		                		};
+		                	});
+		                
 					});
 		});
 
