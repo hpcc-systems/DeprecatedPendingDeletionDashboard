@@ -5,7 +5,9 @@ import java.util.List;
 import java.util.Set;
 
 
+
 import org.hpccsystems.dashboard.Constants;
+import org.hpccsystems.dashboard.entity.widget.Attribute;
 import org.hpccsystems.dashboard.entity.widget.StringFilter;
 import org.hpccsystems.dashboard.manage.WidgetConfiguration;
 import org.hpccsystems.dashboard.service.AuthenticationService;
@@ -62,12 +64,10 @@ public class StringFilterContoller extends SelectorComposer<Component> {
                 widgetConfiguration.getWidget().getLogicalFile(), 
                 widgetConfiguration.getWidget().getFilters());
         
-        if (!valueList.isEmpty()) {
-            valueList.forEach(value->{
-            	Listitem item = new Listitem(value);
-            	item.setParent(filterListBox);
-            });
-        }
+        ListModelList<String> values =  new ListModelList<String>(valueList);
+        values.setMultiple(true);
+        filterListBox.setModel(values);
+     
     }
 
     @Listen("onClick = #filtersSelectedBtn")

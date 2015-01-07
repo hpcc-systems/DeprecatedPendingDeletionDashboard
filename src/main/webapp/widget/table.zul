@@ -1,0 +1,44 @@
+<vlayout id="editWindowLayout"
+	apply="org.hpccsystems.dashboard.manage.widget.TableChartController"
+	style="background-color: white;"
+	vflex="1">
+	<hlayout id="editLayout" vflex="1">
+		<vbox vflex="1">
+			<listbox width="200px" id="measureListbox" vflex="1">
+				<listhead>
+					<listheader label="${labels.measures}"></listheader>
+				</listhead>
+			</listbox>
+			<listbox width="200px" id="attributeListbox" vflex="1">
+				<listhead>
+					<listheader label="${labels.attributes}"></listheader>
+				</listhead>
+			</listbox>
+		</vbox>
+
+		<vbox vflex="1">	
+			
+			<listbox width="200px" vflex="1" id="columnListbox" droppable="true">
+				<listhead>
+					<listheader label="${labels.columns}"></listheader>
+				</listhead>
+			</listbox>
+			
+			
+			<listbox width="200px" vflex="1" id="filterbox" droppable="true">
+				<listhead>
+					<listheader label="${labels.filter}"></listheader>
+				</listhead>
+			</listbox>
+			
+		</vbox>
+
+		<div vflex="1" hflex="1"
+			style="border: 1px solid; border-color: rgb(184, 177, 177);"
+			id="chart">
+
+		</div>
+
+	</hlayout>
+</vlayout>
+

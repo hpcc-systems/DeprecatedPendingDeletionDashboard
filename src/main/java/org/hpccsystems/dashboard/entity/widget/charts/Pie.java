@@ -23,7 +23,8 @@ import org.zkoss.zul.ListModelList;
 
 public class Pie extends Widget {
     private Attribute label;
-    private Measure weight;    
+    private Measure weight;  
+    private List<Filter> filters=new ArrayList<Filter>();
 
     @Override
     public String generateSQL() {        
@@ -48,10 +49,10 @@ public class Pie extends Widget {
         sql.append(" FROM ")
         .append(getLogicalFile());
         
-        if((this.getFilters()!=null)&&(!this.getFilters().isEmpty())){
+       /* if((this.getFilters()!=null)&&(!this.getFilters().isEmpty())){
                 sql.append(" WHERE ");
                 getFilterQuery(sql);
-            }
+            }*/
         return sql.toString();
     }
 
@@ -92,7 +93,7 @@ public class Pie extends Widget {
         RecordInstance ri = new RecordInstance();
         visualElement.setBasisQualifier(ri);
         StringBuilder builder = new StringBuilder();
-        visualElement.setBasisFilter(getFilterQuery(builder));
+        //visualElement.setBasisFilter(getFilterQuery(builder));
 
         // Attribute settings       
         ri.add(new FieldInstance(null, getPluginAttribute()));
@@ -118,6 +119,14 @@ public class Pie extends Widget {
         Map<String, String> fieldNames = new HashMap<String, String>();
         fieldNames.put(getPluginAttribute(), this.getLabel().getColumn());
         fieldNames.put(getPluginMeasure(), this.getWeight().getColumn());
+        
+        filters = this.getFilters();
+        if(!filters.isEmpty()){
+        	 filters.forEach(value->{
+        		 fieldNames.put(getFilterName(value),value.getColumn());
+        	 });
+        	
+        }
         return fieldNames;
     }
 
@@ -139,6 +148,18 @@ public class Pie extends Widget {
                 new FieldInstance(null,getWeight().getColumn())));
         measureInput.setType(InputElement.TYPE_FIELD);
         inputs.add(measureInput);
+      
+       filters = this.getFilters();
+        if(!filters.isEmpty()){
+        	 filters.forEach(value->{
+            	 InputElement filterElement = new InputElement();
+            	 filterElement.setName(getFilterName(value));
+            	 filterElement.addOption(new ElementOption(Element.LABEL,new FieldInstance(null,value.getColumn())));
+            	 measureInput.setType(InputElement.TYPE_FIELD);
+                 inputs.add(filterElement);
+            });
+        }
+       
 
         return inputs;
     
@@ -182,9 +203,7 @@ public class Pie extends Widget {
     }
     
     public String getFilterQuery(StringBuilder sql){
-    	
     	 Iterator<Filter> filters=this.getFilters().iterator();
-         
          while(filters.hasNext()){
              sql.append(filters.next().generateFilterSQL(getLogicalFile()));
              if(filters.hasNext()){
@@ -192,7 +211,14 @@ public class Pie extends Widget {
              }
          }     
 		return sql.toString();
-    	
+    }
+    
+    public String getFilterName(Filter filter) {
+        StringBuilder filterName = new StringBuilder();
+        filterName.append("Filter")
+                .append(getFilters().indexOf(filter) + 1).append("_")
+                .append(this.getName());
+        return filterName.toString();
     }
     
 }
