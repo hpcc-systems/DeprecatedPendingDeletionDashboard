@@ -4,13 +4,11 @@ import java.util.HashMap;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.hpccsystems.dashboard.Constants;
-import org.hpccsystems.dashboard.authentication.LoginController;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.service.AuthenticationService;
 import org.hpccsystems.dashboard.service.DashboardService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.zkoss.json.JSONObject;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
