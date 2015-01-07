@@ -109,11 +109,11 @@ public class USMapController extends ConfigurationComposer<Component> {
     
     @Listen("onDrop = #chartMeasureListbox")
     public void onDropChartMeasure(DropEvent event) {
-        Listitem draggedItem = (Listitem) event.getDragged();
-        Measure measure = draggedItem.getValue();        
+        Listitem draggedItem = (Listitem) event.getDragged();                
         if(event.getDragged().getParent().equals(attributeListbox)){
             Clients.showNotification("Only measure objects can be dropped","warning",chartMeasureListbox,"end_center", 5000, true);
         }else{
+            Measure measure = draggedItem.getValue();
             usMap.setMeasure(measure);
             measures.add(measure);
             chartMeasureListbox.setDroppable(Constants.FALSE);
