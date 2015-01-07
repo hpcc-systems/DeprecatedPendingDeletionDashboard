@@ -33,6 +33,7 @@ function createPreview(target, chartType, data) {
 			if (chartType == "C3_LINE") {
 				new C3Line()
 				.target(target)
+				.columns(actualData.columns)
 				.data(actualData.data)
 				.render();
 			}
@@ -40,6 +41,7 @@ function createPreview(target, chartType, data) {
 			if (chartType == "C3_COLUMN") {
 				new C3Column()
 				.target(target)
+				.columns(actualData.columns)
 				.data(actualData.data)
 				.render();
 			}
@@ -63,6 +65,7 @@ function createPreview(target, chartType, data) {
 			if (chartType == "C3_BAR") {
 				new C3Bar()
 				.target(target)
+				.columns(actualData.columns)
 				.data(actualData.data)
 				.render();
 			}
@@ -70,6 +73,7 @@ function createPreview(target, chartType, data) {
 			if (chartType == "C3_AREA") {
 				new C3Area()
 				.target(target)
+				.columns(actualData.columns)
 				.data(actualData.data)
 				.render();
 			}
@@ -77,6 +81,7 @@ function createPreview(target, chartType, data) {
 			if (chartType == "C3_SCATTER") {
 				new C3Scatter()
 				.target(target)
+				.columns(actualData.columns)
 				.data(actualData.data)
 				.render();
 			}
@@ -84,6 +89,7 @@ function createPreview(target, chartType, data) {
 			if (chartType == "C3_STEP") {
 				new C3Step()
 				.target(target)
+				.columns(actualData.columns)
 				.data(actualData.data)
 				.render();
 			}
