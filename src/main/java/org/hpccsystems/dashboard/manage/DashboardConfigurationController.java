@@ -93,12 +93,10 @@ public class DashboardConfigurationController extends
     public void onClickOkButton() {
     	  
         if(nameTextbox.getText() == null || nameTextbox.getText().isEmpty()){
-            message.setVisible(true);
-            message.setValue(Labels.getLabel("emptyDashboardName"));
+            Clients.showNotification(Labels.getLabel("emptyDashboardName"), "error", nameTextbox, "end_center", 5000, true);            
             return;
         }else if(connectionList.getSelectedItem() == null){
-            message.setVisible(true);
-            message.setValue(Labels.getLabel("chooseConnection"));
+            Clients.showNotification(Labels.getLabel("chooseConnection"), "error", connectionList, "end_center", 5000, true);            
             return;
         }   
         

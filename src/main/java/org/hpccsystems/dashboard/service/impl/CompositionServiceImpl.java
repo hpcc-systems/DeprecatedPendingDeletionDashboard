@@ -260,7 +260,23 @@ public class CompositionServiceImpl implements CompositionService{
         
         contract.getVisualElements().add(visualization);
         
+<<<<<<< Upstream, based on origin/dashboard_2.0
         return  contract;
+=======
+        contract = hipieService.saveContractAs(authenticationService.getUserCredential().getId(), contract,contract.getName());
+        LOGGER.debug("contract"+contract.toString());
+        
+        ContractInstance pluginInstance = contract.createContractInstance();
+        
+        widget.getInstanceProperties().forEach((propertyName,propertyValue)->
+            pluginInstance.setProperty(propertyName,propertyValue)
+        );
+      
+        if(LOGGER.isDebugEnabled()) {
+            LOGGER.debug("Visuslisation plugin - " + pluginInstance.toCompositionString());
+        }
+        return  pluginInstance;
+>>>>>>> 1db7e4c Notifications changed to notification balloons
     }
 
     /* 

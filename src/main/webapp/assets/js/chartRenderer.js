@@ -3,13 +3,15 @@ var previewData = {};
 
 function createPreview(target, chartType, data) {
 	clearChart(target);
-
+	
 	require([ "assets/js/Visualization/widgets/config" ], function() {
 
 		requirejs.config({
 			baseUrl : "assets/js/Visualization/widgets"
 		});
-
+		
+		if(data == "null")
+			jq('#'+target).html("Unable to render chart");
 		var actualData = JSON.parse(data);
 		console.log(actualData);		
 		
