@@ -105,7 +105,7 @@ public class ConfigurationComposer<T> extends SelectorComposer<Component>{
             if(LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Div id -{}\nChart - {}\nJSON - {}", 
                         chart.getUuid(), 
-                        widgetConfiguration.getWidget().getChartConfiguration().getHipieChartId(),
+                        widgetConfiguration.getWidget().getChartConfiguration().getType(),
                         new GsonBuilder().setPrettyPrinting().create().toJson(chartData));
             }
             Clients.evalJavaScript("createPreview('"+ chart.getUuid()+"', '" 

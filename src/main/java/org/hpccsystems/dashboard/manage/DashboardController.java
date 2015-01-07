@@ -1,12 +1,28 @@
 package org.hpccsystems.dashboard.manage;
 
 import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.hpcc.HIPIE.Composition;
+import org.hpcc.HIPIE.Contract;
+import org.hpcc.HIPIE.ContractInstance;
+import org.hpcc.HIPIE.HIPIEService;
+import org.hpcc.HIPIE.dude.Element;
+import org.hpcc.HIPIE.dude.VisualElement;
+import org.hpccsystems.dashboard.ChartTypes;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.Dashboard;
+import org.hpccsystems.dashboard.entity.widget.ChartConfiguration;
+import org.hpccsystems.dashboard.entity.widget.Widget;
+import org.hpccsystems.dashboard.entity.widget.charts.Pie;
+import org.hpccsystems.dashboard.entity.widget.charts.USMap;
+import org.hpccsystems.dashboard.entity.widget.charts.XYChart;
 import org.hpccsystems.dashboard.service.AuthenticationService;
 import org.hpccsystems.dashboard.service.DashboardService;
+import org.hpccsystems.dashboard.util.HipieSingleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zkoss.util.resource.Labels;
@@ -114,4 +130,50 @@ public class DashboardController extends SelectorComposer<Component> {
                 Messagebox.QUESTION, 
                 clickListener);
 	}
+	
+	  public void editChart(String chartName){
+	        HIPIEService hipieService = HipieSingleton.getHipie();
+	        String userId = authenticationService.getUserCredential().getId();
+	        Composition composition = null;
+	        ContractInstance contractInstance = null;
+	        Contract contract = null;
+	        try {
+	            composition = hipieService.getComposition(userId, dashboard.getCompositionName());
+	            contractInstance = composition.getContractInstanceByName(composition.getName());
+	            contract = contractInstance.getContract();
+	            VisualElement visualization=contract.getVisualElements().iterator().next();
+	           List<? extends Element> visualElement = visualization.getChildElements();
+	           visualElement.forEach(element->{
+	               createWidgetObject((VisualElement)element);
+	           });
+	            
+	        } catch (Exception e) {
+	          LOGGER.debug(Constants.EXCEPTION,e);
+	        }
+	        
+	    }
+
+    private void createWidgetObject(VisualElement visualElement) {
+
+        Map<String, ChartConfiguration> chartTypes = Constants.CHART_CONFIGURATIONS;
+
+        ChartConfiguration chartConfig = chartTypes.get(visualElement.getType());
+        Widget widget = null;
+        
+        if (chartConfig.getType() == ChartTypes.PIE.getChartCode()
+                || chartConfig.getType() == ChartTypes.DONUT.getChartCode()) {
+            widget = new Pie();
+        } else if (chartConfig.getType() == ChartTypes.BAR.getChartCode()
+                || chartConfig.getType() == ChartTypes.COLUMN.getChartCode()
+                || chartConfig.getType() == ChartTypes.LINE.getChartCode()
+                || chartConfig.getType() == ChartTypes.SCATTER.getChartCode()
+                || chartConfig.getType() == ChartTypes.STEP.getChartCode()
+                || chartConfig.getType() == ChartTypes.AREA.getChartCode()) {
+            widget = new XYChart();
+        } else if (chartConfig.getType() == ChartTypes.US_MAP.getChartCode()) {
+            widget = new USMap();
+        }
+        
+        
+    }
 }

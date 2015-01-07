@@ -3,8 +3,8 @@ package org.hpccsystems.dashboard.manage.widget;
 
 import java.util.Map.Entry;
 
+import org.hpccsystems.dashboard.ChartTypes;
 import org.hpccsystems.dashboard.Constants;
-import org.hpccsystems.dashboard.Constants.CHART_TYPES;
 import org.hpccsystems.dashboard.entity.widget.ChartConfiguration;
 import org.hpccsystems.dashboard.entity.widget.charts.Pie;
 import org.hpccsystems.dashboard.entity.widget.charts.USMap;
@@ -49,7 +49,7 @@ public class ChartListController extends SelectorComposer<Component>{
         
         
       
-        for (Entry<CHART_TYPES, ChartConfiguration> entry : Constants.CHART_CONFIGURATIONS.entrySet()) {
+        for (Entry<String, ChartConfiguration> entry : Constants.CHART_CONFIGURATIONS.entrySet()) {
         	
         	Anchorchildren anchorChildren = new Anchorchildren();
         	Vbox vbox = new Vbox();
@@ -74,26 +74,38 @@ public class ChartListController extends SelectorComposer<Component>{
         
         @Override
         public void onEvent(Event event) throws Exception {
-        	Image img=(Image) event.getTarget();
-        	 ChartConfiguration configuration= (ChartConfiguration) img.getAttribute("config");        
-        	 if(configuration.getType()==CHART_TYPES.PIE || configuration.getType()==CHART_TYPES.DONUT){
-        		 widgetConfiguration.setWidget(new Pie()); 
-        	 }else if(configuration.getType()==CHART_TYPES.BAR ||configuration.getType()==CHART_TYPES.COLUMN ||configuration.getType()==CHART_TYPES.LINE ||configuration.getType()==CHART_TYPES.SCATTER ||configuration.getType()==CHART_TYPES.STEP ||configuration.getType()==CHART_TYPES.AREA){
-        		 widgetConfiguration.setWidget(new XYChart());
-        	 }else if(configuration.getType()==CHART_TYPES.US_MAP ){
-        		 widgetConfiguration.setWidget(new USMap());
-        	 }
-        	  widgetConfiguration.getWidget().setChartConfiguration(configuration);
-        	  final String charnam = DashboardUtil.removeSpaceSplChar(chartname.getText());
-        	  final String emptyString="";
-        	  if(emptyString.equals(chartname.getText())||emptyString.equals(charnam)){
-                  Clients.showNotification("Enter a valid chart name", "warning", chartname, "end_center", 5000);
-              }else{
-                  widgetConfiguration.getWidget().setTitle(chartname.getText());
-                  widgetConfiguration.getWidget().setName(charnam);
-                  Events.postEvent(WidgetConfiguration.ON_CHART_TYPE_SELECT, widgetConfiguration.getHolder(), null);
-              } 	 
-           
+            Image img = (Image) event.getTarget();
+            ChartConfiguration configuration = (ChartConfiguration) img.getAttribute("config");
+            
+            if (configuration.getType() == ChartTypes.PIE.getChartCode()
+                    || configuration.getType() == ChartTypes.DONUT .getChartCode()) {
+                widgetConfiguration.setWidget(new Pie());
+            } else if (configuration.getType() == ChartTypes.BAR.getChartCode()
+                    || configuration.getType() == ChartTypes.COLUMN .getChartCode()
+                    || configuration.getType() == ChartTypes.LINE.getChartCode()
+                    || configuration.getType() == ChartTypes.SCATTER.getChartCode()
+                    || configuration.getType() == ChartTypes.STEP.getChartCode()
+                    || configuration.getType() == ChartTypes.AREA.getChartCode()) {
+                widgetConfiguration.setWidget(new XYChart());
+            } else if (configuration.getType() == ChartTypes.US_MAP.getChartCode()) {
+                widgetConfiguration.setWidget(new USMap());
+            }
+            widgetConfiguration.getWidget()
+                    .setChartConfiguration(configuration);
+            final String charnam = DashboardUtil.removeSpaceSplChar(chartname
+                    .getText());
+            final String emptyString = "";
+            if (emptyString.equals(chartname.getText())
+                    || emptyString.equals(charnam)) {
+                Clients.showNotification("Enter a valid chart name", "warning",
+                        chartname, "end_center", 5000);
+            } else {
+                widgetConfiguration.getWidget().setTitle(chartname.getText());
+                widgetConfiguration.getWidget().setName(charnam);
+                Events.postEvent(WidgetConfiguration.ON_CHART_TYPE_SELECT,
+                        widgetConfiguration.getHolder(), null);
+            }
+
         }
     }; 
 

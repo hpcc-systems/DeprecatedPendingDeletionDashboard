@@ -91,7 +91,7 @@ public class USMap extends Widget{
 
         VisualElement visualElement = new VisualElement();
         // TODO:Need to set chart type using Hipie's 'Element' class
-        visualElement.setType(this.getChartConfiguration().getHipieChartId());
+        visualElement.setType(this.getChartConfiguration().getType());
         
 
         visualElement.setName(DashboardUtil.removeSpaceSplChar(this.getName()));
