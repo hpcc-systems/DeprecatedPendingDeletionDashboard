@@ -36,6 +36,12 @@
         <description>Initializer for HIPIE Service</description>
         <listener-class>org.hpccsystems.dashboard.util.HipieSingleton</listener-class>
 	</listener>
+	
+	<!-- Executor Service Initializer -->
+    <listener>
+         <description>Webapp Initializer for Executor Service</description>
+        <listener-class>org.hpccsystems.dashboard.util.DashboardExecutorHolder</listener-class>
+	</listener>
 
 	<!-- <error-page>
 	    <exception-type>java.lang.Throwable</exception-type>    
