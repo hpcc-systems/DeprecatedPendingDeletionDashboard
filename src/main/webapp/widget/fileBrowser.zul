@@ -1,4 +1,4 @@
-<window apply="org.hpccsystems.dashboard.manage.widget.FileBrowserController" vflex="1">	
+<window apply="org.hpccsystems.dashboard.manage.widget.FileBrowserController" vflex="1" sclass="file-list-window">	
 	<tree id="fileTree" vflex="1" >
 		<treecols>
 			<treecol id="treeColumn"

@@ -140,6 +140,16 @@
 .z-window-header {
 	padding:0;
 }
+
+.z-window-close {
+    background: none repeat scroll 0 0 rgba(0, 0, 0, 0);
+    border: medium none;
+    box-shadow: none;
+    color: red;
+    float: right;
+    font-size: 14px;   
+}
+
 .config-caption i.glyphicon{
 	float:left;
 	padding:10px;
@@ -224,3 +234,70 @@
 	top: 48%;
 	left: 40%;
 }
+
+.chart-list-window,.file-list-window.z-window{
+	border:0;
+}
+.chartList .z-anchorchildren {
+	margin:5px;		
+}	
+.chartList .z-anchorchildren .z-vbox table tr td{
+	border:1px solid #ccc;
+	padding:5px;
+}
+
+.chartList .z-anchorchildren .z-vbox table .z-vbox-separator td{
+	padding:0;
+	border-top: 0;
+	border-bottom: 0;
+	
+}
+.chartList .z-anchorchildren .z-vbox table .z-vbox-separator{
+	display:none;
+}
+
+.widget-panel .z-listbox-header,.widget-panel .z-listheader {
+	background: none repeat scroll 0 0 rgba(0, 0, 0, 0); 
+}
+
+.widget-panel .z-listbox-header-border {
+	border:0;
+}
+
+.widget-panel .z-listbox .btn-close {
+    background: none repeat scroll 0 0 rgba(0, 0, 0, 0);
+    border: medium none;
+    box-shadow: none;
+    color: red;
+    float: right;
+    font-size: 14px;   
+}
+.widget-panel .z-listbox .btn-sum{
+	background-color:#449D44;
+	border-radius: 3px;
+    font-size: 12px;
+    line-height: 1.5;
+    padding: 1px 5px;   
+    border: 1px solid transparent;    
+    cursor: pointer;
+    display: inline-block;    
+    font-weight: normal;    
+    margin: 0 5px 0 5px;
+    padding: 0 10px;   
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+}
+.widget-panel .z-listbox .btn-play {
+ 	background: none repeat scroll 0 0 rgba(0, 0, 0, 0);
+    border: medium none;
+    box-shadow: none;
+    color: red;    
+    font-size: 14px;
+    color: #2e6da4;
+    cursor: pointer;
+}
+
+.z-listbox-header table th.z-listhead-bar{
+	border-left:0;
+}        
