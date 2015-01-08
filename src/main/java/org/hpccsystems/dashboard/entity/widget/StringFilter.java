@@ -4,8 +4,13 @@ import java.util.Iterator;
 import java.util.List;
 
 import org.hpccsystems.dashboard.Constants;
+import org.hpccsystems.dashboard.manage.widget.WidgetConfigurationController;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class StringFilter extends Filter {
+
+    private static final Logger LOGGER = LoggerFactory.getLogger(StringFilter.class);
 
     private List<String> values;
     
@@ -45,8 +50,34 @@ public class StringFilter extends Filter {
         return stringSql.toString();
     }
 
+    
     @Override
     public boolean hasValues() {
         return values != null && !values.isEmpty();
+    }
+    
+    @Override
+    public String getHipieFilterQuery(Filter filter,int index,String chartName) {
+
+        StringBuilder sql = new StringBuilder();
+        sql.append(getFilterName(filter,index,chartName)).append(" IN (");
+
+        Iterator<String> valueIterator = ((StringFilter) filter).getValues()
+                .iterator();
+        while (valueIterator.hasNext()) {
+            sql.append("'").append(valueIterator.next());
+            if (valueIterator.hasNext()) {
+                sql.append("', ");
+            } else {
+                sql.append("' ");
+            }
+        }
+        sql.append(")");
+        if(LOGGER.isDebugEnabled()){
+            LOGGER.debug("Hipie filter query -->"+sql);
+        }
+        
+        return sql.toString();
+
     }
 }

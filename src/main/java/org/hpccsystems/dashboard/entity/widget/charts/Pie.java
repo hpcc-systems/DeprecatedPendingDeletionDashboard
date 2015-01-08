@@ -17,6 +17,7 @@ import org.hpccsystems.dashboard.Constants.AGGREGATION;
 import org.hpccsystems.dashboard.entity.widget.Attribute;
 import org.hpccsystems.dashboard.entity.widget.Filter;
 import org.hpccsystems.dashboard.entity.widget.Measure;
+import org.hpccsystems.dashboard.entity.widget.StringFilter;
 import org.hpccsystems.dashboard.entity.widget.Widget;
 import org.hpccsystems.dashboard.util.DashboardUtil;
 import org.zkoss.zul.ListModelList;
@@ -49,10 +50,10 @@ public class Pie extends Widget {
         sql.append(" FROM ")
         .append(getLogicalFile());
         
-       /* if((this.getFilters()!=null)&&(!this.getFilters().isEmpty())){
+        if((this.getFilters()!=null)&&(!this.getFilters().isEmpty())){
                 sql.append(" WHERE ");
                 getFilterQuery(sql);
-            }*/
+            }
         return sql.toString();
     }
 
@@ -92,8 +93,12 @@ public class Pie extends Widget {
 
         RecordInstance ri = new RecordInstance();
         visualElement.setBasisQualifier(ri);
-        StringBuilder builder = new StringBuilder();
-        //visualElement.setBasisFilter(getFilterQuery(builder));
+        
+        if(this.getFilters() != null && !this.getFilters().isEmpty()){
+            visualElement.setBasisFilter(getHipieFilterQuery());
+        }
+        
+       
 
         // Attribute settings       
         ri.add(new FieldInstance(null, getPluginAttribute()));
@@ -121,9 +126,12 @@ public class Pie extends Widget {
         fieldNames.put(getPluginMeasure(), this.getWeight().getColumn());
         
         filters = this.getFilters();
-        if(!filters.isEmpty()){
-        	 filters.forEach(value->{
-        		 fieldNames.put(getFilterName(value),value.getColumn());
+        if(filters != null){
+        	 filters.forEach(filter->{
+                fieldNames.put(
+                        filter.getFilterName(filter,
+                                getFilters().indexOf(filter), this.getName()),
+                        filter.getColumn());
         	 });
         	
         }
@@ -150,11 +158,13 @@ public class Pie extends Widget {
         inputs.add(measureInput);
       
        filters = this.getFilters();
-        if(!filters.isEmpty()){
-        	 filters.forEach(value->{
+       
+        if(filters != null){
+        	 filters.forEach(filter->{
             	 InputElement filterElement = new InputElement();
-            	 filterElement.setName(getFilterName(value));
-            	 filterElement.addOption(new ElementOption(Element.LABEL,new FieldInstance(null,value.getColumn())));
+            	 filterElement.setName(filter.getFilterName(filter,
+                         getFilters().indexOf(filter), this.getName()));
+            	 filterElement.addOption(new ElementOption(Element.LABEL,new FieldInstance(null,filter.getColumn())));
             	 measureInput.setType(InputElement.TYPE_FIELD);
                  inputs.add(filterElement);
             });
@@ -209,16 +219,24 @@ public class Pie extends Widget {
              if(filters.hasNext()){
                  sql.append(" AND ");
              }
-         }     
+         }   
 		return sql.toString();
     }
     
-    public String getFilterName(Filter filter) {
-        StringBuilder filterName = new StringBuilder();
-        filterName.append("Filter")
-                .append(getFilters().indexOf(filter) + 1).append("_")
-                .append(this.getName());
-        return filterName.toString();
+    private String getHipieFilterQuery(){
+        StringBuilder query = new StringBuilder();
+        Iterator<Filter> filters=this.getFilters().iterator();
+        Filter filter = null;
+        while(filters.hasNext()){
+            filter = filters.next();
+            query.append(filter.getHipieFilterQuery(filter,  getFilters().indexOf(filter), this.getName()));
+            if(filters.hasNext()){
+                query.append(" AND ");
+            }
+        }   
+        
+       return query.toString();
     }
     
+   
 }

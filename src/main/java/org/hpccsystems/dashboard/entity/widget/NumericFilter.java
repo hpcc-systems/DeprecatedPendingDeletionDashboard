@@ -1,6 +1,7 @@
 package org.hpccsystems.dashboard.entity.widget;
 
 import java.math.BigDecimal;
+import java.util.Iterator;
 
 import org.hpccsystems.dashboard.Constants;
 
@@ -48,5 +49,19 @@ public class NumericFilter extends Filter {
     @Override
     public boolean hasValues() {
         return minValue != null || maxValue != null;
+    }
+
+    @Override
+    public String getHipieFilterQuery(Filter filter, int index, String chartName) {
+        
+        StringBuilder sql = new StringBuilder();
+        sql.append(getFilterName(filter,index,chartName)).append(" <= ")
+        .append(maxValue)
+        .append(" AND ")
+        .append(this.getColumn())
+        .append(" >= ")
+        .append(minValue);
+        
+        return sql.toString();
     }
 }
