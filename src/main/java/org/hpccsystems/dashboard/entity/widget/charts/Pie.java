@@ -2,9 +2,7 @@ package org.hpccsystems.dashboard.entity.widget.charts;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.Iterator;
 import java.util.List;
-import java.util.ListIterator;
 import java.util.Map;
 
 import org.hpcc.HIPIE.dude.Element;
@@ -18,7 +16,6 @@ import org.hpccsystems.dashboard.Constants.AGGREGATION;
 import org.hpccsystems.dashboard.entity.widget.Attribute;
 import org.hpccsystems.dashboard.entity.widget.Filter;
 import org.hpccsystems.dashboard.entity.widget.Measure;
-import org.hpccsystems.dashboard.entity.widget.StringFilter;
 import org.hpccsystems.dashboard.entity.widget.Widget;
 import org.hpccsystems.dashboard.util.DashboardUtil;
 import org.zkoss.zul.ListModelList;
@@ -211,32 +208,6 @@ public class Pie extends Widget {
         StringBuilder builder = new StringBuilder();
         builder.append("Measure").append("_").append(this.getName());
         return builder.toString();
-    }
-    
-    public String getFilterQuery(StringBuilder sql){
-    	 Iterator<Filter> filters=this.getFilters().iterator();
-         while(filters.hasNext()){
-             sql.append(filters.next().generateFilterSQL(getLogicalFile()));
-             if(filters.hasNext()){
-                 sql.append(" AND ");
-             }
-         }   
-		return sql.toString();
-    }
-    
-    private String getHipieFilterQuery(){
-        StringBuilder query = new StringBuilder();
-        ListIterator<Filter> filters=(ListIterator<Filter>) this.getFilters().iterator();
-        Filter filter = null;
-        while(filters.hasNext()){
-            filter = filters.next();           
-            query.append(filter.getHipieFilterQuery(filter,filters.nextIndex(), this.getName()));
-            if(filters.hasNext()){
-                query.append(" AND ");
-            }
-        }   
-        
-       return query.toString();
     }
     
    

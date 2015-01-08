@@ -42,13 +42,13 @@ public class USMap extends Widget{
         .append(Constants.DOT)
         .append(state.getColumn())
         .append(Constants.COMMA);
-        if(measure.getAggregation()!=null && measure.getAggregation()!= AGGREGATION.NONE){
-        sql.append(measure.getAggregation())
-        .append("(")
-        .append(getLogicalFile())
-        .append(Constants.DOT)
-        .append(measure.getColumn())
-        .append(")");
+        if(!measure.getAggregation().equals(AGGREGATION.NONE)){
+            sql.append(measure.getAggregation())
+            .append("(")
+            .append(getLogicalFile())
+            .append(Constants.DOT)
+            .append(measure.getColumn())
+            .append(")");
         }else{
             sql.append(getLogicalFile())
             .append(Constants.DOT)
@@ -105,7 +105,7 @@ public class USMap extends Widget{
                 new FieldInstance(null, getPluginAttribute())));
 
         // Measures settings
-        ri.add(new FieldInstance((getMeasure().getAggregation() != null) ? getMeasure()
+        ri.add(new FieldInstance((!getMeasure().getAggregation().equals(AGGREGATION.NONE)) ? getMeasure()
                 .getAggregation().toString() : null, getPluginMeasure()));
 
         visualElement.addOption(new ElementOption(VisualElement.WEIGHT,
@@ -116,8 +116,8 @@ public class USMap extends Widget{
                 new FieldInstance(null, this.getTitle())));
         
       //Setting color
-        visualElement.addOption(new ElementOption(VisualElement.COLOR,
-                new FieldInstance(null, "Red_Yellow_Blue")));
+        /*visualElement.addOption(new ElementOption(VisualElement.COLOR,
+                new FieldInstance(null, new String("Red_Yellow_Blue"))));*/
 
         return visualElement;
 
@@ -163,7 +163,7 @@ public class USMap extends Widget{
     public List<String> getSQLColumns() {
         List<String> sqlColumnList=new ArrayList<String>();
         sqlColumnList.add(state.getDisplayName());
-        if((measure.getAggregation()!=null)&&(measure.getAggregation()!=AGGREGATION.NONE)){
+        if(!measure.getAggregation().equals(AGGREGATION.NONE)){
             sqlColumnList.add(measure.getAggregation().toString()+"out1");
         }else{
             sqlColumnList.add(measure.getDisplayName());

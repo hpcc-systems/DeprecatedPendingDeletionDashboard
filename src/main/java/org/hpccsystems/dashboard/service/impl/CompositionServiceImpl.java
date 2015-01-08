@@ -1,6 +1,8 @@
 package org.hpccsystems.dashboard.service.impl;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import org.hpcc.HIPIE.Composition;
@@ -56,8 +58,7 @@ public class CompositionServiceImpl implements CompositionService{
         contractInstance.addPrecursor(datasource); 
         
         composition = HipieSingleton.getHipie().saveCompositionAs(user, composition,compName + ".cmp");
-        dashboard.setCompositionName(composition.getCanonicalName());    
-        
+        dashboard.setCompositionName(composition.getCanonicalName());   
     } catch (Exception e) {
         LOGGER.error(Constants.EXCEPTION, e);
         throw e;
@@ -68,16 +69,41 @@ public class CompositionServiceImpl implements CompositionService{
     public void updateComposition(Dashboard dashboard, Widget widget,String user) {
         HIPIEService hipieService = HipieSingleton.getHipie();
         Composition composition;
-        try {
+        try {           
             composition = hipieService.getComposition(user, dashboard.getCompositionName());
-            appendOnVisualElement(composition,widget,user);   
-            //addOnRawdataset(composition,"~" + widget.getLogicalFile(),widget,dashboard.getHpccConnection(),user);
+            if(checkFileExistence(composition,widget.getLogicalFile())){
+                appendOnVisualElement(composition,widget,user); 
+            }else{
+                addOnRawdataset(composition,"~" + widget.getLogicalFile(),widget,dashboard.getHpccConnection(),user);
+            }
+            
             HipieSingleton.getHipie().saveComposition(user, composition);
         } catch (Exception e) {
             LOGGER.error(Constants.EXCEPTION, e);
         }
     }
     
+    private boolean checkFileExistence(Composition composition, String logicalFile) {
+        try {
+            List<String> files = new ArrayList<String>();
+            Map<String, ContractInstance> contractInstances = composition.getContractInstances();
+          
+            contractInstances.forEach((key, instance) ->{
+                if(instance.getProperty("LogicalFilename")!= null){
+                    files.add(instance.getProperty("LogicalFilename"));
+                }
+            });
+            if(LOGGER.isDebugEnabled()){
+                LOGGER.debug("file --->"+files);
+            }
+            
+           return (files.contains(logicalFile) ? true : false);
+        } catch (Exception e) {
+            LOGGER.error(Constants.EXCEPTION,e);
+            return false;
+        }
+    }
+
     /**
      * @param composition
      * @param fileName
@@ -292,7 +318,7 @@ public class CompositionServiceImpl implements CompositionService{
                     user, true);
             if(latestInstance == null){
                 latestInstance = runComposition(dashboard,user);
-            } 
+           } 
             
             if(latestInstance.getWorkunitStatus().contains("failed")) {
                return null;

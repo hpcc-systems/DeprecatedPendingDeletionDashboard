@@ -1,7 +1,9 @@
 package org.hpccsystems.dashboard.entity.widget;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import org.hpcc.HIPIE.dude.InputElement;
@@ -78,4 +80,31 @@ public abstract class Widget {
         filters.remove(filter);
     }
     
+    public String getFilterQuery(StringBuilder sql){
+        Iterator<Filter> filters=this.getFilters().iterator();
+        while(filters.hasNext()){
+            sql.append(filters.next().generateFilterSQL(getLogicalFile()));
+            if(filters.hasNext()){
+                sql.append(" AND ");
+            }
+        }   
+       return sql.toString();
+   }
+    
+    public String getHipieFilterQuery(){
+        StringBuilder query = new StringBuilder();
+        ListIterator<Filter> filters= this.getFilters().listIterator();
+        Filter filter = null;
+        while(filters.hasNext()){
+            filter = filters.next();           
+            query.append(filter.getHipieFilterQuery(filter,filters.nextIndex(), this.getName()));
+            if(filters.hasNext()){
+                query.append(" AND ");
+            }
+        }   
+        
+       return query.toString();
+    }
+    
 }
+
