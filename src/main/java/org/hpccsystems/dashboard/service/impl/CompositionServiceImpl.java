@@ -274,23 +274,6 @@ public class CompositionServiceImpl implements CompositionService{
             LOGGER.debug("Visuslisation contract - " + contractInstance.toCompositionString());
         }
         return  contractInstance;
-}
-
-
-
-<<<<<<< Upstream, based on origin/dashboard_2.0
-        VisualElement visualization = new VisualElement();
-        visualization.setName(compName);
-        visualization.setType(VisualElement.VISUALIZE);
-        
-        //TODO:set title for visualization
-        VisualElement ve = widget.generateVisualElement();
-        ve.setBasis(output);
-        visualization.addChildElement(ve);
-        
-        contract.getVisualElements().add(visualization);
-        
-        return  contract;
     }
 
     /* 
@@ -319,31 +302,4 @@ public class CompositionServiceImpl implements CompositionService{
         return latestInstance.getWorkunitId();
     }
 }
-=======
-    /* 
-     * Gets the composition's latest workuntit ID
-     */
-    @Override
-    public String getWorkunitId(Dashboard dashboard,String user) throws Exception {
-        Composition composition = null;
-        CompositionInstance latestInstance = null;
-        composition =  HipieSingleton.getHipie().getComposition(
-                user,
-                dashboard.getCompositionName());
-        
-        if(composition != null) {
-            latestInstance = composition.getMostRecentInstance(
-                    user, true);
-            if(latestInstance == null){
-                latestInstance = runComposition(dashboard,user);
-            } 
-            
-            if(latestInstance.getWorkunitStatus().contains("failed")) {
-               return null;
-            }
-        }
-        
-        return latestInstance.getWorkunitId();
-    }
-}
->>>>>>> b1fe0c3 Filter changes
+
