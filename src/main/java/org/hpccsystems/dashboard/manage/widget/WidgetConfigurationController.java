@@ -5,11 +5,15 @@ import org.hpccsystems.dashboard.manage.WidgetConfiguration;
 import org.hpccsystems.dashboard.service.AuthenticationService;
 import org.hpccsystems.dashboard.service.CompositionService;
 import org.hpccsystems.dashboard.service.DashboardService;
+import org.hpccsystems.dashboard.util.DashboardExecutorHolder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.Desktop;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
@@ -19,7 +23,7 @@ import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Include;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
-public class WidgetConfigurationController extends SelectorComposer<Component> {
+public class WidgetConfigurationController extends SelectorComposer<Component> implements EventListener<Event>{
 
     private static final long serialVersionUID = 1L;
     private static final Logger LOGGER = LoggerFactory.getLogger(WidgetConfigurationController.class);
@@ -27,7 +31,8 @@ public class WidgetConfigurationController extends SelectorComposer<Component> {
     
     @Wire
     private Include holder;    
-    
+    @WireVariable
+    private Desktop desktop;
     @WireVariable
     private CompositionService compositionService;
     @WireVariable
@@ -77,7 +82,19 @@ public class WidgetConfigurationController extends SelectorComposer<Component> {
             compositionService.updateComposition(configuration.getDashboard(), configuration.getWidget(), userId);
         }
         
-        compositionService.runComposition(configuration.getDashboard(), userId);
+     // Run composition in separate thread
+        desktop.enableServerPush(true);
+        Runnable runComposition = () -> {
+            try {
+                compositionService.runComposition(configuration.getDashboard(), userId);
+            } catch (Exception e) {
+                Executions.schedule(desktop, this, new Event("OnRunCompositionFailed", null, e));
+                LOGGER.error(Constants.EXCEPTION, e);
+            }
+            Executions.schedule(desktop, this, new Event("OnRunCompositionCompleted"));
+        };
+        DashboardExecutorHolder.getExecutor().execute(runComposition);
+        
         dashboardService.updateDashboard(configuration.getDashboard(), userId);
         
         if(LOGGER.isDebugEnabled()) {
@@ -94,5 +111,16 @@ public class WidgetConfigurationController extends SelectorComposer<Component> {
 	private void drawChart() {
 	    Clients.evalJavaScript("injectPreviewChart()");
 	}
+	
+	@Override
+    public void onEvent(Event arg0) throws Exception {
+        
+        if ("OnRunCompositionCompleted".equals(arg0.getName())) {
+            LOGGER.debug("Run Composition completed");
+        } else {
+            LOGGER.debug("Run Composition failed");
+            //need to post the event to dashboard controller to show the failure message to the user.
+        }
+    }
 
 }
