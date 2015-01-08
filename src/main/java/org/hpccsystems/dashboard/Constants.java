@@ -44,7 +44,7 @@ public class Constants {
             put(ChartTypes.BAR.getChartCode(), new ChartConfiguration(ChartTypes.BAR.getChartCode(), "Bar", "assets/img/charts/bar.png", "widget/xyChart.zul","C3_BAR"));
             put(ChartTypes.COLUMN.getChartCode(), new ChartConfiguration(ChartTypes.COLUMN.getChartCode(), "Column", "assets/img/charts/column.png", "widget/xyChart.zul","C3_COLUMN"));
             put(ChartTypes.US_MAP.getChartCode(), new ChartConfiguration(ChartTypes.US_MAP.getChartCode(), "US_Map", "assets/img/charts/geo.png", "widget/usMap.zul","CHORO"));
-            put(ChartTypes.TABLE.getChartCode(), new ChartConfiguration(ChartTypes.TABLE.getChartCode(), "Table", "assets/img/charts/table.png", "widget/xyChart.zul", "TABLE"));
+            put(ChartTypes.TABLE.getChartCode(), new ChartConfiguration(ChartTypes.TABLE.getChartCode(), "Table", "assets/img/charts/table.png", "widget/table.zul", "TABLE"));
             put(ChartTypes.STEP.getChartCode(), new ChartConfiguration(ChartTypes.STEP.getChartCode(), "Step", "assets/img/charts/step.png", "widget/xyChart.zul", "C3_STEP"));
             put(ChartTypes.SCATTER.getChartCode(), new ChartConfiguration(ChartTypes.SCATTER.getChartCode(), "Scatter", "assets/img/charts/scatter.png", "widget/xyChart.zul", "C3_SCATTER"));
             put(ChartTypes.AREA.getChartCode(), new ChartConfiguration(ChartTypes.AREA.getChartCode(), "Area", "assets/img/charts/area.png", "widget/xyChart.zul","C3_AREA"));
