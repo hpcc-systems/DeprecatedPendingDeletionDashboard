@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.ListIterator;
 import java.util.Map;
 
 import org.hpcc.HIPIE.dude.Element;
@@ -225,11 +226,11 @@ public class Pie extends Widget {
     
     private String getHipieFilterQuery(){
         StringBuilder query = new StringBuilder();
-        Iterator<Filter> filters=this.getFilters().iterator();
+        ListIterator<Filter> filters=(ListIterator<Filter>) this.getFilters().iterator();
         Filter filter = null;
         while(filters.hasNext()){
-            filter = filters.next();
-            query.append(filter.getHipieFilterQuery(filter,  getFilters().indexOf(filter), this.getName()));
+            filter = filters.next();           
+            query.append(filter.getHipieFilterQuery(filter,filters.nextIndex(), this.getName()));
             if(filters.hasNext()){
                 query.append(" AND ");
             }
