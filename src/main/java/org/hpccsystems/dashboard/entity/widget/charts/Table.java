@@ -1,5 +1,6 @@
 package org.hpccsystems.dashboard.entity.widget.charts;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -10,11 +11,21 @@ import org.hpccsystems.dashboard.Constants.AGGREGATION;
 import org.hpccsystems.dashboard.entity.widget.Field;
 import org.hpccsystems.dashboard.entity.widget.Measure;
 import org.hpccsystems.dashboard.entity.widget.Widget;
-import org.zkoss.poi.ss.formula.functions.Column;
 
 public class Table extends Widget{
 
     private List<Field> tableColumns;
+    
+    public void addColumn(Field column) {
+		if(tableColumns == null) {
+			tableColumns = new ArrayList<>();
+		}
+		tableColumns.add(column);
+	}
+    
+    public void removeColumn(Field column) {
+		tableColumns.remove(column);
+	}
     
 	@Override
 	public boolean isConfigured() {
@@ -42,12 +53,20 @@ public class Table extends Widget{
         tableColumns.forEach(column -> {
             if(column.isNumeric()) {
                 Measure measure = (Measure) column;
-                sql.append(measure.getAggregation())
-                    .append("(")
-                    .append(getLogicalFile())
-                    .append(Constants.DOT)
-                    .append(measure.getColumn())
-                    .append(")");
+                if(measure.getAggregation() !=null && 
+                		measure.getAggregation() != AGGREGATION.NONE){
+                	sql.append(measure.getAggregation())
+	                	.append("(")
+	                	.append(getLogicalFile())
+	                	.append(Constants.DOT)
+	                	.append(measure.getColumn())
+	                	.append(")");
+                } else {
+                	sql.append(getLogicalFile())
+	                    .append(Constants.DOT)
+	                    .append(measure.getColumn())
+	                    .append(Constants.COMMA);
+                }
             } else {
                 sql.append(getLogicalFile())
                     .append(Constants.DOT)

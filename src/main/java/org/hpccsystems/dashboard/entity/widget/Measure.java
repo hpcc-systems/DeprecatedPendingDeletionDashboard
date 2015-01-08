@@ -10,6 +10,10 @@ public class Measure extends Field {
     public Measure() {
     }
     
+    public Measure(Measure measure) {
+    	//TODO: 
+    }
+    
     public Measure(Field field) {
         super(field);
         this.setDisplayName(field.getColumn());

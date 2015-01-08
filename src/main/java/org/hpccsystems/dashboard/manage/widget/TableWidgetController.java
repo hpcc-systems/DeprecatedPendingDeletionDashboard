@@ -1,6 +1,7 @@
 package org.hpccsystems.dashboard.manage.widget;
 
 import org.hpccsystems.dashboard.Constants;
+import org.hpccsystems.dashboard.entity.widget.Attribute;
 import org.hpccsystems.dashboard.entity.widget.Field;
 import org.hpccsystems.dashboard.entity.widget.Measure;
 import org.hpccsystems.dashboard.entity.widget.charts.Table;
@@ -26,25 +27,30 @@ public class TableWidgetController extends ConfigurationComposer<Component>{
 	 private static final String ON_LOADING = "onLoading";
 	 private static final long serialVersionUID = 1L;
 	 private static final Logger LOGGER = LoggerFactory.getLogger(TableWidgetController.class);
-
-	/**
-	 * 
-	 */
-	private Table table;
+  
+	 private Table table;
 	
 	@Wire
 	private Listbox columnListbox;
-	 private ListModelList<TableColumn> columns = new ListModelList<TableColumn>();
+	 private ListModelList<Field> columns = new ListModelList<Field>();
 	 
-	  private ListitemRenderer<TableColumn> tableColumnRenderer = (listitem, column, index) -> {
+	  private ListitemRenderer<Field> tableColumnRenderer = (listitem, column, index) -> {
           Listcell listcell = new Listcell(column.getColumn());
-          Button button = null;
-          if(!column.getAggregation().equals(null)){
-        	   button = new Button();
-        	   button.setLabel(column.getAggregation().toString());
-               button.setZclass("btn btn-xs");
-               listcell.appendChild(button);
+
+          if(column.isNumeric()) {
+        	  Measure measure = (Measure) column;
+        	  
+        	  Button button = null;
+        	  if(!measure.getAggregation().equals(null)){
+        		  button = new Button();
+        		  button.setLabel(measure.getAggregation().toString());
+        		  button.setZclass("btn btn-xs");
+        		  listcell.appendChild(button);
+        	  }
+          } else {
+        	  
           }
+          
        
           
           Button closeButton=new Button();
@@ -79,10 +85,18 @@ public class TableWidgetController extends ConfigurationComposer<Component>{
 	  @Listen("onDrop = #columnListbox")
 	    public void onDropColumns(DropEvent event) {
 		  Listitem draggedItem = (Listitem) event.getDragged();
-	      TableColumn column = new TableColumn(draggedItem.getValue());
-	      table.setColumn(column);;
-	      columns.add(column);
-	      columnListbox.setDroppable(Constants.FALSE);
+	      Field field = draggedItem.getValue();
+	      
+	      if(field.isNumeric()) {
+	    	  Measure measure = new Measure((Measure)field);
+	    	  table.addColumn(measure);
+	    	  columns.add(measure);
+	      } else {
+	    	  Attribute attribute = new Attribute(field);
+	    	  table.addColumn(attribute);
+	    	  columns.add(attribute);
+	      }
+	      
 	       
 	       drawChart();
 	    }
