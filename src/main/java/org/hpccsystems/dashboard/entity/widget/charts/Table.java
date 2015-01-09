@@ -160,9 +160,7 @@ public class Table extends Widget{
 			}
 			valueList.add(createInputName(column));
 		});
-        
-       // valueArray = (String[]) valueList.toArray(valueArray);
-     //   labelArray = (String[]) labellist.toArray(labelArray);
+		
         visualElement.addOption(new ElementOption(VisualElement.LABEL, labellist.toArray(labelArray)));
         visualElement.addOption(new ElementOption(VisualElement.VALUE, valueList.toArray(valueArray)));
         
