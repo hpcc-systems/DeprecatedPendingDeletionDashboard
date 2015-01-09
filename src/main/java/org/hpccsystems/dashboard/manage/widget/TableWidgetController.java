@@ -39,7 +39,7 @@ public class TableWidgetController extends ConfigurationComposer<Component>{
           if(column.isNumeric()) {
         	  Measure measure = (Measure) column;
         	  Button button = null;
-        	  if(!measure.getAggregation().equals(null)){
+        	  if(measure.getAggregation()!=null){
         		  button = new Button();
         		  button.setLabel(measure.getAggregation().toString());
         		  button.setZclass("btn btn-xs btn-sum");
