@@ -102,6 +102,7 @@ public class ConfigurationComposer<T> extends SelectorComposer<Component>{
         try {
             ChartdataJSON chartData;
             chartData = wssqlService.getChartdata(widget, hpccConnection);
+            chartData.setTitle(widget.getTitle());
             if(LOGGER.isDebugEnabled()) {
                 LOGGER.debug("Div id -{}\nChart - {}\nJSON - {}", 
                         chart.getUuid(), 

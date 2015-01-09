@@ -5,6 +5,7 @@ import java.util.List;
 public class ChartdataJSON {
     List<String> columns;
     List<List<Object>> data;
+    String title;
     
     /* Sample chart JSON to be supplied to visualization api for rendering the chart.
      * 
@@ -18,6 +19,12 @@ public class ChartdataJSON {
         ]
      */
     
+    public String getTitle() {
+        return title;
+    }
+    public void setTitle(String title) {
+        this.title = title;
+    }
     public List<String> getColumns() {
         return columns;
     }

@@ -18,6 +18,7 @@ function createPreview(target, chartType, data) {
 		
 		previewData.data = actualData;
 		previewData.type = chartType;
+		previewData.title = actualData.title;
 		
 
 	require([ "src/c3/Pie", "src/c3/Line", "src/c3/Column",
@@ -183,22 +184,34 @@ function injectPreviewChart() {
 			baseUrl : "assets/js/Visualization/widgets"
 		});
 		
-		require(["src/chart/MultiChartSurface"], function (MultiChartSurface) {	
-
+		require(["src/chart/MultiChartSurface","src/map/ChoroplethStates"], function (MultiChartSurface,ChoroplethStates) {	
+			
 			var oldData = dashboardViz.graph._data;
+			
+			if (previewData.type == "CHORO") {
+				  oldData.vertices.push(  new MultiChartSurface()
+	                .title(previewData.title)
+	                .faChar("\uf024")
+	                .size({ width: 210, height: 210 })
+	                .content(new ChoroplethStates().data(previewData.data.data))                                    
+				  );
 
-            oldData.vertices.push( 
-            	new MultiChartSurface()
-                    .data(previewData.data.data)
-                    .chartType(previewData.type)
-                    .title("Injected")
-                    .faChar("\uf080")
-                    .size({ width: 210, height: 210 })
-            );			
+			}else{
 
-            dashboardViz.graph
-            	.data(oldData)
-            	.render();
+	            oldData.vertices.push( 
+	            	new MultiChartSurface()
+	                    .data(previewData.data.data)
+	                    .chartType(previewData.type)
+	                    .title(previewData.title)
+	                    .faChar("\uf080")
+	                    .size({ width: 210, height: 210 })
+	            );			
+
+			}
+			
+			 dashboardViz.graph
+         	.data(oldData)
+         	.render();
 
 		});
 	});
