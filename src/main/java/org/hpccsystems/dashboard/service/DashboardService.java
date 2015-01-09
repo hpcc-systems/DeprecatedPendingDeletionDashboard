@@ -19,7 +19,9 @@ public interface DashboardService {
      * @param userId 
      * @throws Exception
      */
-    void updateDashboard(Dashboard dashboard, String userId);
+    void updateDashboard(Dashboard dashboard);
+    
+    void updateLayout(Dashboard dashboard);
 
 	
 }

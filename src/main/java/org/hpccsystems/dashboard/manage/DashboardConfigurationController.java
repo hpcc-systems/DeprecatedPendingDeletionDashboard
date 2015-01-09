@@ -120,7 +120,7 @@ public class DashboardConfigurationController extends
               dashboard.setVisiblity(Integer.parseInt(visiblityRadiogroup.getSelectedItem().getValue().toString()));
               dashboard.setHpccId(connectionList.getSelectedItem().getLabel());
               //updates dashboard into DB
-              dashboardService.updateDashboard(dashboard, authenticationService.getUserCredential().getId());
+              dashboardService.updateDashboard(dashboard);
         }       
         this.getSelf().detach();
     }

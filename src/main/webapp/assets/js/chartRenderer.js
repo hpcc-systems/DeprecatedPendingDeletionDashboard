@@ -151,6 +151,7 @@ function visualizeDDLChart(data) {
 						
 						dashboardViz.graph.target(target)
 											.layout(layout)
+											.deserialize(chartData.layout)
 											.renderDashboards();
 						
 
@@ -216,3 +217,10 @@ function injectPreviewChart() {
 		});
 	});
 }
+
+function saveLayout(chartDivId){
+
+		console.log(dashboardViz.graph.serialize());
+		zAu.send(new zk.Event(zk.Widget.$(chartDivId), "onSave", dashboardViz.graph.serialize(), {toServer:true}));
+}
+

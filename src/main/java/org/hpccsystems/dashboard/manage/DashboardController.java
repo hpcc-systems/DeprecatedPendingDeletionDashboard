@@ -33,6 +33,7 @@ import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
+import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
@@ -43,8 +44,10 @@ import org.zkoss.zul.Window;
 
 import com.google.gson.JsonObject;
 
+@VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class DashboardController extends SelectorComposer<Component> {
-	private static final String WS_ECL = "WsEcl";
+	private static final String LAYOUT = "layout";
+    private static final String WS_ECL = "WsEcl";
     private static final String WS_WORKUNITS = "WsWorkunits";
     private static final long serialVersionUID = 1L;
 	private static final Logger LOGGER = LoggerFactory
@@ -82,6 +85,11 @@ public class DashboardController extends SelectorComposer<Component> {
         } else {
             drawChart(false);
         }
+		
+		chartDiv.addEventListener("onSave", event->{		   
+		   dashboard.setLayout(event.getData().toString());
+		   dashboardService.updateLayout(dashboard);
+		});
 
 	}
 
@@ -101,6 +109,7 @@ public class DashboardController extends SelectorComposer<Component> {
 			chartObj.addProperty(Constants.HPCC_ID, dashboard.getHpccId());
             chartObj.addProperty(WS_WORKUNITS, dashboard.getHpccConnection().getESPUrl() + WS_WORKUNITS);
             chartObj.addProperty(WS_ECL, dashboard.getHpccConnection().getRoxieServiceUrl() + WS_ECL);
+            chartObj.addProperty(LAYOUT, dashboard.getLayout());
 
             String data = StringEscapeUtils.escapeJavaScript(chartObj.toString());
             Clients.evalJavaScript("visualizeDDLChart('" + data + "')");
@@ -110,6 +119,11 @@ public class DashboardController extends SelectorComposer<Component> {
 					Clients.NOTIFICATION_TYPE_ERROR, chartDiv, "middle_center",
 					5000, true);
 		}
+	}
+	
+	@Listen("onClick = #saveLayout")
+	public void onSaveLayout() {
+	    Clients.evalJavaScript("saveLayout('"+chartDiv.getUuid()+"')");
 	}
 
     @Listen("onClick = #addWidget")

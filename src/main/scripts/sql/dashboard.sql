@@ -38,6 +38,7 @@ visibility TINYINT,
 last_updated_date TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
 hpcc_id VARCHAR(100),
 composition_name VARCHAR(200),
+layout TEXT,
 PRIMARY KEY(id)
 ) ENGINE=InnoDB;
 

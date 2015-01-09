@@ -318,7 +318,7 @@ public class CompositionServiceImpl implements CompositionService{
                     user, true);
             if(latestInstance == null){
                 latestInstance = runComposition(dashboard,user);
-           } 
+            } 
             
             if(latestInstance.getWorkunitStatus().contains("failed")) {
                return null;

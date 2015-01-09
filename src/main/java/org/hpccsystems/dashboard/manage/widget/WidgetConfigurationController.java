@@ -95,7 +95,7 @@ public class WidgetConfigurationController extends SelectorComposer<Component> i
         };
         DashboardExecutorHolder.getExecutor().execute(runComposition);
         
-        dashboardService.updateDashboard(configuration.getDashboard(), userId);
+        dashboardService.updateDashboard(configuration.getDashboard());
         
         if(LOGGER.isDebugEnabled()) {
             LOGGER.debug("Composition {}, Run sucessfully", configuration.getDashboard().getCompositionName());

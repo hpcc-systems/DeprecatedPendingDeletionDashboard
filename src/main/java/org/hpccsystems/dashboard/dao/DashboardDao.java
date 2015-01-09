@@ -20,7 +20,9 @@ public interface DashboardDao {
      * @param userId 
      * @throws Exception
      */
-    void updateDashboard(Dashboard dashboard, String userId)throws DataAccessException;
+    void updateDashboard(Dashboard dashboard)throws DataAccessException;
+    
+    void updateLayout(Dashboard dashboard);
     
 
 }

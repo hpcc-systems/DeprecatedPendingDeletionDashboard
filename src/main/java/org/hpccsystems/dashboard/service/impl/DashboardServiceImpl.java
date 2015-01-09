@@ -38,8 +38,13 @@ public class DashboardServiceImpl implements DashboardService {
     }
     
    
-    public void updateDashboard(Dashboard dashboard,String userId ) throws DataAccessException {
-            dashboardDao.updateDashboard(dashboard,userId);
+    public void updateDashboard(Dashboard dashboard) throws DataAccessException {
+            dashboardDao.updateDashboard(dashboard);
        
        }
+
+    @Override
+    public void updateLayout(Dashboard dashboard) {
+        dashboardDao.updateLayout(dashboard);        
+    }
 }

@@ -33,6 +33,7 @@ public class DashboardDaoImpl implements DashboardDao {
         dashboard.setName(rs.getString("name"));
         dashboard.setVisiblity(rs.getInt("visibility"));
         dashboard.setCompositionName(rs.getString("composition_name"));
+        dashboard.setLayout(rs.getString("layout"));
         return dashboard;
     };
 
@@ -74,10 +75,9 @@ public class DashboardDaoImpl implements DashboardDao {
      }
     
     @Override
-    public void updateDashboard(final Dashboard dashboard ,String userId) throws DataAccessException {
-    	jdbcTemplate.update("update dashboard set name=?, user_id=?, visibility=?,last_updated_date=?, hpcc_id=?,composition_name=? where id=?", new Object[] { 
-    			dashboard.getName(),
-    			userId,
+    public void updateDashboard(final Dashboard dashboard) throws DataAccessException {
+    	jdbcTemplate.update("update dashboard set name=?, visibility=?,last_updated_date=?, hpcc_id=?,composition_name=? where id=?", new Object[] { 
+    			dashboard.getName(),    			
     			dashboard.getVisiblity(),
     			new java.sql.Date(new Date().getTime()),
     			dashboard.getHpccId(),
@@ -85,6 +85,17 @@ public class DashboardDaoImpl implements DashboardDao {
     			dashboard.getId()
             });
     	
+    
+    	
+    }
+
+    @Override
+    public void updateLayout(Dashboard dashboard) {
+        jdbcTemplate.update("update dashboard set layout=? where id=?", new Object[] {
+           dashboard.getLayout(),
+           dashboard.getId()
+        });
+        
     }
    
 }

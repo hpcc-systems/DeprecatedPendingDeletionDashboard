@@ -16,6 +16,7 @@ public class Dashboard {
     private int visiblity;   
     private String hpccId;
     private String compositionName;
+    private String layout;
     
     public int getId() {
         return id;
@@ -52,6 +53,12 @@ public class Dashboard {
     }
     public void setHpccId(String hpccId) {
         this.hpccId = hpccId;
+    }
+    public String getLayout() {
+        return layout;
+    }
+    public void setLayout(String layout) {
+        this.layout = layout;
     }
     
     /**
@@ -98,5 +105,5 @@ public class Dashboard {
             return null;
         }
 
-    }
+    }    
 }
