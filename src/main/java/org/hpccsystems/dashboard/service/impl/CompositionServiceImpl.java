@@ -97,7 +97,7 @@ public class CompositionServiceImpl implements CompositionService{
                 LOGGER.debug("files --->"+files);
             }
             
-           return (files.contains(logicalFile) ? true : false);
+           return (files.contains("~"+logicalFile) ? true : false);
         } catch (Exception e) {
             LOGGER.error(Constants.EXCEPTION,e);
             return false;
@@ -328,4 +328,3 @@ public class CompositionServiceImpl implements CompositionService{
         return latestInstance.getWorkunitId();
     }
 }
-

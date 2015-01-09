@@ -3,7 +3,6 @@ package org.hpccsystems.dashboard.manage;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.hpcc.HIPIE.Composition;
@@ -25,6 +24,8 @@ import org.hpccsystems.dashboard.service.DashboardService;
 import org.hpccsystems.dashboard.util.HipieSingleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.zkoss.json.JSONObject;
+import org.zkoss.json.parser.JSONParser;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
@@ -63,7 +64,19 @@ public class DashboardController extends SelectorComposer<Component> {
 		super.doAfterCompose(comp);
 		dashboard = (Dashboard) Executions.getCurrent().getAttribute(
 				Constants.ACTIVE_DASHBOARD);
-
+		
+		// OnEditChart 
+        comp.addEventListener("onEditChart", event -> {
+            JSONObject json = (JSONObject) new JSONParser().parse(event.getData().toString()); 
+            LOGGER.info(json.get("chartId").toString());
+        });
+		
+     // OnDeleteChart 
+        comp.addEventListener("onDeleteChart", event -> {
+            JSONObject json = (JSONObject) new JSONParser().parse(event.getData().toString()); 
+            LOGGER.info(json.get("chartId").toString());
+        });
+        
 		if(dashboard.getCompositionName() != null){
             drawChart(true);
         } else {

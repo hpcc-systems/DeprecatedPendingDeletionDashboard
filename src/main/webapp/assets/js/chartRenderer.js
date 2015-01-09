@@ -158,10 +158,13 @@ function visualizeDDLChart(data) {
 		                	.forEach(function(multiChartSurface) {
 		                		multiChartSurface.menu(["Configure", "Delete"]);
 		                		multiChartSurface._menu.click = function(option) {
+		                			var payload = {};
+		                			payload.chartId=multiChartSurface._title;
 		                			if(option == 'Configure') {
-		                				console.log('Configure ' + multiChartSurface._title);
+		                				zAu.send(new zk.Event(zk.Widget.$("$dashboardContainer"),'onEditChart', payload, {toServer:true}));
+		                				
 		                			} else if (option == 'Delete') {
-		                				console.log('Delete ' + multiChartSurface._title);
+		                				zAu.send(new zk.Event(zk.Widget.$("$dashboardContainer"),'onDeleteChart', payload, {toServer:true}));
 		                			}
 		                		};
 		                	});
