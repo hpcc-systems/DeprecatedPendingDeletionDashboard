@@ -89,11 +89,18 @@ public class NavigationController extends SelectorComposer<Component> {
         this.getSelf().addEventListener(Constants.ON_DELTE_DASHBOARD, event -> {
             Dashboard dashboard = (Dashboard) event.getData();
             
-            //Deleting composition from the HIPIE
-            Composition compositionToDelete = hipieService.getComposition(authenticationService.getUserCredential().getId(),dashboard.getName());
-            hipieService.deleteComposition(compositionToDelete);
-            hipieService.refreshData();
-            
+           
+            try{
+                 //Deleting composition from the HIPIE
+            	  Composition compositionToDelete = hipieService.getComposition(authenticationService.getUserCredential().getId(),dashboard.getName());
+            	  if(compositionToDelete != null){
+            	  	     hipieService.deleteComposition(compositionToDelete);
+            	    	 hipieService.refreshData();
+            	     }
+            }catch(Exception e){
+            	 LOGGER.error(Constants.EXCEPTION, e);
+            	 
+            }
             // Removing the composition from DB
             int index = dashboardModel.indexOf(dashboard);
             dashboardService.deleteDashboard(dashboard.getId());

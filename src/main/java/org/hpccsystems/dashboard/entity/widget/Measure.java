@@ -14,6 +14,7 @@ public class Measure extends Field {
     	this.setColumn(measure.getColumn());
     	this.setAggregation(measure.getAggregation());
     	this.setDisplayName(measure.getDisplayName());
+    	this.setDataType(measure.getDataType());
      }
     
     public Measure(Field field) {

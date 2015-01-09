@@ -35,10 +35,9 @@ public class TableWidgetController extends ConfigurationComposer<Component>{
 	 
 	  private ListitemRenderer<Field> tableColumnRenderer = (listitem, column, index) -> {
           Listcell listcell = new Listcell(column.getColumn());
-
+          Button button = null;
           if(column.isNumeric()) {
         	  Measure measure = (Measure) column;
-        	  Button button = null;
         	  if(measure.getAggregation()!=null){
         		  button = new Button();
         		  button.setLabel(measure.getAggregation().toString());
@@ -83,7 +82,7 @@ public class TableWidgetController extends ConfigurationComposer<Component>{
 	    public void onDropColumns(DropEvent event) {
 		  Listitem draggedItem = (Listitem) event.getDragged();
 	      Field field = draggedItem.getValue();
-	      
+	      LOGGER.debug("field -->"+field.isNumeric());
 	      if(field.isNumeric()) {
 	    	  Measure measure = new Measure((Measure)field);
 	    	  table.addColumn(measure);
