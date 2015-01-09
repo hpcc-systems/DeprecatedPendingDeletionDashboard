@@ -7,6 +7,7 @@ import org.hpccsystems.dashboard.ChartTypes;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.widget.ChartConfiguration;
 import org.hpccsystems.dashboard.entity.widget.charts.Pie;
+import org.hpccsystems.dashboard.entity.widget.charts.Table;
 import org.hpccsystems.dashboard.entity.widget.charts.USMap;
 import org.hpccsystems.dashboard.entity.widget.charts.XYChart;
 import org.hpccsystems.dashboard.manage.WidgetConfiguration;
@@ -89,6 +90,8 @@ public class ChartListController extends SelectorComposer<Component>{
                 widgetConfiguration.setWidget(new XYChart());
             } else if (configuration.getType() == ChartTypes.US_MAP.getChartCode()) {
                 widgetConfiguration.setWidget(new USMap());
+            }  else if (configuration.getType() == ChartTypes.TABLE.getChartCode()) {
+                widgetConfiguration.setWidget(new Table());
             }
             widgetConfiguration.getWidget()
                     .setChartConfiguration(configuration);

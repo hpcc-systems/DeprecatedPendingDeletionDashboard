@@ -19,8 +19,12 @@ function createPreview(target, chartType, data) {
 		previewData.data = actualData;
 		previewData.type = chartType;
 		
-		require([ "src/c3/Pie", "src/c3/Line", "src/c3/Column", "src/map/ChoroplethStates", "src/c3/Donut", "src/c3/Bar", "src/c3/Area", "src/c3/Scatter", "src/c3/Step" ], function(
-				C3Pie, C3Line, C3Column, ChoroplethStates, C3Donut, C3Bar, C3Area, C3Scatter, C3Step) {
+
+	require([ "src/c3/Pie", "src/c3/Line", "src/c3/Column",
+				"src/map/ChoroplethStates", "src/c3/Donut", "src/c3/Bar",
+				"src/c3/Area", "src/c3/Scatter", "src/c3/Step",
+				"src/other/Table" ], function(
+				C3Pie, C3Line, C3Column, ChoroplethStates, C3Donut, C3Bar, C3Area, C3Scatter, C3Step,Table) {
 
 			console.log(actualData);
 			if (chartType == "C3_PIE") {
@@ -88,6 +92,15 @@ function createPreview(target, chartType, data) {
 			
 			if (chartType == "C3_STEP") {
 				new C3Step()
+				.target(target)
+				.columns(actualData.columns)
+				.data(actualData.data)
+				.render();
+			}
+			
+			if (chartType == "TABLE") {
+				console.log("actual data:"+actualData.data);
+				new Table()
 				.target(target)
 				.columns(actualData.columns)
 				.data(actualData.data)

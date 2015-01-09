@@ -11,8 +11,10 @@ public class Measure extends Field {
     }
     
     public Measure(Measure measure) {
-    	//TODO: 
-    }
+    	this.setColumn(measure.getColumn());
+    	this.setAggregation(measure.getAggregation());
+    	this.setDisplayName(measure.getDisplayName());
+     }
     
     public Measure(Field field) {
         super(field);

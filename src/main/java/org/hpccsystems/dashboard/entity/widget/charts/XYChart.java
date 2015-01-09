@@ -208,7 +208,6 @@ public class XYChart extends Widget{
         List<String> sqlColumnList=new ArrayList<String>();
         int listSize=0;
         sqlColumnList.add(attribute.getDisplayName());
-        listSize++;
         Iterator<Measure> measureIterator=measures.iterator();
         while(measureIterator.hasNext()){
             Measure measure=measureIterator.next();            

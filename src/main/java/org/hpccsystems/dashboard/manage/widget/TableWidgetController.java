@@ -38,7 +38,6 @@ public class TableWidgetController extends ConfigurationComposer<Component>{
 
           if(column.isNumeric()) {
         	  Measure measure = (Measure) column;
-        	  
         	  Button button = null;
         	  if(!measure.getAggregation().equals(null)){
         		  button = new Button();
@@ -46,16 +45,14 @@ public class TableWidgetController extends ConfigurationComposer<Component>{
         		  button.setZclass("btn btn-xs btn-sum");
         		  listcell.appendChild(button);
         	  }
-          } else {
-        	  
           }
-          
-       
-          
           Button closeButton=new Button();
           closeButton.setIconSclass("z-icon-times");
           closeButton.setSclass("btn-close");
           closeButton.addEventListener("onClick", event -> {
+        	  columns.remove(column);
+        	  table.removeColumn(column);
+               clearChart();
            
           });
           listcell.appendChild(closeButton);
@@ -76,7 +73,7 @@ public class TableWidgetController extends ConfigurationComposer<Component>{
 	        columnListbox.setItemRenderer(tableColumnRenderer);
 	        
 	        if(table.isConfigured()) {
-	        	//columns.add(table.);
+	        	columns.addAll(table.getTableColumns());
 	            drawChart();
 	        }
 	      
@@ -96,9 +93,14 @@ public class TableWidgetController extends ConfigurationComposer<Component>{
 	    	  table.addColumn(attribute);
 	    	  columns.add(attribute);
 	      }
-	      
-	       
-	       drawChart();
+	     
 	    }
 
+	  @Listen("onClick = #drawChart")
+	    public void onClickOk(){
+		  if(columns.isEmpty()){
+			  Clients.showNotification("No columns to show",Clients.NOTIFICATION_TYPE_ERROR,columnListbox,"end_center", 5000, true);
+		  }
+		  drawChart();  
+	  }
 }

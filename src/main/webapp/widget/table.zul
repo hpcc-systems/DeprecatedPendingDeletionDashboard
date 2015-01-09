@@ -1,5 +1,5 @@
 <vlayout id="editWindowLayout"
-	apply="org.hpccsystems.dashboard.manage.widget.TableChartController"
+	apply="org.hpccsystems.dashboard.manage.widget.TableWidgetController"
 	style="background-color: white;"
 	vflex="1">
 	<hlayout id="editLayout" vflex="1">
@@ -20,7 +20,9 @@
 			
 			<listbox width="200px" vflex="1" id="columnListbox" droppable="true">
 				<listhead>
-					<listheader label="${labels.columns}"></listheader>
+					<listheader label="${labels.columns}">
+					<button iconSclass="z-icon-play" id="drawChart" style="float:right;"> </button>
+					</listheader>
 				</listhead>
 			</listbox>
 			
