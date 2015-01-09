@@ -27,11 +27,11 @@ public class MeasureRenderer implements ListitemRenderer<Measure> {
         
         final Popup popup = new Popup();
         popup.setWidth("100px");
-        popup.setZclass(Constants.STYLE_POPUP);
+        popup.setZclass(Constants.STYLE_POPUP);        
         
         final Button button = new Button("SUM");
         measure.setAggregation(AGGREGATION.SUM);
-        button.setZclass("btn btn-xs");
+        button.setZclass("btn btn-xs btn-sum");
         button.setPopup(popup);
 
         Listbox listbox = new Listbox();

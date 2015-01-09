@@ -55,10 +55,11 @@ public class USMapController extends ConfigurationComposer<Component> {
         Listcell listCell=new Listcell(measure.getColumn());
         Button button = new Button();
         button.setLabel(measure.getAggregation().toString());
-        button.setZclass("btn btn-xs");        
+        button.setZclass("btn btn-xs btn-sum");   
         
         Button closeButton=new Button();              
-        closeButton.setIconSclass("z-icon-times");        
+        closeButton.setIconSclass("z-icon-times");  
+        closeButton.setSclass("btn-close");
         closeButton.addEventListener("onClick", event -> {
             measures.remove(measure);    
             usMap.setMeasure(null);
@@ -77,6 +78,7 @@ public class USMapController extends ConfigurationComposer<Component> {
         Button closeButton=new Button();
         closeButton.setParent(listItemCell);
         closeButton.setIconSclass("z-icon-times");
+        closeButton.setSclass("btn-close");
         listitem.appendChild(listItemCell);
         closeButton.addEventListener("onClick", event -> {
             states.remove(attribute);    

@@ -1,6 +1,5 @@
 package org.hpccsystems.dashboard.manage.widget;
 
-import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.widget.Attribute;
 import org.hpccsystems.dashboard.entity.widget.Field;
 import org.hpccsystems.dashboard.entity.widget.Measure;
@@ -44,7 +43,7 @@ public class TableWidgetController extends ConfigurationComposer<Component>{
         	  if(!measure.getAggregation().equals(null)){
         		  button = new Button();
         		  button.setLabel(measure.getAggregation().toString());
-        		  button.setZclass("btn btn-xs");
+        		  button.setZclass("btn btn-xs btn-sum");
         		  listcell.appendChild(button);
         	  }
           } else {
@@ -55,6 +54,7 @@ public class TableWidgetController extends ConfigurationComposer<Component>{
           
           Button closeButton=new Button();
           closeButton.setIconSclass("z-icon-times");
+          closeButton.setSclass("btn-close");
           closeButton.addEventListener("onClick", event -> {
            
           });

@@ -39,12 +39,13 @@ public class PieChartController extends ConfigurationComposer<Component> {
     
     private ListitemRenderer<Measure> weightRenderer = (listitem, measure, index) -> {
         Listcell listcell = new Listcell(measure.getColumn());
-        Button button = new Button();
+        Button button = new Button();        
         button.setLabel(measure.getAggregation().toString());
-        button.setZclass("btn btn-xs");
+        button.setZclass("btn btn-xs btn-sum");
         
         Button closeButton=new Button();
         closeButton.setIconSclass("z-icon-times");
+        closeButton.setSclass("btn-close");
         closeButton.addEventListener("onClick", event -> {
             weights.remove(measure);    
             pie.setWeight(null);
@@ -63,6 +64,7 @@ public class PieChartController extends ConfigurationComposer<Component> {
         listItemCell.setParent(listitem);
         Button closeButton=new Button();
         closeButton.setParent(listItemCell);
+        closeButton.setSclass("btn-close");
         closeButton.setIconSclass("z-icon-times");
         listitem.appendChild(listItemCell);
         closeButton.addEventListener("onClick", event -> {

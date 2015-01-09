@@ -157,6 +157,7 @@ public class ConfigurationComposer<T> extends SelectorComposer<Component>{
         
         Button closeButton = new Button();
         closeButton.setIconSclass("z-icon-times");
+        closeButton.setSclass("btn-close");
         closeButton.addEventListener("onClick", event -> {
         	widget.removeFilter(filter);    
         	item.getChildren().clear();
@@ -166,6 +167,7 @@ public class ConfigurationComposer<T> extends SelectorComposer<Component>{
         
         Button playButton = new Button();
         playButton.setIconSclass("z-icon-play");
+        playButton.setSclass("btn-play");
         
         Popup popup = new Popup(){
             private static final long serialVersionUID = 1L;
