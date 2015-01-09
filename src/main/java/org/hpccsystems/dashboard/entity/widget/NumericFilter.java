@@ -30,6 +30,8 @@ public class NumericFilter extends Filter {
     }
     @Override
     public String generateFilterSQL(String fileName) {
+        if(!this.hasValues())
+            return "";
         StringBuilder numFilterSql=new StringBuilder();
         numFilterSql.append(fileName)
             .append(Constants.DOT)

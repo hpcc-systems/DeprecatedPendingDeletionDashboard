@@ -2,6 +2,7 @@ package org.hpccsystems.dashboard.entity.widget.charts;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
@@ -49,9 +50,21 @@ public class Pie extends Widget {
         .append(getLogicalFile());
         
         if((this.getFilters()!=null)&&(!this.getFilters().isEmpty())){
-                sql.append(" WHERE ");
-                getFilterQuery(sql);
-            }
+            Iterator<Filter> filters=this.getFilters().iterator();            
+            Filter localFilter;
+            boolean firstTime=true;                        
+            while(filters.hasNext()){
+                localFilter = filters.next();
+                if(firstTime&&localFilter.hasValues()){
+                    sql.append(" WHERE ");
+                    sql.append(localFilter.generateFilterSQL(getLogicalFile()));
+                    firstTime=false;
+                    }else if(localFilter.hasValues()){
+                        sql.append(" AND ");
+                        sql.append(localFilter.generateFilterSQL(getLogicalFile()));
+                    }                
+            }            
+        }
         return sql.toString();
     }
 

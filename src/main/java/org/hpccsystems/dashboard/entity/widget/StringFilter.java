@@ -29,6 +29,8 @@ public class StringFilter extends Filter {
     
     @Override
     public String generateFilterSQL(String fileName) {
+        if(!this.hasValues())
+            return "";
         StringBuilder stringSql=new StringBuilder();
         stringSql.append(fileName)
         .append(Constants.DOT)

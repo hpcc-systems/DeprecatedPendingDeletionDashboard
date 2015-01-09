@@ -58,15 +58,21 @@ public class USMap extends Widget{
         .append(getLogicalFile());
         
         if((this.getFilters()!=null)&&(!this.getFilters().isEmpty())){
-                sql.append(" WHERE ");
-                Iterator<Filter> filters=this.getFilters().iterator();
-                while(filters.hasNext()){
-                    sql.append(filters.next().generateFilterSQL(getLogicalFile()));
-                    if(filters.hasNext()){
+            Iterator<Filter> filters=this.getFilters().iterator();            
+            Filter localFilter;
+            boolean firstTime=true;                        
+            while(filters.hasNext()){
+                localFilter = filters.next();
+                if(firstTime&&localFilter.hasValues()){
+                    sql.append(" WHERE ");
+                    sql.append(localFilter.generateFilterSQL(getLogicalFile()));
+                    firstTime=false;
+                    }else if(localFilter.hasValues()){
                         sql.append(" AND ");
-                    }
-                }                           
-            }
+                        sql.append(localFilter.generateFilterSQL(getLogicalFile()));
+                    }                
+            }            
+        }
         return sql.toString();
     }
 
