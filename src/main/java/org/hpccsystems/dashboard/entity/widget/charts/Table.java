@@ -110,7 +110,7 @@ public class Table extends Widget{
 					}
 					 listSize++;
 				} else {
-					Attribute attribute = (Attribute) column;
+					Attribute attribute = new Attribute(column);
 					sqlColumnList.add(attribute.getDisplayName());
 				} 
 			}
@@ -154,17 +154,17 @@ public class Table extends Widget{
 								.getAggregation().toString() : null,
 						createInputName(measure)));
 			} else {
-				Attribute attribute = (Attribute) column;
+				Attribute attribute = new Attribute(column);
 				labellist.add(attribute.getDisplayName());
 				ri.add(new FieldInstance(null, createInputName(attribute)));
 			}
 			valueList.add(createInputName(column));
 		});
         
-        valueArray = (String[]) valueList.toArray();
-        labelArray = (String[]) labellist.toArray();
-        visualElement.addOption(new ElementOption(VisualElement.LABEL, labelArray));
-        visualElement.addOption(new ElementOption(VisualElement.VALUE, valueArray));
+       // valueArray = (String[]) valueList.toArray(valueArray);
+     //   labelArray = (String[]) labellist.toArray(labelArray);
+        visualElement.addOption(new ElementOption(VisualElement.LABEL, labellist.toArray(labelArray)));
+        visualElement.addOption(new ElementOption(VisualElement.VALUE, valueList.toArray(valueArray)));
         
         // Setting Title for chart
         visualElement.addOption(new ElementOption(VisualElement.TITLE,

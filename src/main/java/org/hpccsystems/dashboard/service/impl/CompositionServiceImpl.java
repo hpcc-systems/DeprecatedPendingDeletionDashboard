@@ -43,6 +43,7 @@ public class CompositionServiceImpl implements CompositionService{
     HIPIEService hipieService = HipieSingleton.getHipie();
     Composition composition;
     try {
+    	System.out.println("in->>>>>>>>>>>>>>>>>>>>>>>>>");
         composition = hipieService.getCompositionTemplate(user,BASIC_TEMPLATE);
         composition.setLabel(dashboard.getName());
         String compName = dashboard.getName().replaceAll("[^a-zA-Z0-9]+", "");
@@ -58,6 +59,7 @@ public class CompositionServiceImpl implements CompositionService{
         contractInstance.addPrecursor(datasource); 
         
         composition = HipieSingleton.getHipie().saveCompositionAs(user, composition,compName + ".cmp");
+        System.out.println("in->>>>>>>>>>>>>>>>>>>>>>>>>"+composition);
         dashboard.setCompositionName(composition.getCanonicalName());   
     } catch (Exception e) {
         LOGGER.error(Constants.EXCEPTION, e);

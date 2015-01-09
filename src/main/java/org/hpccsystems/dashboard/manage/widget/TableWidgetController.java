@@ -100,6 +100,7 @@ public class TableWidgetController extends ConfigurationComposer<Component>{
 	    public void onClickOk(){
 		  if(columns.isEmpty()){
 			  Clients.showNotification("No columns to show",Clients.NOTIFICATION_TYPE_ERROR,columnListbox,"end_center", 5000, true);
+			  return;
 		  }
 		  drawChart();  
 	  }
