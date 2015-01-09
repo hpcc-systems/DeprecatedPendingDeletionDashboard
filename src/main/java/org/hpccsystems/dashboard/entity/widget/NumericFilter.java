@@ -1,8 +1,6 @@
 package org.hpccsystems.dashboard.entity.widget;
 
 import java.math.BigDecimal;
-import java.util.Iterator;
-
 import org.hpccsystems.dashboard.Constants;
 
 public class NumericFilter extends Filter {

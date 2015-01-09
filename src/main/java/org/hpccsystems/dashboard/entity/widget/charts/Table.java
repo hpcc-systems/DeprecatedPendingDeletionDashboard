@@ -132,8 +132,6 @@ public class Table extends Widget{
 
         RecordInstance ri = new RecordInstance();
         visualElement.setBasisQualifier(ri);
-        StringBuilder builder = new StringBuilder();
-        //visualElement.setBasisFilter(getFilterQuery(builder));
 
 		String[] labelArray = new String[tableColumns.size()];
 		String[] valueArray = new String[tableColumns.size()];

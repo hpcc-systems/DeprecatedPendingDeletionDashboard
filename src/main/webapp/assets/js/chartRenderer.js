@@ -148,13 +148,14 @@ function visualizeDDLChart(data) {
 			GraphMarshaller.createSingle(url, proxyMappings, visualizeRoxie,
 					function(graphDashboard, json) {
 						dashboardViz.graph = graphDashboard;
-						
-						dashboardViz.graph.target(target)
-											.layout(layout)
-											.deserialize(chartData.layout)
-											.renderDashboards();
-						
-
+						if(chartData.layout) {
+							var deSerializedString=graphDashboard.deserialize(chartData.layout,[],["layout", "palette"]);
+							graphDashboard.target(target)
+							.layout(layout).renderDashboards(deSerializedString);
+						}else{
+							graphDashboard.target(target)
+							.layout(layout).renderDashboards();
+						}
 		                dashboardViz.graph._data
 		                	.vertices
 		                	.forEach(function(multiChartSurface) {
@@ -219,8 +220,6 @@ function injectPreviewChart() {
 }
 
 function saveLayout(chartDivId){
-
-		console.log(dashboardViz.graph.serialize());
-		zAu.send(new zk.Event(zk.Widget.$(chartDivId), "onSave", dashboardViz.graph.serialize(), {toServer:true}));
+	zAu.send(new zk.Event(zk.Widget.$(chartDivId), "onSave", dashboardViz.graph.serialize([],["layout", "palette"]), {toServer:true}));
 }
 
