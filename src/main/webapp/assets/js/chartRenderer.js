@@ -220,6 +220,11 @@ function injectPreviewChart() {
 }
 
 function saveLayout(chartDivId){
+<<<<<<< Upstream, based on origin/dashboard_2.0
 	zAu.send(new zk.Event(zk.Widget.$(chartDivId), "onSave", dashboardViz.graph.serialize([],["layout", "palette"]), {toServer:true}));
+=======
+
+	zAu.send(new zk.Event(zk.Widget.$(chartDivId), "onSave", dashboardViz.graph.serialize(), {toServer:true}));
+>>>>>>> 591ce26 Edit chages
 }
 

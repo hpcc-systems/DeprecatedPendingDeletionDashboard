@@ -109,7 +109,7 @@ public class Pie extends Widget {
             visualElement.setBasisFilter(getHipieFilterQuery());
         }
         
-       
+
 
         // Attribute settings       
         ri.add(new FieldInstance(null, getPluginAttribute()));

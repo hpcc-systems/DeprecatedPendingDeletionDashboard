@@ -60,14 +60,16 @@ public class Constants {
         AVG ("AVG"),
         NONE ("NONE");
 
-        private final String name;       
-
+        private final String name; 
+        
         private AGGREGATION(String s) {
             name = s;
         }
         public String toString(){
            return name;
         }
+        
+        
 
     }
     
