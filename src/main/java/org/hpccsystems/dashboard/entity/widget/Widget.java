@@ -2,10 +2,12 @@ package org.hpccsystems.dashboard.entity.widget;
 
 import java.util.ArrayList;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.ListIterator;
 import java.util.Map;
 
+import org.hpcc.HIPIE.dude.Element;
 import org.hpcc.HIPIE.dude.InputElement;
 import org.hpcc.HIPIE.dude.VisualElement;
 
@@ -29,6 +31,8 @@ public abstract class Widget {
 	public abstract List<InputElement> generateInputElement();
 
 	public abstract Map<String, String> getInstanceProperties();
+	
+	public abstract void editVisualElement(VisualElement visualElement);
 
 	public String getName() {
 		return name;
@@ -97,7 +101,7 @@ public abstract class Widget {
         Filter filter = null;
         while(filters.hasNext()){
             filter = filters.next();           
-            query.append(filter.getHipieFilterQuery(filter,filters.nextIndex(), this.getName()));
+            query.append(filter.getHipieFilterQuery(filter,filters.nextIndex()-1, this.getName()));
             if(filters.hasNext()){
                 query.append(" AND ");
             }
@@ -105,6 +109,17 @@ public abstract class Widget {
         
        return query.toString();
     }
+
+    @Override
+    public String toString() {
+        return "Widget [name=" + name + ", logicalFile=" + logicalFile
+                + ", filters=" + filters + ", title=" + title
+                + ", chartConfiguration=" + chartConfiguration + "]";
+    }
+
+    public abstract void removeInput(InputElement inputElement);
+
+    public abstract void removeInstanceProperty(LinkedHashMap<String, String[]> props);
     
 }
 

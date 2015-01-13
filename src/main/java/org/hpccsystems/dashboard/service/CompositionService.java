@@ -12,5 +12,7 @@ public interface CompositionService {
     
     String getWorkunitId(Dashboard dashboard,String user) throws Exception ;
 
-    void updateComposition(Dashboard dashboard, Widget widget,String user);
+    void addCompositionChart(Dashboard dashboard, Widget widget,String user);
+    
+    void editCompositionChart(Dashboard dashboard, Widget widget,String user) throws Exception;
 }

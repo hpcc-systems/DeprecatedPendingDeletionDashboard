@@ -68,9 +68,23 @@ public class Constants {
         public String toString(){
            return name;
         }
-        
-        
 
+    }
+    
+    public enum FLOW {
+        NEW("NEW"),
+        EDIT ("EDIT"),
+        DELETE ("DELETE");  
+        
+        private final String name; 
+        
+        private FLOW(String s) {
+            name = s;
+        }
+        
+        public String toString(){
+            return name;
+         }
     }
     
  // Style class names

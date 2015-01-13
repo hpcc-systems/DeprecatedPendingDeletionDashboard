@@ -1,5 +1,6 @@
 package org.hpccsystems.dashboard.manage;
 
+import org.hpccsystems.dashboard.Constants.FLOW;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.widget.Widget;
 import org.hpccsystems.dashboard.manage.widget.ConfigurationComposer;
@@ -14,6 +15,7 @@ public class WidgetConfiguration {
     private Component holder;
     private Widget widget;
     private Div chartDiv;
+    private FLOW flowType;
 
     private ConfigurationComposer<?> composer;
 
@@ -61,4 +63,14 @@ public class WidgetConfiguration {
     public void setComposer(ConfigurationComposer<?> configurationComposer) {
         this.composer = configurationComposer;
     }
+    
+    public FLOW getFlowType() {
+        return flowType;
+    }
+
+    public void setFlowType(FLOW flowType) {
+        this.flowType = flowType;
+    }
+
 }
+

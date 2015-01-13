@@ -3,6 +3,7 @@ package org.hpccsystems.dashboard.entity.widget.charts;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -223,5 +224,25 @@ public class Table extends Widget{
         }     
 		return sql.toString();
    }
+
+
+    @Override
+    public void editVisualElement(VisualElement visualElement) {
+        // TODO Auto-generated method stub
+    }
+
+
+    @Override
+    public void removeInput(InputElement inputElement) {
+        // TODO Auto-generated method stub
+        
+    }
+
+
+    @Override
+    public void removeInstanceProperty(LinkedHashMap<String, String[]> props) {
+        // TODO Auto-generated method stub
+        
+    }
 
 }

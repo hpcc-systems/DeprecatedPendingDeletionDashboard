@@ -9,7 +9,9 @@ import org.hpcc.HIPIE.ContractInstance;
 import org.hpcc.HIPIE.HIPIEService;
 import org.hpcc.HIPIE.dude.VisualElement;
 import org.hpccsystems.dashboard.Constants;
+import org.hpccsystems.dashboard.Constants.FLOW;
 import org.hpccsystems.dashboard.entity.Dashboard;
+import org.hpccsystems.dashboard.entity.widget.Widget;
 import org.hpccsystems.dashboard.service.AuthenticationService;
 import org.hpccsystems.dashboard.service.DashboardService;
 import org.hpccsystems.dashboard.util.HipieSingleton;
@@ -123,7 +125,9 @@ public class DashboardController extends SelectorComposer<Component> {
         Window window = (Window) Executions.createComponents("widget/config.zul", null, new HashMap<String, Object>() {
             private static final long serialVersionUID = 1L;
             {
-                put(Constants.WIDGET_CONFIG, new WidgetConfiguration(dashboard, chartDiv));
+                WidgetConfiguration widgetConfig = new WidgetConfiguration(dashboard, chartDiv);
+                widgetConfig.setFlowType(FLOW.NEW);
+                put(Constants.WIDGET_CONFIG, widgetConfig);
             }
         });
 
@@ -155,14 +159,23 @@ public class DashboardController extends SelectorComposer<Component> {
 	        String userId = authenticationService.getUserCredential().getId();
 	        Composition composition = null;
 	        ContractInstance contractInstance = null;
-	        Contract contract = null;
 	        try {
 	            composition = hipieService.getComposition(userId, dashboard.getCompositionName());
 	            contractInstance = composition.getContractInstanceByName(composition.getName());
-	            contract = contractInstance.getContract();
-	            VisualElement visualization=contract.getVisualElements().iterator().next();
-	           HipieUtil.getVisualElementWidget((VisualElement)visualization.getChildElement(chartName));
-	            
+	          
+	         Widget widget =  HipieUtil.getVisualElementWidget(contractInstance,chartName);
+	         WidgetConfiguration widgetConfiguration = new WidgetConfiguration(dashboard, chartDiv);
+	         widgetConfiguration.setWidget(widget);
+	         widgetConfiguration.setFlowType(FLOW.EDIT);
+	         //Opens Edit window
+	         Window window = (Window) Executions.createComponents("widget/config.zul", this.getSelf(), new HashMap<String, Object>() {
+	             private static final long serialVersionUID = 1L;
+	             {
+	                 put(Constants.WIDGET_CONFIG, widgetConfiguration);
+	             }
+	         });
+
+	         window.doModal();
 	        } catch (Exception e) {
 	          LOGGER.debug(Constants.EXCEPTION,e);
 	        }

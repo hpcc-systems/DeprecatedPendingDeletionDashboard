@@ -1,6 +1,7 @@
 package org.hpccsystems.dashboard.manage.widget;
 
 import org.hpccsystems.dashboard.Constants;
+import org.hpccsystems.dashboard.Constants.FLOW;
 import org.hpccsystems.dashboard.manage.WidgetConfiguration;
 import org.hpccsystems.dashboard.service.AuthenticationService;
 import org.hpccsystems.dashboard.service.CompositionService;
@@ -49,7 +50,13 @@ public class WidgetConfigurationController extends SelectorComposer<Component> i
         configuration.setHolder(holder);
         
         holder.setDynamicProperty(Constants.WIDGET_CONFIG, configuration);
-        holder.setSrc("widget/chartList.zul");
+        
+        if(FLOW.NEW.equals(configuration.getFlowType())){
+            holder.setSrc("widget/chartList.zul");
+        }else if(FLOW.EDIT.equals(configuration.getFlowType())){
+            holder.setSrc(configuration.getWidget().getChartConfiguration().getEditLayout());
+        }
+        
         holder.addEventListener(WidgetConfiguration.ON_CHART_TYPE_SELECT, event -> {
                 holder.setSrc("widget/fileBrowser.zul");
         });
@@ -78,8 +85,10 @@ public class WidgetConfigurationController extends SelectorComposer<Component> i
         String userId = authenticationService.getUserCredential().getId();
         if (configuration.getDashboard().getCompositionName() == null) {
             compositionService.createComposition(configuration.getDashboard(), configuration.getWidget(), userId);
-        } else {
-            compositionService.updateComposition(configuration.getDashboard(), configuration.getWidget(), userId);
+        } else if(FLOW.NEW.equals(configuration.getFlowType())) {
+            compositionService.addCompositionChart(configuration.getDashboard(), configuration.getWidget(), userId);
+        } else if(FLOW.EDIT.equals(configuration.getFlowType())){
+            compositionService.editCompositionChart(configuration.getDashboard(), configuration.getWidget(), userId);
         }
         
      // Run composition in separate thread

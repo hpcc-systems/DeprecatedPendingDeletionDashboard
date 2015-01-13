@@ -3,6 +3,7 @@ package org.hpccsystems.dashboard.entity.widget.charts;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -73,6 +74,8 @@ public class USMap extends Widget{
                     }                
             }            
         }
+        sql.append(" GROUP BY ").append(getLogicalFile()).append(Constants.DOT)
+                .append(state.getColumn());
         return sql.toString();
     }
 
@@ -122,8 +125,8 @@ public class USMap extends Widget{
                 new FieldInstance(null, this.getTitle())));
         
       //Setting color
-        /*visualElement.addOption(new ElementOption(VisualElement.COLOR,
-                new FieldInstance(null, new String("Red_Yellow_Blue"))));*/
+        visualElement.addOption(new ElementOption(VisualElement.COLOR,
+                new FieldInstance(null, new String("Red_Yellow_Blue"))));
 
         return visualElement;
 
@@ -196,6 +199,23 @@ public class USMap extends Widget{
         StringBuilder builder = new StringBuilder();
         builder.append("Measure").append("_").append(this.getName());
         return builder.toString();
+    }
+
+    @Override
+    public void editVisualElement(VisualElement visualElement) {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void removeInput(InputElement inputElement) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void removeInstanceProperty(LinkedHashMap<String, String[]> props) {
+        // TODO Auto-generated method stub
+        
     }
 
 }

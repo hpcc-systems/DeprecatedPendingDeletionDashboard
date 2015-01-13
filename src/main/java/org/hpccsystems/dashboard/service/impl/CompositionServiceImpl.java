@@ -1,5 +1,6 @@
 package org.hpccsystems.dashboard.service.impl;
 
+import java.sql.Date;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -16,6 +17,7 @@ import org.hpcc.HIPIE.dude.InputElement;
 import org.hpcc.HIPIE.dude.OutputElement;
 import org.hpcc.HIPIE.dude.RecordInstance;
 import org.hpcc.HIPIE.dude.VisualElement;
+import org.hpcc.HIPIE.utils.ErrorBlock;
 import org.hpcc.HIPIE.utils.HPCCConnection;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.entity.Dashboard;
@@ -23,6 +25,7 @@ import org.hpccsystems.dashboard.entity.widget.Widget;
 import org.hpccsystems.dashboard.service.AuthenticationService;
 import org.hpccsystems.dashboard.service.CompositionService;
 import org.hpccsystems.dashboard.util.HipieSingleton;
+import org.hpccsystems.dashboard.util.HipieUtil;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -66,7 +69,7 @@ public class CompositionServiceImpl implements CompositionService{
     }
     
     @Override
-    public void updateComposition(Dashboard dashboard, Widget widget,String user) {
+    public void addCompositionChart(Dashboard dashboard, Widget widget,String user) {
         HIPIEService hipieService = HipieSingleton.getHipie();
         Composition composition;
         try {           
@@ -218,7 +221,7 @@ public class CompositionServiceImpl implements CompositionService{
         
         HIPIEService hipieService=HipieSingleton.getHipie();
         Contract contract = composition.getContractInstanceByName(composition.getName()).getContract();
-       // Contract contract =hipieService.getContract(user, composition.getName());
+        
         Element input=contract.getInputElements().iterator().next();
         widget.generateInputElement().stream().forEach(inputElement->
             input.addChildElement(inputElement)
@@ -230,11 +233,9 @@ public class CompositionServiceImpl implements CompositionService{
         Element output = contract.getOutputElements().iterator().next();
         visualElement.setBasis(output);
         visualization.addChildElement(visualElement);
-        
-        if(LOGGER.isDebugEnabled()){
-        LOGGER.debug("visual 2 -->"+(VisualElement)visualization.getChildElements().iterator().next());
-        }
-        
+        visualization.getChildElements().stream().forEach(visual ->{
+            LOGGER.debug("visual -->{}",visual);
+        });
         contract.setRepository(hipieService.getRepositoryManager().getDefaultRepository());
         hipieService.saveContract(user, contract);
         
@@ -285,7 +286,6 @@ public class CompositionServiceImpl implements CompositionService{
         VisualElement ve = widget.generateVisualElement();
         ve.setBasis(output);
         visualization.addChildElement(ve);
-        
         contract.getVisualElements().add(visualization);
         
         contract = hipieService.saveContractAs(authenticationService.getUserCredential().getId(), contract,contract.getName());
@@ -312,13 +312,17 @@ public class CompositionServiceImpl implements CompositionService{
         composition =  HipieSingleton.getHipie().getComposition(
                 user,
                 dashboard.getCompositionName());
-        
         if(composition != null) {
             latestInstance = composition.getMostRecentInstance(
                     user, true);
-            if(latestInstance == null){
-                latestInstance = runComposition(dashboard,user);
-            } 
+            //Compare last updated date
+            LOGGER.debug("last updated date -->{}", new Date(composition.getLastModified()));
+            if (latestInstance == null) {
+                latestInstance = runComposition(dashboard, user);
+            } else if (latestInstance.getDate(latestInstance.getWorkunitId())
+                    .before(new Date(composition.getLastModified()))) {
+                latestInstance = runComposition(dashboard, user);
+            }
             
             if(latestInstance.getWorkunitStatus().contains("failed")) {
                return null;
@@ -326,5 +330,43 @@ public class CompositionServiceImpl implements CompositionService{
         }
         
         return latestInstance.getWorkunitId();
+    }
+
+    @Override
+    public void editCompositionChart(Dashboard dashboard, Widget widget,
+            String user) throws Exception {
+        HIPIEService hipieService = HipieSingleton.getHipie();
+        Composition composition;
+        
+        composition = hipieService.getComposition(user, dashboard.getCompositionName());
+        ContractInstance contractInstance = composition.getContractInstanceByName(composition.getName());
+        Contract contract = contractInstance.getContract();
+        
+        VisualElement visualElement = HipieUtil.getVisualElement(contract,widget.getName());
+        
+        //Removing previous input fields
+        widget.removeInput(contract.getInputElement(0));
+        
+        //Removing previous weight and label
+        visualElement.getOptions().remove(VisualElement.LABEL);
+        visualElement.getOptions().remove(VisualElement.WEIGHT);
+        
+        //Removing instance properties
+        widget.removeInstanceProperty(contractInstance.getProps());
+        
+        //Adding present input
+        Element input=contract.getInputElements().iterator().next();
+        widget.generateInputElement().stream().forEach(inputElement->
+            input.addChildElement(inputElement)
+        );
+        widget.editVisualElement(visualElement);
+        
+        contract.setRepository(hipieService.getRepositoryManager().getDefaultRepository());
+        hipieService.saveContract(user, contract);
+        
+        widget.getInstanceProperties().forEach((propertyName,propertyValue)->
+        contractInstance.setProperty(propertyName,propertyValue) );
+        
+        HipieSingleton.getHipie().saveComposition(user, composition);
     }
 }

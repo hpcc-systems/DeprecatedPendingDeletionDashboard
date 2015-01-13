@@ -131,7 +131,9 @@ public class ConfigurationComposer<T> extends SelectorComposer<Component>{
         filterbox.setItemRenderer(filterRenderer);
         
         if(widgetConfiguration.getWidget().isConfigured()){
-            filterModel.addAll(widgetConfiguration.getWidget().getFilters());
+            if(widgetConfiguration.getWidget().getFilters() != null){
+                filterModel.addAll(widgetConfiguration.getWidget().getFilters());
+            }
         }
         
         chart.addEventListener(Constants.ON_DRAW_CHART, drawChartListener);

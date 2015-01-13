@@ -3,6 +3,7 @@ package org.hpccsystems.dashboard.entity.widget.charts;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -65,6 +66,9 @@ public class Pie extends Widget {
                     }                
             }            
         }
+        
+        sql.append(" GROUP BY ").append(getLogicalFile()).append(Constants.DOT)
+        .append(label.getColumn());
         return sql.toString();
     }
 
@@ -102,6 +106,18 @@ public class Pie extends Widget {
                         .getHipieChartName())));
         visualElement.setName(DashboardUtil.removeSpaceSplChar(this.getName()));
 
+        generateVisualOption(visualElement);
+
+        // Setting Tittle for chart
+        visualElement.addOption(new ElementOption(VisualElement.TITLE,
+                new FieldInstance(null, this.getTitle())));
+        System.out.println("here -->"+visualElement);
+        return visualElement;
+        
+        
+    }
+
+    private void generateVisualOption(VisualElement visualElement) {
         RecordInstance ri = new RecordInstance();
         visualElement.setBasisQualifier(ri);
         
@@ -109,8 +125,6 @@ public class Pie extends Widget {
             visualElement.setBasisFilter(getHipieFilterQuery());
         }
         
-
-
         // Attribute settings       
         ri.add(new FieldInstance(null, getPluginAttribute()));
         visualElement.addOption(new ElementOption(VisualElement.LABEL,
@@ -122,12 +136,6 @@ public class Pie extends Widget {
 
         visualElement.addOption(new ElementOption(VisualElement.WEIGHT,
                 new FieldInstance(null, getPluginMeasure())));
-
-        // Setting Tittle for chart
-        visualElement.addOption(new ElementOption(VisualElement.TITLE,
-                new FieldInstance(null, this.getTitle())));
-
-        return visualElement;
     }
 
     @Override
@@ -176,7 +184,7 @@ public class Pie extends Widget {
             	 filterElement.setName(filter.getFilterName(filter,
                          getFilters().indexOf(filter), this.getName()));
             	 filterElement.addOption(new ElementOption(Element.LABEL,new FieldInstance(null,filter.getColumn())));
-            	 measureInput.setType(InputElement.TYPE_FIELD);
+            	 filterElement.setType(InputElement.TYPE_FIELD);
                  inputs.add(filterElement);
             });
         }
@@ -221,6 +229,32 @@ public class Pie extends Widget {
         StringBuilder builder = new StringBuilder();
         builder.append("Measure").append("_").append(this.getName());
         return builder.toString();
+    }
+
+    @Override
+    public String toString() {
+        return "Pie [label=" + label + ", weight=" + weight + ", filters="
+                + filters + ", getName()=" + getName() + ", toString()="
+                + super.toString() + "]";
+    }
+
+    @Override
+    public void editVisualElement(VisualElement visualElement) {
+        visualElement.setBasisQualifier(null);
+        generateVisualOption(visualElement);
+    }
+
+    @Override
+    public void removeInput(InputElement inputElement) {
+       List<Element> inputs = inputElement.getChildElements();
+       inputs.remove(inputElement.getChildElement(getPluginMeasure()));
+       inputs.remove(inputElement.getChildElement(getPluginAttribute()));
+    }
+
+    @Override
+    public void removeInstanceProperty(LinkedHashMap<String, String[]> props) {
+        props.remove(getPluginAttribute());
+        props.remove(getPluginMeasure());
     }
     
    

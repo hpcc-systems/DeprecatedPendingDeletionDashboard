@@ -3,6 +3,7 @@ package org.hpccsystems.dashboard.entity.widget.charts;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -12,6 +13,7 @@ import org.hpcc.HIPIE.dude.FieldInstance;
 import org.hpcc.HIPIE.dude.InputElement;
 import org.hpcc.HIPIE.dude.RecordInstance;
 import org.hpcc.HIPIE.dude.VisualElement;
+import org.hpccsystems.dashboard.ChartTypes;
 import org.hpccsystems.dashboard.Constants;
 import org.hpccsystems.dashboard.Constants.AGGREGATION;
 import org.hpccsystems.dashboard.entity.widget.Attribute;
@@ -40,7 +42,6 @@ public class XYChart extends Widget{
     @Override
     public String generateSQL() {
         StringBuilder sql=new StringBuilder();
-        String temp=new String();
         sql.append("SELECT ")
         .append(getLogicalFile())
         .append(Constants.DOT)
@@ -81,6 +82,8 @@ public class XYChart extends Widget{
                     }                
             }            
         }
+        sql.append(" GROUP BY ").append(getLogicalFile()).append(Constants.DOT)
+        .append(attribute.getColumn());
         return sql.toString();
     }
 
@@ -140,8 +143,6 @@ public class XYChart extends Widget{
 
         // Attribute settings
         ri.add(new FieldInstance(null, getPluginAttribute()));
-        visualElement.addOption(new ElementOption(VisualElement.LABEL,
-                new FieldInstance(null, getPluginAttribute())));
 
         // Measures settings
         getMeasures().listIterator().forEachRemaining(measure -> {           
@@ -153,8 +154,20 @@ public class XYChart extends Widget{
 
         // TODO:Need to check how behaves for multiple measures
         meaureLabels.deleteCharAt(meaureLabels.length() - 1);
-        visualElement.addOption(new ElementOption(VisualElement.WEIGHT,
-                new FieldInstance(null, meaureLabels.toString())));
+        if(ChartTypes.LINE.getChartCode().equals(this.getChartConfiguration().getType())
+                || ChartTypes.SCATTER.getChartCode().equals(this.getChartConfiguration().getType())
+                || ChartTypes.STEP.getChartCode().equals(this.getChartConfiguration().getType())){
+            visualElement.addOption(new ElementOption(VisualElement.X,
+                    new FieldInstance(null, getPluginAttribute())));
+            visualElement.addOption(new ElementOption(VisualElement.Y,
+                    new FieldInstance(null, meaureLabels.toString())));
+        }else{
+            visualElement.addOption(new ElementOption(VisualElement.LABEL,
+                    new FieldInstance(null, getPluginAttribute())));
+            visualElement.addOption(new ElementOption(VisualElement.WEIGHT,
+                    new FieldInstance(null, meaureLabels.toString())));
+        }
+       
 
         // Setting Tittle for chart
         visualElement.addOption(new ElementOption(VisualElement.TITLE,
@@ -242,5 +255,22 @@ public class XYChart extends Widget{
                 .append(getMeasures().indexOf(measure) + 1).append("_")
                 .append(this.getName());
         return measureName.toString();
+    }
+
+    @Override
+    public void editVisualElement(VisualElement visualElement) {
+        // TODO Auto-generated method stub
+    }
+
+    @Override
+    public void removeInput(InputElement inputElement) {
+        // TODO Auto-generated method stub
+        
+    }
+
+    @Override
+    public void removeInstanceProperty(LinkedHashMap<String, String[]> props) {
+        // TODO Auto-generated method stub
+        
     }
 }

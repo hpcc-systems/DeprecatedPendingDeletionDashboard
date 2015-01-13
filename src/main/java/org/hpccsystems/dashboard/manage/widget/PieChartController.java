@@ -81,7 +81,6 @@ public class PieChartController extends ConfigurationComposer<Component> {
         pie = (Pie) widgetConfiguration.getWidget();
         hpccConnection = widgetConfiguration.getDashboard().getHpccConnection();
         comp.addEventListener(ON_LOADING, loadingListener);
-        
         Clients.showBusy(comp, "Fetching fields");
         Events.echoEvent(ON_LOADING, comp, null);
         
