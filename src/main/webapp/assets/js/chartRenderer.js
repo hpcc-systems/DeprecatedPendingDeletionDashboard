@@ -167,7 +167,12 @@ function visualizeDDLChart(data) {
 		                				zAu.send(new zk.Event(zk.Widget.$("$dashboardContainer"),'onEditChart', payload, {toServer:true}));
 		                				
 		                			} else if (option == 'Delete') {
-		                				zAu.send(new zk.Event(zk.Widget.$("$dashboardContainer"),'onDeleteChart', payload, {toServer:true}));
+		                				var wid = document.getElementById(this._id).parentNode.id;
+		                                if (confirm("Are you sure want to delete the widget?") == true) {
+		                                     document.getElementById(wid).style.display = 'none';
+		                                     zAu.send(new zk.Event(zk.Widget.$("$dashboardContainer"),'onDeleteChart', payload, {toServer:true}));
+		                                } 
+		                				
 		                			}
 		                		};
 		                	});

@@ -273,7 +273,7 @@
     font-size: 14px;   
 }
 .widget-panel .z-listbox .btn-sum{
-	background-color:#449D44;
+	background-color:#1f77b4;
 	border-radius: 3px;
     font-size: 12px;
     line-height: 1.5;
@@ -287,6 +287,7 @@
     text-align: center;
     vertical-align: middle;
     white-space: nowrap;
+    color:#fff;
 }
 .widget-panel .z-listbox .btn-play {
  	background: none repeat scroll 0 0 rgba(0, 0, 0, 0);
@@ -300,4 +301,23 @@
 
 .z-listbox-header table th.z-listhead-bar{
 	border-left:0;
-}        
+}    
+
+.z-popup.z-popup-open{	
+	padding:0;
+}    
+
+.z-popup.z-popup-open .z-popup-content {
+	padding:4px;
+}
+
+.z-popup.z-popup-open .z-popup-content .z-listheader {
+    white-space: normal;
+    background:none repeat scroll 0 0 #fff;
+    padding:0;
+}
+
+.z-popup.z-popup-open .z-popup-content .form-group .form-group-inner .label{
+	color:#000;
+	font-size:11px;
+}
