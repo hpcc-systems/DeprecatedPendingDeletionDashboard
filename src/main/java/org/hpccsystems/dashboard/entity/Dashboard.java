@@ -96,7 +96,7 @@ public class Dashboard {
             StringBuilder url = new StringBuilder(getHpccConnection()
                     .getESPUrl()).append("WsWorkunits/WUResult.json?")
                     .append("Wuid=")
-                    .append(compositionService.getWorkunitId(this,user))
+                    .append(workunitId)
                     .append("&ResultName=").append(resultName)
                     .append("&SuppressXmlSchema=true");
             return url.toString();

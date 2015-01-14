@@ -1,7 +1,8 @@
 package org.hpccsystems.dashboard.service.impl;
 
-import java.sql.Date;
+import java.text.DateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -316,13 +317,18 @@ public class CompositionServiceImpl implements CompositionService{
             latestInstance = composition.getMostRecentInstance(
                     user, true);
             //Compare last updated date
-            LOGGER.debug("last updated date -->{}", new Date(composition.getLastModified()));
-            if (latestInstance == null) {
+            LOGGER.debug("composition last updated date -->{}", new Date(composition.getLastModified()));
+            
+            DateFormat df = DateFormat.getDateInstance(DateFormat.MEDIUM);
+           
+           
+            if (latestInstance == null
+                    || df.parse(
+                            df.format(latestInstance.getDate(latestInstance
+                                    .getWorkunitId()))).before(
+                            new Date(composition.getLastModified()))) {
                 latestInstance = runComposition(dashboard, user);
-            } else if (latestInstance.getDate(latestInstance.getWorkunitId())
-                    .before(new Date(composition.getLastModified()))) {
-                latestInstance = runComposition(dashboard, user);
-            }
+            } 
             
             if(latestInstance.getWorkunitStatus().contains("failed")) {
                return null;

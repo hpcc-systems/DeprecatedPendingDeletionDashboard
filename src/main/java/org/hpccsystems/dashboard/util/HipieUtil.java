@@ -43,8 +43,8 @@ public class HipieUtil {
        if (chartConfig.getType() == ChartTypes.PIE.getChartCode()
                || chartConfig.getType() == ChartTypes.DONUT.getChartCode()) {
            widget = new Pie();
-           ( (Pie) widget).setWeight(createMeasre(visualElement.getOption(VisualElement.WEIGHT)));
-           ( (Pie) widget).setLabel(cretaeAttribute(visualElement.getOption(VisualElement.LABEL)));
+           ( (Pie) widget).setWeight(createMeasre(visualElement.getOption(VisualElement.WEIGHT),contractInstance));
+           ( (Pie) widget).setLabel(cretaeAttribute(visualElement.getOption(VisualElement.LABEL),contractInstance));
            
        } else if (chartConfig.getType() == ChartTypes.BAR.getChartCode()
                || chartConfig.getType() == ChartTypes.COLUMN.getChartCode()
@@ -87,7 +87,7 @@ public static VisualElement getVisualElement(Contract contract ,String chartName
     return visualElement;
 }
 
-private static Attribute cretaeAttribute(ElementOption option) {
+private static Attribute cretaeAttribute(ElementOption option,ContractInstance contractInstance) {
     
     FieldInstance fieldInstance = option.getParams().get(0);
     
@@ -102,7 +102,7 @@ private static Attribute cretaeAttribute(ElementOption option) {
         //TODO:once drea's fix merged, need to fetch actual colum name from contract instance
         //like contractInstance.getProperty("Measure_piechart2")
         Field attributeField = new Field();
-        attributeField.setColumn(fieldInstance.getName());
+        attributeField.setColumn(contractInstance.getProperty(fieldInstance.getName()));
         attributeField.setDataType("string");
        
         Attribute attribute = new Attribute(attributeField);
@@ -111,7 +111,7 @@ private static Attribute cretaeAttribute(ElementOption option) {
         return attribute;
 }
 
-private static Measure createMeasre(ElementOption option) {
+private static Measure createMeasre(ElementOption option,ContractInstance contractInstance) {
     
     FieldInstance fieldInstance = option.getParams().get(0);
         LOGGER.debug("field -->"+fieldInstance.getAssignment());
@@ -126,7 +126,7 @@ private static Measure createMeasre(ElementOption option) {
         //TODO:once drea's fix merged, need to fetch actual colum name from contract instance
         //like contractInstance.getProperty("Attribute_piechart2")
         Field measureField = new Field();
-        measureField.setColumn(fieldInstance.getName());
+        measureField.setColumn(contractInstance.getProperty(fieldInstance.getName()));
         measureField.setDataType("unsigned");
         Measure measure = new Measure(measureField);
         if(fieldInstance.getType() != null){

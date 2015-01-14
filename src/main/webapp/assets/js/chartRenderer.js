@@ -184,7 +184,7 @@ function visualizeDDLChart(data) {
 
 }
 
-function injectPreviewChart() {
+function injectPreviewChart(flowType) {
 	require([ "assets/js/Visualization/widgets/config" ], function() {
 
 		requirejs.config({
@@ -196,23 +196,30 @@ function injectPreviewChart() {
 			var oldData = dashboardViz.graph._data;
 			
 			if (previewData.type == "CHORO") {
-				  oldData.vertices.push(  new MultiChartSurface()
-	                .title(previewData.title)
-	                .faChar("\uf024")
-	                .size({ width: 210, height: 210 })
-	                .content(new ChoroplethStates().data(previewData.data.data))                                    
-				  );
+				if(flowType == "EDIT"){
+					console.log(flowType);
+				}else{
+					  oldData.vertices.push(  new MultiChartSurface()
+		                .title(previewData.title)
+		                .faChar("\uf024")
+		                .size({ width: 210, height: 210 })
+		                .content(new ChoroplethStates().data(previewData.data.data))                                    
+					  );
+				}
 
 			}else{
+				if(flowType == "EDIT"){
+				}else{
 
-	            oldData.vertices.push( 
-	            	new MultiChartSurface()
-	                    .data(previewData.data.data)
-	                    .chartType(previewData.type)
-	                    .title(previewData.title)
-	                    .faChar("\uf080")
-	                    .size({ width: 210, height: 210 })
-	            );			
+		            oldData.vertices.push( 
+		            	new MultiChartSurface()
+		                    .data(previewData.data.data)
+		                    .chartType(previewData.type)
+		                    .title(previewData.title)
+		                    .faChar("\uf080")
+		                    .size({ width: 210, height: 210 })
+	            );	
+				}
 
 			}
 			

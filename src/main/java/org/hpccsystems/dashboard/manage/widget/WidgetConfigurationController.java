@@ -83,11 +83,12 @@ public class WidgetConfigurationController extends SelectorComposer<Component> i
         }
         
         String userId = authenticationService.getUserCredential().getId();
-        if (configuration.getDashboard().getCompositionName() == null) {
+       
+        if (configuration.getDashboard().getCompositionName() == null) { //Dashboard with no chart
             compositionService.createComposition(configuration.getDashboard(), configuration.getWidget(), userId);
-        } else if(FLOW.NEW.equals(configuration.getFlowType())) {
+        } else if(FLOW.NEW.equals(configuration.getFlowType())) { //Dashboard with charts,and user adding new chart
             compositionService.addCompositionChart(configuration.getDashboard(), configuration.getWidget(), userId);
-        } else if(FLOW.EDIT.equals(configuration.getFlowType())){
+        } else if(FLOW.EDIT.equals(configuration.getFlowType())){//Dashboard with charts,and user edits existing chart
             compositionService.editCompositionChart(configuration.getDashboard(), configuration.getWidget(), userId);
         }
         
@@ -118,7 +119,12 @@ public class WidgetConfigurationController extends SelectorComposer<Component> i
      * Renders chart in dashboard container
      */
 	private void drawChart() {
-	    Clients.evalJavaScript("injectPreviewChart()");
+	    if(FLOW.EDIT.equals(configuration.getFlowType())){
+	        Clients.evalJavaScript("injectPreviewChart('"+FLOW.EDIT.toString()+"')");
+        }else{
+            Clients.evalJavaScript("injectPreviewChart('"+FLOW.NEW.toString()+"')");
+        }
+	    
 	}
 	
 	@Override

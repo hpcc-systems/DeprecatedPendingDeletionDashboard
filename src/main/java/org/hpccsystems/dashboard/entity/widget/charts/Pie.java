@@ -25,7 +25,6 @@ import org.zkoss.zul.ListModelList;
 public class Pie extends Widget {
     private Attribute label;
     private Measure weight;  
-    private List<Filter> filters=new ArrayList<Filter>();
 
     @Override
     public String generateSQL() {        
@@ -144,9 +143,8 @@ public class Pie extends Widget {
         fieldNames.put(getPluginAttribute(), this.getLabel().getColumn());
         fieldNames.put(getPluginMeasure(), this.getWeight().getColumn());
         
-        filters = this.getFilters();
-        if(filters != null){
-        	 filters.forEach(filter->{
+        if(this.getFilters() != null){
+            this.getFilters().forEach(filter->{
                 fieldNames.put(
                         filter.getFilterName(filter,
                                 getFilters().indexOf(filter), this.getName()),
@@ -176,10 +174,9 @@ public class Pie extends Widget {
         measureInput.setType(InputElement.TYPE_FIELD);
         inputs.add(measureInput);
       
-       filters = this.getFilters();
        
-        if(filters != null){
-        	 filters.forEach(filter->{
+        if(this.getFilters() != null){
+            this.getFilters().forEach(filter->{
             	 InputElement filterElement = new InputElement();
             	 filterElement.setName(filter.getFilterName(filter,
                          getFilters().indexOf(filter), this.getName()));
@@ -233,8 +230,7 @@ public class Pie extends Widget {
 
     @Override
     public String toString() {
-        return "Pie [label=" + label + ", weight=" + weight + ", filters="
-                + filters + ", getName()=" + getName() + ", toString()="
+        return "Pie [label=" + label + ", weight=" + weight + ", getName()=" + getName() + ", toString()="
                 + super.toString() + "]";
     }
 
