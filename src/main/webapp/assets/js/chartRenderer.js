@@ -194,41 +194,69 @@ function injectPreviewChart(flowType) {
 		require(["src/chart/MultiChartSurface","src/map/ChoroplethStates"], function (MultiChartSurface,ChoroplethStates) {	
 			
 			var oldData = dashboardViz.graph._data;
-			
-			if (previewData.type == "CHORO") {
-				if(flowType == "EDIT"){
-					console.log(flowType);
+			if(flowType == "EDIT"){
+				if (previewData.type == "CHORO") {
+					var newGraph=new MultiChartSurface()
+	                .title(previewData.title)
+	                .faChar("\uf024")
+	                .size({ width: 210, height: 210 })
+	                .content(new ChoroplethStates().data(previewData.data.data));					
+					
 				}else{
-					  oldData.vertices.push(  new MultiChartSurface()
-		                .title(previewData.title)
-		                .faChar("\uf024")
-		                .size({ width: 210, height: 210 })
-		                .content(new ChoroplethStates().data(previewData.data.data))                                    
-					  );
+					var newGraph=new MultiChartSurface()
+                    .data(previewData.data.data)
+                    .chartType(previewData.type)
+                    .title(previewData.title)
+                    .faChar("\uf080")
+                    .size({ width: 210, height: 210 });					
 				}
-
-			}else{
-				if(flowType == "EDIT"){
+				for(var d in oldData.vertices){						
+					if(oldData.vertices[d]['_title'] == previewData.title){						
+						oldData.vertices[d]=newGraph;													
+					}						
+				}				
+			}else{			
+				if (previewData.type == "CHORO") {				
+						  oldData.vertices.push(  new MultiChartSurface()
+							.title(previewData.title)
+							.faChar("\uf024")
+							.size({ width: 210, height: 210 })
+							.content(new ChoroplethStates().data(previewData.data.data))                                    
+						  );
 				}else{
-
-		            oldData.vertices.push( 
-		            	new MultiChartSurface()
-		                    .data(previewData.data.data)
-		                    .chartType(previewData.type)
-		                    .title(previewData.title)
-		                    .faChar("\uf080")
-		                    .size({ width: 210, height: 210 })
-	            );	
+						oldData.vertices.push( 
+							new MultiChartSurface()
+								.data(previewData.data.data)
+								.chartType(previewData.type)
+								.title(previewData.title)
+								.faChar("\uf080")
+								.size({ width: 210, height: 210 })
+					);
 				}
-
 			}
-			
 			 dashboardViz.graph
          	.data(oldData)
          	.render();
 
 		});
 	});
+}
+
+function deleteWidget(){					
+	if (confirm("Are you sure want to delete the widget?") == true) {						
+		var newVertices = [];
+		var oldData = dashboardViz.graph._data;
+		for(var d in oldData.vertices){							
+			if(oldData.vertices[d]['_title'] != previewData.title){
+				newVertices.push(oldData.vertices[d]);							
+			}
+		}		
+		var newData = {"vertices":newVertices,"edges":[]};
+		console.log(oldData);
+		dashboardViz.graph
+      	.data(newData)
+      	.render();						
+	} 					
 }
 
 function saveLayout(chartDivId){
