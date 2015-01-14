@@ -1,0 +1,323 @@
+.wrapper {
+  background-color: #3c3c3c;
+}
+.z-north, .z-south, .z-west, .z-center, .z-east {
+	background: none;
+    border: none;
+}	
+.z-borderlayout{
+	background: none;
+}
+.z-listbox {
+    border: none;
+}    
+.header{
+	background-image: none;
+    border-bottom: 0 none;
+    box-shadow: none;
+    background-color: #292929;
+    height: 35px;
+    position: relative;
+    width: 100%;
+    z-index: 0;	
+    padding:10px;
+}
+.user-nav{
+	height: 25px !important;    
+    min-height: auto !important;
+    position: absolute;
+    right: 30px;
+    top: 5px;
+    z-index: 20;
+	border-left: 1px solid #1c1c1c;	 
+    margin: -1px 0 0;
+    padding: 0;
+}
+.user-nav .z-button{
+	color:rgba(255, 255, 255, 0.55);	
+	background: none repeat scroll 0 0 #292929;
+	border:none;
+	font-family: Arial,sans-serif;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: normal;
+}
+.user-nav .z-button:hover{
+	color:#fff;
+	background: none repeat scroll 0 0 #292929;
+	border:none;
+	font-family: Arial,sans-serif;
+    font-size: 12px;
+    font-style: normal;
+    font-weight: normal;	
+}
+.content {
+	background: none repeat scroll 0 0 #f2f2f2;
+    /*border-bottom-left-radius: 8px;*/
+    border-top-left-radius: 8px;    
+    margin-right: 0;    
+    min-height: 500px;
+    position: relative;
+    width: auto;
+    padding:10px;
+}
+.empty-space{
+	background-color: #292929;
+	margin:0;
+	padding:0;
+}
+.left-sidebar-separator{
+	margin:0;
+	padding:0;
+	visibility: hidden
+}
+.left-sidebar-separator img{
+	margin:0;
+	padding:0;
+	visibility: hidden;
+	height:0;
+}
+.sidebar-list{
+	background-color: #3c3c3c;
+}	
+.sidebar-list .z-listcell-content{
+	background-color: #3c3c3c;	
+	color:rgba(255, 255, 255, 0.55);
+	padding: 5px 0 5px 15px;
+}
+.sidebar-list .z-listitem.z-listitem-selected .z-listcell-content {
+	background-color: #434343;	
+	color:#fff;
+	background-image: url("../img/menu-active.png");
+	background-repeat:no-repeat;
+	background-position:right center;	
+}	
+.sidebar-list .z-listitem:hover{
+	background-color: #434343;	
+	color:#fff;
+}
+.sidebar-list .z-listitem .z-listcell-content:hover {
+	background-color: #434343;
+	color:#fff;
+}
+.sidebar-list .z-listitem .z-listcell:hover{	
+	background-color: #434343;
+	color:#fff;
+}
+.left-sidebar .btn.btn-info {
+	display:block;
+    background-color: #434343;
+    border-color:#434343;
+    width:100%;
+}
+
+.left-sidebar .glyphicon-stats{
+	margin-right:5px;
+}
+
+.content .configmenu{
+	float:right;
+}
+
+/*.config-ok-button.z-button {
+	margin-left:110px;
+}*/
+
+.z-window-modal.z-window-shadow, .z-window-highlighted.z-window-shadow {
+	border-radius:0;
+	box-shadow:none;	
+}
+
+.z-window {
+	border:1px solid #ccc;
+	padding:0;
+}
+
+.config-caption .z-caption-content, .z-caption .z-label {
+	line-height:0;
+}	
+
+.z-window-header {
+	padding:0;
+}
+
+.z-window-close {
+    background: none repeat scroll 0 0 rgba(0, 0, 0, 0);
+    border: medium none;
+    box-shadow: none;
+    color: red;
+    float: right;
+    font-size: 14px;   
+}
+
+.config-caption i.glyphicon{
+	float:left;
+	padding:10px;
+	margin-left:5px;
+}
+
+.config-caption .configCaptionLabel{
+	float:left;
+	padding:10px;
+	border-left:1px solid #ccc;
+	margin-left:5px;
+}
+
+.config-caption .configCaptionokButton{	
+    float: left;
+    margin-left:40px;
+    border-left:1px solid #ccc;
+    border-right:1px solid #ccc;
+    padding: 5px 10px 5px 10px;    
+}
+
+.config-caption .z-window-close{
+	float: right;
+    margin: 5px 10px 5px 10px; 
+    color:red;    
+    border:none;
+	box-shadow:none;
+	background:none;
+	font-size:14px;  
+}
+
+.config-ok-button.z-button{
+	color:green;
+	border:none;
+	box-shadow:none;
+	background:none;
+	font-size:14px;
+}
+
+.config-panel .z-window-content { 
+ border: 0; 
+ margin:5px;
+} 
+
+.config-panel .z-window-header{
+	border-bottom: 1px solid #cfcfcf;
+}
+
+.form-control{
+	border-radius:0;	
+	height: 30px;
+}
+
+.form-control:focus {
+	border-color:#000;
+	 box-shadow:none;
+}
+
+.widget-panel .config-caption .configCaptionokButton {
+	position: absolute;
+	right: 50px;
+}
+
+.widget-panel .z-textbox{
+	border-radius:0;
+	height:30px;	
+}
+.widget-panel .z-textbox:focus{	
+	border-color:#000;
+}
+
+.widget-panel .z-listbox-body,.widget-panel .z-listhead th:first-child {
+	border:1px solid #ccc;
+}
+
+.widget-panel.z-window{
+	background: none repeat scroll 0 0 #fff;
+}
+#NoChart{
+	color: red;
+	position: absolute;
+	top: 48%;
+	left: 40%;
+}
+
+.chart-list-window,.file-list-window.z-window{
+	border:0;
+}
+.chartList .z-anchorchildren {
+	margin:5px;		
+}	
+.chartList .z-anchorchildren .z-vbox table tr td{
+	border:1px solid #ccc;
+	padding:5px;
+}
+
+.chartList .z-anchorchildren .z-vbox table .z-vbox-separator td{
+	padding:0;
+	border-top: 0;
+	border-bottom: 0;
+	
+}
+.chartList .z-anchorchildren .z-vbox table .z-vbox-separator{
+	display:none;
+}
+
+.widget-panel .z-listbox-header,.widget-panel .z-listheader {
+	background: none repeat scroll 0 0 rgba(0, 0, 0, 0); 
+}
+
+.widget-panel .z-listbox-header-border {
+	border:0;
+}
+
+.widget-panel .z-listbox .btn-close {
+    background: none repeat scroll 0 0 rgba(0, 0, 0, 0);
+    border: medium none;
+    box-shadow: none;
+    color: red;
+    float: right;
+    font-size: 14px;   
+}
+.widget-panel .z-listbox .btn-sum{
+	background-color:#1f77b4;
+	border-radius: 3px;
+    font-size: 12px;
+    line-height: 1.5;
+    padding: 1px 5px;   
+    border: 1px solid transparent;    
+    cursor: pointer;
+    display: inline-block;    
+    font-weight: normal;    
+    margin: 0 5px 0 5px;
+    padding: 0 10px;   
+    text-align: center;
+    vertical-align: middle;
+    white-space: nowrap;
+    color:#fff;
+}
+.widget-panel .z-listbox .btn-play {
+ 	background: none repeat scroll 0 0 rgba(0, 0, 0, 0);
+    border: medium none;
+    box-shadow: none;
+    color: red;    
+    font-size: 14px;
+    color: #2e6da4;
+    cursor: pointer;
+}
+
+.z-listbox-header table th.z-listhead-bar{
+	border-left:0;
+}    
+
+.z-popup.z-popup-open{	
+	padding:0;
+}    
+
+.z-popup.z-popup-open .z-popup-content {
+	padding:4px;
+}
+
+.z-popup.z-popup-open .z-popup-content .z-listheader {
+    white-space: normal;
+    background:none repeat scroll 0 0 #fff;
+    padding:0;
+}
+
+.z-popup.z-popup-open .z-popup-content .form-group .form-group-inner .label{
+	color:#000;
+	font-size:11px;
+}

@@ -1,0 +1,21 @@
+<zk>
+<window border="normal"
+	width="1000px"
+	height="600px" 
+	closable="true"
+	sizable="true"
+	apply="org.hpccsystems.dashboard.manage.widget.WidgetConfigurationController" sclass="widget-panel">
+	
+	<caption iconSclass="glyphicon glyphicon-cog" sclass="config-caption" hflex="1">
+		<div zclass="configCaptionLabel" hflex="1">
+			<label zclass="h5">Widget Configuration</label>
+		</div>
+		<div zclass="configCaptionokButton">
+			<button iconSclass="z-icon-check" id="configOkButton"
+				sclass="config-ok-button" />
+		</div>
+	</caption>	
+	
+	<include id="holder" vflex="1"></include>
+</window>
+</zk>

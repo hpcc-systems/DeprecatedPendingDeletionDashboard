@@ -1,0 +1,12 @@
+<window sclass="chart-list-window">
+	
+	<hbox hflex="1" vflex="0">
+		<label value="${labels.chartNameCaption}" hflex="1" sclass="h5"/>
+		<textbox id="chartname" placeholder="${labels.chartName}" />
+	</hbox>
+	<space></space>	
+	<anchorlayout id="chartList" 
+			apply="org.hpccsystems.dashboard.manage.widget.ChartListController"
+			sclass="chartList">
+	</anchorlayout>	
+</window>

@@ -1,0 +1,34 @@
+<window border="normal"
+	width="350px"
+	apply="org.hpccsystems.dashboard.manage.DashboardConfigurationController"
+	closable="true" sclass="panel config-panel">	
+	<caption iconSclass="glyphicon glyphicon-cog" sclass="config-caption">
+		<div zclass="configCaptionLabel"><label zclass="h5">${labels.configureDashboard}</label></div>
+		<div zclass="configCaptionokButton"><button iconSclass="z-icon-check" id="configOkButton" sclass="config-ok-button"/></div> 
+	</caption>	
+	<vbox spacing="0px" hflex="1">		
+		
+		<hlayout zclass="form-group">
+			<label zclass="h5">${labels.dashBoardName}</label>
+			<textbox id="nameTextbox"  zclass="form-control"></textbox>
+		</hlayout>
+	
+		<hlayout zclass="form-group">			
+			<hbox align="center" sclass="options-form">
+				<div zclass="options-div">
+					<label value="${labels.dashboardVisiblity}" zclass="h5"></label>
+				</div>
+				<radiogroup id="visiblityRadiogroup">
+					<radio  zclass="radio-inline" value="0" label="Private" selected="true"></radio>
+					<radio  zclass="radio-inline" value="1" label="Public"></radio>
+				</radiogroup>
+			</hbox>
+		</hlayout>
+		
+		<hlayout>
+			<label value="${labels.hpccConnection}"/>
+			<combobox id="connectionList" placeholder="${labels.chooseConnection}"></combobox>
+		</hlayout>
+	</vbox>
+	
+</window>

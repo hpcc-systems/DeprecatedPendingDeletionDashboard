@@ -1,0 +1,18 @@
+<div hflex="1">
+	<hbox hflex="1" align="center">
+		<image src="assets/img/logo_white.png" width="150px"/>
+		
+		<!--div apply="org.hpccsystems.dashboard.authentication.LogoutController" sclass="user-nav">
+			<ul class="btn-group">
+                <li class="btn"><a href="#" title=""><button iconSclass="z-icon-user" id="profile-link" label="${sessionScope.userCredential.name}" zclass="navbtn"/></li>	               
+                <li class="btn"><a href="#" title=""><button iconSclass="z-icon-sign-out" id="logout" label="${labels.logout}" zclass="navbtn"/></li>	                
+            </ul>			
+		</div-->
+		<hbox 
+			apply="org.hpccsystems.dashboard.authentication.LogoutController" 
+			hflex="1" pack="end" align="end" sclass="user-nav">
+			<button iconSclass="z-icon-user" id="profile-link" label="${sessionScope.userCredential.name}"/> 
+			<button iconSclass="z-icon-sign-out" id="logout" label="${labels.logout}"/>
+		</hbox>
+	</hbox>
+</div>

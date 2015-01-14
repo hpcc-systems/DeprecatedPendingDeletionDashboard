@@ -1,60 +1,23 @@
 package org.hpccsystems.dashboard.entity;
 
-/**
- * Application is model class for Application Id & Name.
- *
- */
 public class Application {
-
-	@Override
-	public String toString() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("Application [appId=").append(appId)
-				.append(", appName=").append(appName)
-				.append("]");
-		return  builder.toString() ;	}
-
-	public Application() {
-		super();
-	}
-
-	public Application(String appId, String appName) {
-		super();
-		this.appId = appId;
-		this.appName = appName;
-	}
-
-	String appId;
+	private String id;
+	private String name;
 	
-	String appName;
-
-	/**
-	 * @return the appId
-	 */
-	public final String getAppId() {
-		return appId;
+	public Application(String id, String name) {
+		setId(id);
+		setName(name);
 	}
-
-	/**
-	 * @param appId the appId to set
-	 */
-	public final void setAppId(final String appId) {
-		this.appId = appId;
+	public String getId() {
+		return id;
 	}
-
-	/**
-	 * @return the appName
-	 */
-	public final String getAppName() {
-		return appName;
+	public void setId(String id) {
+		this.id = id;
 	}
-
-	/**
-	 * @param appName the appName to set
-	 */
-	public final void setAppName(final String appName) {
-		this.appName = appName;
+	public String getName() {
+		return name;
 	}
-
-	
+	public void setName(String name) {
+		this.name = name;
+	}
 }

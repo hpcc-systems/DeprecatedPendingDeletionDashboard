@@ -1,9 +1,38 @@
-<?taglib uri="http://www.zkoss.org/dsp/web/core" prefix="c" ?>
-<!-- protect page by the authentication init  -->
-<?init class="org.hpccsystems.dashboard.controller.AuthenticationInit"?>
-<!-- authentication init have to locate before composition -->
-<?init class="org.zkoss.zk.ui.util.Composition" arg0="/demo/layout/template.zul"?>
-<zk>
+<?init class="org.hpccsystems.dashboard.authentication.Validator"?>
 
-	<include id="mainInclude" self="@define(content)" src="/demo/home.zul"/>
+<zk>
+<?style src="assets/bootstrap/css/bootstrap.css"?>
+<?style src="assets/css/main.css"?>
+
+<?script src="assets/js/Visualization/widgets/lib/requirejs/require.js"?>
+<?script src="assets/js/chartRenderer.js"?>
+
+<?style src="http://ajax.googleapis.com/ajax/libs/jqueryui/1.8.9/themes/base/jquery-ui.css" ?> 
+<?script src="assets/js/lib/jquery-ui.custom.js" ?>
+
+<div vflex="1" hflex="1" sclass="wrapper" style="">
+	<borderlayout>
+		<north sclass="header">
+			<include src="banner.zul"></include>
+		</north>
+		<west width="205px">
+			<vbox vflex="1" zclass="left-sidebar" id="navHolder" apply="org.hpccsystems.dashboard.manage.NavigationController">				
+				<div zclass="empty-space">
+					<space></space>					
+				</div>				
+				<listbox vflex="1" zclass="sidebar-list" id="dashboardListbox">
+					<listitem label="${labels.dashboard1}" selected="true"></listitem>
+					<listitem label="${labels.dashboard2}"></listitem>
+					<listitem label="${labels.dashboard3}"></listitem> 
+				</listbox>
+				<button id="addDashboard" zclass="btn btn-info" iconSclass="z-icon-plus">${labels.addDashboard}</button>
+			</vbox>
+		</west>
+		<center vflex="1" hflex="1">			
+			<div zclass="content" vflex="1" hflex="1">
+				<include id="container"></include>
+			</div>
+		</center>
+	</borderlayout>	
+</div>
 </zk>
