@@ -22,7 +22,7 @@ public class ChartData {
     private Set<Filter> filters;
     private Set<Join> joins;
 
-    /**
+	/**
      * Checks the query, whether it has'GENERIC' key.
      * If it has, constructs query as 'PROJECTNAME_fetch_input_parameters'
      * to fetch the input parameters.

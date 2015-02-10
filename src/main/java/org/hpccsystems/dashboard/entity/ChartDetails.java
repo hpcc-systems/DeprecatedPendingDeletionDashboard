@@ -1,12 +1,18 @@
 package org.hpccsystems.dashboard.entity;
 
+import java.io.Serializable;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement
-public class ChartDetails {
+public class ChartDetails implements Serializable{
 
-    private boolean isPlugin;
+    /**
+	 * 
+	 */
+	private static final long serialVersionUID = 6598478929739766447L;
+	private boolean isPlugin;
     private int category;
     private Integer id;
     private String name;

@@ -110,9 +110,9 @@ public class ChartWidgetController extends GenericForwardComposer<Component> {
     final EventListener<Event> addListener = new EventListener<Event>() {
         @Override
         public void onEvent(final Event event) {
-            
             final Map<String,Integer> paramMap = new HashMap<String, Integer>();
             Integer chartType =  (Integer) event.getTarget().getAttribute(Constants.CHART_TYPE);
+            LOG.debug("Constants.CHART_TYPE............ "+chartType);
             paramMap.put(Constants.CHART_TYPE, chartType);
             
             portlet.setChartType(chartType);

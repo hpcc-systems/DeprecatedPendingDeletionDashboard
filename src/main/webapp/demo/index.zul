@@ -14,8 +14,15 @@
 <?style src="css/dashboard.css"?>
 <?style src="css/flat.css"?>
 
+<!-- Adding Dependencies of Relavant chart -->
+<?script src="https://code.jquery.com/jquery-1.11.1.min.js" ?>
+<?script src="http://handsontable.com/dist/handsontable.full.js" ?>
+<?script src="js/relevant/widgets/lib/requirejs/require.js"?>
+<?script src="js/relevant/widgets/config.js"?>
+
 <zk >
 	<script type="text/javascript">
+	
 		function showCreationError(divId) {
 			var divElement = jq('$'+divId).empty();
 			var container = jq("#" + divElement.attr("id"));

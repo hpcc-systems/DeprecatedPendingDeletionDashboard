@@ -43,12 +43,12 @@
 	            
 	            <div class="form-group">
 	           		<label for="account">${labels.lblUserName}</label >
-				   <zul:textbox type="text" sclass="form-control" id="account"  style="display:inline"/> 
+				   <zul:textbox type="text" sclass="form-control" id="account"  style="display:inline" forward="onOK=login.onClick"/> 
 				 </div>
 				 
 				 <div class="form-group">
 				   <label for="password">${labels.lblPassword}</label >
-				   <zul:textbox type="password" class="form-control" id="password"  style="display:inline"/>
+				   <zul:textbox type="password" class="form-control" id="password"  style="display:inline" forward="onOK=login.onClick"/>
 				 </div>
                 
                 <div class="footer">                 	

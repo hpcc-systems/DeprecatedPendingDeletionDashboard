@@ -10,6 +10,7 @@ import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.chart.cluster.ClusterData;
 import org.hpccsystems.dashboard.chart.entity.ChartData;
 import org.hpccsystems.dashboard.chart.entity.HpccConnection;
+import org.hpccsystems.dashboard.chart.entity.RelevantData;
 import org.hpccsystems.dashboard.chart.entity.ScoredSearchData;
 import org.hpccsystems.dashboard.chart.entity.TableData;
 import org.hpccsystems.dashboard.chart.entity.TextData;
@@ -83,13 +84,17 @@ public class WidgetServiceImpl implements WidgetService {
                     	ChartData chartData = new TextData();
                     	((TextData)chartData).setHtmlText(portlet.getChartDataXML());
                     	portlet.setChartData(chartData);
-                    }else if(Constants.CATEGORY_CLUSTER == chartService.getCharts().get(portlet.getChartType()).getCategory()){
+                    } else if(Constants.CATEGORY_CLUSTER == chartService.getCharts().get(portlet.getChartType()).getCategory()){
                     	portlet.setChartData(
                                 XMLConverter.makeClusterDataObject(portlet.getChartDataXML()));
-                    }else if(Constants.CATEGORY_ADVANCED_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()){
+                    } else if(Constants.CATEGORY_ADVANCED_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()){
                     	portlet.setChartData(
                     			XMLConverter.makeScoredSearchDataObject(portlet.getChartDataXML()));
-                    }else {
+                    } else if(Constants.RELEVANT_CONFIG == chartService.getCharts().get(portlet.getChartType()).getCategory()){
+                    	portlet.setChartData(
+                                XMLConverter.makeRelevantDataObject(portlet.getChartDataXML()));
+                    }
+                    else {
                         portlet.setChartData(
                                 XMLConverter.makeXYChartDataObject(portlet.getChartDataXML()));
                     }
@@ -161,7 +166,11 @@ public class WidgetServiceImpl implements WidgetService {
                 } else if(Constants.CATEGORY_ADVANCED_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()){
                 	portlet.setChartDataXML(
                 			XMLConverter.makeScoredSearchDataXML((ScoredSearchData) portlet.getChartData()));
-                }else {
+                } else if(Constants.RELEVANT_CONFIG == chartService.getCharts().get(portlet.getChartType()).getCategory()){
+                	portlet.setChartDataXML(
+                			XMLConverter.makeRelevantChartDataXML((RelevantData) portlet.getChartData()));
+                }
+                else {
                     //For Pie/Line/Bar charts
                     portlet.setChartDataXML(
                             XMLConverter.makeXYChartDataXML(

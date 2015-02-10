@@ -19,6 +19,7 @@ import org.hpccsystems.dashboard.chart.entity.Attribute;
 import org.hpccsystems.dashboard.chart.entity.ChartData;
 import org.hpccsystems.dashboard.chart.entity.Field;
 import org.hpccsystems.dashboard.chart.entity.InputParams;
+import org.hpccsystems.dashboard.chart.entity.RelevantData;
 import org.hpccsystems.dashboard.chart.entity.ScoredSearchData;
 import org.hpccsystems.dashboard.chart.entity.TableData;
 import org.hpccsystems.dashboard.chart.entity.TextData;
@@ -68,19 +69,21 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listhead;
 import org.zkoss.zul.Listheader;
 import org.zkoss.zul.Messagebox;
+import org.zkoss.zul.Messagebox.ClickEvent;
+import org.zkoss.zul.Panel;
+import org.zkoss.zul.Panelchildren;
+import org.zkoss.zul.Popup;
 import org.zkoss.zul.Tab;
 import org.zkoss.zul.Tabbox;
 import org.zkoss.zul.Tabpanel;
 import org.zkoss.zul.Tabpanels;
 import org.zkoss.zul.Tabs;
-import org.zkoss.zul.Messagebox.ClickEvent;
-import org.zkoss.zul.Panel;
-import org.zkoss.zul.Panelchildren;
-import org.zkoss.zul.Popup;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Toolbar;
 import org.zkoss.zul.Vbox;
 import org.zkoss.zul.Window;
+
+import com.google.gson.Gson;
 
 
 /**
@@ -202,7 +205,6 @@ public class ChartPanel extends Panel {
     // Defining event listener to 'Input parameter apply/done' button in the portlet
     EventListener<MouseEvent> applyParamsListeners = new EventListener<MouseEvent>() {
         public void onEvent(final MouseEvent event) {
-            
             Map<String,String> inputs = new HashMap<String, String>();
             
             //multipleValues object was created for translating multiple value selection into List of Maps
@@ -301,14 +303,17 @@ public class ChartPanel extends Panel {
         toolbar.setStyle("float:right; border-style: none;");
 
         resetBtn.setSclass(RESET_STYLE);
+        resetBtn.setTooltiptext("Reset Chart");
 
         deleteBtn.setSclass(DELETE_STYLE);
         deleteBtn.addEventListener(Events.ON_CLICK, deleteListener);
+        deleteBtn.setTooltiptext("Delete Chart");
         
         //Shows Input parameters for Quieries(Roxie/Thor)
         onDrawingQueryChart();
         
         if(Constants.SHOW_ALL_BUTTONS == buttonState) {
+        	addBtn.setTooltiptext("Add Chart");
             toolbar.appendChild(addBtn);
             AuthenticationService authenticationService = (AuthenticationService)SpringUtil.getBean("authenticationService");
             if(!Constants.CIRCUIT_APPLICATION_ID.equals(authenticationService.getUserCredential().getApplicationId())){
@@ -325,11 +330,10 @@ public class ChartPanel extends Panel {
         div.appendChild(hbox);
         caption.appendChild(div);
         this.appendChild(caption);
-
         // Creating panel contents
         final Panelchildren panelchildren = new Panelchildren();
         if(portlet.getIsSinglePortlet()){
-        	holderDiv.setHeight("480px");        	
+         	holderDiv.setHeight("625px");
         }else{
         	holderDiv.setHeight("385px");
         }
@@ -365,16 +369,34 @@ public class ChartPanel extends Panel {
 
 		@Override
 		public void onEvent(Event event) throws Exception {
-
 	        HPCCQueryService hpccQueryService = (HPCCQueryService) SpringUtil.getBean(Constants.HPCC_QUERY_SERVICE);
 	        
 	        Map<String, Set<String>> paramValues = null;
 	        try {
-	            paramValues = hpccQueryService.getInputParamDistinctValues(
-	                    portlet.getChartData().getFiles().iterator().next(),
-	                    portlet.getChartData().getInputParams().iterator().next().getParams().keySet(),
-	                    portlet.getChartData().getHpccConnection(), portlet.getChartData().isGenericQuery(),
-	                    portlet.getChartData().getInputParamQuery());
+	        	
+	        	//IF RELEVANT
+	        	// portlet.getChartData().setInputParams(paramsList);
+	        	if(Constants.RELEVANT_CONFIG == chartService.getCharts().get(portlet.getChartType()).getCategory()){
+	        		Set<String> setInuputParams = hpccQueryService.getInputParameters(portlet.getChartData().getFiles().iterator().next(), 
+	        				portlet.getChartData().getHpccConnection(),
+	        				portlet.getChartData().isGenericQuery(), 
+	        				portlet.getChartData().getInputParamQuery());
+	        		
+	        		for(String val : setInuputParams) {
+	        			 if(val.equalsIgnoreCase("claim_ids") || val.equalsIgnoreCase("group_ids") || val.equalsIgnoreCase("person_ids") || val.equalsIgnoreCase("vehicle_ids")) {
+	        				 InputListitem listitem = new InputListitem(val, null, String.valueOf(portlet.getId() + "_board_"));
+		        			 inputListbox.appendChild(listitem);
+	        			 }
+	        			 
+	        		}
+	        		
+	        	} else { 
+		            paramValues = hpccQueryService.getInputParamDistinctValues(
+		                    portlet.getChartData().getFiles().iterator().next(),
+		                    portlet.getChartData().getInputParams().iterator().next().getParams().keySet(),
+		                    portlet.getChartData().getHpccConnection(), portlet.getChartData().isGenericQuery(),
+		                    portlet.getChartData().getInputParamQuery());
+	        	}
 	        } catch (Exception e) {
 	            //Exception is not thrown as it is not necessary
 	            LOG.error(e);
@@ -383,10 +405,13 @@ public class ChartPanel extends Panel {
 	        if(paramValues != null) {
 	            for (InputParams inputParam : portlet.getChartData().getInputParams()) {
 	                for (Entry<String,String> param : inputParam.getParams().entrySet() ) {
-	                    InputListitem listitem = new InputListitem(param.getKey(), 
-	                            paramValues.get(param.getKey()), String.valueOf(portlet.getId() + "_board_"));
-	                    if(param.getValue() != null 
-	                            && !param.getValue().isEmpty()) {
+	                	
+	                	LOG.debug("param.getKey(): "+param.getKey());
+	                	LOG.debug("paramValues.get(param.getKey()): "+paramValues.get(param.getKey()));
+	                	LOG.debug("String.valueOf(portlet.getId() + \"_board_\"): "+String.valueOf(portlet.getId() + "_board_"));
+	                	
+	                    InputListitem listitem = new InputListitem(param.getKey(), paramValues.get(param.getKey()), String.valueOf(portlet.getId() + "_board_"));
+	                    if(param.getValue() != null  && !param.getValue().isEmpty()) {
 	                        listitem.setInputValue(param.getValue());
 	                    }
 	                    inputListbox.appendChild(listitem);
@@ -457,8 +482,8 @@ public class ChartPanel extends Panel {
     }    
        
 
-    public void onCreateLiveChart(Event event) {    	
-    	
+    public void onCreateLiveChart(Event event) {    
+
     	@SuppressWarnings("unchecked")
 		Map<String, Object> parameters = (Map<String, Object>)event.getData();
     	Integer dashboardId =null;
@@ -516,6 +541,15 @@ public class ChartPanel extends Panel {
                 chartRenderer.constructTreeJSON((TreeData) chartData, portlet, builder.toString());
             } else if (Constants.CATEGORY_CLUSTER == category) {
                 chartRenderer.constructClusterJSON((ClusterData) chartData, portlet, false);
+            } else if (Constants.RELEVANT_CONFIG == category) {
+            	RelevantData objRelevantData = (RelevantData)portlet.getChartData();
+            	LOG.debug("RELEVANT DATA: "+objRelevantData);
+            	
+        		String relJSON = new Gson().toJson(objRelevantData);
+        		LOG.debug("RELEVANT JSON: "+relJSON);
+            	
+            	//portlet.setChartDataJSON(" { \"claimId\": \"CLM00042945-C034\", \"claimImage\": \"\\uf0d6\", \"personImage\": \"\\uf007\", \"vehicleImage\": \"\\uf1b9\", \"policyImage\": \"\\uf0f6\" }");
+        		portlet.setChartDataJSON(relJSON);
             }
 
             // To construct Table Widget
@@ -881,6 +915,7 @@ public class ChartPanel extends Panel {
             setStaticImage();    
             addBtn.removeEventListener(Events.ON_CLICK, addListener);
             addBtn.setSclass(EDIT_STYLE);
+            addBtn.setTooltiptext("Configure Chart");
             resetBtn.setDisabled(false);
             addBtn.addEventListener(Events.ON_CLICK, editListener);
         }
