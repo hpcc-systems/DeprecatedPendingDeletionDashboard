@@ -15,9 +15,9 @@
 		<center id="mainContent" border="none" self="@insert(content)" >
 			<!-- the main content will be insert to here -->
 		</center>
-		<south height="25px" border="none">
+		<!-- <south height="25px" border="none">
 			<include src="/demo/layout/footer.zul"/>
-		</south>
+		</south> -->
 	</borderlayout>
 	
 	<div if="${(sessionScope.userCredential.hasRole('viewChart') or sessionScope.userCredential.hasRole('configureChart'))}">

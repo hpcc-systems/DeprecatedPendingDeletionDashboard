@@ -526,9 +526,13 @@ public class SelectDataController extends SelectorComposer<Component>{
             for (String fileName : chartData.getFiles()) {
                 fields = new ArrayList<Field>();
                 try {                	
-	                if(!chartData.getIsQuery()){	                   
+	                if(!chartData.getIsQuery()){
 						fields.addAll(hpccService.getColumns(fileName, chartData.getHpccConnection()));						
 	                } else {
+	                	LOG.debug("FileName: "+fileName);
+	                	LOG.debug("chartData.isGenericQuery(): "+chartData.isGenericQuery());
+	                	LOG.debug("chartData.getInputParamQuery(): "+chartData.getInputParamQuery());
+	                	
 	                	querySchema = hpccQueryService.getQuerySchema(fileName, chartData.getHpccConnection(),
 	                			chartData.isGenericQuery(), 
 	                			chartData.getInputParamQuery());

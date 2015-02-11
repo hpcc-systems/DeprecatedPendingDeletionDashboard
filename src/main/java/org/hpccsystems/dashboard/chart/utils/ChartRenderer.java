@@ -558,6 +558,101 @@ public class ChartRenderer {
         Clients.evalJavaScript(jsBuilder.toString());
     }
     
+    /**
+     * Must Construct JSON before invoking this method
+     * 
+     * Draws D3 chart onto the 'divToDraw' of the specified type
+     * Must construct JSON before calling this function
+     * @param divToDraw
+     * @param portlet
+     * @param chartType
+     */
+    public void drawChartForRelevant(String divToDraw, Portlet portlet) throws Exception {
+
+        if( portlet.getChartDataJSON() == null) {
+            Clients.showNotification(Labels.getLabel("noDataAvailable"), true);
+        }    
+
+        ChartDetails chartDetails = chartService.getCharts().get(portlet.getChartType());
+        
+        //Forming java script
+        StringBuilder jsBuilder = new StringBuilder();
+        
+        //Importing Styles
+        if(chartDetails.getConfiguration().getDependentCssURL() != null) {
+            for (String path : chartDetails.getConfiguration().getDependentCssURL()) {
+                jsBuilder.append("jq('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"")
+                        .append(path)
+                        .append("\" />');");
+            }
+        }
+        
+        if(chartDetails.getConfiguration().getGooglePackages() != null) {
+            jsBuilder.append("function oneMethod() {");
+            
+            jsBuilder.append("jq.when(");
+            
+            jsBuilder.append("jq.getScript('")
+                .append(chartDetails.getConfiguration().getJsURL())
+                .append("'),");
+            
+            
+            jsBuilder.append("$.Deferred(function( deferred ){")
+                    .append("$( deferred.resolve );")
+                    .append("})")
+                .append(").done(function(){")
+                 .append(chartDetails.getConfiguration().getFunctionName())
+                  .append("('" + divToDraw +  "','"+ portlet.getChartDataJSON() +"')")
+            .append("});");
+            
+            jsBuilder.append("}");
+            
+            jsBuilder.append("google.load('visualization', '1', {'packages': [");
+            Iterator<String> iterator = chartDetails.getConfiguration().getGooglePackages().iterator();
+            
+            while (iterator.hasNext()) {
+                jsBuilder.append("'");
+                jsBuilder.append(iterator.next());
+                jsBuilder.append("'");
+                
+                if(iterator.hasNext()) {
+                    jsBuilder.append(",");
+                }
+            }
+            
+            jsBuilder.append("],'callback': oneMethod});");
+        } else {
+            jsBuilder.append("jq.when(");
+            if(chartDetails.getConfiguration().getDependentJsURL() != null 
+                    && !chartDetails.getConfiguration().getDependentJsURL().isEmpty()) {
+                for (String path : chartDetails.getConfiguration().getDependentJsURL()) {
+                    jsBuilder.append("jq.getScript('")
+                        .append(path)
+                        .append("'),");
+                }
+            }
+            
+            jsBuilder.append("jq.getScript('")
+                .append(chartDetails.getConfiguration().getJsURL())
+                .append("'),");
+            
+            jsBuilder.append("$.Deferred(function( deferred ){")
+                    .append("$( deferred.resolve );")
+                    .append("})")
+                .append(").done(function(){")
+                .append(chartDetails.getConfiguration().getFunctionName())
+                //.append("('" + divToDraw +"')")
+                .append("('" + divToDraw +  "','"+ portlet.getChartDataJSON() +"')")
+                .append("});");
+        }
+        
+        if(LOG.isDebugEnabled()) {
+            LOG.debug(jsBuilder.toString());
+        }
+        
+        Clients.evalJavaScript(jsBuilder.toString());
+    }
+    
     
     /**
      * @param treeData
@@ -856,7 +951,6 @@ public class ChartRenderer {
                 node.setConnectedNodes(relations);
                 nodes.add(node);
             }
-         
             //Creating Links
             List<ClusterLink> links = new ArrayList<ClusterLink>();
             ClusterLink link;

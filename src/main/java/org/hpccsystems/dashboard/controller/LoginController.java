@@ -155,7 +155,7 @@ public class LoginController extends SelectorComposer<Component> {
         Executions.sendRedirect(null);
     }
 
-    @Listen("onClick=#login; onOK=#loginWin")
+    @Listen("onClick=#login")
     public void doLogin() {
         Boolean isLoginSuccessful = false;
         User user = null;

@@ -286,7 +286,7 @@ public class SidebarController extends GenericForwardComposer<Component>{
      * @param event
      */
     public void onCloseDialog(final Event event) {        
-        try {            
+        try { 
             final Dashboard dashboard = (Dashboard) event.getData();    
             //updating dashboard sequence into dashboard_details
             List<Component> comp = navBar.getChildren();

@@ -12,6 +12,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.chart.cluster.ClusterData;
 import org.hpccsystems.dashboard.chart.entity.ChartData;
+import org.hpccsystems.dashboard.chart.entity.RelevantData;
 import org.hpccsystems.dashboard.chart.entity.ScoredSearchData;
 import org.hpccsystems.dashboard.chart.entity.TableData;
 import org.hpccsystems.dashboard.chart.entity.XYChartData;
@@ -348,7 +349,7 @@ public class XMLConverter {
         return sw.toString();
     }
 
-	public static String makeScoredSearchDataXML(ScoredSearchData chartData)throws JAXBException, EncryptDecryptException  {	
+	public static String makeScoredSearchDataXML(ScoredSearchData chartData)throws JAXBException, EncryptDecryptException  {
 		 //encrypt password
         String rawPassword = chartData.getHpccConnection().getPassword();
         
@@ -397,5 +398,64 @@ public class XMLConverter {
         }    
         return chartData;
 	}
+	
+	/**
+	 * Return an XML string containing hpccConnection details and input parameters(if any) for the Relevant graph
+	 * @param chartData 
+	 * @return XML string
+	 * @throws JAXBException
+	 * @throws EncryptDecryptException
+	 * @author Dinesh
+	 */
+	public static String makeRelevantChartDataXML(RelevantData  chartData) throws JAXBException, EncryptDecryptException  {
+        
+        //encrypt password
+        String rawPassword = chartData.getHpccConnection().getPassword();
+        
+        EncryptDecrypt encrypter = null;
+        String encrypted = null;        
+        java.io.StringWriter sw = new StringWriter();
+        JAXBContext jaxbContext;
+        try {
+            encrypter = new EncryptDecrypt("");
+            encrypted = encrypter.encrypt(rawPassword);
+            chartData.getHpccConnection().setPassword(encrypted);
+            jaxbContext = JAXBContext.newInstance(RelevantData.class);
+            Marshaller marshaller = jaxbContext.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+            marshaller.marshal(chartData, sw);
+        } catch (JAXBException e) {
+            LOG.error(Constants.EXCEPTION,e);
+            throw e;
+        }
+        
+        //reset raw password again to the object
+        chartData.getHpccConnection().setPassword(rawPassword);
+        
+        return sw.toString();
+    }
+	
+	public static RelevantData makeRelevantDataObject(String xml) throws JAXBException, EncryptDecryptException {
+        String encryptedpassWord="";
+        String decryptedPassword="";
+        EncryptDecrypt decrypter = null;
+        RelevantData chartData = null;
+        JAXBContext jaxbContext;
+        try {
+            decrypter = new EncryptDecrypt("");
+            jaxbContext = JAXBContext.newInstance(RelevantData.class);
+            Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+            chartData = (RelevantData) jaxbUnmarshaller.unmarshal(new StringReader(xml));
+            
+            //decrypt password
+            encryptedpassWord = chartData.getHpccConnection().getPassword();
+            decryptedPassword = decrypter.decrypt(encryptedpassWord);
+            chartData.getHpccConnection().setPassword(decryptedPassword);
+        } catch (JAXBException e) {
+            LOG.error(Constants.EXCEPTION,e);
+            throw e;
+        }    
+        return chartData;
+    }
 
 }

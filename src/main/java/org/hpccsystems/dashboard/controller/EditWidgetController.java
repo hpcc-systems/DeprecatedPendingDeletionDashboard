@@ -16,6 +16,7 @@ import org.hpccsystems.dashboard.api.entity.ApiChartConfiguration;
 import org.hpccsystems.dashboard.chart.cluster.ClusterData;
 import org.hpccsystems.dashboard.chart.entity.Attribute;
 import org.hpccsystems.dashboard.chart.entity.ChartData;
+import org.hpccsystems.dashboard.chart.entity.RelevantData;
 import org.hpccsystems.dashboard.chart.entity.ScoredSearchData;
 import org.hpccsystems.dashboard.chart.entity.TableData;
 import org.hpccsystems.dashboard.chart.entity.TextData;
@@ -53,6 +54,7 @@ import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
+import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.Messagebox;
@@ -61,9 +63,11 @@ import org.zkoss.zul.Tabbox;
 import org.zkoss.zul.Tabpanel;
 import org.zkoss.zul.Tabpanels;
 import org.zkoss.zul.Tabs;
+import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Vbox;
 import org.zkoss.zul.Window;
 
+import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
  
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
@@ -97,7 +101,7 @@ public class EditWidgetController extends SelectorComposer<Component> {
     Window editPortletWindow;
     @Wire
     Button doneButton;
-
+    
     Portlet portlet;
     ChartData chartData;
     ChartPanel chartPanel;
@@ -185,10 +189,11 @@ public class EditWidgetController extends SelectorComposer<Component> {
             
 		} else if (Constants.CATEGORY_TEXT_EDITOR == chartService.getCharts()
 				.get(portlet.getChartType()).getCategory()) {
-			
+			LOG.debug("Calling layout/edit_text_editor.zul");
 			holderInclude.setDynamicProperty(Constants.CHART_DATA, chartData);
             holderInclude.setSrc("layout/edit_text_editor.zul");
         }else {
+        	LOG.debug("Calling layout/edit_select_data.zul");
             holderInclude.setDynamicProperty(Constants.CHART_DATA, chartData);
             holderInclude.setSrc("layout/edit_select_data.zul");
         }
@@ -198,6 +203,7 @@ public class EditWidgetController extends SelectorComposer<Component> {
 
             @Override
             public void onEvent(Event event) {
+            	LOG.debug("EditWidgetController..... editPortletWindow.... onExit event().... ");
                 Clients.evalJavaScript("window.open('','_self',''); window.close();");
                 editPortletWindow.detach();
             }
@@ -287,14 +293,16 @@ public class EditWidgetController extends SelectorComposer<Component> {
      */
     EventListener<Event> includeDetachListener = new EventListener<Event>() {
         public void onEvent(Event event) throws Exception {
-            if (event.getData() != null
-                    && event.getData().equals(Constants.EDIT_WINDOW_TYPE_DATA_SELECTION)) {
+        	LOG.debug("EditWidgetController ...... Calling event includeDetachListener .............");
+            if (event.getData() != null && event.getData().equals(Constants.EDIT_WINDOW_TYPE_DATA_SELECTION)) {
                 
 				if (chartData.getFiles().size() > 1 ) {
+					LOG.debug("chartData.getFiles().size() > 1: "+chartData.getFiles().size());
                     holderInclude.setSrc("layout/edit_join_data.zul");
                     return;
                 }
-                
+				
+				LOG.debug("INCLUDE VAL: "+Constants.EDIT_SCREEN_URL_BY_CATEGORY.get(chartService.getCharts().get(portlet.getChartType()).getCategory()));
                 holderInclude.setSrc(Constants.EDIT_SCREEN_URL_BY_CATEGORY.get(chartService.getCharts().get(portlet.getChartType()).getCategory()));
             }else if(event.getData()!= null
                     && event.getData().equals(Constants.EDIT_WINDOW_JOIN_DATA)) {
@@ -312,7 +320,7 @@ public class EditWidgetController extends SelectorComposer<Component> {
      */
     @Listen("onClick=#doneButton")
     public void closeEditWindow(final MouseEvent event) {
-        
+        LOG.debug("EditWidgetController....... Calling Done Button..... ");
         portlet.setWidgetState(Constants.STATE_LIVE_CHART);
         
         if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_CONFIG_CHART)){    
@@ -353,7 +361,28 @@ public class EditWidgetController extends SelectorComposer<Component> {
             	Events.postEvent("onCreateDocumentWidget", chartPanel, null);
             }else if(Constants.CATEGORY_ADVANCED_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()){
             	costructScoredSearchTable((ScoredSearchData) portlet.getChartData(),div);                	
-            }else {
+            } else if(Constants.RELEVANT_CONFIG == chartService.getCharts().get(portlet.getChartType()).getCategory()){
+            	RelevantData objRelevantData = (RelevantData)portlet.getChartData();
+            	
+            	objRelevantData.setClaimId((Textbox)holderInclude.getFellow("claimId") != null ? ((Textbox)holderInclude.getFellow("claimId")).getValue() : null);
+            	objRelevantData.setClaimImage((Combobox)holderInclude.getFellow("cmbClaim") != null ? ((Combobox)holderInclude.getFellow("cmbClaim")).getSelectedItem().getValue().toString() : null);
+            	objRelevantData.setPersonImage((Combobox)holderInclude.getFellow("cmbPerson") != null ? ((Combobox)holderInclude.getFellow("cmbPerson")).getSelectedItem().getValue().toString() : null);
+            	objRelevantData.setVehicleImage((Combobox)holderInclude.getFellow("cmbVehicle") != null ? ((Combobox)holderInclude.getFellow("cmbVehicle")).getSelectedItem().getValue().toString() : null);
+            	objRelevantData.setPolicyImage((Combobox)holderInclude.getFellow("cmbPolicy") != null ? ((Combobox)holderInclude.getFellow("cmbPolicy")).getSelectedItem().getValue().toString() : null);
+            	
+            	LOG.debug("RELEVANT DATA: "+objRelevantData);
+            	
+        		String relJSON = new Gson().toJson(objRelevantData);
+        		LOG.debug("RELEVANT JSON: "+relJSON);
+            	
+            	//portlet.setChartDataJSON(" { \"claimId\": \"CLM00042945-C034\", \"claimImage\": \"\\uf0d6\", \"personImage\": \"\\uf007\", \"vehicleImage\": \"\\uf1b9\", \"policyImage\": \"\\uf0f6\" }");
+        		portlet.setChartDataJSON(relJSON);
+        		
+            	final String divToDraw = div.getId(); 
+            	chartRenderer.drawChartForRelevant(divToDraw, portlet);
+            	LOG.debug("Drawing Relevant chart in portlet : "+ divToDraw);
+            	
+            } else {
                 //For Chart Widgets
                 final String divToDraw = div.getId(); 
                 if(Constants.CATEGORY_GAUGE == chartService.getCharts().get(portlet.getChartType()).getCategory()) {
@@ -398,6 +427,8 @@ public class EditWidgetController extends SelectorComposer<Component> {
         
         //Send event to create input params
         Events.sendEvent("onDrawingQueryChart", chartPanel, null);
+        
+        LOG.debug("Closing the editPortletWindow.detach() ..... ");
         
         editPortletWindow.detach();        
     }
@@ -545,6 +576,7 @@ public class EditWidgetController extends SelectorComposer<Component> {
 
     private void initChartData() {
         int category = chartService.getCharts().get(portlet.getChartType()).getCategory();
+        LOG.debug("EditWidgetController : initChartData() .... CHART TYPE CATEGORY: "+category);
         
         if(category == Constants.CATEGORY_XY_CHART ||
                 category == Constants.CATEGORY_PIE || category == Constants.CATEGORY_USGEO) {
@@ -557,10 +589,14 @@ public class EditWidgetController extends SelectorComposer<Component> {
             chartData = new GaugeChartData();
         } else if(category == Constants.CATEGORY_TEXT_EDITOR){
         	 chartData = new TextData();
-        }else if(category == Constants.CATEGORY_CLUSTER){
+        } else if(category == Constants.CATEGORY_CLUSTER){
         	 chartData = new ClusterData();
-        }else if(category == Constants.CATEGORY_ADVANCED_TABLE){
-       	 chartData = new ScoredSearchData();
-       }
+        } else if(category == Constants.CATEGORY_ADVANCED_TABLE){
+       	 	chartData = new ScoredSearchData();
+        } 
+        // For Relevant Graph
+        else if(category == Constants.RELEVANT_CONFIG){
+        	chartData = new RelevantData();
+        }
     }
 }

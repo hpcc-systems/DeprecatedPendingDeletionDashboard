@@ -235,7 +235,7 @@ public class DashboardController extends SelectorComposer<Window>{
             nameLabel.setValue(dashboard.getName());
             
             //Preparing the layout
-            Integer count = 0;           
+            Integer count = 0;
             for (Portalchildren portalchildren : portalChildren) {
                 if( count < dashboard.getColumnCount()) {
                     portalchildren.setVisible(true);
@@ -629,7 +629,7 @@ public class DashboardController extends SelectorComposer<Window>{
         @Override
         public void onEvent(Event event) throws Exception {
             Portlet portlet = (Portlet) event.getData();
-            
+            LOG.debug("DashboardController....... Calling onDrawingLiveChart");
             Map<String, Set<Field>> newFiles;
             if(dashboard.getHasCommonFilter() && 
                     Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState()) 

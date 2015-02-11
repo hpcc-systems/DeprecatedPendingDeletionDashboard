@@ -7,6 +7,8 @@ import java.math.RoundingMode;
 import java.rmi.RemoteException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -931,7 +933,8 @@ public class HPCCServiceImpl implements HPCCService {
         url.append(":");
         url.append(hpccConnection.getEspPort());
         url.append("/WsWorkunits?ver_=1.5");
-
+        
+        LOG.debug("SOAP CALL: "+url.toString());
         locator.setWsWorkunitsServiceSoap_address(url.toString());
         locator.setWsWorkunitsServiceSoap_userName(hpccConnection.getUsername());
         locator.setWsWorkunitsServiceSoap_password(hpccConnection.getPassword());
@@ -945,11 +948,25 @@ public class HPCCServiceImpl implements HPCCService {
 
             WUQuerySetDetailsResponse result = soap.WUQuerysetDetails(req);
             QuerySetAlias[] resultsArray = result.getQuerysetAliases();
+            
+            // Sort the queries returned by name
+            Arrays.sort(resultsArray, new Comparator<QuerySetAlias>() {
 
+				@Override
+				public int compare(QuerySetAlias o1, QuerySetAlias o2) {
+					 return o1.getName().compareTo(o2.getName());
+				}
+            	
+            });
+            
             List<FileMeta> results = new ArrayList<FileMeta>();
             FileMeta fileMeta;
+            
+            /**
+             * This section is commented out to allow scored search to use all queries.
+             */
             //For Scored-Search-table need queries starts with 'score'
-            if(Constants.CATEGORY_ADVANCED_TABLE == category){
+            /*if(Constants.CATEGORY_ADVANCED_TABLE == category){
             	for (QuerySetAlias querySetAlias : resultsArray) {  
             		if(querySetAlias.getName().startsWith("score")){
 	                    fileMeta = new FileMeta();
@@ -966,8 +983,14 @@ public class HPCCServiceImpl implements HPCCService {
                     results.add(fileMeta);
                 }
             	
-            }
+            }*/
             
+            for (QuerySetAlias querySetAlias : resultsArray) {            	
+                fileMeta = new FileMeta();
+                fileMeta.setFileName(querySetAlias.getName());
+                fileMeta.setIsDirectory(false);
+                results.add(fileMeta);
+            }
 
             return results;
         } catch (RemoteException | ServiceException e) {
