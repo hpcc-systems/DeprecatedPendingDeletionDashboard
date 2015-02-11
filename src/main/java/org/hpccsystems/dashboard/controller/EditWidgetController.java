@@ -359,7 +359,7 @@ public class EditWidgetController extends SelectorComposer<Component> {
                 
             } else if(Constants.CATEGORY_TEXT_EDITOR == chartService.getCharts().get(portlet.getChartType()).getCategory()){
             	Events.postEvent("onCreateDocumentWidget", chartPanel, null);
-            }else if(Constants.CATEGORY_ADVANCED_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()){
+            }else if(Constants.CATEGORY_SCORED_SEARCH_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()){
             	costructScoredSearchTable((ScoredSearchData) portlet.getChartData(),div);                	
             } else if(Constants.RELEVANT_CONFIG == chartService.getCharts().get(portlet.getChartType()).getCategory()){
             	RelevantData objRelevantData = (RelevantData)portlet.getChartData();
@@ -591,7 +591,7 @@ public class EditWidgetController extends SelectorComposer<Component> {
         	 chartData = new TextData();
         } else if(category == Constants.CATEGORY_CLUSTER){
         	 chartData = new ClusterData();
-        } else if(category == Constants.CATEGORY_ADVANCED_TABLE){
+        } else if(category == Constants.CATEGORY_SCORED_SEARCH_TABLE){
        	 	chartData = new ScoredSearchData();
         } 
         // For Relevant Graph

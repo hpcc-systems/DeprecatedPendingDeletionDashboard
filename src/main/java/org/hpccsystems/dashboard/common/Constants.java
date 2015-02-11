@@ -119,6 +119,7 @@ public class Constants {
     public static final String PARAMS = "params";
     
     public static final String JSON ="json";
+    public static final String SCORE = "score";
     
     //For Circuit project
     
@@ -143,7 +144,7 @@ public class Constants {
     public static final int CATEGORY_TEXT_EDITOR = 6;
     public static final int CATEGORY_CLUSTER = 7;
     public static final int CATEGORY_USGEO = 8;
-    public static final int CATEGORY_ADVANCED_TABLE = 9;
+    public static final int CATEGORY_SCORED_SEARCH_TABLE = 9;
     public static final int RELEVANT_CONFIG = 10;
 
     public static final Map<Integer, String> EDIT_SCREEN_URL_BY_CATEGORY = new HashMap<Integer, String>() {
@@ -157,7 +158,7 @@ public class Constants {
             put(CATEGORY_TEXT_EDITOR, "layout/edit_text_editor.zul");
             put(CATEGORY_CLUSTER, "layout/edit_cluster_chart.zul");
             put(CATEGORY_USGEO, "layout/edit_chart.zul");
-            put(CATEGORY_ADVANCED_TABLE, "layout/scored_search_table.zul");
+            put(CATEGORY_SCORED_SEARCH_TABLE, "layout/scored_search_table.zul");
             put(RELEVANT_CONFIG, "layout/relevant_config.zul");
         }
     };

@@ -296,6 +296,7 @@ public class TableRenderer {
 		listBox.setMold("paging");
 		listBox.setSizedByContent(true);
 		listBox.setHflex("1");
+		listBox.setSpan(true);
 		if (isEditing) {
 	            // .. 542 - 30 -22
 	            listBox.setHeight("445px");             
@@ -349,6 +350,7 @@ public class TableRenderer {
             listheader.setSort("auto");
             listheader.setParent(listhead);
             listhead.setParent(listBox);
+            listhead.setSizable(true);
             columnList.add(entry.getValue());
         }        
         return listheader;

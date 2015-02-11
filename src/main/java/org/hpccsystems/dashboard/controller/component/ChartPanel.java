@@ -12,6 +12,7 @@ import java.util.Set;
 
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.JAXBException;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.chart.cluster.ClusterData;
@@ -69,15 +70,15 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listhead;
 import org.zkoss.zul.Listheader;
 import org.zkoss.zul.Messagebox;
-import org.zkoss.zul.Messagebox.ClickEvent;
-import org.zkoss.zul.Panel;
-import org.zkoss.zul.Panelchildren;
-import org.zkoss.zul.Popup;
 import org.zkoss.zul.Tab;
 import org.zkoss.zul.Tabbox;
 import org.zkoss.zul.Tabpanel;
 import org.zkoss.zul.Tabpanels;
 import org.zkoss.zul.Tabs;
+import org.zkoss.zul.Messagebox.ClickEvent;
+import org.zkoss.zul.Panel;
+import org.zkoss.zul.Panelchildren;
+import org.zkoss.zul.Popup;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Toolbar;
 import org.zkoss.zul.Vbox;
@@ -126,9 +127,9 @@ public class ChartPanel extends Panel {
     EventListener<Event> resetListener = new EventListener<Event>() { 
         public void onEvent(final Event event) {
             //Removing Input params button if available
-        	if(inputParamBtn != null) {
-        	    inputParamBtn.detach();
-        	}
+            if(inputParamBtn != null) {
+                inputParamBtn.detach();
+            }
             
             Components.removeAllChildren(chartDiv);
             Components.removeAllChildren(imageContainer);
@@ -136,6 +137,7 @@ public class ChartPanel extends Panel {
             chartDiv.detach();
             
             addBtn.setSclass(ADD_STYLE);
+            
             resetBtn.setDisabled(true);
             addBtn.removeEventListener(Events.ON_CLICK, editListener);
             addBtn.addEventListener(Events.ON_CLICK, addListener); 
@@ -205,6 +207,7 @@ public class ChartPanel extends Panel {
     // Defining event listener to 'Input parameter apply/done' button in the portlet
     EventListener<MouseEvent> applyParamsListeners = new EventListener<MouseEvent>() {
         public void onEvent(final MouseEvent event) {
+            
             Map<String,String> inputs = new HashMap<String, String>();
             
             //multipleValues object was created for translating multiple value selection into List of Maps
@@ -330,12 +333,13 @@ public class ChartPanel extends Panel {
         div.appendChild(hbox);
         caption.appendChild(div);
         this.appendChild(caption);
+
         // Creating panel contents
         final Panelchildren panelchildren = new Panelchildren();
         if(portlet.getIsSinglePortlet()){
-         	holderDiv.setHeight("625px");
+            holderDiv.setHeight("625px");           
         }else{
-        	holderDiv.setHeight("385px");
+            holderDiv.setHeight("385px");
         }
         panelchildren.appendChild(holderDiv);
         this.appendChild(panelchildren);
@@ -367,68 +371,68 @@ public class ChartPanel extends Panel {
     //Adds input parameters to display in chart/portlet
     EventListener<Event> onAddInputParams = new EventListener<Event>() {
 
-		@Override
-		public void onEvent(Event event) throws Exception {
-	        HPCCQueryService hpccQueryService = (HPCCQueryService) SpringUtil.getBean(Constants.HPCC_QUERY_SERVICE);
-	        
-	        Map<String, Set<String>> paramValues = null;
-	        try {
-	        	
-	        	//IF RELEVANT
-	        	// portlet.getChartData().setInputParams(paramsList);
-	        	if(Constants.RELEVANT_CONFIG == chartService.getCharts().get(portlet.getChartType()).getCategory()){
-	        		Set<String> setInuputParams = hpccQueryService.getInputParameters(portlet.getChartData().getFiles().iterator().next(), 
-	        				portlet.getChartData().getHpccConnection(),
-	        				portlet.getChartData().isGenericQuery(), 
-	        				portlet.getChartData().getInputParamQuery());
-	        		
-	        		for(String val : setInuputParams) {
-	        			 if(val.equalsIgnoreCase("claim_ids") || val.equalsIgnoreCase("group_ids") || val.equalsIgnoreCase("person_ids") || val.equalsIgnoreCase("vehicle_ids")) {
-	        				 InputListitem listitem = new InputListitem(val, null, String.valueOf(portlet.getId() + "_board_"));
-		        			 inputListbox.appendChild(listitem);
-	        			 }
-	        			 
-	        		}
-	        		
-	        	} else { 
-		            paramValues = hpccQueryService.getInputParamDistinctValues(
-		                    portlet.getChartData().getFiles().iterator().next(),
-		                    portlet.getChartData().getInputParams().iterator().next().getParams().keySet(),
-		                    portlet.getChartData().getHpccConnection(), portlet.getChartData().isGenericQuery(),
-		                    portlet.getChartData().getInputParamQuery());
-	        	}
-	        } catch (Exception e) {
-	            //Exception is not thrown as it is not necessary
-	            LOG.error(e);
-	        }
+        @Override
+        public void onEvent(Event event) throws Exception {
+            HPCCQueryService hpccQueryService = (HPCCQueryService) SpringUtil.getBean(Constants.HPCC_QUERY_SERVICE);
+            
+            Map<String, Set<String>> paramValues = null;
+            try {
+                
+                //IF RELEVANT
+                // portlet.getChartData().setInputParams(paramsList);
+                if(Constants.RELEVANT_CONFIG == chartService.getCharts().get(portlet.getChartType()).getCategory()){
+                    Set<String> setInuputParams = hpccQueryService.getInputParameters(portlet.getChartData().getFiles().iterator().next(), 
+                            portlet.getChartData().getHpccConnection(),
+                            portlet.getChartData().isGenericQuery(), 
+                            portlet.getChartData().getInputParamQuery());
+                    
+                    for(String val : setInuputParams) {
+                         if(val.equalsIgnoreCase("claim_ids") || val.equalsIgnoreCase("group_ids") || val.equalsIgnoreCase("person_ids") || val.equalsIgnoreCase("vehicle_ids")) {
+                             InputListitem listitem = new InputListitem(val, null, String.valueOf(portlet.getId() + "_board_"));
+                             inputListbox.appendChild(listitem);
+                         }
+                         
+                    }
+                    
+                } else { 
+                    paramValues = hpccQueryService.getInputParamDistinctValues(
+                            portlet.getChartData().getFiles().iterator().next(),
+                            portlet.getChartData().getInputParams().iterator().next().getParams().keySet(),
+                            portlet.getChartData().getHpccConnection(), portlet.getChartData().isGenericQuery(),
+                            portlet.getChartData().getInputParamQuery());
+                }
+            } catch (Exception e) {
+                //Exception is not thrown as it is not necessary
+                LOG.error(e);
+            }
 
-	        if(paramValues != null) {
-	            for (InputParams inputParam : portlet.getChartData().getInputParams()) {
-	                for (Entry<String,String> param : inputParam.getParams().entrySet() ) {
-	                	
-	                	LOG.debug("param.getKey(): "+param.getKey());
-	                	LOG.debug("paramValues.get(param.getKey()): "+paramValues.get(param.getKey()));
-	                	LOG.debug("String.valueOf(portlet.getId() + \"_board_\"): "+String.valueOf(portlet.getId() + "_board_"));
-	                	
-	                    InputListitem listitem = new InputListitem(param.getKey(), paramValues.get(param.getKey()), String.valueOf(portlet.getId() + "_board_"));
-	                    if(param.getValue() != null  && !param.getValue().isEmpty()) {
-	                        listitem.setInputValue(param.getValue());
-	                    }
-	                    inputListbox.appendChild(listitem);
-	                }
-	            }
-	        }
-	        inputListbox.setAttribute(Constants.HAS_INPUT_PARAM_VALUES, true);
-	        
-	        Clients.clearBusy((Popup)event.getData());        
-	    
-		}
-	}; 
+            if(paramValues != null) {
+                for (InputParams inputParam : portlet.getChartData().getInputParams()) {
+                    for (Entry<String,String> param : inputParam.getParams().entrySet() ) {
+                        
+                        LOG.debug("param.getKey(): "+param.getKey());
+                        LOG.debug("paramValues.get(param.getKey()): "+paramValues.get(param.getKey()));
+                        LOG.debug("String.valueOf(portlet.getId() + \"_board_\"): "+String.valueOf(portlet.getId() + "_board_"));
+                        
+                        InputListitem listitem = new InputListitem(param.getKey(), paramValues.get(param.getKey()), String.valueOf(portlet.getId() + "_board_"));
+                        if(param.getValue() != null  && !param.getValue().isEmpty()) {
+                            listitem.setInputValue(param.getValue());
+                        }
+                        inputListbox.appendChild(listitem);
+                    }
+                }
+            }
+            inputListbox.setAttribute(Constants.HAS_INPUT_PARAM_VALUES, true);
+            
+            Clients.clearBusy((Popup)event.getData());        
+        
+        }
+    }; 
     
     public void onDrawingQueryChart() {
         if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState()) && portlet.getChartData().getIsQuery() 
-        		&& (Constants.CATEGORY_HIERARCHY !=  chartService.getCharts().get(portlet.getChartType())
-                        .getCategory() && Constants.CATEGORY_ADVANCED_TABLE !=  chartService.getCharts().get(portlet.getChartType())
+                && (Constants.CATEGORY_HIERARCHY !=  chartService.getCharts().get(portlet.getChartType())
+                        .getCategory() && Constants.CATEGORY_SCORED_SEARCH_TABLE !=  chartService.getCharts().get(portlet.getChartType())
                                 .getCategory())){
             if(inputParamBtn != null) {
                 inputParamBtn.detach();
@@ -453,16 +457,16 @@ public class ChartPanel extends Panel {
             inputParamBtn.setPopup(popup);         
             
             inputParamBtn.addEventListener(Events.ON_CLICK, new EventListener<MouseEvent>() {
-				@Override
-				public void onEvent(MouseEvent event) throws Exception {
-					Boolean hasParamValues = (Boolean)inputListbox.getAttribute(Constants.HAS_INPUT_PARAM_VALUES);
-					 if(portlet.getChartData().getInputParams() != null 
-							 && (hasParamValues == null || !hasParamValues)){
-						 	Clients.showBusy(popup, "Fetching Input Parameters");
-			                Events.echoEvent(new Event("onAddInputParams", inputListbox,popup));
-			            }
-				}
-			});
+                @Override
+                public void onEvent(MouseEvent event) throws Exception {
+                    Boolean hasParamValues = (Boolean)inputListbox.getAttribute(Constants.HAS_INPUT_PARAM_VALUES);
+                     if(portlet.getChartData().getInputParams() != null 
+                             && (hasParamValues == null || !hasParamValues)){
+                            Clients.showBusy(popup, "Fetching Input Parameters");
+                            Events.echoEvent(new Event("onAddInputParams", inputListbox,popup));
+                        }
+                }
+            });
             
             inputListbox = new Listbox();
             inputListbox.addEventListener("onAddInputParams", onAddInputParams);
@@ -482,17 +486,17 @@ public class ChartPanel extends Panel {
     }    
        
 
-    public void onCreateLiveChart(Event event) {    
-
-    	@SuppressWarnings("unchecked")
-		Map<String, Object> parameters = (Map<String, Object>)event.getData();
-    	Integer dashboardId =null;
-    	Boolean isCommonFilterEnabled = null;
-    	if(parameters != null){
-    		dashboardId =(Integer) parameters.get(Constants.DASHBOARD_ID);
-    		isCommonFilterEnabled = (Boolean)parameters.get(Constants.COMMON_FILTERS_ENABLED);
-    	}
-    	
+    public void onCreateLiveChart(Event event) {        
+        
+        @SuppressWarnings("unchecked")
+        Map<String, Object> parameters = (Map<String, Object>)event.getData();
+        Integer dashboardId =null;
+        Boolean isCommonFilterEnabled = null;
+        if(parameters != null){
+            dashboardId =(Integer) parameters.get(Constants.DASHBOARD_ID);
+            isCommonFilterEnabled = (Boolean)parameters.get(Constants.COMMON_FILTERS_ENABLED);
+        }
+        
 
         try {
             ChartRenderer chartRenderer = (ChartRenderer) SpringUtil.getBean("chartRenderer");
@@ -501,10 +505,10 @@ public class ChartPanel extends Panel {
             ChartData chartData = portlet.getChartData();
             int category = chartService.getCharts().get(portlet.getChartType()).getCategory();
 
-			if (Constants.CATEGORY_TEXT_EDITOR !=category
-					&& (isCommonFilterEnabled 
-							|| Constants.CATEGORY_TABLE == category
-							|| Constants.CATEGORY_CLUSTER == category) ) {
+            if (Constants.CATEGORY_TEXT_EDITOR !=category
+                    && (isCommonFilterEnabled 
+                            || Constants.CATEGORY_TABLE == category
+                            || Constants.CATEGORY_CLUSTER == category) ) {
                 // Getting fields for each files
                 Map<String, List<Field>> fieldMap = new LinkedHashMap<String, List<Field>>();
                 List<Field> fields = null;
@@ -517,7 +521,7 @@ public class ChartPanel extends Panel {
                         // Roxie Query - fetching fields/columns of Roxie queries
                         HPCCQueryService hpccQueryService = (HPCCQueryService) SpringUtil.getBean(Constants.HPCC_QUERY_SERVICE);
                         querySchema = hpccQueryService.getQuerySchema(file, chartData.getHpccConnection(),
-                        		chartData.isGenericQuery(), chartData.getInputParamQuery());
+                                chartData.isGenericQuery(), chartData.getInputParamQuery());
                         fields.addAll(querySchema.getFields());
                     }
 
@@ -557,10 +561,10 @@ public class ChartPanel extends Panel {
                 drawTableWidget();
             } else if (Constants.CATEGORY_TEXT_EDITOR == chartService.getCharts().get(portlet.getChartType()).getCategory()) {
                 onCreateDocumentWidget();
-            } else if(Constants.CATEGORY_ADVANCED_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()){
-            	drawScoredSearchTable();
+            } else if(Constants.CATEGORY_SCORED_SEARCH_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()){
+                drawScoredSearchTable();
             }else {
-            	String chartScript = drawD3Graph();
+                String chartScript = drawD3Graph();
                 if (chartScript != null) {
                     Clients.evalJavaScript(chartScript);
                 } else {
@@ -602,42 +606,42 @@ public class ChartPanel extends Panel {
      * Draws scored search table for DB data
      */
     private void drawScoredSearchTable() {
-    	 TableRenderer tableRenderer = (TableRenderer) SpringUtil.getBean("tableRenderer");    
-    	 ScoredSearchData scoredSearchData = (ScoredSearchData) portlet.getChartData();
+         TableRenderer tableRenderer = (TableRenderer) SpringUtil.getBean("tableRenderer");    
+         ScoredSearchData scoredSearchData = (ScoredSearchData) portlet.getChartData();
          
-    	 chartDiv.getChildren().clear();
-    	 Tabbox tabbox = new Tabbox();
-    	 tabbox.setVflex("1");
-    	 tabbox.setParent(chartDiv);
-    	 Tabs tabs = new Tabs();
-    	 tabs.setParent(tabbox);
-    	 Tabpanels tabpanels = new Tabpanels();
-    	 tabpanels.setParent(tabbox);
-    	 HPCCQueryService hpccQueryService = (HPCCQueryService) SpringUtil.getBean("hpccQueryService"); 
-    	 HashMap<String, HashMap<String, List<Attribute>>> hpccResult;
-		try {
-			hpccResult = hpccQueryService.fetchScoredSearchData(scoredSearchData);
-			scoredSearchData.setHpccTableData(hpccResult);
+         chartDiv.getChildren().clear();
+         Tabbox tabbox = new Tabbox();
+         tabbox.setVflex("1");
+         tabbox.setParent(chartDiv);
+         Tabs tabs = new Tabs();
+         tabs.setParent(tabbox);
+         Tabpanels tabpanels = new Tabpanels();
+         tabpanels.setParent(tabbox);
+         HPCCQueryService hpccQueryService = (HPCCQueryService) SpringUtil.getBean("hpccQueryService"); 
+         HashMap<String, HashMap<String, List<Attribute>>> hpccResult;
+        try {
+            hpccResult = hpccQueryService.fetchScoredSearchData(scoredSearchData);
+            scoredSearchData.setHpccTableData(hpccResult);
 
-			for (Entry<String, HashMap<String, List<Attribute>>> entry : hpccResult.entrySet()) {
-				Tab tab = new Tab(entry.getKey());
-				tab.setParent(tabs);
-				Tabpanel tabpanel = new Tabpanel();
-				Vbox vbox = tableRenderer.constructScoredSearchTable(entry.getValue(),false);
-				vbox.setParent(tabpanel);
-				tabpanel.setParent(tabpanels);
-			}
-		} catch (RemoteException | HpccConnectionException e) {
-			LOG.error(Constants.EXCEPTION,e);
-			Clients.showNotification("Unable to fetch Hpcc data",
-					Clients.NOTIFICATION_TYPE_ERROR, this,"middle_center", 3000, true);
-			return;
-		}	                 
+            for (Entry<String, HashMap<String, List<Attribute>>> entry : hpccResult.entrySet()) {
+                Tab tab = new Tab(entry.getKey());
+                tab.setParent(tabs);
+                Tabpanel tabpanel = new Tabpanel();
+                Vbox vbox = tableRenderer.constructScoredSearchTable(entry.getValue(),false);
+                vbox.setParent(tabpanel);
+                tabpanel.setParent(tabpanels);
+            }
+        } catch (RemoteException | HpccConnectionException e) {
+            LOG.error(Constants.EXCEPTION,e);
+            Clients.showNotification("Unable to fetch Hpcc data",
+                    Clients.NOTIFICATION_TYPE_ERROR, this,"middle_center", 3000, true);
+            return;
+        }                    
         
      }
 
 
-	private void createErrorUI() {
+    private void createErrorUI() {
         chartDiv.setSclass("error-div");
         Label label = new Label("Unable to recreate this widget.");
         label.setZclass("error-label");
@@ -815,16 +819,16 @@ public class ChartPanel extends Panel {
     
     //To construct Text Editor Widget
     public void onCreateDocumentWidget(){
-    	Div container = new Div();
-    	container.setVflex("1");
-    	container.setHflex("1");
-    	container.setSclass("html-container");
+        Div container = new Div();
+        container.setVflex("1");
+        container.setHflex("1");
+        container.setSclass("html-container");
         Html html = new Html();
-    	html.setContent(((TextData)portlet.getChartData()).getHtmlText());
-    	container.appendChild(html);
-    	
-    	chartDiv.getChildren().clear();
-        chartDiv.appendChild(container);    	
+        html.setContent(((TextData)portlet.getChartData()).getHtmlText());
+        container.appendChild(html);
+        
+        chartDiv.getChildren().clear();
+        chartDiv.appendChild(container);        
     }
 
     /**

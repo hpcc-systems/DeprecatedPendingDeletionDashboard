@@ -25,6 +25,7 @@ import org.hpccsystems.dashboard.exception.HpccConnectionException;
 import org.hpccsystems.dashboard.services.ChartService;
 import org.hpccsystems.dashboard.services.HPCCQueryService;
 import org.hpccsystems.dashboard.services.HPCCService;
+import org.hpccsystems.dashboard.util.EncryptDecrypt;
 import org.hpccsystems.dashboard.util.FileListTreeModel;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
@@ -65,6 +66,7 @@ public class SelectDataController extends SelectorComposer<Component>{
 
     private static final long serialVersionUID = 1L;
     private static final  Log LOG = LogFactory.getLog(SelectDataController.class);
+    private static final String CONFIG_FILE = "hpcc_config.xml";
     @WireVariable
     private HPCCService hpccService;
     @WireVariable
@@ -143,12 +145,20 @@ public class SelectDataController extends SelectorComposer<Component>{
             builder.append(hpccConnection.getHostIp());
             hpccUrl.setValue(builder.toString());
         } else {
-            InputStream is = SelectDataController.class.getClassLoader().getResourceAsStream("hpcc_config.xml");
+            InputStream is = SelectDataController.class.getClassLoader().getResourceAsStream(CONFIG_FILE);
             JAXBContext jaxbContext = JAXBContext.newInstance(HpccConnections.class);
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
             HpccConnections connections = (HpccConnections) jaxbUnmarshaller.unmarshal(is);
             
             List<HpccConnection> defaulHpccConnections = connections.getHpccConnections();
+            EncryptDecrypt decrypter = new EncryptDecrypt("");
+            defaulHpccConnections.stream().forEach(connection -> {
+                try {
+                    connection.setPassword(decrypter.decrypt(connection.getPassword()));
+                } catch (Exception e) {
+                    LOG.debug(Constants.EXCEPTION + e);
+                }
+            });
             
             if(LOG.isDebugEnabled()) {
                 LOG.debug("Default HPCC Connections - " + defaulHpccConnections);
@@ -533,10 +543,12 @@ public class SelectDataController extends SelectorComposer<Component>{
 	                	LOG.debug("chartData.isGenericQuery(): "+chartData.isGenericQuery());
 	                	LOG.debug("chartData.getInputParamQuery(): "+chartData.getInputParamQuery());
 	                	
-	                	querySchema = hpccQueryService.getQuerySchema(fileName, chartData.getHpccConnection(),
-	                			chartData.isGenericQuery(), 
-	                			chartData.getInputParamQuery());
-	                    fields.addAll(querySchema.getFields());
+	                	if(Constants.CATEGORY_SCORED_SEARCH_TABLE != chartService.getCharts().get(portlet.getChartType()).getCategory()){
+	                	    querySchema = hpccQueryService.getQuerySchema(fileName, chartData.getHpccConnection(),
+                                    chartData.isGenericQuery(), 
+                                    chartData.getInputParamQuery());
+                            fields.addAll(querySchema.getFields());
+	                	}
 	                }
                 } catch (Exception e) {
                 	LOG.error(Constants.EXCEPTION, e);

@@ -2,7 +2,7 @@
 	<vbox width="1000px" height="570px" apply="org.hpccsystems.dashboard.controller.ScoredSearchController">
 		<panel id="inputPanel" title="Search Criteria" collapsible="true" height="570px">
 			<panelchildren>
-				<hbox id="inputDataHbox">
+				<hbox id="inputDataHbox" vflex="1">
 					<listbox id="inputFields" vflex="1">
 						<listhead>
 							<listheader label="${labels.inputFields}"></listheader>
@@ -10,7 +10,7 @@
 					</listbox>
 					<vbox vflex="1">
 						<hbox height="240px">
-							<listbox id="model" vflex="1">
+							<listbox id="model" vflex="1" visible="false">
 								<listhead>
 									<listheader label="${labels.model}"></listheader>
 								</listhead>
