@@ -1,5 +1,7 @@
 package org.hpccsystems.dashboard.controller.component; 
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -337,7 +339,12 @@ public class ChartPanel extends Panel {
         // Creating panel contents
         final Panelchildren panelchildren = new Panelchildren();
         if(portlet.getIsSinglePortlet()){
-            holderDiv.setHeight("625px");           
+        	Toolkit tk = Toolkit.getDefaultToolkit();
+        	Dimension d = tk.getScreenSize();
+        	StringBuilder sb = new StringBuilder();
+        	sb.append(d.height-254);
+        	sb.append("px");
+        	holderDiv.setHeight(sb.toString());
         }else{
             holderDiv.setHeight("385px");
         }
