@@ -105,9 +105,13 @@ public class ChartPanel extends Panel {
     private static final String RESET_STYLE = "glyphicon glyphicon-repeat btn btn-link img-btn";
     private static final String DELETE_STYLE = "glyphicon glyphicon-trash btn btn-link img-btn";
     private static final String INPUT_PARAM_STYLE = "glyphicon glyphicon-tasks btn btn-link img-btn";
+    private static final String RESIZE_MAX_STYLE = "glyphicon glyphicon-resize-full btn btn-link img-btn";
+    private static final String RESIZE_MIN_STYLE = "glyphicon glyphicon-resize-small btn btn-link img-btn";
+    
     final Button addBtn = new Button();
     final Button resetBtn = new Button();
     final Button deleteBtn = new Button();
+    final Button resizeBtn = new Button();
     final Div holderDiv = new Div();
     final Div chartDiv = new Div();
     final Textbox titleTextbox = new Textbox();
@@ -281,6 +285,7 @@ public class ChartPanel extends Panel {
         this.setWidth("99%");
         this.setStyle("margin-bottom:5px");
 
+        
         // Creating title bar for the panel
         caption.setWidth("100%");
 
@@ -314,6 +319,9 @@ public class ChartPanel extends Panel {
         deleteBtn.addEventListener(Events.ON_CLICK, deleteListener);
         deleteBtn.setTooltiptext("Delete Chart");
         
+        resizeBtn.setSclass(RESIZE_MAX_STYLE);
+        resizeBtn.setTooltiptext("Maximize window");
+        
         //Shows Input parameters for Quieries(Roxie/Thor)
         onDrawingQueryChart();
         
@@ -328,7 +336,8 @@ public class ChartPanel extends Panel {
         } else if (Constants.SHOW_EDIT_ONLY == buttonState) {
             toolbar.appendChild(addBtn);
         }
-
+        toolbar.appendChild(resizeBtn);
+        
         hbox.appendChild(titleTextbox);
         hbox.appendChild(toolbar);
 
@@ -373,6 +382,19 @@ public class ChartPanel extends Panel {
         
         chartDiv.setVflex("1");
         
+        //listener to maximize and minimize window
+        resizeBtn.addEventListener(Events.ON_CLICK, maximizeListener ->{
+            ChartPanel.this.setMaximizable(true);
+            if(!ChartPanel.this.isMaximized()){
+                ChartPanel.this.setMaximized(true);
+                resizeBtn.setSclass(RESIZE_MIN_STYLE);
+                resizeBtn.setTooltiptext("Minimize window");
+            }else{
+                ChartPanel.this.setMaximized(false);
+                resizeBtn.setSclass(RESIZE_MAX_STYLE);
+                resizeBtn.setTooltiptext("Maximize window");
+            }
+        });
     }
     
     //Adds input parameters to display in chart/portlet
@@ -887,7 +909,7 @@ public class ChartPanel extends Panel {
     private void deleteDashboard() {
         try {
             // ask confirmation before deleting widget
-            EventListener<ClickEvent> clickListener = new EventListener<Messagebox.ClickEvent>() {
+           EventListener<ClickEvent> clickListener = new EventListener<Messagebox.ClickEvent>() {
                 public void onEvent(ClickEvent event) {
                     if (Messagebox.Button.YES.equals(event.getButton())) {
                         WidgetService widgetService = (WidgetService) SpringUtil.getBean(Constants.WIDGET_SERVICE);
