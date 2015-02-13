@@ -271,6 +271,7 @@ public class ChartPanel extends Panel {
         final Hbox hbox = new Hbox();
         hbox.setPack("stretch");
         hbox.setWidth("100%");
+        hbox.setHflex("1");
 
         titleTextbox.setInplace(true);
         titleTextbox.setVflex("1");

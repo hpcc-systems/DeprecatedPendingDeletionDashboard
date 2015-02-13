@@ -82,8 +82,8 @@ public class TableRenderer {
             }
         } else {
             if (isEditing) {
-                // .. 542 - 30 -22 -25
-                listBox.setHeight("475px");             
+                // .. 542 - 30 -22 -30
+                listBox.setHeight("470px");             
             } else {
                 // .. 385 - 30 -25   
                 listBox.setHeight("330px"); 
