@@ -9,7 +9,7 @@
 						</listhead>			
 					</listbox>
 					<vbox vflex="1">
-						<hbox height="240px">
+						<hbox height="210px">
 							<listbox id="model" vflex="1" visible="false">
 								<listhead>
 									<listheader label="${labels.model}"></listheader>
@@ -29,7 +29,7 @@
 								<listitem label="Count" value="C"></listitem>
 							</listbox>
 						</hbox>
-						<grid id="filterGrid" vflex="1" hflex="1" droppable="true">
+						<grid id="filterGrid" hflex="1" droppable="true" height="265px">
 							<auxhead>
 								<auxheader colspan="5" style="float:center"  label="${labels.filters}"></auxheader>
 							</auxhead>
@@ -44,7 +44,10 @@
 								
 							</rows>
 						</grid>
-						<button id="inputDoneButton" label="Add Chart to Dashboard" zclass="btn btn-sm btn-success right-btn"/>
+						<hbox hflex="1" pack="end">
+							<button id="inputDoneButton1" label="Add Chart to Dashboard" zclass="btn btn-sm btn-success right-btn"/>
+							<space></space>
+						</hbox>
 					</vbox>
 				</hbox>
 			</panelchildren>
