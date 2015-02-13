@@ -1748,14 +1748,14 @@ public class DashboardController extends SelectorComposer<Window>{
                } 
            };
            
-       Messagebox.show(Constants.DELETE_DASHBOARD, Constants.DELETE_DASHBOARD_TITLE, new Messagebox.Button[]{
+       Messagebox.show(Labels.getLabel("deleteDashboardMsg"), Labels.getLabel("deleteDashboardTitle"), new Messagebox.Button[]{
                Messagebox.Button.YES, Messagebox.Button.NO }, Messagebox.QUESTION, clickListener);
         }catch(DataAccessException ex){
-            Clients.showNotification(Labels.getLabel("unableToDeleteDashboard"), Constants.ERROR_NOTIFICATION, this.getSelf(), Constants.POSITION_CENTER, 3000, true);
+            Clients.showNotification(Labels.getLabel("unableToDeleteDashboard"), Clients.NOTIFICATION_TYPE_ERROR, this.getSelf(), Constants.POSITION_CENTER, 3000, true);
             LOG.error("Exception while deleting Dashboard in DashboardController", ex);
             return;
         }catch(Exception ex){
-            Clients.showNotification(Labels.getLabel("unableToDeleteDashboard"), Constants.ERROR_NOTIFICATION, this.getSelf(), Constants.POSITION_CENTER, 3000, true);
+            Clients.showNotification(Labels.getLabel("unableToDeleteDashboard"), Clients.NOTIFICATION_TYPE_ERROR, this.getSelf(), Constants.POSITION_CENTER, 3000, true);
             LOG.error("Exception while deleting Dashboard in DashboardController", ex);
             return;            
         }

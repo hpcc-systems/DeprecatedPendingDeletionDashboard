@@ -74,7 +74,7 @@ public class ChartRenderer {
     private static final String X_AXIS_LABEL = "xAxisLabel";
     private static final String PRIMARY_Y_AXIS_LABEL = "primaryYAxisLabel";
     private static final String SECONDARY_Y_AXIS_LABEL = "secondaryYAxisLabel";
-    private static final String PORTLET_ID = "portletId";
+   
     private static final String IS_ENABLED = "isEnabled";
     private static final String CHART_TYPES = "chartTypes";
     private static final String AXES = "axes";
@@ -126,9 +126,9 @@ public class ChartRenderer {
         header.addProperty(SECONDARY_Y_AXIS_LABEL, yLabels[1]);
         
         if(isEditWindow) {
-            header.addProperty(PORTLET_ID, "e_" + portlet.getId());
+            header.addProperty(Constants.PORTLET_ID, "e_" + portlet.getId());
         } else {
-            header.addProperty(PORTLET_ID, "p_" + portlet.getId());
+            header.addProperty(Constants.PORTLET_ID, "p_" + portlet.getId());
         }
         
         if(LOG.isDebugEnabled()){
@@ -372,9 +372,8 @@ public class ChartRenderer {
 
         String data = header.toString();
         if (LOG.isDebugEnabled()) {
-            LOG.debug(data);
+            LOG.debug("data -->" +data);
         }
-        data = StringEscapeUtils.escapeJavaScript(data);
 
         portlet.setChartDataJSON(data);
     }
@@ -478,7 +477,7 @@ public class ChartRenderer {
         if( portlet.getChartDataJSON() == null) {
             Clients.showNotification(Labels.getLabel("noDataAvailable"), true);
         }    
-
+        String chartJson = StringEscapeUtils.escapeJavaScript(portlet.getChartDataJSON());
         ChartDetails chartDetails = chartService.getCharts().get(portlet.getChartType());
         
         //Forming java script
@@ -508,7 +507,7 @@ public class ChartRenderer {
                     .append("})")
                 .append(").done(function(){")
                  .append(chartDetails.getConfiguration().getFunctionName())
-                  .append("('" + divToDraw +  "','"+ portlet.getChartDataJSON() +"')")
+                  .append("('" + divToDraw +  "','"+ chartJson +"')")
             .append("});");
             
             jsBuilder.append("}");
@@ -547,102 +546,7 @@ public class ChartRenderer {
                     .append("})")
                 .append(").done(function(){")
                 .append(chartDetails.getConfiguration().getFunctionName())
-                .append("('" + divToDraw +  "','"+ portlet.getChartDataJSON() +"')")
-                .append("});");
-        }
-        
-        if(LOG.isDebugEnabled()) {
-            LOG.debug(jsBuilder.toString());
-        }
-        
-        Clients.evalJavaScript(jsBuilder.toString());
-    }
-    
-    /**
-     * Must Construct JSON before invoking this method
-     * 
-     * Draws D3 chart onto the 'divToDraw' of the specified type
-     * Must construct JSON before calling this function
-     * @param divToDraw
-     * @param portlet
-     * @param chartType
-     */
-    public void drawChartForRelevant(String divToDraw, Portlet portlet) throws Exception {
-
-        if( portlet.getChartDataJSON() == null) {
-            Clients.showNotification(Labels.getLabel("noDataAvailable"), true);
-        }    
-
-        ChartDetails chartDetails = chartService.getCharts().get(portlet.getChartType());
-        
-        //Forming java script
-        StringBuilder jsBuilder = new StringBuilder();
-        
-        //Importing Styles
-        if(chartDetails.getConfiguration().getDependentCssURL() != null) {
-            for (String path : chartDetails.getConfiguration().getDependentCssURL()) {
-                jsBuilder.append("jq('head').append('<link rel=\"stylesheet\" type=\"text/css\" href=\"")
-                        .append(path)
-                        .append("\" />');");
-            }
-        }
-        
-        if(chartDetails.getConfiguration().getGooglePackages() != null) {
-            jsBuilder.append("function oneMethod() {");
-            
-            jsBuilder.append("jq.when(");
-            
-            jsBuilder.append("jq.getScript('")
-                .append(chartDetails.getConfiguration().getJsURL())
-                .append("'),");
-            
-            
-            jsBuilder.append("$.Deferred(function( deferred ){")
-                    .append("$( deferred.resolve );")
-                    .append("})")
-                .append(").done(function(){")
-                 .append(chartDetails.getConfiguration().getFunctionName())
-                  .append("('" + divToDraw +  "','"+ portlet.getChartDataJSON() +"')")
-            .append("});");
-            
-            jsBuilder.append("}");
-            
-            jsBuilder.append("google.load('visualization', '1', {'packages': [");
-            Iterator<String> iterator = chartDetails.getConfiguration().getGooglePackages().iterator();
-            
-            while (iterator.hasNext()) {
-                jsBuilder.append("'");
-                jsBuilder.append(iterator.next());
-                jsBuilder.append("'");
-                
-                if(iterator.hasNext()) {
-                    jsBuilder.append(",");
-                }
-            }
-            
-            jsBuilder.append("],'callback': oneMethod});");
-        } else {
-            jsBuilder.append("jq.when(");
-            if(chartDetails.getConfiguration().getDependentJsURL() != null 
-                    && !chartDetails.getConfiguration().getDependentJsURL().isEmpty()) {
-                for (String path : chartDetails.getConfiguration().getDependentJsURL()) {
-                    jsBuilder.append("jq.getScript('")
-                        .append(path)
-                        .append("'),");
-                }
-            }
-            
-            jsBuilder.append("jq.getScript('")
-                .append(chartDetails.getConfiguration().getJsURL())
-                .append("'),");
-            
-            jsBuilder.append("$.Deferred(function( deferred ){")
-                    .append("$( deferred.resolve );")
-                    .append("})")
-                .append(").done(function(){")
-                .append(chartDetails.getConfiguration().getFunctionName())
-                //.append("('" + divToDraw +"')")
-                .append("('" + divToDraw +  "','"+ portlet.getChartDataJSON() +"')")
+                .append("('" + divToDraw +  "','"+ chartJson +"')")
                 .append("});");
         }
         
@@ -822,7 +726,7 @@ public class ChartRenderer {
 	    if(isEditing) {
 	       gaugeJSON.setPortletId("edit" + portlet.getId());
 	    } else {
-	        gaugeJSON.setPortletId( PORTLET_ID + portlet.getId());
+	        gaugeJSON.setPortletId(Constants.PORTLET_ID + portlet.getId());
 	    }
 	    
 	    XYChartData xyChartData = new XYChartData(chartData);
@@ -872,7 +776,7 @@ public class ChartRenderer {
         }
 	}
 	
-	public void constructClusterJSON(ClusterData chartData, Portlet portlet, boolean isEditing) 
+	public void constructClusterJSON(ClusterData chartData, Portlet portlet) 
 	        throws HpccConnectionException {
 	    ClusterJSON json = new ClusterJSON();
 	    

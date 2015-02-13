@@ -87,7 +87,7 @@ public class WidgetServiceImpl implements WidgetService {
                     } else if(Constants.CATEGORY_CLUSTER == chartService.getCharts().get(portlet.getChartType()).getCategory()){
                     	portlet.setChartData(
                                 XMLConverter.makeClusterDataObject(portlet.getChartDataXML()));
-                    } else if(Constants.CATEGORY_ADVANCED_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()){
+                    } else if(Constants.CATEGORY_SCORED_SEARCH_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()){
                     	portlet.setChartData(
                     			XMLConverter.makeScoredSearchDataObject(portlet.getChartDataXML()));
                     } else if(Constants.RELEVANT_CONFIG == chartService.getCharts().get(portlet.getChartType()).getCategory()){
@@ -163,7 +163,7 @@ public class WidgetServiceImpl implements WidgetService {
                 	 portlet.setChartDataXML(
                              XMLConverter.makeClusterChartDataXML(
                                      (ClusterData) portlet.getChartData()));
-                } else if(Constants.CATEGORY_ADVANCED_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()){
+                } else if(Constants.CATEGORY_SCORED_SEARCH_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()){
                 	portlet.setChartDataXML(
                 			XMLConverter.makeScoredSearchDataXML((ScoredSearchData) portlet.getChartData()));
                 } else if(Constants.RELEVANT_CONFIG == chartService.getCharts().get(portlet.getChartType()).getCategory()){
@@ -219,7 +219,7 @@ public class WidgetServiceImpl implements WidgetService {
                             .makeTreeDataXML((TreeData) portlet.getChartData()));
                 }else if(Constants.CATEGORY_TEXT_EDITOR == chartService.getCharts().get(portlet.getChartType()).getCategory()){
                 	portlet.setChartDataXML(((TextData) portlet.getChartData()).getHtmlText());
-                } else if(Constants.CATEGORY_ADVANCED_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()){
+                } else if(Constants.CATEGORY_SCORED_SEARCH_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()){
                 	portlet.setChartDataXML(
                 			XMLConverter.makeScoredSearchDataXML((ScoredSearchData) portlet.getChartData()));
                 }else {

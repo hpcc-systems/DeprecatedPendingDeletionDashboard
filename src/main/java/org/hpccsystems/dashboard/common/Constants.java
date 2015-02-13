@@ -57,10 +57,6 @@ public class Constants {
     public static final String COLUMN_NAME = "getColumnSchema::userName:";
     public static final String EDIT_URL =  "getColumnSchema::url:";
     public static final String EDIT_SQL =  "getColumnSchema::Sql:";
-    public static final String DELETE_DASHBOARD = "You are about to delete the Active Dashboard. Do you want to proceed?";
-    public static final String DELETE_WIDGET = "You are about to delete the Widget. Do you want to proceed?";
-    public static final String DELETE_DASHBOARD_TITLE = "Delete Dashboard";
-    public static final String DELETE_WIDGET_TITLE = "Delete Widget";
     public static final String TREE_DIRECTORY = "Directory";
     public static final String TREE_FILE = "File";
     public static final String TREE_IS_DIRECTORY = "isDirectory";
@@ -119,7 +115,8 @@ public class Constants {
     public static final String PARAMS = "params";
     
     public static final String JSON ="json";
-    
+    public static final String SCORE = "score";
+    public static final String PORTLET_ID = "portletId";
     //For Circuit project
     
     public static final String CIRCUIT_VALIDATE_REQ = "/validate.do";
@@ -143,7 +140,7 @@ public class Constants {
     public static final int CATEGORY_TEXT_EDITOR = 6;
     public static final int CATEGORY_CLUSTER = 7;
     public static final int CATEGORY_USGEO = 8;
-    public static final int CATEGORY_ADVANCED_TABLE = 9;
+    public static final int CATEGORY_SCORED_SEARCH_TABLE = 9;
     public static final int RELEVANT_CONFIG = 10;
 
     public static final Map<Integer, String> EDIT_SCREEN_URL_BY_CATEGORY = new HashMap<Integer, String>() {
@@ -157,7 +154,7 @@ public class Constants {
             put(CATEGORY_TEXT_EDITOR, "layout/edit_text_editor.zul");
             put(CATEGORY_CLUSTER, "layout/edit_cluster_chart.zul");
             put(CATEGORY_USGEO, "layout/edit_chart.zul");
-            put(CATEGORY_ADVANCED_TABLE, "layout/scored_search_table.zul");
+            put(CATEGORY_SCORED_SEARCH_TABLE, "layout/scored_search_table.zul");
             put(RELEVANT_CONFIG, "layout/relevant_config.zul");
         }
     };
