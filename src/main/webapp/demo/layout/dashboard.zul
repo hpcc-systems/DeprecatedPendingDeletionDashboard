@@ -53,6 +53,13 @@
 	.ui-slider .ui-slider-range {
 		background-color: #B3B3B3;
 	}
+	.panel-icon.panel-maximize {
+		display: none;
+	}
+	
+	.panel-icon.panel-maximize.panel-maximized {
+		display: none;
+	}
 	
 </style>
 
@@ -89,7 +96,7 @@
 			</grid>
 		</panelchildren>
 	</panel>
-	<portallayout>
+	<portallayout maximizedMode="whole">
 		<portalchildren visible="false"/>
 		<portalchildren visible="false"/>
 		<portalchildren visible="false"/>

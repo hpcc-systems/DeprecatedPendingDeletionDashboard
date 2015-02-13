@@ -81,7 +81,7 @@ public class EditClusterController extends SelectorComposer<Hbox> {
 
         @Override
         public void onEvent(Event event) throws Exception {
-            chartRenderer.constructClusterJSON(chartData, portlet, true);
+            chartRenderer.constructClusterJSON(chartData, portlet);
             chartRenderer.drawChart(Constants.EDIT_WINDOW_CHART_DIV, portlet);
             Clients.clearBusy(chart);
             doneButton.setDisabled(false);

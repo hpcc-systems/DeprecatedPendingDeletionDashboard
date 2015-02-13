@@ -2,16 +2,19 @@ package org.hpccsystems.dashboard.chart.entity;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.XmlTransient;
 
 @XmlRootElement
 public class TableData extends ChartData {
 
     private List<Attribute> attributes;
     private boolean enableChangeIndicators;
-    
+    Map<String, List<Attribute>> hpccTableData;
+
     public TableData() {
     }
     
@@ -52,5 +55,14 @@ public class TableData extends ChartData {
 
     public void setEnableChangeIndicators(boolean enableChangeIndicators) {
         this.enableChangeIndicators = enableChangeIndicators;
+    }
+    
+    @XmlTransient
+    public Map<String, List<Attribute>> getHpccTableData() {
+        return hpccTableData;
+    }
+
+    public void setHpccTableData(Map<String, List<Attribute>> hpccTableData) {
+        this.hpccTableData = hpccTableData;
     }
 }

@@ -3,7 +3,7 @@
 	<hpccConnection name="File Cluster">
 		<hostIp>216.19.105.2</hostIp>
 		<username>generic_dashboard</username>
-		<password>Lexis123!</password>
+		<password>r9lpTQz1etaeGsbwR/ijNw==</password>
 		<isSSL>true</isSSL>
 		<espPort>18010</espPort>
 		<!-- wsEclPort is the roxie port (8002). 
@@ -15,7 +15,7 @@
 	<hpccConnection name="Query Cluster">
 		<hostIp>216.19.105.2</hostIp>
 		<username>generic_dashboard</username>
-		<password>Lexis123!</password>
+		<password>r9lpTQz1etaeGsbwR/ijNw==</password>
 		<isSSL>true</isSSL>
 		<datasource>query</datasource>
 		<espPort>18010</espPort>
