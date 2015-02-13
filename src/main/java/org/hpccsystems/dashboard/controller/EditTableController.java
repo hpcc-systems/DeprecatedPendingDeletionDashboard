@@ -200,6 +200,10 @@ public class EditTableController extends SelectorComposer<Component> {
         @Override
         public void onEvent(Event arg0) throws Exception {
             try {
+                Map<String, List<Attribute>> tableDataMap = null;
+                tableDataMap = hpccService.fetchTableData(tableData);
+                tableData.setHpccTableData(tableDataMap);
+                
                 tableHolder.getChildren().clear();
                 tableHolder.appendChild(tableRenderer.constructTableWidget(portlet, tableData, true));
             } catch (Exception e) {

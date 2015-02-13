@@ -15,6 +15,7 @@ import java.util.Set;
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.JAXBException;
 
+import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.chart.cluster.ClusterData;
@@ -125,41 +126,16 @@ public class ChartPanel extends Panel {
     //Delete panel listener
     EventListener<Event> deleteListener = new EventListener<Event>() {
         public void onEvent(final Event event) {
-            deleteDashboard();
+            deleteWidget();
         }
     };
     
     //Reset button listener
     EventListener<Event> resetListener = new EventListener<Event>() { 
         public void onEvent(final Event event) {
-            //Removing Input params button if available
-            if(inputParamBtn != null) {
-                inputParamBtn.detach();
-            }
-            
-            Components.removeAllChildren(chartDiv);
-            Components.removeAllChildren(imageContainer);
-            chartDiv.getChildren().clear();
-            chartDiv.detach();
-            
-            addBtn.setSclass(ADD_STYLE);
-            
-            resetBtn.setDisabled(true);
-            addBtn.removeEventListener(Events.ON_CLICK, editListener);
-            addBtn.addEventListener(Events.ON_CLICK, addListener); 
-            addBtn.setVisible(true);
-            //Calling listener in Dashboard - This listener resets portlet object
-            Window window =  null;
-            Session session = Sessions.getCurrent();
-            final List<Component> list = (ArrayList<Component>) Selectors.find(((Component)session.getAttribute(Constants.NAVBAR)).getPage(), "window");
-            for (final Component component : list) {
-                if(component instanceof Window){
-                    window = (Window) component;
-                    Events.sendEvent(new Event("onPanelReset", window, portlet));
-                }
-            }
-            
-        } 
+            resetWidget();
+        }
+
     };
 
             
@@ -573,7 +549,7 @@ public class ChartPanel extends Panel {
 
                 chartRenderer.constructTreeJSON((TreeData) chartData, portlet, builder.toString());
             } else if (Constants.CATEGORY_CLUSTER == category) {
-                chartRenderer.constructClusterJSON((ClusterData) chartData, portlet, false);
+                chartRenderer.constructClusterJSON((ClusterData) chartData, portlet);
             } else if (Constants.RELEVANT_CONFIG == category) {
             	RelevantData objRelevantData = (RelevantData)portlet.getChartData();
             	LOG.debug("RELEVANT DATA: "+objRelevantData);
@@ -756,6 +732,7 @@ public class ChartPanel extends Panel {
         if(!portlet.getWidgetState().equals(Constants.STATE_LIVE_CHART)){
             return null;
         }
+        String chartJson = StringEscapeUtils.escapeJavaScript(portlet.getChartDataJSON());
         
         ChartDetails chartDetails = chartService.getCharts().get(portlet.getChartType());
         
@@ -786,7 +763,7 @@ public class ChartPanel extends Panel {
                     .append("})")
                 .append(").done(function(){")
                 .append(chartDetails.getConfiguration().getFunctionName())
-                .append("('" + chartDiv.getId() +  "','"+ portlet.getChartDataJSON() +"')")
+                .append("('" + chartDiv.getId() +  "','"+ chartJson +"')")
             .append("});");
             
             jsBuilder.append("}");
@@ -825,7 +802,7 @@ public class ChartPanel extends Panel {
                     .append("})")
                 .append(").done(function(){")
                 .append(chartDetails.getConfiguration().getFunctionName())
-                .append("('" + chartDiv.getId() +  "','"+ portlet.getChartDataJSON() +"')")
+                .append("('" + chartDiv.getId() +  "','"+ chartJson +"')")
                 .append("});");
         }
         
@@ -906,7 +883,7 @@ public class ChartPanel extends Panel {
     /**
      * deletes widget with confirmation message
      */
-    private void deleteDashboard() {
+    private void deleteWidget() {
         try {
             // ask confirmation before deleting widget
            EventListener<ClickEvent> clickListener = new EventListener<Messagebox.ClickEvent>() {
@@ -930,7 +907,7 @@ public class ChartPanel extends Panel {
                 }
             };
 
-            Messagebox.show(Constants.DELETE_WIDGET, Constants.DELETE_WIDGET_TITLE, new Messagebox.Button[] {
+            Messagebox.show(Labels.getLabel("deleteConfirmMsg"), Labels.getLabel("deleteChartTitle"), new Messagebox.Button[] {
                             Messagebox.Button.YES, Messagebox.Button.NO },Messagebox.QUESTION, clickListener);
         } catch (Exception ex) {
             Clients.showNotification(Labels.getLabel("unableToDeletewidget"));
@@ -972,4 +949,53 @@ public class ChartPanel extends Panel {
         imageContainer.detach();
         return chartDiv;
     }
-}
+    
+    private void resetWidget() {
+        EventListener<ClickEvent> clickListener = event -> {
+            if (Messagebox.Button.YES.equals(event.getButton())) {
+               resetChart();
+            }
+
+        };
+
+        Messagebox.show(
+                Labels.getLabel("resetChart"), 
+                Labels.getLabel("resetChartTitle"), 
+                new Messagebox.Button[] {
+                    Messagebox.Button.YES, Messagebox.Button.NO 
+                }, 
+                Messagebox.QUESTION, 
+                clickListener);
+     
+    }
+    
+
+    private void resetChart() {
+        //Removing Input params button if available
+        if(inputParamBtn != null) {
+            inputParamBtn.detach();
+        }
+        
+        Components.removeAllChildren(chartDiv);
+        Components.removeAllChildren(imageContainer);
+        chartDiv.getChildren().clear();
+        chartDiv.detach();
+        
+        addBtn.setSclass(ADD_STYLE);
+        
+        resetBtn.setDisabled(true);
+        addBtn.removeEventListener(Events.ON_CLICK, editListener);
+        addBtn.addEventListener(Events.ON_CLICK, addListener); 
+        addBtn.setVisible(true);
+        //Calling listener in Dashboard - This listener resets portlet object
+        Window window =  null;
+        Session session = Sessions.getCurrent();
+        final List<Component> list = (ArrayList<Component>) Selectors.find(((Component)session.getAttribute(Constants.NAVBAR)).getPage(), "window");
+        for (final Component component : list) {
+            if(component instanceof Window){
+                window = (Window) component;
+                Events.sendEvent(new Event("onPanelReset", window, portlet));
+            }
+        }
+    }
+} 

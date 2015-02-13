@@ -57,9 +57,11 @@ public class TableRenderer {
 
         HPCCService hpccService = (HPCCService) SpringUtil.getBean(Constants.HPCC_SERVICE);
 
-        Map<String, List<Attribute>> tableDataMap = new LinkedHashMap<String, List<Attribute>>();
+        Map<String, List<Attribute>> tableDataMap = chartData.getHpccTableData();
         try {
-            tableDataMap = hpccService.fetchTableData(chartData);
+            if(tableDataMap == null){
+                tableDataMap = hpccService.fetchTableData(chartData);
+            }
         } catch (Exception e) {
             LOG.error(Constants.EXCEPTION, e);
             return null;
@@ -72,18 +74,18 @@ public class TableRenderer {
         //Adjusting height of the Holder Div based on Filter selection
         if(!chartData.getIsFiltered()){        
             if (isEditing) {
-                // .. 542 - 30
-                listBox.setHeight("512px"); 
+                // .. 542 - 45
+                listBox.setHeight("497px"); 
             } else {
                 // .. 385 - 30
                 listBox.setHeight("355px"); 
             }
         } else {
             if (isEditing) {
-                // .. 542 - 30 -22
-                listBox.setHeight("490px");             
+                // .. 542 - 30 -22 -25
+                listBox.setHeight("475px");             
             } else {
-                // .. 385 - 30 -25    
+                // .. 385 - 30 -25   
                 listBox.setHeight("330px"); 
             }
         }
@@ -128,7 +130,7 @@ public class TableRenderer {
         Vbox vbox = new Vbox();
         //Appending Chart Title as Data file name
         final Div div = new Div();            
-        div.setStyle("margin-top: 3px; margin-left: 5px; height: 15px;");
+        div.setStyle("margin-top: 3px; margin-left: 5px; height: 7px;");
         
         
         if(chartData.getIsFiltered()){                

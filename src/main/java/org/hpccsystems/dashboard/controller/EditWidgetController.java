@@ -69,6 +69,8 @@ import org.zkoss.zul.Window;
 
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
  
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class EditWidgetController extends SelectorComposer<Component> {
@@ -379,21 +381,24 @@ public class EditWidgetController extends SelectorComposer<Component> {
         		portlet.setChartDataJSON(relJSON);
         		
             	final String divToDraw = div.getId(); 
-            	chartRenderer.drawChartForRelevant(divToDraw, portlet);
+            	chartRenderer.drawChart(divToDraw, portlet);
             	LOG.debug("Drawing Relevant chart in portlet : "+ divToDraw);
             	
             } else {
                 //For Chart Widgets
                 final String divToDraw = div.getId(); 
-                if(Constants.CATEGORY_GAUGE == chartService.getCharts().get(portlet.getChartType()).getCategory()) {
-                    chartRenderer.constructGaugeJSON((GaugeChartData) chartData, portlet, false);
-                } else if(Constants.CATEGORY_CLUSTER == chartService.getCharts().get(portlet.getChartType()).getCategory()){
-                	chartRenderer.constructClusterJSON((ClusterData)chartData, portlet, false);
-                }
-                else {
-                    //isEdit Window is set to false as we are constructing the JSON to be drawn in the Widget itself
-                    chartRenderer.constructChartJSON((XYChartData) chartData, portlet, false); 
-                }
+                if(Constants.CATEGORY_GAUGE != chartService.getCharts().get(portlet.getChartType()).getCategory()
+                    && Constants.CATEGORY_CLUSTER != chartService.getCharts().get(portlet.getChartType()).getCategory()){
+                        //Changing the portlet Id from e_id to p_id
+                        Gson gson = new Gson();
+                        JsonElement element = gson.fromJson (portlet.getChartDataJSON(), JsonElement.class);
+                        JsonObject jsonObj = element.getAsJsonObject();
+                        jsonObj.remove(Constants.PORTLET_ID);               
+                        jsonObj.addProperty(Constants.PORTLET_ID, "p_" + portlet.getId());               
+                        LOG.debug("jsonObj -->"+jsonObj.toString());
+                        portlet.setChartDataJSON(jsonObj.toString());
+                   }
+                    
                 chartRenderer.drawChart(divToDraw, portlet);         
 
                 if (LOG.isDebugEnabled()) {
