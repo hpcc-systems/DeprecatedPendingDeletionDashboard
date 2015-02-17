@@ -25,11 +25,8 @@ function createTreeChart(divId, chartData) {
 
     // size of the diagram
     var viewerWidth = divElement.width();
-    var viewerHeight = divElement.height();
+    var viewerHeight = divElement.parent().parent().height();
 
- 	if(viewerWidth < 50 ){ viewerWidth = 400; } 
-	if(viewerHeight < 50 ){ viewerHeight = 385; }
-	
     var tree = d3.layout.tree()
         .size([viewerHeight, viewerWidth]);
 
@@ -263,7 +260,7 @@ function createTreeChart(divId, chartData) {
             // d.y = (d.depth * 500); //500px per level.
         });
 
-        // Update the nodes…
+        // Update the nodesï¿½
         node = svgGroup.selectAll("g.node")
             .data(nodes, function(d) {
                 return d.id || (d.id = ++i);
@@ -350,7 +347,7 @@ function createTreeChart(divId, chartData) {
         nodeExit.select("text")
             .style("fill-opacity", 0);
 
-        // Update the links…
+        // Update the linksï¿½
         var link = svgGroup.selectAll("path.link")
             .data(links, function(d) {
                 return d.target.id;

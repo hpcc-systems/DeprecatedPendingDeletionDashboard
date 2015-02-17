@@ -8,11 +8,8 @@ function createGaugeChart(divId, reqData) {
 	
 	// size of the diagram
     var width = divElement.width();
-    var height = divElement.height();
+    var height = divElement.parent().parent().height();
 
- 	if(width < 50 ){ width = 400; } 
-	if(height < 50 ){ height = 385; }
-	
 	var gauge = function(container, configuration) {
 		var that = {};
 		var config = {

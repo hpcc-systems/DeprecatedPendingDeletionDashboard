@@ -371,7 +371,23 @@ public class ChartPanel extends Panel {
                 resizeBtn.setSclass(RESIZE_MAX_STYLE);
                 resizeBtn.setTooltiptext("Maximize window");
             }
+            
+            if (Constants.CATEGORY_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()) {
+                //drawTableWidget();
+            } else if (Constants.CATEGORY_TEXT_EDITOR == chartService.getCharts().get(portlet.getChartType()).getCategory()) {
+                //onCreateDocumentWidget();
+            } else if(Constants.CATEGORY_SCORED_SEARCH_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()){
+                //drawScoredSearchTable();
+            }else {
+                String chartScript = drawD3Graph();
+                if (chartScript != null) {
+                    Clients.evalJavaScript(chartScript);
+                } else {
+                    throw new WrongValueException("JSON to create chart is null");
+                }
+            }
         });
+        
     }
     
     //Adds input parameters to display in chart/portlet

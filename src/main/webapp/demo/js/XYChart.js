@@ -38,11 +38,8 @@ function createXYChart (divId, chartData) {
 				jq( "<div id='"+ response.portletId + "holderDiv" +"'> Rendering chart... </div>" )
 			);
 	
-	var fullHeight = divElement.height();
+	var fullHeight = divElement.parent().parent().height();
 	var fullWidth = divElement.width();
-	
-	if(fullWidth < 50 ){ fullWidth = 400; }
-	if(fullHeight < 50 ){ fullHeight = 385; }
 	
 	var isLargeGraph = false;
 	if(response.xCategoryLabels.length > 25){

@@ -9,7 +9,7 @@ function createGeoChart(divId, reqData) {
 
 	// size of the diagram
 	var width = divElement.width();
-	var height = divElement.height();
+	var height = divElement.parent().parent().height();
 		
 	if (width > 1.7 * height) {
 		width = height * 1.7;
