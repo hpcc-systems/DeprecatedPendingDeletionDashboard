@@ -23,9 +23,15 @@ function createTreeChart(divId, chartData) {
     var duration = 750;
     var root;
 
-    // size of the diagram
-    var viewerWidth = divElement.width();
-    var viewerHeight = divElement.parent().parent().height();
+ // size of the diagram
+	var viewerHeight = divElement.height();
+	var viewerWidth = divElement.width();
+	
+	//checking the minimum height for browser and component and set the same as window height. 
+	if(divElement.parent().parent().height()<($(window).height()-150)){viewerHeight = divElement.parent().parent().height();}
+	else{viewerHeight = ($(window).height()-150);}
+	
+	if(divElement.width()>$(window).width()){viewerWidth = $(window).width();}
 
     var tree = d3.layout.tree()
         .size([viewerHeight, viewerWidth]);

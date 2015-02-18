@@ -38,8 +38,14 @@ function createXYChart (divId, chartData) {
 				jq( "<div id='"+ response.portletId + "holderDiv" +"'> Rendering chart... </div>" )
 			);
 	
-	var fullHeight = divElement.parent().parent().height();
+	var fullHeight = divElement.height();
 	var fullWidth = divElement.width();
+	
+	//checking the minimum height for browser and component and set the same as window height. 
+	if(divElement.parent().parent().height()<($(window).height()-150)){fullHeight = divElement.parent().parent().height();}
+	else{fullHeight = ($(window).height()-150);}
+	
+	if(divElement.width()>$(window).width()){fullWidth = $(window).width();}
 	
 	var isLargeGraph = false;
 	if(response.xCategoryLabels.length > 25){
@@ -78,7 +84,7 @@ function createXYChart (divId, chartData) {
 			bindto: "#" + response.portletId + "holderDiv",
 			size: { 
 				width:fullWidth - 5,
-				height:fullHeight - 25
+				height:fullHeight
 			},
 			bar:{
 				width:{

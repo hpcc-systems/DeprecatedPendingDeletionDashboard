@@ -7,9 +7,15 @@ function createGaugeChart(divId, reqData) {
 	var container = d3.select(divElement.get(0)).select("div");
 	
 	// size of the diagram
-    var width = divElement.width();
-    var height = divElement.parent().parent().height();
-
+	var height = divElement.height();
+	var width = divElement.width();
+	
+	//checking the minimum height for browser and component and set the same as window height. 
+	if(divElement.parent().parent().height()<($(window).height()-150)){height = divElement.parent().parent().height();}
+	else{height = ($(window).height()-150);}
+	
+	if(divElement.width()>$(window).width()){width = $(window).width();}
+	
 	var gauge = function(container, configuration) {
 		var that = {};
 		var config = {
