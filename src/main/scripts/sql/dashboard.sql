@@ -21,11 +21,11 @@ first_name  VARCHAR(50),
 last_name  VARCHAR(50),
 password VARCHAR(40) ,
 active_flag CHAR(1),
-PRIMARY KEY(user_id)
+PRIMARY KEY(id)
 ) ENGINE=InnoDB;
 
 LOCK TABLES `user_details` WRITE;
-INSERT INTO user_details(id,first_name,last_name,password,active_flag) VALUES ('user', 'User','','1234','N'),('admin','Administrator','','1234','N');
+INSERT INTO user_details(id,first_name,last_name,password,active_flag) VALUES ('user', 'User','','HGq7g5SZ3oo=','N'),('admin','Administrator','','HGq7g5SZ3oo=','N');
 UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `dashboard_details`;
