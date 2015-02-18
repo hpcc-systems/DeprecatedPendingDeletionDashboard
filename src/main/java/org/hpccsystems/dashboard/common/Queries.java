@@ -15,6 +15,7 @@ public class Queries {
     public static final String DELETE_DASHBOARD = "delete from dashboard_details where dashboard_id=? and user_id =? ";    
     public static final String INSERT_WIDGET_DETAILS = "insert into widget_details(dashboard_id,widget_name,widget_state,chart_type,column_identifier,widget_sequence,chart_data,single_widget) values(?,?,?,?,?,?,?,?)";
     public static final String GET_USER_DETAILS = "select id,password,active_flag,first_name,last_name from user_details where id=?"; 
+    public static final String INSERT_USER = "INSERT INTO user_details(id,first_name,last_name,password) VALUES (?, ?,?,?)";
     public static final String GET_APPLICATIONS = "SELECT dash_app_id,dash_app_name FROM dash_application";
     public static final String RESET_USER_FLAG = "update user_details set active_flag=? where id=?";
     public static final String GET_WIDGET_DETAILS = "SELECT widget_id,widget_name,widget_state,column_identifier,chart_type,chart_data,single_widget FROM widget_details where  dashboard_id = ";
@@ -44,6 +45,7 @@ public class Queries {
     public static final String GET_DASHBOARD_NAME = "SELECT dashboard_name  FROM dashboard_details where user_id = ? and application_id = ?";
     public static final String GET_ALL_GROUPS = "select * from group_details";
     public static final String GET_USER_GROUPS = "select * from group_details as g JOIN user_groups as u ON g.group_code = u.group_code AND u.user_id=?";
+    public static final String GET_ALL_USER_IDS = "SELECT id FROM user_details";
     
     
 }

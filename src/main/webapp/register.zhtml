@@ -25,17 +25,17 @@
                 <legend>Register to <span class="blue">Dashboard</span></legend>
 
 	            <div class="form-group">
-	            	<label for="fname">First Name</label > 
+	            	<label for="fname">${labels.firatName}</label > 
 	        		<zul:textbox type="text" sclass="form-control" id="fname" style="display:inline" forward="onOK=register.onClick"/> 
 				 </div>
 	            
 	            <div class="form-group">
-	            	<label for="lname">Last Name</label > 
+	            	<label for="lname">${labels.lastName}</label > 
 	        		<zul:textbox type="text" sclass="form-control" id="lname" style="display:inline" forward="onOK=register.onClick"/> 
 				 </div>
 	            
 	            <div class="form-group">
-	            	<label for="userid">User Name</label > 
+	            	<label for="userid">${labels.lblUserName}</label > 
 	        		<zul:textbox type="text" sclass="form-control" id="userid" style="display:inline" forward="onOK=register.onClick"/> 
 				 </div>
 				 
@@ -45,7 +45,7 @@
 				 </div>
 				 
 				 <div class="form-group">
-				   <label for="confirmPassword">Confirm Password</label >
+				   <label for="confirmPassword">${labels.confirmPassowrd}</label >
 				   <zul:textbox type="password" class="form-control" id="confirmPassword"  style="display:inline" forward="onOK=register.onClick"/>
 				 </div>
                 
