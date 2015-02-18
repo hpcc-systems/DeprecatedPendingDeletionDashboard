@@ -71,7 +71,7 @@
 					<zul:listitem id="listItemChinese" label="中文" value="Chinese"/>
 			</zul:listbox> 
 		 </div>
-      ${labels.donthaveanAccountYet} <a href="#" class="btn btn-black">${labels.register}</a>
+      ${labels.donthaveanAccountYet} <a href="register.zhtml" class="btn btn-black">${labels.register}</a>
     </footer>
     
     </zul:div>

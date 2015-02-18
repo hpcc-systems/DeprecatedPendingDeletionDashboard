@@ -11,6 +11,10 @@ public class User  implements Serializable,Cloneable {
     
     String account;
     String fullName;
+    
+    private String firstName;
+    private String lastName;
+    
     String password;
     String email;
     Date birthday;
@@ -240,5 +244,21 @@ public class User  implements Serializable,Cloneable {
                 .append(activeFlag).append(", validUser=").append(validUser)
                 .append("]");
         return buffer.toString();
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 }
