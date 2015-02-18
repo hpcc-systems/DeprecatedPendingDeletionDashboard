@@ -71,24 +71,8 @@ public class TableRenderer {
         listBox.setMold("paging");
         listBox.setSizedByContent(true);
         listBox.setHflex("1");
-        //Adjusting height of the Holder Div based on Filter selection
-        if(!chartData.getIsFiltered()){        
-            if (isEditing) {
-                // .. 542 - 45
-                listBox.setHeight("497px"); 
-            } else {
-                // .. 385 - 30
-                listBox.setHeight("355px"); 
-            }
-        } else {
-            if (isEditing) {
-                // .. 542 - 30 -22 -30
-                listBox.setHeight("470px");             
-            } else {
-                // .. 385 - 30 -25   
-                listBox.setHeight("330px"); 
-            }
-        }
+        listBox.setVflex("1");
+        
         listBox.setAutopaging(true);
 
         Listhead listhead = new Listhead();
@@ -128,9 +112,10 @@ public class TableRenderer {
         });
         hbox.appendChild(button);
         Vbox vbox = new Vbox();
+        vbox.setVflex("1");
         //Appending Chart Title as Data file name
         final Div div = new Div();            
-        div.setStyle("margin-top: 3px; margin-left: 5px; height: 7px;");
+        div.setStyle("margin-top: 3px; margin-left: 5px; height: 1px;");
         
         
         if(chartData.getIsFiltered()){                
@@ -190,6 +175,7 @@ public class TableRenderer {
             listheader.setSort("auto");
             listheader.setParent(listhead);
             listhead.setParent(listBox);
+            listheader.setHflex("1");
             columnList.add(entry.getValue());
         }
         return listheader;

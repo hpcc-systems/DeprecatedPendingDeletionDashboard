@@ -262,7 +262,6 @@ public class DashboardController extends SelectorComposer<Window>{
             //Removing AddWidget , Configure Dashboard buttons for Single layout
             if(dashboard.getPortletList().size() == 1 && dashboard.getPortletList().get(0).getIsSinglePortlet()){
             	addWidget.detach();
-            	configureDashboard.detach();           	
             }
             for (Portlet portlet : dashboard.getPortletList()) {    
                 if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD) ||
@@ -536,9 +535,7 @@ public class DashboardController extends SelectorComposer<Window>{
                     for (Filter filter : portlet.getChartData().getFilters()) {
                         // overriding the portlet specific filter by selected global/dashboard filter
                         if (!filter.getIsCommonFilter()
-                        		&& filter.equals(newFilter)
-                                /*&& filter.getFileName().equals(fileName)
-                                && filter.getColumn().equals(field.getColumnName())*/) {
+                        		&& filter.equals(newFilter)) {
                             filtersToReomove.add(filter);                        
                         }
                     }

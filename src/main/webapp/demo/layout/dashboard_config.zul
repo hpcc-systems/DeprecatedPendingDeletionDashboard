@@ -66,7 +66,7 @@
 			</hbox>
 		</hlayout>
 		
-		<hlayout zclass="form-group">
+		<hlayout id="layout" zclass="form-group">
 			<label zclass="label" value="${labels.dashboardLayout}"></label>
 			<radiogroup id="layoutRadiogroup">
 				<radio sclass="img-radio" image="images/full_page.png" value="0">	</radio>

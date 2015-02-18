@@ -363,17 +363,21 @@ public class ChartPanel extends Panel {
         resizeBtn.addEventListener(Events.ON_CLICK, maximizeListener ->{
             ChartPanel.this.setMaximizable(true);
             if(!ChartPanel.this.isMaximized()){
+                holderDiv.setHeight("");
+                holderDiv.setVflex("1");
                 ChartPanel.this.setMaximized(true);
                 resizeBtn.setSclass(RESIZE_MIN_STYLE);
                 resizeBtn.setTooltiptext("Minimize window");
             }else{
+                holderDiv.setVflex(null);
+                holderDiv.setHeight("385px");
                 ChartPanel.this.setMaximized(false);
                 resizeBtn.setSclass(RESIZE_MAX_STYLE);
                 resizeBtn.setTooltiptext("Maximize window");
             }
             
             if (Constants.CATEGORY_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()) {
-                //drawTableWidget();
+                drawTableWidget();
             } else if (Constants.CATEGORY_TEXT_EDITOR == chartService.getCharts().get(portlet.getChartType()).getCategory()) {
                 //onCreateDocumentWidget();
             } else if(Constants.CATEGORY_SCORED_SEARCH_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()){
