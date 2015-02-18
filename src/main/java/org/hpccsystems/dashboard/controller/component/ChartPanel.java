@@ -281,7 +281,6 @@ public class ChartPanel extends Panel {
         } else {
             titleTextbox.setValue(Labels.getLabel("chartTitle"));
         }
-        titleTextbox.setWidth("250px");
         titleTextbox.setMaxlength(30);
         titleTextbox.addEventListener(Events.ON_CHANGE, titleChangeLisnr);
 
