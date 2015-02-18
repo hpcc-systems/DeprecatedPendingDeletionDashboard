@@ -44,7 +44,7 @@ public class AuthenticationDaoImpl implements AuthenticationDao{
         try    {
             user = getJdbcTemplate().queryForObject(sql, new Object[]{userName}, new UserRowMapper());
             if(user != null) {
-                String userId = user.getUserId();
+                String userId = user.getId();
                 String pwd = user.getPassword();
                 String flag = user.getActiveFlag();    
                 if(password.trim().equals(pwd))    {
@@ -70,7 +70,7 @@ public class AuthenticationDaoImpl implements AuthenticationDao{
     
     public void updateActiveFlag(User user)  throws SQLException{
         String sqlQuery=Queries.RESET_USER_FLAG;
-        getJdbcTemplate().update(sqlQuery, new Object[]{Constants.INACTIVE_FLAG,user.getUserId()});
+        getJdbcTemplate().update(sqlQuery, new Object[]{Constants.INACTIVE_FLAG,user.getId()});
     }
 
 }

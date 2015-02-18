@@ -20,7 +20,7 @@ public class User  implements Serializable,Cloneable {
     
     //TODO - Romve fields added for persistance
     //Added for persistence
-    String userId;
+    String id;
     String activeFlag;
     boolean validUser;
     
@@ -32,12 +32,12 @@ public class User  implements Serializable,Cloneable {
         this.validUser = validUser;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getId() {
+        return id;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getActiveFlag() {
@@ -236,7 +236,7 @@ public class User  implements Serializable,Cloneable {
                 .append(", email=").append(email).append(", birthday=")
                 .append(birthday).append(", country=").append(country)
                 .append(", bio=").append(bio).append(", car=").append(car)
-                .append(", userId=").append(userId).append(", activeFlag=")
+                .append(", userId=").append(id).append(", activeFlag=")
                 .append(activeFlag).append(", validUser=").append(validUser)
                 .append("]");
         return buffer.toString();

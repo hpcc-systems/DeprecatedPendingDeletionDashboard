@@ -105,13 +105,13 @@ public class AuthenticationServiceImpl implements AuthenticationService,Serializ
             
             Boolean isSuperUser = false;
             try {
-                List<String> groupCodes =groupService.getGroupCodes(user.getUserId());
+                List<String> groupCodes =groupService.getGroupCodes(user.getId());
                 //Checking Super user
-                isSuperUser = checkSuperUser(groupCodes,user.getUserId());    
+                isSuperUser = checkSuperUser(groupCodes,user.getId());    
             } catch (Exception e) {
                 LOG.error(Constants.EXCEPTION, e);                
             } finally {
-                credential = new UserCredential(user.getUserId(), user.getFullName(),appId, isSuperUser);
+                credential = new UserCredential(user.getId(), user.getFullName(),appId, isSuperUser);
             }
             
             Sessions.getCurrent().setAttribute("userCredential",credential);

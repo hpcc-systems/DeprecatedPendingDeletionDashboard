@@ -46,7 +46,7 @@ public class LDAPAuthenticationServiceImpl implements LDAPAuthenticationService 
         validUser = authenticate(context, env, username, credential);
         if(validUser){
             user =new User();
-            user.setUserId(username);
+            user.setId(username);
             user.setFullName(username);
             user.setValidUser(true);
         }

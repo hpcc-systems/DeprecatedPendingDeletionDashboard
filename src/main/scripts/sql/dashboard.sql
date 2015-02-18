@@ -16,15 +16,16 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `user_details`;
 
 create table user_details (
-user_id VARCHAR(40) NOT NULL,
-user_name  VARCHAR(40),
+id VARCHAR(50) NOT NULL,
+first_name  VARCHAR(50),
+last_name  VARCHAR(50),
 password VARCHAR(40) ,
 active_flag CHAR(1),
 PRIMARY KEY(user_id)
 ) ENGINE=InnoDB;
 
 LOCK TABLES `user_details` WRITE;
-INSERT INTO user_details(user_id, user_name,password,active_flag) VALUES ('user', 'User','1234','N'),('admin','Administrator','1234','N');
+INSERT INTO user_details(id,first_name,last_name,password,active_flag) VALUES ('user', 'User','','1234','N'),('admin','Administrator','','1234','N');
 UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `dashboard_details`;

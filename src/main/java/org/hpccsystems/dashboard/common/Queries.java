@@ -14,9 +14,9 @@ public class Queries {
     public static final String DELETE_WIDGETS = "delete from widget_details where widget_id=?";
     public static final String DELETE_DASHBOARD = "delete from dashboard_details where dashboard_id=? and user_id =? ";    
     public static final String INSERT_WIDGET_DETAILS = "insert into widget_details(dashboard_id,widget_name,widget_state,chart_type,column_identifier,widget_sequence,chart_data,single_widget) values(?,?,?,?,?,?,?,?)";
-    public static final String GET_USER_DETAILS = "select user_id,password,active_flag,user_name from user_details where user_id=?"; 
+    public static final String GET_USER_DETAILS = "select id,password,active_flag,first_name,last_name from user_details where id=?"; 
     public static final String GET_APPLICATIONS = "SELECT dash_app_id,dash_app_name FROM dash_application";
-    public static final String RESET_USER_FLAG = "update user_details set active_flag=? where user_id=?";
+    public static final String RESET_USER_FLAG = "update user_details set active_flag=? where id=?";
     public static final String GET_WIDGET_DETAILS = "SELECT widget_id,widget_name,widget_state,column_identifier,chart_type,chart_data,single_widget FROM widget_details where  dashboard_id = ";
     public static final String API_DELETE_DASHBOARD = "delete from dashboard_details where dashboard_id=? ";
     public static final String RETRIEVE_DASHBOARD_DETAILS = "select * from dashboard_details where application_id = ";
