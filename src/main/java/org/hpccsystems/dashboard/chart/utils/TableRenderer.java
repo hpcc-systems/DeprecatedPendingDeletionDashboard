@@ -29,6 +29,7 @@ import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Listhead;
 import org.zkoss.zul.Listheader;
 import org.zkoss.zul.Listitem;
+import org.zkoss.zul.Space;
 import org.zkoss.zul.Span;
 import org.zkoss.zul.Vbox;
 
@@ -115,7 +116,8 @@ public class TableRenderer {
         vbox.setVflex("1");
         //Appending Chart Title as Data file name
         final Div div = new Div();            
-        div.setStyle("margin-top: 3px; margin-left: 5px; height: 1px;");
+        div.setHeight("10px");
+        div.setStyle("margin-top: 3px; margin-left: 5px;");
         
         
         if(chartData.getIsFiltered()){                
@@ -125,6 +127,10 @@ public class TableRenderer {
         
         vbox.appendChild(listBox);
         vbox.appendChild(hbox);
+        Div space = new Div(); 
+        space.setHeight("8px");
+        vbox.appendChild(space);
+        
         if (LOG.isDebugEnabled()) {
             LOG.debug("Created table widget..");
         }
@@ -207,6 +213,7 @@ public class TableRenderer {
         Span filterSpan = new Span();
         filterSpan.setClass("btn-link btn-sm");
         filterSpan.setStyle("float: right; padding: 0px 10px;");
+        
         filterSpan.appendChild(new Label("Filters"));            
         div.appendChild(filterSpan);        
         
