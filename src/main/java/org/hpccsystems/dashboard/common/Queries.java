@@ -50,6 +50,7 @@ public class Queries {
     public static final String GET_ALL_USER = "SELECT * FROM user_details";
     public static final String INSERT_GROUP_USER = "INSERT INTO user_groups(group_code,user_id) values(?,?) ";
     public static final String INSERT_NEW_GROUP = "INSERT INTO group_details(group_code,group_name) values(?,?)";
+    public static final String DELETE_GROUP_USER = "DELETE FROM user_groups WHERE user_id = ? and group_code = ?";
     
     
 }

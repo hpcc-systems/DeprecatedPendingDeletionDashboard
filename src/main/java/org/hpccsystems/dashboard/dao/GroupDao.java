@@ -61,4 +61,6 @@ public interface GroupDao {
     void addUser(Set<User> selectedUsers,Group group);
 
     void addgroup(Group newGroup);
+
+    void removeUser(Group selectedGroup, User user);
 }

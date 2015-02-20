@@ -39,14 +39,27 @@ public class RegisterController  extends SelectorComposer<Component>{
     @Listen("onClick = #register")
     public void register() {
         //Validations
-        if(password.getText().isEmpty()) {
+        if(fname.getText().isEmpty()) {
+            showValidationError(Labels.getLabel("provideValidFname"), fname);
+            return;
+        }else if(lname.getText().isEmpty()) {
+            showValidationError(Labels.getLabel("provideValidlname"), lname);
+            return;
+        }else if(userid.getText().isEmpty()){
+            showValidationError(Labels.getLabel("provideValiduserid"), userid);
+            return;
+        }else if(password.getText().isEmpty()) {
             showValidationError(Labels.getLabel("provideValidPassword"), password);
             return;
         }
-        if(!password.getText().equals(confirmPassword.getText())) {
+        else if(confirmPassword.getText().isEmpty()){
+            showValidationError(Labels.getLabel("passwordsNotMatch"), confirmPassword);
+            return;
+        }else if(!password.getText().equals(confirmPassword.getText())) {
             showValidationError(Labels.getLabel("passwordsNotMatch"), confirmPassword);
             return;
         }
+        
         if(userService.userExist(userid.getText())) {
             showValidationError(Labels.getLabel("userExists"), userid);
             return;

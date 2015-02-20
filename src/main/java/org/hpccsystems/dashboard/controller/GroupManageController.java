@@ -26,11 +26,14 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
+import org.zkoss.zul.Button;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
+import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Panel;
 import org.zkoss.zul.Textbox;
+import org.zkoss.zul.Label;
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class GroupManageController extends SelectorComposer<Component> {
@@ -69,6 +72,13 @@ public class GroupManageController extends SelectorComposer<Component> {
     private  ListModelList<User> groupUserModel =null;
     private ListModelList<User> userModel = new ListModelList<User>();
     
+    EventListener<Event> removeUserListener = (event)->{
+        User user = ((Listitem)event.getTarget().getParent().getParent()).getValue();
+       ((ListModelList<Object>) groupUserListbox.getModel()).remove(user);
+       Group selectedGroup = new ArrayList<Group>(groupModel.getSelection()).get(0);
+       dbGroupService.removeUser(selectedGroup,user);
+    };
+    
     EventListener<Event> showGroupusers = (event)->{
         Group selectdGroup = (Group)((Listitem)event.getTarget()).getValue();
         List<User> groupUsers = dbGroupService.getGroupUsers(selectdGroup);
@@ -78,8 +88,14 @@ public class GroupManageController extends SelectorComposer<Component> {
         groupUserListbox.setModel(groupUserModel);
         groupUserListbox.setItemRenderer((listitem,userr,index) ->{
             User user =(User)userr;
-            listitem.setLabel(user.getFullName());
             listitem.setValue(user);
+            Listcell listcell = new Listcell();
+            listcell.appendChild(new Label(user.getFullName()));
+            Button closeBtn = new Button();
+            closeBtn.setSclass(Constants.CLOSE_BUTTON_STYLE);
+            closeBtn.addEventListener(Events.ON_CLICK, removeUserListener);
+            listcell.appendChild(closeBtn);
+            listcell.setParent(listitem);
         });
         
     };

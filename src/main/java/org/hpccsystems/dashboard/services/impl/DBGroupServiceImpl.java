@@ -63,4 +63,9 @@ public class DBGroupServiceImpl implements ConditionalGroupService,DBGroupServic
          groupDao.addgroup(newGroup);
     }
 
+    public void removeUser(Group selectedGroup, User user) {
+        groupDao.removeUser(selectedGroup,user);
+        
+    }
+
 }

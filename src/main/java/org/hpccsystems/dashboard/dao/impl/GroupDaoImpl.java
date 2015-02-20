@@ -110,5 +110,10 @@ public class GroupDaoImpl implements GroupDao {
     @Override
     public void addgroup(Group newGroup) {
         jdbcTemplate.update(Queries.INSERT_NEW_GROUP, new Object[]{newGroup.getCode(),newGroup.getName()});
+    }
+
+    @Override
+    public void removeUser(Group selectedGroup, User user) {
+        jdbcTemplate.update(Queries.DELETE_GROUP_USER,new Object[]{user.getId(),selectedGroup.getCode()} );
     }    
 }

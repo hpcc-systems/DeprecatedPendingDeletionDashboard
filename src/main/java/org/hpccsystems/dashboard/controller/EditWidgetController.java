@@ -65,7 +65,6 @@ import org.zkoss.zul.Tabpanel;
 import org.zkoss.zul.Tabpanels;
 import org.zkoss.zul.Tabs;
 import org.zkoss.zul.Textbox;
-import org.zkoss.zul.Vbox;
 import org.zkoss.zul.Window;
 
 import com.google.gson.Gson;
