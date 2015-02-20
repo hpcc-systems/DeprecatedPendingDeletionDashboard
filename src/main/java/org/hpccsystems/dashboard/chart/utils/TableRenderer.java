@@ -285,20 +285,13 @@ public class TableRenderer {
         return div;
     }
     
-	public Vbox constructScoredSearchTable(Map<String, List<Attribute>> scoredTableData,Boolean isEditing) {
-		Vbox vbox = new Vbox();
+	public Listbox constructScoredSearchTable(Map<String, List<Attribute>> scoredTableData,Boolean isEditing) {
 		final Listbox listBox = new Listbox();
 		listBox.setMold("paging");
 		listBox.setSizedByContent(true);
 		listBox.setHflex("1");
 		listBox.setSpan(true);
-		if (isEditing) {
-	            // .. 542 - 30 -22
-	            listBox.setHeight("445px");             
-	        } else {
-	            // .. 385 - 30 -25    
-	            listBox.setHeight("330px"); 
-	        }
+		listBox.setVflex("1");
 		listBox.setAutopaging(true);
 		
 		Listhead listhead = new Listhead();
@@ -313,8 +306,7 @@ public class TableRenderer {
 		}
 		
 		listBox.appendChild(listhead);
-		vbox.appendChild(listBox);
-		return vbox;
+		return listBox;
 
 	}
 

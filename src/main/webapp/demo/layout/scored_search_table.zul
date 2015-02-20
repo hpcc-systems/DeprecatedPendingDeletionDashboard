@@ -45,7 +45,7 @@
 							</rows>
 						</grid>
 						<hbox hflex="1" pack="end">
-							<button id="inputDoneButton1" label="Add Chart to Dashboard" zclass="btn btn-sm btn-success right-btn"/>
+							<button id="inputDoneButton" label="Add Chart to Dashboard" zclass="btn btn-sm btn-success right-btn"/>
 							<space></space>
 						</hbox>
 					</vbox>

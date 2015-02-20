@@ -57,6 +57,7 @@ import org.zkoss.zul.Button;
 import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Include;
+import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Tab;
 import org.zkoss.zul.Tabbox;
@@ -470,9 +471,11 @@ public class EditWidgetController extends SelectorComposer<Component> {
 			Tab tab = new Tab(entry.getKey());
 			tab.setParent(tabs);
 			Tabpanel tabpanel = new Tabpanel();
-			Vbox vbox = tableRenderer.constructScoredSearchTable(entry.getValue(),false);
-			vbox.setParent(tabpanel);
+			Listbox listBox = tableRenderer.constructScoredSearchTable(entry.getValue(),false);
+			listBox.setParent(tabpanel);
+			tabpanel.setVflex("1");
 			tabpanel.setParent(tabpanels);
+			tabpanel.setVflex("1");
 		}	
 	}
 

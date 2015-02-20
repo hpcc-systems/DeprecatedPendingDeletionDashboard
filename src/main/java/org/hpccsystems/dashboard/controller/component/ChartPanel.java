@@ -46,6 +46,7 @@ import org.hpccsystems.dashboard.services.GroupService;
 import org.hpccsystems.dashboard.services.HPCCQueryService;
 import org.hpccsystems.dashboard.services.HPCCService;
 import org.hpccsystems.dashboard.services.WidgetService;
+import org.hpccsystems.dashboard.util.UiGenerator;
 import org.springframework.dao.DataAccessException;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
@@ -363,7 +364,11 @@ public class ChartPanel extends Panel {
             ChartPanel.this.setMaximizable(true);
             if(!ChartPanel.this.isMaximized()){
                 holderDiv.setHeight("");
-                holderDiv.setVflex("1");
+                if ((Constants.CATEGORY_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory())||(Constants.CATEGORY_TEXT_EDITOR == chartService.getCharts().get(portlet.getChartType()).getCategory())||(Constants.CATEGORY_SCORED_SEARCH_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory())) {
+                	holderDiv.setHeight(String.valueOf(UiGenerator.getScreenSize().height-250)+"px");
+                } else {
+                	holderDiv.setVflex("1");	
+                }
                 ChartPanel.this.setMaximized(true);
                 resizeBtn.setSclass(RESIZE_MIN_STYLE);
                 resizeBtn.setTooltiptext("Minimize window");
@@ -652,8 +657,8 @@ public class ChartPanel extends Panel {
                 Tab tab = new Tab(entry.getKey());
                 tab.setParent(tabs);
                 Tabpanel tabpanel = new Tabpanel();
-                Vbox vbox = tableRenderer.constructScoredSearchTable(entry.getValue(),false);
-                vbox.setParent(tabpanel);
+                Listbox listBox = tableRenderer.constructScoredSearchTable(entry.getValue(),false);
+                listBox.setParent(tabpanel);
                 tabpanel.setParent(tabpanels);
             }
         } catch (RemoteException | HpccConnectionException e) {
