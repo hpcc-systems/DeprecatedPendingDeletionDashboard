@@ -56,7 +56,8 @@ public class AuthenticationDaoImpl implements AuthenticationDao{
                     } else {
                         user.setActiveFlag(Constants.ACTIVE_FLAG);
                     }
-                    
+                }else{
+                    return null;
                 }
             }
         } catch(EmptyResultDataAccessException ex) {

@@ -1,58 +1,85 @@
-<window width="1000px" vflex="1" apply="org.hpccsystems.dashboard.controller.GroupManageController" 
-	border="normal"  contentStyle="overflow:auto" zclass="dashboard-container">
+<window apply="org.hpccsystems.dashboard.controller.GroupManageController" border="normal" hflex="1" vflex="1" contentStyle="overflow:auto" zclass="dashboard-container">
 	
-	<vlayout zclass="dashboard-body" hflex="1" vflex="1">
-		<panel id="pwdPanel" sclass="pagePanel" collapsible="true">
+	<caption sclass="panel-heading" zclass="dashboard-header">
+		<div style="padding:0">
+			<hbox pack="stretch" width="100%" style="font-size:12px">
+				<label zclass="h1" value="${labels.profile}" />  
+				
+			</hbox> 
+		</div>
+	</caption>
+
+	<vlayout zclass="dashboard-body" style="margin-top: 32px; padding:10px">
+		<panel id="pwdPanel" sclass="pagePanel" vflex="1">
 			<caption iconSclass="glyphicon glyphicon-pushpin">
 				<label zclass="h5" value="${labels.resetPwd}"></label>			
 			</caption>
 			<panelchildren>
 				<vbox hflex="1">
-					<hbox sclass="form-group" hflex="1" pack="center" spacing="15px">
+					<hbox sclass="form-group" hflex="1" pack="center" spacing="50px">
 						<label value="${labels.oldPwd}"></label>
-						<textbox id="oldPwd" constraint="no empty"></textbox>
+						<textbox id="oldPwd"  type="password"></textbox>
 					</hbox>
-					<hbox sclass="form-group" hflex="1" pack="center" spacing="15px">
+					<hbox sclass="form-group" hflex="1" pack="center" spacing="45px">
 						<label value="${labels.newPwd}"></label>
-						<textbox id="newPwd" constraint="no empty"></textbox>
+						<textbox id="newPwd"  type="password"></textbox>
 					</hbox>
-					<hbox sclass="form-group" hflex="1" pack="center" spacing="15px">
+					<hbox sclass="form-group" hflex="1" pack="center" spacing="27px">
 						<label value="${labels.confirmPassowrd}"></label>
-						<textbox id="confirmPwd" constraint="no empty"></textbox>
+						<textbox id="confirmPwd"  type="password"></textbox>
 					</hbox>
 					<hbox sclass="form-group" hflex="1" pack="center">
-						<button id="changePwdBtn"  label="${labels.changePwd}"  zclass="btn btn-primary" width="135px" />
+						<button id="changePwdBtn"  label="${labels.changePwd}"  zclass="btn btn-primary btn-sm" width="135px" />
 					</hbox>
 				</vbox>	
 			</panelchildren>
 		</panel>
 		
-		<panel id="groupPanel" sclass="pagePanel" collapsible="true">
+		<panel id="groupPanel" sclass="pagePanel" vflex="1" visible="false">
 			<caption iconSclass="glyphicon glyphicon-pushpin">
 				<label zclass="h5" value="${labels.mngGroup}"></label>			
 			</caption>
 			<panelchildren>
 				<hbox hflex="1" vflex="1">
-					<listbox>
+					<listbox hflex="1" vflex="1" id="groupListbox">
 						<listhead>
 							<listheader label="${labels.avlGroups}">
 							</listheader>
 						</listhead>
+						<listfoot>
+							<listfooter>
+								<vbox vflex="1">
+									<hbox>
+										<textbox id="groupname" placeholder="Enter group name"></textbox>
+										<button id="addGroupBtn"  label="${labels.addGroup}"  zclass="btn btn-primary btn-sm" width="135px" />
+									</hbox>
+									
+								</vbox>
+							</listfooter>
+						</listfoot>
 					</listbox>
-					<listbox droppable="true">
+					<listbox hflex="1" vflex="1" id="groupUserListbox" emptyMessage="No users available">
 						<listhead>
 							<listheader label="${labels.GroupMem}">
 							</listheader>
 						</listhead>
 					</listbox>
-					<listbox draggable="true">
+					<listbox id="userListbox"  checkmark="true" hflex="1" vflex="1">
 						<listhead>
 							<listheader label="${labels.avlUsers}">
 							</listheader>
 						</listhead>
+						<listfoot>
+							<listfooter>
+								<button id="adduserBtn"  label="${labels.adduser}"  zclass="btn btn-primary btn-sm" width="135px" />
+							</listfooter>
+						</listfoot>
 					</listbox>
 				</hbox>
 			</panelchildren>
 		</panel>
 	</vlayout>
 </window>
+
+
+

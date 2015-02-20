@@ -3,9 +3,11 @@ package org.hpccsystems.dashboard.controller;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.entity.User;
+import org.hpccsystems.dashboard.exception.EncryptDecryptException;
 import org.hpccsystems.dashboard.services.UserService;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
+import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
@@ -56,7 +58,12 @@ public class RegisterController  extends SelectorComposer<Component>{
         user.setFirstName(fname.getText());
         user.setLastName(lname.getText());
         
-        boolean isRegistered = userService.addUser(user);
+        boolean isRegistered = false;
+        try {
+            isRegistered = userService.addUser(user);
+        } catch (EncryptDecryptException e) {
+            Clients.showNotification(Labels.getLabel("registrationFailed"), Clients.NOTIFICATION_TYPE_ERROR, getSelf(), "middle_center", 0, true);
+        }
         
         if(isRegistered) {
             userid.setText(null);
@@ -64,7 +71,9 @@ public class RegisterController  extends SelectorComposer<Component>{
             lname.setText(null);
             password.setText(null);
             confirmPassword.setText(null);
-            Clients.showNotification(Labels.getLabel("registrationSuccess"));
+            
+            //Redirects to login page
+            Executions.sendRedirect("/login.zhtml");
         } else {
             Clients.showNotification(Labels.getLabel("registrationFailed"), Clients.NOTIFICATION_TYPE_ERROR, getSelf(), "middle_center", 0, true);
         }

@@ -192,37 +192,38 @@ public class User  implements Serializable,Cloneable {
         this.car = car;
     }
 
-
     @Override
     public int hashCode() {
-        int prime = 31;
+        final int prime = 31;
         int result = 1;
-        result = prime * result + ((account == null) ? 0 : account.hashCode());
+        result = prime * result
+                + ((fullName == null) ? 0 : fullName.hashCode());
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
         return result;
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj){
+    public boolean equals(Object obj) {
+        if (this == obj)
             return true;
-        }    
-        if (obj == null){
+        if (obj == null)
             return false;
-        }    
-        if (getClass() != obj.getClass()){
+        if (getClass() != obj.getClass())
             return false;
-        }    
-        final User other = (User) obj;
-        if (account == null) {
-            if (other.account != null){
+        User other = (User) obj;
+        if (fullName == null) {
+            if (other.fullName != null)
                 return false;
-            }    
-        } else if (!account.equals(other.account)){
+        } else if (!fullName.equals(other.fullName))
             return false;
-        }    
+        if (id == null) {
+            if (other.id != null)
+                return false;
+        } else if (!id.equals(other.id))
+            return false;
         return true;
     }
-    
+
     public static User clone(final User user){
         try {
             return (User)user.clone();

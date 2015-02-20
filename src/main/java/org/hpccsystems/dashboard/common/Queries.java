@@ -46,6 +46,10 @@ public class Queries {
     public static final String GET_ALL_GROUPS = "select * from group_details";
     public static final String GET_USER_GROUPS = "select * from group_details as g JOIN user_groups as u ON g.group_code = u.group_code AND u.user_id=?";
     public static final String GET_ALL_USER_IDS = "SELECT id FROM user_details";
+    public static final String RESET_USER_PASSWORD = "UPDATE user_details SET password=? WHERE id=?";
+    public static final String GET_ALL_USER = "SELECT * FROM user_details";
+    public static final String INSERT_GROUP_USER = "INSERT INTO user_groups(group_code,user_id) values(?,?) ";
+    public static final String INSERT_NEW_GROUP = "INSERT INTO group_details(group_code,group_name) values(?,?)";
     
     
 }

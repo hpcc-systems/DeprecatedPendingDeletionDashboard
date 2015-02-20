@@ -202,8 +202,14 @@
 			<groupId>com.lowagie</groupId>
 			<artifactId>itext</artifactId>
 			<version>2.1.7</version>
-		</dependency>	
-		
+		</dependency>
+			
+		<!-- Collection utils supported by Apache  -->
+		<dependency>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-collections4</artifactId>
+			<version>4.0</version>
+		</dependency>
 		
 	</dependencies>
 	<build>
