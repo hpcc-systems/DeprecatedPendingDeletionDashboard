@@ -82,6 +82,12 @@
 	<bean id="userDao" class="org.hpccsystems.dashboard.dao.impl.UserDaoImpl">
 		<property name="dataSource" ref="mySQLDataSource"></property>
 	</bean>
+	
+	
+	<bean id="dbGroupService" class="org.hpccsystems.dashboard.services.impl.DBGroupServiceImpl">
+		<property name="groupDao" ref="groupDao"></property>
+	</bean>
+	
    
   <bean id="mySQLDataSource" class="org.apache.commons.dbcp.BasicDataSource">
         <property name="driverClassName">
