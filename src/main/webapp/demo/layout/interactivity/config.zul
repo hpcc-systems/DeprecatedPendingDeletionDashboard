@@ -1,0 +1,66 @@
+<window apply="org.hpccsystems.dashboard.controller.InteractivityController" width="750px" height="500px" closable="true" sclass="panel">
+	<caption iconSclass="glyphicon glyphicon-cog">
+		<label zclass="h5">${labels.interactivity}</label>
+	</caption>	
+	
+<vlayout  id="joinLayout" style="background-color: white;"> 
+	
+	<vbox vflex="1" hflex="1">
+	<hbox hflex="1">
+		<panel sclass="editPanel" height="180px" hflex="1">
+			<caption>
+				<label zclass="h5" value="${labels.sourceWidget}"></label>
+			</caption>
+			<panelchildren>
+				<vbox hflex="1" align="center" pack="center">
+					<combobox hflex="1"  id="sourceCombobox" autodrop="true"></combobox>
+					<listbox hflex="1"  id="sourceListBox" style="margin:3px;"	vflex="1" multiple="false" visible="false">
+						<listhead>
+							<listheader label="Columns" sclass="lightHeader">
+							</listheader>
+						</listhead>
+					</listbox>
+				</vbox>
+			</panelchildren>
+		</panel>
+		<panel sclass="editPanel" height="180px" hflex="1">
+			<caption>
+				<label zclass="h5" value="${labels.targetWidget}"></label>
+			</caption>
+			<panelchildren>
+				<vbox hflex="1" align="center" pack="center">
+					<combobox hflex="1"  id="targetCombobox" autodrop="true"></combobox>
+					<listbox hflex="1"  id="targetListBox" style="margin:3px;" vflex="1" multiple="false" visible="false">
+						<listhead>
+							<listheader label="Columns"	sclass="lightHeader">
+							</listheader>
+						</listhead>
+					</listbox>
+				</vbox>
+			</panelchildren>
+		</panel>
+	</hbox>
+	
+	<hbox hflex="1" pack="end">
+		<button zclass="btn btn-xs btn-info" id="addInteractivity" style="float:right; margin: 5px" disabled="true">
+			${labels.addInteractivity}
+		</button>
+	</hbox>
+
+	<panel sclass="editPanel"  id="joinConditionPanel" height="100px">
+		<caption>
+			<label zclass="h5" value="${labels.definedinteractivity}"></label>
+		</caption>
+		<panelchildren>
+			<listbox id="interactivityListbox" height="80px" emptyMessage="Define a Interactivity">
+			</listbox>
+		</panelchildren>
+	</panel>
+
+	<hbox pack="end" hflex="1">
+				<button label="${labels.visualize}" zclass="btn btn-success" id="visualizeBtn" style="float:right; margin: 5px" />
+		</hbox>
+	</vbox>
+	
+</vlayout>
+</window>

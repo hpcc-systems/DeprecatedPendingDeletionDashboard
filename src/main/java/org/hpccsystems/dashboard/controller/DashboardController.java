@@ -125,8 +125,6 @@ public class DashboardController extends SelectorComposer<Window>{
     @Wire
     private Label nameLabel;
     
-    @Wire
-    private Window dashboardWin;
     
     @Wire
     private Toolbar dashboardToolbar;
@@ -294,12 +292,12 @@ public class DashboardController extends SelectorComposer<Window>{
             }
             
         } else {
-            dashboardWin.setBorder("none");            
+            this.getSelf().setBorder("none");            
             return;
         }
          
-        dashboardWin.addEventListener("onPortalClose", onPanelClose);
-        dashboardWin.addEventListener("onLayoutChange", onLayoutChange);
+        this.getSelf().addEventListener("onPortalClose", onPanelClose);
+        this.getSelf().addEventListener("onLayoutChange", onLayoutChange);
         
         if(LOG.isDebugEnabled()){
             LOG.debug("Created Dashboard");
@@ -1255,10 +1253,10 @@ public class DashboardController extends SelectorComposer<Window>{
         oldColumnCount = dashboard.getColumnCount();
         
         Map<String, Object> parameters = new HashMap<String, Object>();
-        parameters.put(Constants.PARENT, dashboardWin);
+        parameters.put(Constants.PARENT, this.getSelf());
         parameters.put(Constants.DASHBOARD, dashboard);
         
-        Window window  = (Window) Executions.createComponents("/demo/layout/dashboard_config.zul", dashboardWin, parameters);
+        Window window  = (Window) Executions.createComponents("/demo/layout/dashboard_config.zul", this.getSelf(), parameters);
         window.doModal();
     }
     
@@ -1795,5 +1793,14 @@ public class DashboardController extends SelectorComposer<Window>{
             LOG.error(Constants.EXCEPTION, e);
             throw e;
         }    
+    }
+    
+    @Listen("onClick = #interactivityBtn")
+    public void onClickInteractivity() {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put(Constants.DASHBOARD, dashboard);
+        
+        Window window  = (Window) Executions.createComponents("/demo/layout/interactivity/config.zul", this.getSelf(), parameters);
+        window.doModal();
     }
 }
