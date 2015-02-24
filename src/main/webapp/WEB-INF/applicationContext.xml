@@ -74,13 +74,27 @@
 	<bean id="groupDao" class="org.hpccsystems.dashboard.dao.impl.GroupDaoImpl">
 		<property name="dataSource" ref="mySQLDataSource"></property>
 	</bean>
+	
+	<bean id="userService" class="org.hpccsystems.dashboard.services.impl.UserServiceImpl">
+		<property name="userDao" ref="userDao"></property>
+	</bean>
+	
+	<bean id="userDao" class="org.hpccsystems.dashboard.dao.impl.UserDaoImpl">
+		<property name="dataSource" ref="mySQLDataSource"></property>
+	</bean>
+	
+	
+	<bean id="dbGroupService" class="org.hpccsystems.dashboard.services.impl.DBGroupServiceImpl">
+		<property name="groupDao" ref="groupDao"></property>
+	</bean>
+	
    
   <bean id="mySQLDataSource" class="org.apache.commons.dbcp.BasicDataSource">
         <property name="driverClassName">
             <value>com.mysql.jdbc.Driver</value>
         </property>
         <property name="url">
-            <value>jdbc:mysql://localhost:3306/dashboard_ch</value>
+            <value>jdbc:mysql://localhost:3306/dashboard</value>
         </property>
         <property name="username">
             <value>root</value>
