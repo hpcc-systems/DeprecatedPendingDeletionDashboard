@@ -1,5 +1,7 @@
 package org.hpccsystems.dashboard.controller;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -31,6 +33,7 @@ import org.zkoss.zul.Comboitem;
 import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Window;
+
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class InteractivityController extends SelectorComposer<Component> {
 
@@ -53,6 +56,8 @@ public class InteractivityController extends SelectorComposer<Component> {
     
     private  Dashboard dashboard;
     private Window parent;
+    private List<Portlet> selectedTables = new ArrayList<Portlet>(); 
+    
     
     
     EventListener<Event> populateTableAttributes = (event) -> {
@@ -143,14 +148,14 @@ public class InteractivityController extends SelectorComposer<Component> {
         interactivity.setTargetId(portlet.getId());
         interactivity.setSourceColumn(sourceListBox.getSelectedItem().getValue());
         interactivity.setTragetColumn(targetListBox.getSelectedItem().getLabel());
-        
-        //to set interactivity to tabledata
-        
+        TableData tableData=(TableData) portlet.getChartData();
+        tableData.setInteractivity(interactivity);
+        selectedTables.add(portlet);
     }
     
     @Listen("onClick = #saveBtn")
     public void onClickSave(){
-        Events.postEvent(Constants.ON_SAVE_INTERACTIVITY, parent, null);
+        Events.postEvent(Constants.ON_SAVE_INTERACTIVITY, parent, selectedTables);
         //Update tabledata with interactivity object in DB 
     }
 }
