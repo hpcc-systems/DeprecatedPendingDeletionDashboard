@@ -140,6 +140,19 @@ VALUES('Scored Search',
 '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xyConfiguration><imageURL>chart/scored_search.png</imageURL></xyConfiguration>',
 '2',9,false);
 
+INSERT INTO chart_details(name,description,configuration,created_by,category,isplugin) 
+VALUES('Relevant',
+'Relevant widget',
+'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                <xyConfiguration>
+                                <dependentCssURL>http://handsontable.com/dist/handsontable.full.css</dependentCssURL>
+                                <functionName>createRelevantChart</functionName>
+                                <imageURL>chart/China_Relevant_Graph.jpg</imageURL>
+                                <dependentCssURL>js/relevant/css/relevant.css</dependentCssURL>
+                                <jsURL>js/relevant.js</jsURL>
+                </xyConfiguration>',
+'2',10,false);
+
 create table acl_public (
 dashboard_id  INT,  
 group_code VARCHAR(50),
