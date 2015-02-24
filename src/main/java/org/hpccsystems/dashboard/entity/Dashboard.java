@@ -255,6 +255,18 @@ public class Dashboard {
         }
         return true;
     }
+    
+    public List<Portlet> getLiveCharts(){
+        List<Portlet> liveCharts = new ArrayList<Portlet>();
+        if(this.portletList != null) {
+            for (Portlet portlet : this.portletList) {
+                if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())) {
+                    liveCharts.add(portlet);
+                }
+            }
+        }
+        return liveCharts;
+    }
 
     @Override
     public String toString() {    

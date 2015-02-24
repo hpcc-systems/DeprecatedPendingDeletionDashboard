@@ -21,7 +21,9 @@ public class ChartData {
     private boolean isFiltered;
     private Set<Filter> filters;
     private Set<Join> joins;
-
+    private boolean isQuery;
+    private List<InputParams> inputParams;
+    
 	/**
      * Checks the query, whether it has'GENERIC' key.
      * If it has, constructs query as 'PROJECTNAME_fetch_input_parameters'
@@ -40,8 +42,7 @@ public class ChartData {
 		return StringUtils.containsIgnoreCase(files.get(0), Constants.GENERIC);		 
 	}
 
-	private boolean isQuery;
-    private List<InputParams> inputParams;
+	
     
     @XmlTransient
     public Map<String, List<Field>> getFields() {
