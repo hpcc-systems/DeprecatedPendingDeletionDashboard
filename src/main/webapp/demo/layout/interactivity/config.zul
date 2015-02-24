@@ -42,7 +42,7 @@
 	</hbox>
 	
 	<hbox hflex="1" pack="end">
-		<button zclass="btn btn-xs btn-info" id="addInteractivity" style="float:right; margin: 5px" disabled="true">
+		<button zclass="btn btn-xs btn-info" id="addInteractivity" style="float:right; margin: 5px">
 			${labels.addInteractivity}
 		</button>
 	</hbox>

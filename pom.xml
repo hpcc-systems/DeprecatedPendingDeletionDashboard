@@ -32,8 +32,8 @@
 			<url>http://mavensync.zkoss.org/maven2</url>
 		</repository>
 		<repository>
-			<id>ZK PE</id>
-        	<url>http://mavensync.zkoss.org/eval</url>
+			<id>ZK EE</id>
+        	<url>https://maven.zkoss.org/repo/zk/ee</url>
 		</repository>
 	</repositories>
 
@@ -204,7 +204,7 @@
 			<version>2.1.7</version>
 		</dependency>
 			
-		<!-- Collection utils supported by Apache  -->
+		<!-- Collection util supported by Apache  -->
 		<dependency>
 			<groupId>org.apache.commons</groupId>
 			<artifactId>commons-collections4</artifactId>

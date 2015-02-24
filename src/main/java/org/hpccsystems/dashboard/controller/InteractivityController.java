@@ -149,21 +149,23 @@ public class InteractivityController extends SelectorComposer<Component> {
     @Listen("onClick=#addInteractivity")
     public void click() {
         Interactivity interactivity=new Interactivity();
-        Portlet portlet=(Portlet) ((ListModelList)sourceCombobox.getModel()).getSelection().iterator().next();
-        interactivity.setSourceId(portlet.getId());
-        portlet=(Portlet) ((ListModelList)targetCombobox.getModel()).getSelection().iterator().next();
-        interactivity.setTargetId(portlet.getId());
-        interactivity.setSourceColumn(sourceListBox.getSelectedItem().getValue());
+        Portlet sourceportlet=(Portlet) ((ListModelList)sourceCombobox.getModel()).getSelection().iterator().next();
+        interactivity.setSourceId(sourceportlet.getId());
+        Portlet targetportlet=(Portlet) ((ListModelList)targetCombobox.getModel()).getSelection().iterator().next();
+        interactivity.setTargetId(targetportlet.getId());
+        interactivity.setSourceColumn(sourceListBox.getSelectedItem().getLabel());
         interactivity.setTragetColumn(targetListBox.getSelectedItem().getLabel());
-        TableData tableData=(TableData) portlet.getChartData();
+        TableData tableData=(TableData) sourceportlet.getChartData();
+        tableData.setHasInteractivity(true);
         tableData.setInteractivity(interactivity);
-        selectedTables.add(portlet);
-        
-        
+        selectedTables.add(sourceportlet);
+        LOG.debug("interactivity -->"+interactivity);
     }
     
     @Listen("onClick = #saveBtn")
     public void onClickSave(){
+        //TODO:need to get selected tables from UI instead of having selectedTables @ class level
+        LOG.debug("selectedTables -->"+selectedTables);
         Events.postEvent(Constants.ON_SAVE_INTERACTIVITY, parent, selectedTables);
         //Update tabledata with interactivity object in DB 
     }

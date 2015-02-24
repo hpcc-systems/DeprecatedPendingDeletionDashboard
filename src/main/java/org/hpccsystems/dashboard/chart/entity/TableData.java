@@ -47,7 +47,9 @@ public class TableData extends ChartData {
     @Override
     public String toString() {
         StringBuilder buffer = new StringBuilder();
-        buffer.append("TableData [attributes=").append(attributes).append("]");
+        buffer.append("TableData [attributes=").append(attributes)
+        .append(",hasInteractivity = ").append(hasInteractivity)
+        .append(",interactivity = ").append(interactivity).append("]");
         return buffer.toString();
     }
 

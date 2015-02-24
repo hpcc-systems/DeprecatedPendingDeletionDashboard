@@ -8,8 +8,10 @@ public class Interactivity {
     
 private int sourceId;
 private int targetId;
-private Attribute sourceColumn;
+private String sourceColumn;
 private String tragetColumn;
+private String filterValue;
+
 
 @XmlElement
 public int getSourceId() {
@@ -26,10 +28,10 @@ public void setTargetId(int targetId) {
     this.targetId = targetId;
 }
 @XmlElement
-public Attribute getSourceColumn() {
+public String getSourceColumn() {
     return sourceColumn;
 }
-public void setSourceColumn(Attribute sourceColumn) {
+public void setSourceColumn(String sourceColumn) {
     this.sourceColumn = sourceColumn;
 }
 @XmlElement
@@ -38,6 +40,19 @@ public String getTragetColumn() {
 }
 public void setTragetColumn(String tragetColumn) {
     this.tragetColumn = tragetColumn;
+}
+@XmlElement
+public String getFilterValue() {
+    return filterValue;
+}
+public void setFilterValue(String filterValue) {
+    this.filterValue = filterValue;
+}
+@Override
+public String toString() {
+    return "Interactivity [sourceId=" + sourceId + ", targetId=" + targetId
+            + ", sourceColumn=" + sourceColumn + ", tragetColumn="
+            + tragetColumn + "]";
 }
 
 

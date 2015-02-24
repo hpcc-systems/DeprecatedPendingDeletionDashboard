@@ -29,6 +29,7 @@ import org.hpccsystems.dashboard.chart.cluster.ClusterData;
 import org.hpccsystems.dashboard.chart.entity.ChartData;
 import org.hpccsystems.dashboard.chart.entity.Field;
 import org.hpccsystems.dashboard.chart.entity.Filter;
+import org.hpccsystems.dashboard.chart.entity.RelevantData;
 import org.hpccsystems.dashboard.chart.entity.TableData;
 import org.hpccsystems.dashboard.chart.entity.TextData;
 import org.hpccsystems.dashboard.chart.entity.XYChartData;
@@ -91,6 +92,7 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Messagebox;
+import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Messagebox.ClickEvent;
 import org.zkoss.zul.Panel;
 import org.zkoss.zul.Popup;
@@ -101,6 +103,9 @@ import org.zkoss.zul.Tabbox;
 import org.zkoss.zul.Tabpanel;
 import org.zkoss.zul.Toolbar;
 import org.zkoss.zul.Window;
+import org.hpccsystems.dashboard.chart.entity.Interactivity;
+
+import com.google.gson.Gson;
 
 /**
  * DashboardController class is used to add new dashboard into sidebar and 
@@ -177,6 +182,44 @@ public class DashboardController extends SelectorComposer<Window>{
     @WireVariable
     private GroupService groupService;
     
+    EventListener<Event> redrawInteractivityTable = (event) -> {
+        List<Portlet> selectedtables = (List<Portlet>) event.getData();
+        selectedtables.stream().forEach(portlet -> {
+            List<Component> chartPanels = portalChildren.get(portlet.getColumn()).getChildren();
+                    ChartPanel selectedTablePanel = (ChartPanel) chartPanels
+                            .stream()
+                            .filter(panel -> portlet.getId().equals(
+                                    ((ChartPanel) panel).getPortlet().getId()))
+                            .findFirst().get();
+                   LOG.debug("panel's --->"+selectedTablePanel.getPortlet());
+                   LOG.debug("selected --->"+portlet);
+                   selectedTablePanel.drawTableWidget();
+        });
+    };
+    
+    EventListener<Event> applyInteractivityFilter = (event) -> {
+        Interactivity interactivity = (Interactivity) event.getData();
+        Portlet releventPortlet = dashboard.getPortletList().stream().filter(portlet -> portlet.getId().equals(interactivity.getTargetId())).findFirst().get();
+        List<Component> chartPanels = portalChildren.get(releventPortlet.getColumn()).getChildren();
+        ChartPanel selectedRelevantPanel = (ChartPanel) chartPanels
+                .stream()
+                .filter(panel -> releventPortlet.getId().equals(
+                        ((ChartPanel) panel).getPortlet().getId()))
+                .findFirst().get();
+        
+        RelevantData relevantData = (RelevantData)releventPortlet.getChartData();
+        relevantData.setClaimId(interactivity.getFilterValue());
+        String relJSON = new Gson().toJson(relevantData);
+        LOG.debug("relJSON --> "+relJSON);
+        
+        releventPortlet.setChartDataJSON(relJSON);
+        
+        String chartScript = selectedRelevantPanel.drawD3Graph();
+        if (chartScript != null) {
+            Clients.evalJavaScript(chartScript);
+        } 
+        
+    };
     @Override
     public void doAfterCompose(Window comp) throws Exception {
         super.doAfterCompose(comp);
@@ -309,6 +352,8 @@ public class DashboardController extends SelectorComposer<Window>{
         this.getSelf().addEventListener("onDrawingLiveChart", onDrawingLiveChart);
         this.getSelf().addEventListener("onPanelReset", onPanelReset);
         this.getSelf().addEventListener("onPanelDrawn", onPanelDrawn);
+        this.getSelf().addEventListener(Constants.ON_SAVE_INTERACTIVITY, redrawInteractivityTable);
+        this.getSelf().addEventListener(Constants.ON_SELECT_INTERACTIVITY_FILTER, applyInteractivityFilter);
         
         //Setting common HpccObject to Session
         if(dashboard.getHasCommonFilter()) {

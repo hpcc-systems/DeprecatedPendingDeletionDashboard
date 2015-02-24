@@ -86,9 +86,11 @@ public class TableRenderer {
                     .getDisplayName()));
         }
 
+        Vbox vbox = new Vbox();
+        
         listheader = populateListHeader(chartData, tableDataMap, listBox,
                 listhead, listheader, columnList);
-        populateListCell(listBox, columnList, chartData);
+        populateListCell(listBox, columnList, chartData,tableDataMap,vbox);
         listBox.appendChild(listhead);
         Hbox hbox = new Hbox();
         hbox.setStyle("margin-left: 3px");
@@ -112,7 +114,7 @@ public class TableRenderer {
             }
         });
         hbox.appendChild(button);
-        Vbox vbox = new Vbox();
+       
         vbox.setVflex("1");
         //Appending Chart Title as Data file name
         final Div div = new Div();            
@@ -138,28 +140,52 @@ public class TableRenderer {
     }
 
     private void populateListCell(final Listbox listBox,
-            List<List<Attribute>> columnList, TableData chartData) {
+            List<List<Attribute>> columnList, TableData chartData,
+            Map<String, List<Attribute>> tableDataMap,Vbox vbox) {
         Listcell listcell;
         Listitem listitem;
+        
+        String interactivityColumn = null;
+        if(chartData.getHasInteractivity()){
+            interactivityColumn = chartData.getInteractivity().getSourceColumn();
+        }
+        
         for (int index = 0; index < columnList.get(0).size(); index++) {
             listitem = new Listitem();
-            for (List<Attribute> list : columnList) {
-                listcell = new Listcell();
-                Attribute listCellValue = list.get(index);
+            for (Map.Entry<String, List<Attribute>> entry : tableDataMap.entrySet()) {
                 
-                if(chartData.getEnableChangeIndicators() && (getNumericValue(listCellValue.getColumn()) < 0)) {
-                    listcell.setIconSclass("z-icon-long-arrow-down");
-                    listcell.setStyle("background-color: rgb(255, 113, 113);");
-                } else if(chartData.getEnableChangeIndicators() && (getNumericValue(listCellValue.getColumn()) > 0)) {
-                    listcell.setIconSclass("z-icon-long-arrow-up");
-                    listcell.setStyle("background-color: rgb(136, 255, 136);");
-                }
-                
-                listcell.setLabel(listCellValue.getColumn());
-                listcell.setParent(listitem);
+                List<Attribute> values = entry.getValue();
+                    listcell = new Listcell();
+                    Attribute listCellValue = values.get(index);
+                    
+                    if(chartData.getEnableChangeIndicators() && (getNumericValue(listCellValue.getColumn()) < 0)) {
+                        listcell.setIconSclass("z-icon-long-arrow-down");
+                        listcell.setStyle("background-color: rgb(255, 113, 113);");
+                    } else if(chartData.getEnableChangeIndicators() && (getNumericValue(listCellValue.getColumn()) > 0)) {
+                        listcell.setIconSclass("z-icon-long-arrow-up");
+                        listcell.setStyle("background-color: rgb(136, 255, 136);");
+                    }
+                    
+                  //Column chosen for interactivity shown different style 
+                    if(interactivityColumn != null && interactivityColumn.equals(entry.getKey())){
+                        listcell.setStyle("color:#5858FA");
+                        chartData.getInteractivity().setFilterValue(listCellValue.getColumn());
+                        listcell.addEventListener(Events.ON_CLICK, event ->{
+                            LOG.debug("win -->"+vbox.getParent().getParent().getFellow("dashboardWin"));
+                        Events.postEvent(
+                                Constants.ON_SELECT_INTERACTIVITY_FILTER,
+                                vbox.getParent().getParent()
+                                        .getFellow("dashboardWin"),
+                                chartData.getInteractivity());
+                        });
+                    }
+                    
+                    listcell.setLabel(listCellValue.getColumn());
+                    listcell.setParent(listitem);
             }
             listitem.setParent(listBox);
         }
+       
     }
     
     private int getNumericValue(String value) {
@@ -175,9 +201,19 @@ public class TableRenderer {
             Map<String, List<Attribute>> tableDataMap, final Listbox listBox,
             Listhead listhead, Listheader listheader,
             List<List<Attribute>> columnList) {
+           
+            String interactivityColumn = null;
+            if(chartData.getHasInteractivity()){
+                interactivityColumn = chartData.getInteractivity().getSourceColumn();
+            }
+            
         for (Map.Entry<String, List<Attribute>> entry : tableDataMap.entrySet()) {
             String columnStr = entry.getKey();
             listheader = listHeader(chartData, listheader, columnStr);
+            //Column chosen for interactivity shown different style 
+            if(interactivityColumn != null && interactivityColumn.equals(entry.getKey())){
+                listheader.setStyle("color:#5858FA");
+            }
             listheader.setSort("auto");
             listheader.setParent(listhead);
             listhead.setParent(listBox);
