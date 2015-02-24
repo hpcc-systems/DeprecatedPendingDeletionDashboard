@@ -3,11 +3,11 @@
 		<label zclass="h5">${labels.interactivity}</label>
 	</caption>	
 	
-<vlayout  id="joinLayout" style="background-color: white;"> 
+<vlayout  vflex="1" id="joinLayout" style="background-color: white;"> 
 	
 	<vbox vflex="1" hflex="1">
-	<hbox hflex="1">
-		<panel sclass="editPanel" height="180px" hflex="1">
+	<hbox hflex="1" vflex="1">
+		<panel sclass="editPanel"  hflex="1" vflex="1">
 			<caption>
 				<label zclass="h5" value="${labels.sourceWidget}"></label>
 			</caption>
@@ -23,7 +23,7 @@
 				</vbox>
 			</panelchildren>
 		</panel>
-		<panel sclass="editPanel" height="180px" hflex="1">
+		<panel sclass="editPanel"  hflex="1" vflex="1">
 			<caption>
 				<label zclass="h5" value="${labels.targetWidget}"></label>
 			</caption>
@@ -47,18 +47,18 @@
 		</button>
 	</hbox>
 
-	<panel sclass="editPanel"  id="joinConditionPanel" height="100px">
+	<panel sclass="editPanel"  id="joinConditionPanel" >
 		<caption>
 			<label zclass="h5" value="${labels.definedinteractivity}"></label>
 		</caption>
 		<panelchildren>
-			<listbox id="interactivityListbox" height="80px" emptyMessage="Define a Interactivity">
+			<listbox id="interactivityListbox"  emptyMessage="Define a Interactivity">
 			</listbox>
 		</panelchildren>
 	</panel>
 
-	<hbox pack="end" hflex="1">
-				<button label="${labels.visualize}" zclass="btn btn-success" id="visualizeBtn" style="float:right; margin: 5px" />
+	<hbox pack="end" hflex="1" >
+				<button label="${labels.save}" zclass="btn btn-success" id="saveBtn" style="float:right; margin: 5px" />
 		</hbox>
 	</vbox>
 	
