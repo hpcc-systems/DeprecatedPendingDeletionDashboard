@@ -5,22 +5,27 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.chart.entity.Attribute;
+import org.hpccsystems.dashboard.chart.entity.Interactivity;
 import org.hpccsystems.dashboard.chart.entity.RelevantData;
 import org.hpccsystems.dashboard.chart.entity.TableData;
 import org.hpccsystems.dashboard.common.Constants;
+import org.hpccsystems.dashboard.controller.component.ChartPanel;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.services.ChartService;
 import org.hpccsystems.dashboard.services.HPCCQueryService;
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.select.SelectorComposer;
+import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
+import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Comboitem;
 import org.zkoss.zul.ListModelList;
@@ -113,10 +118,26 @@ public class InteractivityController extends SelectorComposer<Component> {
                     comboitem.setValue(widget);
                     comboitem.addEventListener(Events.ON_SELECT, populateRelevantAttributes);
                 });
-            }else{
-                
-            }
+            }else {
+        	Clients.showNotification(
+        			 Labels.getLabel("configureCharts"),
+                    Clients.NOTIFICATION_TYPE_INFO, comp, Constants.POSITION_CENTER, 3000, true);
+        	}
     }
     
+    @Listen("onClick=#addInteractivity")
+    public void click() {
+
+    	Interactivity interactivity=new Interactivity();
+    	Portlet portlet=(Portlet) ((ListModelList)sourceCombobox.getModel()).getSelection().iterator().next();
+    	interactivity.setSourceId(portlet.getId());
+    	portlet=(Portlet) ((ListModelList)targetCombobox.getModel()).getSelection().iterator().next();
+    	interactivity.setTargetId(portlet.getId());
+    	interactivity.setSourceColumn(sourceListBox.getSelectedItem().getValue());
+    	interactivity.setTragetColumn(targetListBox.getSelectedItem().getLabel());
+    	
+    	//to set interactivity to tabledata
+    	
+   	}
     
 }

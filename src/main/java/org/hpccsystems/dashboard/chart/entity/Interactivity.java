@@ -6,37 +6,37 @@ import javax.xml.bind.annotation.XmlRootElement;
 @XmlRootElement
 public class Interactivity {
     
-private String sourceId;
-private String targetId;
-private Field sourceColumn;
-private Field tragetColumn;
+private int sourceId;
+private int targetId;
+private Attribute sourceColumn;
+private String tragetColumn;
 
 @XmlElement
-public String getSourceId() {
+public int getSourceId() {
     return sourceId;
 }
-public void setSourceId(String sourceId) {
+public void setSourceId(int sourceId) {
     this.sourceId = sourceId;
 }
 @XmlElement
-public String getTargetId() {
+public int getTargetId() {
     return targetId;
 }
-public void setTargetId(String targetId) {
+public void setTargetId(int targetId) {
     this.targetId = targetId;
 }
 @XmlElement
-public Field getSourceColumn() {
+public Attribute getSourceColumn() {
     return sourceColumn;
 }
-public void setSourceColumn(Field sourceColumn) {
+public void setSourceColumn(Attribute sourceColumn) {
     this.sourceColumn = sourceColumn;
 }
 @XmlElement
-public Field getTragetColumn() {
+public String getTragetColumn() {
     return tragetColumn;
 }
-public void setTragetColumn(Field tragetColumn) {
+public void setTragetColumn(String tragetColumn) {
     this.tragetColumn = tragetColumn;
 }
 
