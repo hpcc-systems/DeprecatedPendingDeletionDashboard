@@ -118,7 +118,11 @@ public class InteractivityController extends SelectorComposer<Component> {
                 sourceCombobox.setModel(sourceModel);
                 sourceCombobox.setItemRenderer((comboitem,widgetPassed,index)->{
                     Portlet widget =(Portlet)widgetPassed;
-                    comboitem.setLabel(widget.getName());
+                    if(widget.getName().isEmpty()){
+                    	comboitem.setLabel("Table - ".concat(widget.getId().toString()));
+                    } else {
+                    	comboitem.setLabel(widget.getName());
+                    }
                     comboitem.setValue(widget);
                     sourceCombobox.addEventListener(Events.ON_CHANGE, populateTableAttributes);
                 });
@@ -127,7 +131,11 @@ public class InteractivityController extends SelectorComposer<Component> {
                 targetCombobox.setModel(targetModel);
                 targetCombobox.setItemRenderer((comboitem,widgetPassed,index)->{
                     Portlet widget =(Portlet)widgetPassed;
-                    comboitem.setLabel(widget.getName());
+                    if(widget.getName().isEmpty()){
+                    	comboitem.setLabel("Relavent - ".concat(widget.getId().toString()));
+                    } else {
+                    	comboitem.setLabel(widget.getName());
+                    }
                     comboitem.setValue(widget);
                     targetCombobox.addEventListener(Events.ON_CHANGE, populateRelevantAttributes);
                 });
@@ -135,7 +143,6 @@ public class InteractivityController extends SelectorComposer<Component> {
                 Clients.showNotification(
                         Labels.getLabel("configureCharts"),
                        Clients.NOTIFICATION_TYPE_INFO, comp, Constants.POSITION_CENTER, 3000, true);
-                
             }
     }
     
@@ -151,6 +158,8 @@ public class InteractivityController extends SelectorComposer<Component> {
         TableData tableData=(TableData) portlet.getChartData();
         tableData.setInteractivity(interactivity);
         selectedTables.add(portlet);
+        
+        
     }
     
     @Listen("onClick = #saveBtn")
