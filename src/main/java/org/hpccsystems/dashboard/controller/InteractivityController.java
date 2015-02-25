@@ -160,6 +160,8 @@ public class InteractivityController extends SelectorComposer<Component> {
         tableData.setInteractivity(interactivity);
         selectedTables.add(sourceportlet);
         LOG.debug("interactivity -->"+interactivity);
+       
+        
     }
     
     @Listen("onClick = #saveBtn")
