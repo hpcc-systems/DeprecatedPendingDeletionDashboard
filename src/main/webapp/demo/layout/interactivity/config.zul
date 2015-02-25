@@ -3,18 +3,14 @@
 		<label zclass="h5">${labels.interactivity}</label>
 	</caption>	
 	
-<vlayout  vflex="1" id="joinLayout" style="background-color: white;"> 
+<vlayout  vflex="1" hflex="1" id="joinLayout" style="background-color: white; padding: 7px; padding-bottom: 0px"> 
 	
-	<vbox vflex="1" hflex="1">
-	<hbox hflex="1" vflex="1">
-		<panel sclass="editPanel"  hflex="1" vflex="1">
-			<caption>
-				<label zclass="h5" value="${labels.sourceWidget}"></label>
-			</caption>
+	<hbox hflex="1" vflex="1" id="hbox">
+		<panel sclass="editPanel"  hflex="1" vflex="1" title="${labels.sourceWidget}">
 			<panelchildren>
-				<vbox hflex="1" align="center" pack="center">
+				<vbox hflex="1" vflex="1" align="center" pack="center">
 					<combobox hflex="1"  id="sourceCombobox" autodrop="true"></combobox>
-					<listbox hflex="1"  id="sourceListBox" style="margin:3px;"	vflex="1" multiple="false" visible="false">
+					<listbox hflex="1"  id="sourceListBox" style="margin:3px;"	vflex="1" multiple="false" emptyMessage="Select source widget">
 						<listhead>
 							<listheader label="Columns" sclass="lightHeader">
 							</listheader>
@@ -23,14 +19,11 @@
 				</vbox>
 			</panelchildren>
 		</panel>
-		<panel sclass="editPanel"  hflex="1" vflex="1">
-			<caption>
-				<label zclass="h5" value="${labels.targetWidget}"></label>
-			</caption>
+		<panel sclass="editPanel"  hflex="1" vflex="1" title="${labels.targetWidget}">
 			<panelchildren>
-				<vbox hflex="1" align="center" pack="center">
+				<vbox hflex="1" vflex="1" align="center" pack="center">
 					<combobox hflex="1"  id="targetCombobox" autodrop="true"></combobox>
-					<listbox hflex="1"  id="targetListBox" style="margin:3px;" vflex="1" multiple="false" visible="false">
+					<listbox hflex="1"  id="targetListBox" style="margin:3px;" vflex="1" multiple="false" emptyMessage="Select target widget">
 						<listhead>
 							<listheader label="Columns"	sclass="lightHeader">
 							</listheader>
@@ -47,20 +40,16 @@
 		</button>
 	</hbox>
 
-	<panel sclass="editPanel"  id="joinConditionPanel" >
-		<caption>
-			<label zclass="h5" value="${labels.definedinteractivity}"></label>
-		</caption>
+	<panel sclass="editPanel"  id="joinConditionPanel"  hflex="1" title="${labels.definedinteractivity}">
 		<panelchildren>
-			<listbox id="interactivityListbox"  emptyMessage="Define a Interactivity">
+			<listbox id="interactivityListbox"  emptyMessage="Define a Interactivity" height="60px">
 			</listbox>
 		</panelchildren>
 	</panel>
 
-	<hbox pack="end" hflex="1" >
+	<hbox pack="end" hflex="1">
 				<button label="${labels.save}" zclass="btn btn-success" id="saveBtn" style="float:right; margin: 5px" />
 		</hbox>
-	</vbox>
 	
 </vlayout>
 </window>

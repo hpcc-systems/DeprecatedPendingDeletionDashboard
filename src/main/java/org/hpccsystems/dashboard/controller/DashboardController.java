@@ -172,7 +172,7 @@ public class DashboardController extends SelectorComposer<Window>{
     @WireVariable
     private DashboardService dashboardService;
     @WireVariable
-       private WidgetService widgetService;
+    private WidgetService widgetService;
     @WireVariable
     private HPCCService hpccService;
     @WireVariable
@@ -183,6 +183,7 @@ public class DashboardController extends SelectorComposer<Window>{
     private GroupService groupService;
     
     EventListener<Event> redrawInteractivityTable = (event) -> {
+        @SuppressWarnings("unchecked")
         List<Portlet> selectedtables = (List<Portlet>) event.getData();
         selectedtables.stream().forEach(portlet -> {
             List<Component> chartPanels = portalChildren.get(portlet.getColumn()).getChildren();
@@ -191,8 +192,6 @@ public class DashboardController extends SelectorComposer<Window>{
                             .filter(panel -> portlet.getId().equals(
                                     ((ChartPanel) panel).getPortlet().getId()))
                             .findFirst().get();
-                   LOG.debug("panel's --->"+selectedTablePanel.getPortlet());
-                   LOG.debug("selected --->"+portlet);
                    selectedTablePanel.drawTableWidget();
         });
     };
@@ -209,10 +208,13 @@ public class DashboardController extends SelectorComposer<Window>{
         
         RelevantData relevantData = (RelevantData)releventPortlet.getChartData();
         relevantData.setClaimId(interactivity.getFilterValue());
+       
         String relJSON = new Gson().toJson(relevantData);
         LOG.debug("relJSON --> "+relJSON);
         
         releventPortlet.setChartDataJSON(relJSON);
+        //To update Relevant data with the selected claim id
+        widgetService.updateWidget(releventPortlet);
         
         String chartScript = selectedRelevantPanel.drawD3Graph();
         if (chartScript != null) {

@@ -169,14 +169,14 @@ public class TableRenderer {
                   //Column chosen for interactivity shown different style 
                     if(interactivityColumn != null && interactivityColumn.equals(entry.getKey())){
                         listcell.setStyle("color:#5858FA");
-                        chartData.getInteractivity().setFilterValue(listCellValue.getColumn());
+                       
                         listcell.addEventListener(Events.ON_CLICK, event ->{
-                            LOG.debug("win -->"+vbox.getParent().getParent().getFellow("dashboardWin"));
-                        Events.postEvent(
-                                Constants.ON_SELECT_INTERACTIVITY_FILTER,
-                                vbox.getParent().getParent()
-                                        .getFellow("dashboardWin"),
-                                chartData.getInteractivity());
+                            chartData.getInteractivity().setFilterValue(listCellValue.getColumn());
+                            Events.postEvent(
+                                    Constants.ON_SELECT_INTERACTIVITY_FILTER,
+                                    vbox.getParent().getParent()
+                                            .getFellow("dashboardWin"),
+                                    chartData.getInteractivity());
                         });
                     }
                     
@@ -201,19 +201,10 @@ public class TableRenderer {
             Map<String, List<Attribute>> tableDataMap, final Listbox listBox,
             Listhead listhead, Listheader listheader,
             List<List<Attribute>> columnList) {
-           
-            String interactivityColumn = null;
-            if(chartData.getHasInteractivity()){
-                interactivityColumn = chartData.getInteractivity().getSourceColumn();
-            }
             
         for (Map.Entry<String, List<Attribute>> entry : tableDataMap.entrySet()) {
             String columnStr = entry.getKey();
             listheader = listHeader(chartData, listheader, columnStr);
-            //Column chosen for interactivity shown different style 
-            if(interactivityColumn != null && interactivityColumn.equals(entry.getKey())){
-                listheader.setStyle("color:#5858FA");
-            }
             listheader.setSort("auto");
             listheader.setParent(listhead);
             listhead.setParent(listBox);
