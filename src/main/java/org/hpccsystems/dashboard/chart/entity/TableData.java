@@ -13,7 +13,10 @@ public class TableData extends ChartData {
 
     private List<Attribute> attributes;
     private boolean enableChangeIndicators;
-    Map<String, List<Attribute>> hpccTableData;
+    private  Map<String, List<Attribute>> hpccTableData;
+    private boolean hasInteractivity;
+    private Interactivity interactivity;
+    
 
     public TableData() {
     }
@@ -44,7 +47,9 @@ public class TableData extends ChartData {
     @Override
     public String toString() {
         StringBuilder buffer = new StringBuilder();
-        buffer.append("TableData [attributes=").append(attributes).append("]");
+        buffer.append("TableData [attributes=").append(attributes)
+        .append(",hasInteractivity = ").append(hasInteractivity)
+        .append(",interactivity = ").append(interactivity).append("]");
         return buffer.toString();
     }
 
@@ -64,5 +69,23 @@ public class TableData extends ChartData {
 
     public void setHpccTableData(Map<String, List<Attribute>> hpccTableData) {
         this.hpccTableData = hpccTableData;
+    }
+    
+    @XmlElement
+    public boolean getHasInteractivity() {
+        return hasInteractivity;
+    }
+
+    public void setHasInteractivity(boolean hasInteractivity) {
+        this.hasInteractivity = hasInteractivity;
+    }
+
+    @XmlElement
+    public Interactivity getInteractivity() {
+        return interactivity;
+    }
+
+    public void setInteractivity(Interactivity interactivity) {
+        this.interactivity = interactivity;
     }
 }

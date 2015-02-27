@@ -16,15 +16,16 @@ UNLOCK TABLES;
 DROP TABLE IF EXISTS `user_details`;
 
 create table user_details (
-user_id VARCHAR(40) NOT NULL,
-user_name  VARCHAR(40),
+id VARCHAR(50) NOT NULL,
+first_name  VARCHAR(50),
+last_name  VARCHAR(50),
 password VARCHAR(40) ,
 active_flag CHAR(1),
-PRIMARY KEY(user_id)
+PRIMARY KEY(id)
 ) ENGINE=InnoDB;
 
 LOCK TABLES `user_details` WRITE;
-INSERT INTO user_details(user_id, user_name,password,active_flag) VALUES ('user', 'User','1234','N'),('admin','Administrator','1234','N');
+INSERT INTO user_details(id,first_name,last_name,password,active_flag) VALUES ('user', 'User','','HGq7g5SZ3oo=','N'),('admin','Administrator','','HGq7g5SZ3oo=','N');
 UNLOCK TABLES;
 
 DROP TABLE IF EXISTS `dashboard_details`;
@@ -138,6 +139,19 @@ VALUES('Scored Search',
 'Scored Search widget used to advanced settings on Filter',
 '<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xyConfiguration><imageURL>chart/scored_search.png</imageURL></xyConfiguration>',
 '2',9,false);
+
+INSERT INTO chart_details(name,description,configuration,created_by,category,isplugin) 
+VALUES('Relevant',
+'Relevant widget',
+'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+                <xyConfiguration>
+                                <dependentCssURL>http://handsontable.com/dist/handsontable.full.css</dependentCssURL>
+                                <functionName>createRelevantChart</functionName>
+                                <imageURL>chart/China_Relevant_Graph.jpg</imageURL>
+                                <dependentCssURL>js/relevant/css/relevant.css</dependentCssURL>
+                                <jsURL>js/relevant.js</jsURL>
+                </xyConfiguration>',
+'2',10,false);
 
 create table acl_public (
 dashboard_id  INT,  

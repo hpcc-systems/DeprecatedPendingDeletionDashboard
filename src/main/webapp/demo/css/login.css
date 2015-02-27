@@ -139,7 +139,7 @@ body {
   margin-top: -185px;
   margin-left: -235px;
   padding: 20px;
-  width: 420px;
+  width: 450px;
   background: white;
   text-align: center;
 }
@@ -155,7 +155,7 @@ body {
 }
 
 .login-form .form-group label{
-	width: 100px;
+	width: 160px;
 	text-align: left;
 }
 
@@ -349,4 +349,86 @@ footer.navbar-fixed-bottom {
     display: block;
     margin: 0 auto;
   }
+}
+
+/* ######### */
+/* $REGISTER */
+/* ######### */
+/* line 127, ../sass/typica-login.scss */
+#register-wraper {
+  -webkit-border-radius: 15px;
+  -moz-border-radius: 15px;
+  -ms-border-radius: 15px;
+  -o-border-radius: 15px;
+  border-radius: 15px;
+  -webkit-box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+  -moz-box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 0 8px rgba(0, 0, 0, 0.4);
+  margin-top: 25px;
+  margin-bottom: 70px;
+  padding-top: 25px;
+  padding-bottom: 25px;
+  background: white;
+  text-align: center;
+}
+
+/* line 137, ../sass/typica-login.scss */
+#register-form {
+  margin: 0 auto;
+  width: 350px;
+}
+/* line 140, ../sass/typica-login.scss */
+#register-form .control-inline {
+  display: inline-block;
+}
+/* line 143, ../sass/typica-login.scss */
+#register-form legend {
+  margin-bottom: 15px;
+  border-bottom: none;
+}
+/* line 147, ../sass/typica-login.scss */
+#register-form input.input-huge {
+  width: 318px;
+}
+/* line 150, ../sass/typica-login.scss */
+#register-form .control-group {
+  margin-bottom: 0;
+}
+/* line 153, ../sass/typica-login.scss */
+#register-form .checkbox.inline {
+  margin-bottom: 10px;
+  padding: 0;
+  font-size: 98%;
+}
+/* line 157, ../sass/typica-login.scss */
+#register-form .checkbox.inline input {
+  margin-right: 10px;
+}
+/* line 161, ../sass/typica-login.scss */
+#register-form .body {
+  overflow-y: auto;
+  height: auto;
+}
+/* line 165, ../sass/typica-login.scss */
+#register-form .btn {
+  padding: 10px 40px;
+  background-image: none;
+  box-shadow: none;
+}
+.register-info-wraper {
+  background: rgba(0, 0, 0, 0.2);
+}
+
+/* line 174, ../sass/typica-login.scss */
+#register-info {
+  position: relative;
+  padding: 25px;
+}
+/* line 177, ../sass/typica-login.scss */
+#register-info ul {
+  margin-right: 25px;
+}
+/* line 179, ../sass/typica-login.scss */
+#register-info ul li {
+  margin-bottom: 25px;
 }

@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" xmlns:zul="http://www.zkoss.org/2005/zul">
+  <head>
+    <title>Dashboard | Register</title>
+
+    <!-- styles -->
+    <link href="demo/css/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
+    <link rel="stylesheet" href="demo/css/login.css" />
+
+  </head>
+
+  <body>
+
+	<div class="navbar navbar-fixed-top">
+      <div class="navbar-inner">
+        <div class="container">
+         <img src="demo/images/logo.png" alt="HPCC Systems" class="logo" style="width: 300px"/>
+        </div>
+      </div>
+    </div>
+
+    <zul:div zclass="container" apply="org.hpccsystems.dashboard.controller.RegisterController">
+		<div id="login-wraper" class="login-form">
+           
+                <legend>Register to <span class="blue">Dashboard</span></legend>
+
+	            <div class="form-group">
+	            	<label for="fname">${labels.firatName}</label > 
+	        		<zul:textbox type="text" sclass="form-control" id="fname" style="display:inline" forward="onOK=register.onClick"/> 
+				 </div>
+	            
+	            <div class="form-group">
+	            	<label for="lname">${labels.lastName}</label > 
+	        		<zul:textbox type="text" sclass="form-control" id="lname" style="display:inline" forward="onOK=register.onClick"/> 
+				 </div>
+	            
+	            <div class="form-group">
+	            	<label for="userid">${labels.lblUserName}</label > 
+	        		<zul:textbox type="text" sclass="form-control" id="userid" style="display:inline" forward="onOK=register.onClick"/> 
+				 </div>
+				 
+				 <div class="form-group">
+				   <label for="password">${labels.lblPassword}</label >
+				   <zul:textbox type="password" class="form-control" id="password"  style="display:inline" forward="onOK=register.onClick"/>
+				 </div>
+				 
+				 <div class="form-group">
+				   <label for="confirmPassword">${labels.confirmPassowrd}</label >
+				   <zul:textbox type="password" class="form-control" id="confirmPassword"  style="display:inline" forward="onOK=register.onClick"/>
+				 </div>
+                
+                <div class="footer">                 	
+                	<zul:label id="message" zclass="label" sclass="warn" style="color: red;" value=" "/>
+                    <button type="submit" id="register" class="btn btn-success"> ${labels.register} </button>
+                </div>
+        </div>
+
+    </zul:div>
+
+    <footer class="white navbar-fixed-bottom">
+      Already have an account? <a href="login.zhtml" class="btn btn-black">Sign in</a>
+    </footer>
+  </body>
+</html>

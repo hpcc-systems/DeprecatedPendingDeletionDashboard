@@ -2,8 +2,10 @@ package org.hpccsystems.dashboard.dao;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Set;
 
 import org.hpccsystems.dashboard.entity.Group;
+import org.hpccsystems.dashboard.entity.User;
 import org.springframework.dao.DataAccessException;
 
 public interface GroupDao {
@@ -51,4 +53,14 @@ public interface GroupDao {
      * @throws DataAccessException
      */
     List<Group> getGroups(String userId)throws DataAccessException;
+
+    List<User> getGroupUsers(Group selectdGroup);
+
+    List<User> getAllUser();
+
+    void addUser(Set<User> selectedUsers,Group group);
+
+    void addgroup(Group newGroup);
+
+    void removeUser(Group selectedGroup, User user);
 }

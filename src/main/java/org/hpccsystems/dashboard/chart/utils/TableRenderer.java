@@ -29,6 +29,7 @@ import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Listhead;
 import org.zkoss.zul.Listheader;
 import org.zkoss.zul.Listitem;
+import org.zkoss.zul.Space;
 import org.zkoss.zul.Span;
 import org.zkoss.zul.Vbox;
 
@@ -71,24 +72,8 @@ public class TableRenderer {
         listBox.setMold("paging");
         listBox.setSizedByContent(true);
         listBox.setHflex("1");
-        //Adjusting height of the Holder Div based on Filter selection
-        if(!chartData.getIsFiltered()){        
-            if (isEditing) {
-                // .. 542 - 45
-                listBox.setHeight("497px"); 
-            } else {
-                // .. 385 - 30
-                listBox.setHeight("355px"); 
-            }
-        } else {
-            if (isEditing) {
-                // .. 542 - 30 -22 -30
-                listBox.setHeight("470px");             
-            } else {
-                // .. 385 - 30 -25   
-                listBox.setHeight("330px"); 
-            }
-        }
+        listBox.setVflex("1");
+        
         listBox.setAutopaging(true);
 
         Listhead listhead = new Listhead();
@@ -101,9 +86,11 @@ public class TableRenderer {
                     .getDisplayName()));
         }
 
+        Vbox vbox = new Vbox();
+        
         listheader = populateListHeader(chartData, tableDataMap, listBox,
                 listhead, listheader, columnList);
-        populateListCell(listBox, columnList, chartData);
+        populateListCell(listBox, columnList, chartData,tableDataMap,vbox);
         listBox.appendChild(listhead);
         Hbox hbox = new Hbox();
         hbox.setStyle("margin-left: 3px");
@@ -127,10 +114,12 @@ public class TableRenderer {
             }
         });
         hbox.appendChild(button);
-        Vbox vbox = new Vbox();
+       
+        vbox.setVflex("1");
         //Appending Chart Title as Data file name
         final Div div = new Div();            
-        div.setStyle("margin-top: 3px; margin-left: 5px; height: 7px;");
+        div.setHeight("10px");
+        div.setStyle("margin-top: 3px; margin-left: 5px;");
         
         
         if(chartData.getIsFiltered()){                
@@ -140,6 +129,10 @@ public class TableRenderer {
         
         vbox.appendChild(listBox);
         vbox.appendChild(hbox);
+        Div space = new Div(); 
+        space.setHeight("8px");
+        vbox.appendChild(space);
+        
         if (LOG.isDebugEnabled()) {
             LOG.debug("Created table widget..");
         }
@@ -147,28 +140,52 @@ public class TableRenderer {
     }
 
     private void populateListCell(final Listbox listBox,
-            List<List<Attribute>> columnList, TableData chartData) {
+            List<List<Attribute>> columnList, TableData chartData,
+            Map<String, List<Attribute>> tableDataMap,Vbox vbox) {
         Listcell listcell;
         Listitem listitem;
+        
+        String interactivityColumn = null;
+        if(chartData.getHasInteractivity()){
+            interactivityColumn = chartData.getInteractivity().getSourceColumn();
+        }
+        
         for (int index = 0; index < columnList.get(0).size(); index++) {
             listitem = new Listitem();
-            for (List<Attribute> list : columnList) {
-                listcell = new Listcell();
-                Attribute listCellValue = list.get(index);
+            for (Map.Entry<String, List<Attribute>> entry : tableDataMap.entrySet()) {
                 
-                if(chartData.getEnableChangeIndicators() && (getNumericValue(listCellValue.getColumn()) < 0)) {
-                    listcell.setIconSclass("z-icon-long-arrow-down");
-                    listcell.setStyle("background-color: rgb(255, 113, 113);");
-                } else if(chartData.getEnableChangeIndicators() && (getNumericValue(listCellValue.getColumn()) > 0)) {
-                    listcell.setIconSclass("z-icon-long-arrow-up");
-                    listcell.setStyle("background-color: rgb(136, 255, 136);");
-                }
-                
-                listcell.setLabel(listCellValue.getColumn());
-                listcell.setParent(listitem);
+                List<Attribute> values = entry.getValue();
+                    listcell = new Listcell();
+                    Attribute listCellValue = values.get(index);
+                    
+                    if(chartData.getEnableChangeIndicators() && (getNumericValue(listCellValue.getColumn()) < 0)) {
+                        listcell.setIconSclass("z-icon-long-arrow-down");
+                        listcell.setStyle("background-color: rgb(255, 113, 113);");
+                    } else if(chartData.getEnableChangeIndicators() && (getNumericValue(listCellValue.getColumn()) > 0)) {
+                        listcell.setIconSclass("z-icon-long-arrow-up");
+                        listcell.setStyle("background-color: rgb(136, 255, 136);");
+                    }
+                    
+                  //Column chosen for interactivity shown different style 
+                    if(interactivityColumn != null && interactivityColumn.equals(entry.getKey())){
+                        listcell.setStyle("color:#5858FA");
+                       
+                        listcell.addEventListener(Events.ON_CLICK, event ->{
+                            chartData.getInteractivity().setFilterValue(listCellValue.getColumn());
+                            Events.postEvent(
+                                    Constants.ON_SELECT_INTERACTIVITY_FILTER,
+                                    vbox.getParent().getParent()
+                                            .getFellow("dashboardWin"),
+                                    chartData.getInteractivity());
+                        });
+                    }
+                    
+                    listcell.setLabel(listCellValue.getColumn());
+                    listcell.setParent(listitem);
             }
             listitem.setParent(listBox);
         }
+       
     }
     
     private int getNumericValue(String value) {
@@ -184,12 +201,14 @@ public class TableRenderer {
             Map<String, List<Attribute>> tableDataMap, final Listbox listBox,
             Listhead listhead, Listheader listheader,
             List<List<Attribute>> columnList) {
+            
         for (Map.Entry<String, List<Attribute>> entry : tableDataMap.entrySet()) {
             String columnStr = entry.getKey();
             listheader = listHeader(chartData, listheader, columnStr);
             listheader.setSort("auto");
             listheader.setParent(listhead);
             listhead.setParent(listBox);
+            listheader.setHflex("1");
             columnList.add(entry.getValue());
         }
         return listheader;
@@ -221,6 +240,7 @@ public class TableRenderer {
         Span filterSpan = new Span();
         filterSpan.setClass("btn-link btn-sm");
         filterSpan.setStyle("float: right; padding: 0px 10px;");
+        
         filterSpan.appendChild(new Label("Filters"));            
         div.appendChild(filterSpan);        
         
@@ -292,20 +312,13 @@ public class TableRenderer {
         return div;
     }
     
-	public Vbox constructScoredSearchTable(Map<String, List<Attribute>> scoredTableData,Boolean isEditing) {
-		Vbox vbox = new Vbox();
+	public Listbox constructScoredSearchTable(Map<String, List<Attribute>> scoredTableData,Boolean isEditing) {
 		final Listbox listBox = new Listbox();
 		listBox.setMold("paging");
 		listBox.setSizedByContent(true);
 		listBox.setHflex("1");
 		listBox.setSpan(true);
-		if (isEditing) {
-	            // .. 542 - 30 -22
-	            listBox.setHeight("445px");             
-	        } else {
-	            // .. 385 - 30 -25    
-	            listBox.setHeight("330px"); 
-	        }
+		listBox.setVflex("1");
 		listBox.setAutopaging(true);
 		
 		Listhead listhead = new Listhead();
@@ -320,8 +333,7 @@ public class TableRenderer {
 		}
 		
 		listBox.appendChild(listhead);
-		vbox.appendChild(listBox);
-		return vbox;
+		return listBox;
 
 	}
 

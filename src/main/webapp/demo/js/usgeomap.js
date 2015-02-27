@@ -8,13 +8,20 @@ function createGeoChart(divId, reqData) {
 	divElement.append(jq("<div id='" + uniqueId + "'/>"));
 
 	// size of the diagram
-	var width = divElement.width();
-	var height = divElement.height();
-		
-	if (width > 1.7 * height) {
-		width = height * 1.7;
+	
+	var fullHeight = divElement.height();
+	var fullWidth = divElement.width();
+	
+	//checking the minimum height for browser and component and set the same as window height. 
+	if(divElement.parent().parent().height()<($(window).height()-150)){fullHeight = divElement.parent().parent().height();}
+	else{fullHeight = ($(window).height()-150);}
+	
+	if(divElement.width()>$(window).width()){fullWidth = $(window).width();}
+	
+	if (fullWidth > 1.7 * fullHeight) {
+		fullWidth = fullHeight * 1.7;
 	}
-
+	
 	var colorData = jq.extend(true, {}, chartData.states);
 
 	var arr = Object.keys(colorData).map(function(key) {
@@ -45,8 +52,8 @@ function createGeoChart(divId, reqData) {
 	});
 
 	var election = new Datamap({
-		height : height,
-		width : width,
+		height : fullHeight,
+		width : fullWidth,
 		scope : 'usa',
 		element : document.getElementById(uniqueId),
 

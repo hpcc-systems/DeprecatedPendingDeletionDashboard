@@ -208,8 +208,8 @@ public class ScoredSearchController extends SelectorComposer<Component> {
                     Tab tab = new Tab(entry.getKey());
                     tab.setParent(tableTabs);
                     Tabpanel tabpanel = new Tabpanel();
-                    Vbox vbox = tableRenderer.constructScoredSearchTable(entry.getValue(),true);
-                    vbox.setParent(tabpanel);
+                    Listbox listBox = tableRenderer.constructScoredSearchTable(entry.getValue(),true);
+                    listBox.setParent(tabpanel);
                     tabpanel.setParent(tableTabpanels);
                 }
                 doneButton.setDisabled(false);

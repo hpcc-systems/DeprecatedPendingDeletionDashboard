@@ -1,5 +1,7 @@
 package org.hpccsystems.dashboard.util;
 
+import java.awt.Dimension;
+import java.awt.Toolkit;
 import java.util.List;
 import java.util.Map;
 
@@ -244,5 +246,10 @@ public class UiGenerator {
             attributeTabpanel.appendChild(attributesListBox);
             attributeTabbox.getTabpanels().appendChild(attributeTabpanel);
         }
+    }
+    
+    public static Dimension getScreenSize(){
+    	Toolkit tk = Toolkit.getDefaultToolkit();
+        return tk.getScreenSize();
     }
 }

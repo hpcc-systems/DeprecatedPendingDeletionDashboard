@@ -11,6 +11,10 @@ public class User  implements Serializable,Cloneable {
     
     String account;
     String fullName;
+    
+    private String firstName;
+    private String lastName;
+    
     String password;
     String email;
     Date birthday;
@@ -20,7 +24,7 @@ public class User  implements Serializable,Cloneable {
     
     //TODO - Romve fields added for persistance
     //Added for persistence
-    String userId;
+    String id;
     String activeFlag;
     boolean validUser;
     
@@ -32,12 +36,12 @@ public class User  implements Serializable,Cloneable {
         this.validUser = validUser;
     }
 
-    public String getUserId() {
-        return userId;
+    public String getId() {
+        return id;
     }
 
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public void setId(String id) {
+        this.id = id;
     }
 
     public String getActiveFlag() {
@@ -188,37 +192,38 @@ public class User  implements Serializable,Cloneable {
         this.car = car;
     }
 
-
     @Override
     public int hashCode() {
-        int prime = 31;
+        final int prime = 31;
         int result = 1;
-        result = prime * result + ((account == null) ? 0 : account.hashCode());
+        result = prime * result
+                + ((fullName == null) ? 0 : fullName.hashCode());
+        result = prime * result + ((id == null) ? 0 : id.hashCode());
         return result;
     }
 
     @Override
-    public boolean equals(final Object obj) {
-        if (this == obj){
+    public boolean equals(Object obj) {
+        if (this == obj)
             return true;
-        }    
-        if (obj == null){
+        if (obj == null)
             return false;
-        }    
-        if (getClass() != obj.getClass()){
+        if (getClass() != obj.getClass())
             return false;
-        }    
-        final User other = (User) obj;
-        if (account == null) {
-            if (other.account != null){
+        User other = (User) obj;
+        if (fullName == null) {
+            if (other.fullName != null)
                 return false;
-            }    
-        } else if (!account.equals(other.account)){
+        } else if (!fullName.equals(other.fullName))
             return false;
-        }    
+        if (id == null) {
+            if (other.id != null)
+                return false;
+        } else if (!id.equals(other.id))
+            return false;
         return true;
     }
-    
+
     public static User clone(final User user){
         try {
             return (User)user.clone();
@@ -236,9 +241,25 @@ public class User  implements Serializable,Cloneable {
                 .append(", email=").append(email).append(", birthday=")
                 .append(birthday).append(", country=").append(country)
                 .append(", bio=").append(bio).append(", car=").append(car)
-                .append(", userId=").append(userId).append(", activeFlag=")
+                .append(", userId=").append(id).append(", activeFlag=")
                 .append(activeFlag).append(", validUser=").append(validUser)
                 .append("]");
         return buffer.toString();
+    }
+
+    public String getFirstName() {
+        return firstName;
+    }
+
+    public void setFirstName(String firstName) {
+        this.firstName = firstName;
+    }
+
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
     }
 }

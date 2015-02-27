@@ -29,6 +29,7 @@ import org.hpccsystems.dashboard.chart.cluster.ClusterData;
 import org.hpccsystems.dashboard.chart.entity.ChartData;
 import org.hpccsystems.dashboard.chart.entity.Field;
 import org.hpccsystems.dashboard.chart.entity.Filter;
+import org.hpccsystems.dashboard.chart.entity.RelevantData;
 import org.hpccsystems.dashboard.chart.entity.TableData;
 import org.hpccsystems.dashboard.chart.entity.TextData;
 import org.hpccsystems.dashboard.chart.entity.XYChartData;
@@ -91,6 +92,7 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Messagebox;
+import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Messagebox.ClickEvent;
 import org.zkoss.zul.Panel;
 import org.zkoss.zul.Popup;
@@ -101,6 +103,9 @@ import org.zkoss.zul.Tabbox;
 import org.zkoss.zul.Tabpanel;
 import org.zkoss.zul.Toolbar;
 import org.zkoss.zul.Window;
+import org.hpccsystems.dashboard.chart.entity.Interactivity;
+
+import com.google.gson.Gson;
 
 /**
  * DashboardController class is used to add new dashboard into sidebar and 
@@ -125,8 +130,6 @@ public class DashboardController extends SelectorComposer<Window>{
     @Wire
     private Label nameLabel;
     
-    @Wire
-    private Window dashboardWin;
     
     @Wire
     private Toolbar dashboardToolbar;
@@ -169,7 +172,7 @@ public class DashboardController extends SelectorComposer<Window>{
     @WireVariable
     private DashboardService dashboardService;
     @WireVariable
-       private WidgetService widgetService;
+    private WidgetService widgetService;
     @WireVariable
     private HPCCService hpccService;
     @WireVariable
@@ -179,6 +182,46 @@ public class DashboardController extends SelectorComposer<Window>{
     @WireVariable
     private GroupService groupService;
     
+    EventListener<Event> redrawInteractivityTable = (event) -> {
+        @SuppressWarnings("unchecked")
+        List<Portlet> selectedtables = (List<Portlet>) event.getData();
+        selectedtables.stream().forEach(portlet -> {
+            List<Component> chartPanels = portalChildren.get(portlet.getColumn()).getChildren();
+                    ChartPanel selectedTablePanel = (ChartPanel) chartPanels
+                            .stream()
+                            .filter(panel -> portlet.getId().equals(
+                                    ((ChartPanel) panel).getPortlet().getId()))
+                            .findFirst().get();
+                   selectedTablePanel.drawTableWidget();
+        });
+    };
+    
+    EventListener<Event> applyInteractivityFilter = (event) -> {
+        Interactivity interactivity = (Interactivity) event.getData();
+        Portlet releventPortlet = dashboard.getPortletList().stream().filter(portlet -> portlet.getId().equals(interactivity.getTargetId())).findFirst().get();
+        List<Component> chartPanels = portalChildren.get(releventPortlet.getColumn()).getChildren();
+        ChartPanel selectedRelevantPanel = (ChartPanel) chartPanels
+                .stream()
+                .filter(panel -> releventPortlet.getId().equals(
+                        ((ChartPanel) panel).getPortlet().getId()))
+                .findFirst().get();
+        
+        RelevantData relevantData = (RelevantData)releventPortlet.getChartData();
+        relevantData.setClaimId(interactivity.getFilterValue());
+       
+        String relJSON = new Gson().toJson(relevantData);
+        LOG.debug("relJSON --> "+relJSON);
+        
+        releventPortlet.setChartDataJSON(relJSON);
+        //To update Relevant data with the selected claim id
+        widgetService.updateWidget(releventPortlet);
+        
+        String chartScript = selectedRelevantPanel.drawD3Graph();
+        if (chartScript != null) {
+            Clients.evalJavaScript(chartScript);
+        } 
+        
+    };
     @Override
     public void doAfterCompose(Window comp) throws Exception {
         super.doAfterCompose(comp);
@@ -262,7 +305,6 @@ public class DashboardController extends SelectorComposer<Window>{
             //Removing AddWidget , Configure Dashboard buttons for Single layout
             if(dashboard.getPortletList().size() == 1 && dashboard.getPortletList().get(0).getIsSinglePortlet()){
             	addWidget.detach();
-            	configureDashboard.detach();           	
             }
             for (Portlet portlet : dashboard.getPortletList()) {    
                 if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD) ||
@@ -295,12 +337,12 @@ public class DashboardController extends SelectorComposer<Window>{
             }
             
         } else {
-            dashboardWin.setBorder("none");            
+            this.getSelf().setBorder("none");            
             return;
         }
          
-        dashboardWin.addEventListener("onPortalClose", onPanelClose);
-        dashboardWin.addEventListener("onLayoutChange", onLayoutChange);
+        this.getSelf().addEventListener("onPortalClose", onPanelClose);
+        this.getSelf().addEventListener("onLayoutChange", onLayoutChange);
         
         if(LOG.isDebugEnabled()){
             LOG.debug("Created Dashboard");
@@ -312,6 +354,8 @@ public class DashboardController extends SelectorComposer<Window>{
         this.getSelf().addEventListener("onDrawingLiveChart", onDrawingLiveChart);
         this.getSelf().addEventListener("onPanelReset", onPanelReset);
         this.getSelf().addEventListener("onPanelDrawn", onPanelDrawn);
+        this.getSelf().addEventListener(Constants.ON_SAVE_INTERACTIVITY, redrawInteractivityTable);
+        this.getSelf().addEventListener(Constants.ON_SELECT_INTERACTIVITY_FILTER, applyInteractivityFilter);
         
         //Setting common HpccObject to Session
         if(dashboard.getHasCommonFilter()) {
@@ -536,9 +580,7 @@ public class DashboardController extends SelectorComposer<Window>{
                     for (Filter filter : portlet.getChartData().getFilters()) {
                         // overriding the portlet specific filter by selected global/dashboard filter
                         if (!filter.getIsCommonFilter()
-                        		&& filter.equals(newFilter)
-                                /*&& filter.getFileName().equals(fileName)
-                                && filter.getColumn().equals(field.getColumnName())*/) {
+                        		&& filter.equals(newFilter)) {
                             filtersToReomove.add(filter);                        
                         }
                     }
@@ -1258,10 +1300,10 @@ public class DashboardController extends SelectorComposer<Window>{
         oldColumnCount = dashboard.getColumnCount();
         
         Map<String, Object> parameters = new HashMap<String, Object>();
-        parameters.put(Constants.PARENT, dashboardWin);
+        parameters.put(Constants.PARENT, this.getSelf());
         parameters.put(Constants.DASHBOARD, dashboard);
         
-        Window window  = (Window) Executions.createComponents("/demo/layout/dashboard_config.zul", dashboardWin, parameters);
+        Window window  = (Window) Executions.createComponents("/demo/layout/dashboard_config.zul", this.getSelf(), parameters);
         window.doModal();
     }
     
@@ -1798,5 +1840,14 @@ public class DashboardController extends SelectorComposer<Window>{
             LOG.error(Constants.EXCEPTION, e);
             throw e;
         }    
+    }
+    
+    @Listen("onClick = #interactivityBtn")
+    public void onClickInteractivity() {
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put(Constants.DASHBOARD, dashboard);
+        
+        Window window  = (Window) Executions.createComponents("/demo/layout/interactivity/config.zul", this.getSelf(), parameters);
+        window.doModal();
     }
 }

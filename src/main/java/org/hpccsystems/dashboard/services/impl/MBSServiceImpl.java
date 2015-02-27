@@ -9,6 +9,7 @@ import javax.xml.rpc.ServiceException;
 import org.apache.commons.lang.StringUtils;
 import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.entity.Group;
+import org.hpccsystems.dashboard.entity.User;
 import org.hpccsystems.dashboard.services.ConditionalGroupService;
 
 import com.lexisnexis.billingsystems.GroupRoleResult;

@@ -27,6 +27,7 @@ import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.Hbox;
+import org.zkoss.zul.Hlayout;
 import org.zkoss.zul.Messagebox;
 import org.zkoss.zul.Messagebox.ClickEvent;
 import org.zkoss.zul.Radio;
@@ -49,6 +50,8 @@ public class DashboardConfigurationController extends SelectorComposer<Component
     Checkbox commonFiltersCheckbox;
     @Wire
     Hbox commonFilterHbox;
+    @Wire
+    private Hlayout layout;
     
     private Component parent;
     private Dashboard dashboard;
@@ -95,6 +98,11 @@ public class DashboardConfigurationController extends SelectorComposer<Component
                 LOG.error(Constants.EXCEPTION, e);
                 Clients.showNotification(Labels.getLabel("noWidgetException"), "info", getSelf(), "middle_center", 3000, true);
             }   
+            //To disable layout change and common filter features for single/full page layout dashboard
+            if(dashboard.getPortletList().size() == 1 && dashboard.getPortletList().get(0).getIsSinglePortlet()){
+                layout.setVisible(false);
+                commonFilterHbox.setVisible(false);
+            }
         	
         } else {
         	

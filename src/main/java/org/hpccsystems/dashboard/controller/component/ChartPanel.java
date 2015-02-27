@@ -46,6 +46,7 @@ import org.hpccsystems.dashboard.services.GroupService;
 import org.hpccsystems.dashboard.services.HPCCQueryService;
 import org.hpccsystems.dashboard.services.HPCCService;
 import org.hpccsystems.dashboard.services.WidgetService;
+import org.hpccsystems.dashboard.util.UiGenerator;
 import org.springframework.dao.DataAccessException;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
@@ -281,7 +282,6 @@ public class ChartPanel extends Panel {
         } else {
             titleTextbox.setValue(Labels.getLabel("chartTitle"));
         }
-        titleTextbox.setWidth("250px");
         titleTextbox.setMaxlength(30);
         titleTextbox.addEventListener(Events.ON_CHANGE, titleChangeLisnr);
 
@@ -363,15 +363,39 @@ public class ChartPanel extends Panel {
         resizeBtn.addEventListener(Events.ON_CLICK, maximizeListener ->{
             ChartPanel.this.setMaximizable(true);
             if(!ChartPanel.this.isMaximized()){
+                holderDiv.setHeight("");
+                if ((Constants.CATEGORY_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory())||(Constants.CATEGORY_TEXT_EDITOR == chartService.getCharts().get(portlet.getChartType()).getCategory())||(Constants.CATEGORY_SCORED_SEARCH_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory())) {
+                	holderDiv.setHeight(String.valueOf(UiGenerator.getScreenSize().height-250)+"px");
+                } else {
+                	holderDiv.setVflex("1");	
+                }
                 ChartPanel.this.setMaximized(true);
                 resizeBtn.setSclass(RESIZE_MIN_STYLE);
                 resizeBtn.setTooltiptext("Minimize window");
             }else{
+                holderDiv.setVflex(null);
+                holderDiv.setHeight("385px");
                 ChartPanel.this.setMaximized(false);
                 resizeBtn.setSclass(RESIZE_MAX_STYLE);
                 resizeBtn.setTooltiptext("Maximize window");
             }
+            
+            if (Constants.CATEGORY_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()) {
+                drawTableWidget();
+            } else if (Constants.CATEGORY_TEXT_EDITOR == chartService.getCharts().get(portlet.getChartType()).getCategory()) {
+                //onCreateDocumentWidget();
+            } else if(Constants.CATEGORY_SCORED_SEARCH_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()){
+                //drawScoredSearchTable();
+            }else {
+                String chartScript = drawD3Graph();
+                if (chartScript != null) {
+                    Clients.evalJavaScript(chartScript);
+                } else {
+                    throw new WrongValueException("JSON to create chart is null");
+                }
+            }
         });
+        
     }
     
     //Adds input parameters to display in chart/portlet
@@ -633,8 +657,8 @@ public class ChartPanel extends Panel {
                 Tab tab = new Tab(entry.getKey());
                 tab.setParent(tabs);
                 Tabpanel tabpanel = new Tabpanel();
-                Vbox vbox = tableRenderer.constructScoredSearchTable(entry.getValue(),false);
-                vbox.setParent(tabpanel);
+                Listbox listBox = tableRenderer.constructScoredSearchTable(entry.getValue(),false);
+                listBox.setParent(tabpanel);
                 tabpanel.setParent(tabpanels);
             }
         } catch (RemoteException | HpccConnectionException e) {

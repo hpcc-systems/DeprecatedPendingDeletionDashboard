@@ -134,9 +134,9 @@ public class HPCCServiceImpl implements HPCCService {
             resultString = "<Dataset" + resultString + "</Dataset>";
         }
 
-        if (LOG.isDebugEnabled()) {
+       /* if (LOG.isDebugEnabled()) {
             LOG.debug("Result String: Afetr removing schema tag " + resultString);
-        }
+        }*/
 
         return resultString;
 

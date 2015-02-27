@@ -55,7 +55,7 @@ public class LogoutController extends SelectorComposer<Component> {
                 .iterable(this.getPage(), "#mainInclude").iterator().next();
         Navbar navbar = (Navbar) Sessions.getCurrent().getAttribute(Constants.NAVBAR);
         navbar.setSelectedItem(null);
-        include.setSrc("/demo/profile-mvc.zul");
+        include.setSrc("/demo/group_manage.zul");
     }
     
     //For Adding new Widget Plugins. 
