@@ -5,6 +5,7 @@ import java.awt.Toolkit;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -70,6 +71,7 @@ import org.zkoss.zul.Hbox;
 import org.zkoss.zul.Html;
 import org.zkoss.zul.Image;
 import org.zkoss.zul.Label;
+import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listhead;
 import org.zkoss.zul.Listheader;
@@ -190,41 +192,51 @@ public class ChartPanel extends Panel {
     // Defining event listener to 'Input parameter apply/done' button in the portlet
     EventListener<MouseEvent> applyParamsListeners = new EventListener<MouseEvent>() {
         public void onEvent(final MouseEvent event) {
-            
-            Map<String,String> inputs = new HashMap<String, String>();
-            
-            //multipleValues object was created for translating multiple value selection into List of Maps
-            // This is currently not being used
-            List<Object> multipleValues = new ArrayList<Object>();
-            
-            String multipleValueParamName = null;
-            
-            for ( Component comp : inputListbox.getChildren()) {
-                if(comp instanceof InputListitem) {
-                    InputListitem listitem = (InputListitem) comp;
-                    inputs.put(listitem.getParamName(), listitem.getInputValue());
+            if(Constants.RELEVANT_CONFIG == chartService.getCharts().get(portlet.getChartType()).getCategory()){
+                RelevantData relevantData = (RelevantData) portlet.getChartData();
+                for ( Component comp : inputListbox.getChildren()) {
+                    if(comp instanceof InputListitem) {
+                        InputListitem listitem = (InputListitem) comp;
+                        LOG.debug("listitem.getInputValue() -->"+listitem.getInputValue());
+                        relevantData.setClaimId(listitem.getInputValue());
+                    }
                 }
-            }
-            
-            InputParams inputParams;
-            List<InputParams> paramsList = new ArrayList<InputParams>();
-            if(multipleValues.isEmpty()) {
-                inputParams = new InputParams(inputs);
-                paramsList.add(inputParams);
-            } else {
-                Map<String,String> multiInputs;
-                for (Object object : multipleValues) {
-                    multiInputs = new HashMap<String, String>();
-                    multiInputs.putAll(inputs);
-                    multiInputs.put(multipleValueParamName, object.toString());
-                    inputParams = new InputParams(multiInputs);
+            }else{
+                Map<String,String> inputs = new HashMap<String, String>();
+                
+                //multipleValues object was created for translating multiple value selection into List of Maps
+                // This is currently not being used
+                List<Object> multipleValues = new ArrayList<Object>();
+                
+                String multipleValueParamName = null;
+                
+               for ( Component comp : inputListbox.getChildren()) {
+                    if(comp instanceof InputListitem) {
+                        InputListitem listitem = (InputListitem) comp;
+                        inputs.put(listitem.getParamName(), listitem.getInputValue());
+                    }
+                }
+                
+                InputParams inputParams;
+                List<InputParams> paramsList = new ArrayList<InputParams>();
+                if(multipleValues.isEmpty()) {
+                    inputParams = new InputParams(inputs);
                     paramsList.add(inputParams);
+                } else {
+                    Map<String,String> multiInputs;
+                    for (Object object : multipleValues) {
+                        multiInputs = new HashMap<String, String>();
+                        multiInputs.putAll(inputs);
+                        multiInputs.put(multipleValueParamName, object.toString());
+                        inputParams = new InputParams(multiInputs);
+                        paramsList.add(inputParams);
+                    }
                 }
+                
+                portlet.getChartData().setInputParams(paramsList);
+                
+                portlet.getChartData().setInputParams(paramsList);
             }
-            
-            portlet.getChartData().setInputParams(paramsList);
-            
-            portlet.getChartData().setInputParams(paramsList);
 
             Clients.showBusy(ChartPanel.this, "Updating Chart");
             
@@ -411,18 +423,7 @@ public class ChartPanel extends Panel {
                 //IF RELEVANT
                 // portlet.getChartData().setInputParams(paramsList);
                 if(Constants.RELEVANT_CONFIG == chartService.getCharts().get(portlet.getChartType()).getCategory()){
-                    Set<String> setInuputParams = hpccQueryService.getInputParameters(portlet.getChartData().getFiles().iterator().next(), 
-                            portlet.getChartData().getHpccConnection(),
-                            portlet.getChartData().isGenericQuery(), 
-                            portlet.getChartData().getInputParamQuery());
-                    
-                    for(String val : setInuputParams) {
-                         if(val.equalsIgnoreCase("claim_ids") || val.equalsIgnoreCase("group_ids") || val.equalsIgnoreCase("person_ids") || val.equalsIgnoreCase("vehicle_ids")) {
-                             InputListitem listitem = new InputListitem(val, null, String.valueOf(portlet.getId() + "_board_"));
-                             inputListbox.appendChild(listitem);
-                         }
-                         
-                    }
+                    constructRelevantInputParam(portlet.getChartData());
                     
                 } else { 
                     paramValues = hpccQueryService.getInputParamDistinctValues(
@@ -430,33 +431,70 @@ public class ChartPanel extends Panel {
                             portlet.getChartData().getInputParams().iterator().next().getParams().keySet(),
                             portlet.getChartData().getHpccConnection(), portlet.getChartData().isGenericQuery(),
                             portlet.getChartData().getInputParamQuery());
+                    
+                    if(paramValues != null) {
+                        for (InputParams inputParam : portlet.getChartData().getInputParams()) {
+                            for (Entry<String,String> param : inputParam.getParams().entrySet() ) {
+                                
+                                LOG.debug("param.getKey(): "+param.getKey());
+                                LOG.debug("paramValues.get(param.getKey()): "+paramValues.get(param.getKey()));
+                                LOG.debug("String.valueOf(portlet.getId() + \"_board_\"): "+String.valueOf(portlet.getId() + "_board_"));
+                                
+                                InputListitem listitem = new InputListitem(param.getKey(), paramValues.get(param.getKey()), String.valueOf(portlet.getId() + "_board_"));
+                                if(param.getValue() != null  && !param.getValue().isEmpty()) {
+                                    listitem.setInputValue(param.getValue());
+                                }
+                                inputListbox.appendChild(listitem);
+                            }
+                        }
+                    }
                 }
             } catch (Exception e) {
                 //Exception is not thrown as it is not necessary
                 LOG.error(e);
             }
-
-            if(paramValues != null) {
-                for (InputParams inputParam : portlet.getChartData().getInputParams()) {
-                    for (Entry<String,String> param : inputParam.getParams().entrySet() ) {
-                        
-                        LOG.debug("param.getKey(): "+param.getKey());
-                        LOG.debug("paramValues.get(param.getKey()): "+paramValues.get(param.getKey()));
-                        LOG.debug("String.valueOf(portlet.getId() + \"_board_\"): "+String.valueOf(portlet.getId() + "_board_"));
-                        
-                        InputListitem listitem = new InputListitem(param.getKey(), paramValues.get(param.getKey()), String.valueOf(portlet.getId() + "_board_"));
-                        if(param.getValue() != null  && !param.getValue().isEmpty()) {
-                            listitem.setInputValue(param.getValue());
-                        }
-                        inputListbox.appendChild(listitem);
-                    }
-                }
-            }
+           
             inputListbox.setAttribute(Constants.HAS_INPUT_PARAM_VALUES, true);
             
             Clients.clearBusy((Popup)event.getData());        
         
         }
+    };
+
+        private void constructRelevantInputParam(ChartData chartData) {
+            
+            ChartData inputParamData = new TableData();
+            inputParamData.setHpccConnection(chartData.getHpccConnection());
+            List<String> files = new ArrayList<String>();
+            files.add("relevant_claimslist");
+            inputParamData.setFiles(files);
+            
+            List<Attribute> attributes = new ArrayList<Attribute>();
+            Attribute attr = new Attribute();
+            //hard coding 'report_no' name, as relevant chart always uses only 'claim id'
+            attr.setColumn("report_no");
+            attributes.add(attr);       
+            ((TableData)inputParamData).setAttributes(attributes);
+            
+            ListModelList<String> inputParam = new ListModelList<String>();
+            
+            Map<String, List<Attribute>> inputs = null;
+            try {
+                inputs = ((HPCCQueryService)SpringUtil.getBean("hpccQueryService")).fetchTableData((TableData)inputParamData);
+            } catch (RemoteException | HpccConnectionException e) {
+               LOG.error(Constants.EXCEPTION,e);
+            }
+            LOG.debug("Input parameters -->"+ inputs);
+            
+            if(inputs != null && inputs.get("report_no") != null){
+                inputs.get("report_no").stream().forEach(attribute ->{
+                    Attribute attribut = (Attribute)attribute;
+                    inputParam.add(attribut.getColumn());
+                });
+            }
+        
+            InputListitem listitem = new InputListitem("report_no", new HashSet<String>(inputParam), String.valueOf(portlet.getId() + "_board_"));
+            inputListbox.appendChild(listitem);
     }; 
     
     public void onDrawingQueryChart() {
@@ -490,8 +528,9 @@ public class ChartPanel extends Panel {
                 @Override
                 public void onEvent(MouseEvent event) throws Exception {
                     Boolean hasParamValues = (Boolean)inputListbox.getAttribute(Constants.HAS_INPUT_PARAM_VALUES);
-                     if(portlet.getChartData().getInputParams() != null 
-                             && (hasParamValues == null || !hasParamValues)){
+                     if(Constants.RELEVANT_CONFIG == chartService.getCharts().get(portlet.getChartType()).getCategory()
+                             || (portlet.getChartData().getInputParams() != null 
+                             && (hasParamValues == null || !hasParamValues))){
                             Clients.showBusy(popup, "Fetching Input Parameters");
                             Events.echoEvent(new Event("onAddInputParams", inputListbox,popup));
                         }
@@ -757,7 +796,13 @@ public class ChartPanel extends Panel {
         if(!portlet.getWidgetState().equals(Constants.STATE_LIVE_CHART)){
             return null;
         }
-        String chartJson = StringEscapeUtils.escapeJavaScript(portlet.getChartDataJSON());
+        String chartJson = null;
+        if(Constants.RELEVANT_CONFIG != chartService.getCharts().get(portlet.getChartType()).getCategory()){
+            chartJson = StringEscapeUtils.escapeJavaScript(portlet.getChartDataJSON());
+        }else{
+            chartJson = portlet.getChartDataJSON();
+        }
+                
         
         ChartDetails chartDetails = chartService.getCharts().get(portlet.getChartType());
         

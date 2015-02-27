@@ -1218,7 +1218,7 @@ return resultDataMap;
 
 								if (lstNmElmnt != null) {
 									// Rounding off Numeric values
-									if (DashboardUtil.checkRealValue(tableData
+									if (tableData.getFields() != null && DashboardUtil.checkRealValue(tableData
 											.getFields()
 											.get(data.getFileName())
 											.get(tableData.getFields().get(data.getFileName())
@@ -1229,7 +1229,7 @@ return resultDataMap;
 										str = lstNmElmnt.getTextContent();
 									}
 								} else {
-									if (DashboardUtil.checkRealValue(tableData
+									if (tableData.getFields() != null && DashboardUtil.checkRealValue(tableData
 											.getFields()
 											.get(data.getFileName())
 											.get(tableData.getFields().get(data.getFileName())

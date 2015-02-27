@@ -477,7 +477,12 @@ public class ChartRenderer {
         if( portlet.getChartDataJSON() == null) {
             Clients.showNotification(Labels.getLabel("noDataAvailable"), true);
         }    
-        String chartJson = StringEscapeUtils.escapeJavaScript(portlet.getChartDataJSON());
+        String chartJson = null;
+        if(Constants.RELEVANT_CONFIG != chartService.getCharts().get(portlet.getChartType()).getCategory()){
+            chartJson = StringEscapeUtils.escapeJavaScript(portlet.getChartDataJSON());
+        }else{
+            chartJson = portlet.getChartDataJSON();
+        }
         ChartDetails chartDetails = chartService.getCharts().get(portlet.getChartType());
         
         //Forming java script

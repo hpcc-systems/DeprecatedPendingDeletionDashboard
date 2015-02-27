@@ -180,7 +180,7 @@ public class Constants {
     public static final String GROUP = "group";
     public static final String SUPER_USER_GROUP_CODE = "HPCCDASHDEV_SUPER_USERS"; //Hard Coded for MBS Service
     public static final String SUPER_USER_GROUP_NAME = "super_users"; 
-    public static final Integer ZERO = 1;
+    public static final Integer ZERO = 0;
     public static final String GOOGLE_CHART_API = "Google chart Api";
     public static final String SAVE_BUTTON = "glyphicon glyphicon-save";
     public static final String BUTTON_ZCLASS = "btn btn-xs btn-info";

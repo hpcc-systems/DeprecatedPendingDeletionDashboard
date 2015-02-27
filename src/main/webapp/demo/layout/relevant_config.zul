@@ -11,7 +11,7 @@
 					<div width="350px" sclass="form-label-div" align="right">
 						<label zclass="control-label" value="${labels.claimId}"></label>
 					</div>
-					<textbox id="claimId"  zclass="form-control" height="25px" width="210px"></textbox>
+					<combobox id="claimCombobox" autodrop="true" height="20px" ></combobox>
 				</hbox>
 				
 				<hbox sclass="form-group" hflex="1" align="center" spacing="50px" height="100px">
