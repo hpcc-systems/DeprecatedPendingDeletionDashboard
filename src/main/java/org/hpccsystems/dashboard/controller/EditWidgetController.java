@@ -366,7 +366,6 @@ public class EditWidgetController extends SelectorComposer<Component> {
             } else if(Constants.RELEVANT_CONFIG == chartService.getCharts().get(portlet.getChartType()).getCategory()){
             	RelevantData objRelevantData = (RelevantData)portlet.getChartData();
             	
-            	objRelevantData.setClaimId((Textbox)holderInclude.getFellow("claimId") != null ? ((Textbox)holderInclude.getFellow("claimId")).getValue() : null);
             	objRelevantData.setClaimImage((Combobox)holderInclude.getFellow("cmbClaim") != null ? ((Combobox)holderInclude.getFellow("cmbClaim")).getSelectedItem().getValue().toString() : null);
             	objRelevantData.setPersonImage((Combobox)holderInclude.getFellow("cmbPerson") != null ? ((Combobox)holderInclude.getFellow("cmbPerson")).getSelectedItem().getValue().toString() : null);
             	objRelevantData.setVehicleImage((Combobox)holderInclude.getFellow("cmbVehicle") != null ? ((Combobox)holderInclude.getFellow("cmbVehicle")).getSelectedItem().getValue().toString() : null);

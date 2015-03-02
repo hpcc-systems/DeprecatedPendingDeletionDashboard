@@ -1,5 +1,6 @@
 package org.hpccsystems.dashboard.controller;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
@@ -35,6 +36,8 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.ListitemRenderer;
 import org.zkoss.zul.Window;
 
+import com.mysql.jdbc.StringUtils;
+
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
 public class InteractivityController extends SelectorComposer<Component> {
 
@@ -64,7 +67,8 @@ public class InteractivityController extends SelectorComposer<Component> {
     private  Dashboard dashboard;
     private Window parent;
     
-    
+    private List<Integer> sourceIds = new ArrayList<Integer>(); 
+    private List<Integer> targetIds = new ArrayList<Integer>(); 
     
     EventListener<Event> populateTableAttributes = (event) -> {
         sourceListBox.setVisible(true);
@@ -102,12 +106,15 @@ public class InteractivityController extends SelectorComposer<Component> {
     
     ListitemRenderer<Portlet> interactivityLabelRenderer = (listitem,portlet,index) ->{
         StringBuilder bilder = new StringBuilder();
-        
-        bilder.append(sourceCombobox.getSelectedItem().getLabel())
-        .append("'s column ")
-        .append(sourceListBox.getSelectedItem().getLabel())
-        .append(" updates ")
-        .append(targetCombobox.getSelectedItem().getLabel());
+        TableData table = ((TableData)portlet.getChartData());
+        Interactivity interactivity = table.getInteractivity();
+        Portlet target = dashboard.getPortlet(interactivity.getTargetId());
+        bilder.append(StringUtils.isNullOrEmpty(portlet.getName()) ?"Table - ".concat(portlet.getId().toString()) : portlet.getName())
+        .append(" column '")
+        .append(interactivity.getSourceColumn())
+        .append("'")
+        .append(" updates(--->) ")
+        .append(StringUtils.isNullOrEmpty(target.getName()) ?"Relavent - ".concat(target.getId().toString()) : target.getName());
         
         listitem.setLabel(bilder.toString());
         listitem.setValue(portlet);
@@ -122,10 +129,19 @@ public class InteractivityController extends SelectorComposer<Component> {
         
         ListModelList<Portlet> sourceModel = new ListModelList<Portlet>();
         ListModelList<Portlet> targetModel = new ListModelList<Portlet>();
-      
+        
+        interactivityListbox.setModel(new ListModelList<Portlet>());
+        interactivityListbox.setItemRenderer(interactivityLabelRenderer);
+        
             dashboard.getLiveCharts().stream().forEach(portlet ->{
                 if(Constants.CATEGORY_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()){
                     sourceModel.add(portlet);
+                    TableData table = ((TableData)portlet.getChartData());
+                    if(table.getInteractivity() != null){
+                        ((ListModelList<Object>)interactivityListbox.getModel()).add(portlet);
+                        sourceIds.add(table.getInteractivity().getSourceId());
+                        targetIds.add(table.getInteractivity().getTargetId());
+                    }
                 }else if(Constants.RELEVANT_CONFIG == chartService.getCharts().get(portlet.getChartType()).getCategory()){
                     targetModel.add(portlet);
                 }
@@ -138,7 +154,7 @@ public class InteractivityController extends SelectorComposer<Component> {
                 sourceCombobox.setModel(sourceModel);
                 sourceCombobox.setItemRenderer((comboitem,widgetPassed,index)->{
                     Portlet widget =(Portlet)widgetPassed;
-                    if(widget.getName().isEmpty()){
+                    if(StringUtils.isNullOrEmpty(widget.getName())){
                     	comboitem.setLabel("Table - ".concat(widget.getId().toString()));
                     } else {
                     	comboitem.setLabel(widget.getName());
@@ -151,7 +167,7 @@ public class InteractivityController extends SelectorComposer<Component> {
                 targetCombobox.setModel(targetModel);
                 targetCombobox.setItemRenderer((comboitem,widgetPassed,index)->{
                     Portlet widget =(Portlet)widgetPassed;
-                    if(widget.getName().isEmpty()){
+                    if(StringUtils.isNullOrEmpty(widget.getName())){
                     	comboitem.setLabel("Relavent - ".concat(widget.getId().toString()));
                     } else {
                     	comboitem.setLabel(widget.getName());
@@ -164,8 +180,6 @@ public class InteractivityController extends SelectorComposer<Component> {
                         Labels.getLabel("configureCharts"),
                        Clients.NOTIFICATION_TYPE_INFO, comp, Constants.POSITION_CENTER, 3000, true);
             }
-            interactivityListbox.setModel(new ListModelList<Portlet>());
-            interactivityListbox.setItemRenderer(interactivityLabelRenderer);
     }
     
     @Listen("onClick=#addInteractivity")
@@ -177,22 +191,36 @@ public class InteractivityController extends SelectorComposer<Component> {
                    Clients.NOTIFICATION_TYPE_ERROR, hbox, Constants.POSITION_CENTER, 3000, true);
             return;
         }
-        Interactivity interactivity=new Interactivity();
+        
         Portlet sourceportlet=(Portlet) ((ListModelList<Object>)sourceCombobox.getModel()).getSelection().iterator().next();
-        interactivity.setSourceId(sourceportlet.getId());
-        
         Portlet targetportlet=(Portlet) ((ListModelList<Object>)targetCombobox.getModel()).getSelection().iterator().next();
-        interactivity.setTargetId(targetportlet.getId());
         
-        interactivity.setSourceColumn(sourceListBox.getSelectedItem().getLabel());
-        interactivity.setTragetColumn(targetListBox.getSelectedItem().getLabel());
-        
-        TableData tableData=(TableData) sourceportlet.getChartData();
-        tableData.setHasInteractivity(true);
-        tableData.setInteractivity(interactivity);
-        
-        //To display the selected interactivity label
-        ((ListModelList<Object>)interactivityListbox.getModel()).add(sourceportlet);
+        if(!sourceIds.contains(sourceportlet.getId()) && !targetIds.contains(targetportlet.getId())){
+            
+            Interactivity interactivity=new Interactivity();
+            interactivity.setSourceId(sourceportlet.getId());
+            
+           
+            interactivity.setTargetId(targetportlet.getId());
+            
+            interactivity.setSourceColumn(sourceListBox.getSelectedItem().getLabel());
+            interactivity.setTragetColumn(targetListBox.getSelectedItem().getLabel());
+            
+            TableData tableData=(TableData) sourceportlet.getChartData();
+            tableData.setHasInteractivity(true);
+            tableData.setInteractivity(interactivity);
+            
+            sourceIds.add(sourceportlet.getId());
+            targetIds.add(targetportlet.getId());
+            
+            //To display the selected interactivity label
+            ((ListModelList<Object>)interactivityListbox.getModel()).add(sourceportlet);
+        }else{
+            Clients.showNotification(
+                       Labels.getLabel("sourceTargetExists"),
+                      Clients.NOTIFICATION_TYPE_WARNING, this.getSelf(), Constants.POSITION_CENTER, 3000, true);
+        }
+       
     }
     
     @Listen("onClick = #saveBtn")

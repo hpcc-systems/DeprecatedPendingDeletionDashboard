@@ -2,13 +2,13 @@
 	
 	<panel sclass="pagePanel" collapsible="true" width="1000px" id="formPanel">
 		<caption iconSclass="glyphicon glyphicon-globe">
-			<label sclass="h5"> HPCC Systems Connection Detail</label>
+			<label sclass="h5">${labels.hpccSystemsConnectionDetail} </label>
 		</caption>
 		<panelchildren>
 			<vbox id="viewHpccVbox" visible="false" hflex="1" spacing="0" style="background: rgba(170, 170, 170, 0.45);width: 1000px;">
 				<hbox sclass="form-group" hflex="1" align="center" spacing="15px">
 					<div width="250px" sclass="form-label-div" align="right">
-						<label zclass="control-label" value="HPCC Cluster"></label>
+						<label zclass="control-label" value="${labels.hpccCluster}"></label>
 					</div>
 					<label zclass="form-control" id="hpccUrl" ></label>
 				</hbox>
@@ -26,11 +26,11 @@
 			<vbox id="defaultsContainer" spacing="0" style="background: rgba(170, 170, 170, 0.45); width: 1000px;">
 				<hbox sclass="form-group" hflex="1" align="center" spacing="15px">
 					<div width="250px" sclass="form-label-div" align="right">
-						<label zclass="control-label" value="HPCC Connection"></label>
+						<label zclass="control-label" value="${labels.hpccConnection}"></label>
 					</div>
 					<combobox id="defaultConnections" autodrop="true" placeholder="Choose a pre-defined Cluster" sclass="input-sm"/>
 		  			or
-		  			<button id="defineConnection" zclass="btn btn-sm btn-info" label="Define new connection" />
+		  			<button id="defineConnection" zclass="btn btn-sm btn-info" label="${labels.defineconnection }" />
 				</hbox>
 			</vbox>
 			
@@ -42,8 +42,8 @@
 						<label zclass="control-label" value="${labels.dataSource}"></label>
 					</div>
 					<combobox id="fileType" autodrop="true" >
-		    			<comboitem label="Logical Files"   value="logicalfile"/>
-		  			 	<comboitem label="Queries" value="query"/>
+		    			<comboitem label="${labels.logicalFiles}"   value="logicalfile"/>
+		  			 	<comboitem label="${labels.query}" value="query"/>
 		  			</combobox>	
 				</hbox>
 
@@ -79,7 +79,7 @@
 					<div width="250px" sclass="form-label-div" align="right">
 						<label zclass="control-label" value="${labels.connectionType}"></label>
 					</div>
-					<checkbox style="margin: 5px;" zclass="checkbox" id="sslCheckbox" label="SSL" width="80px"></checkbox>
+					<checkbox style="margin: 5px;" zclass="checkbox" id="sslCheckbox" label="${labels.ssl}" width="80px"></checkbox>
 				</hbox>
 				
 				<hbox sclass="form-group" hflex="1" align="center" spacing="15px">
@@ -98,10 +98,10 @@
 				
 				<hbox id="clusterNameHbox" sclass="form-group" hflex="1" align="center" spacing="15px" visible="false"> 
 				 	<div width="250px" sclass="form-label-div" align="right">
-						<label zclass="control-label" value="Cluster Type"></label>
+						<label zclass="control-label" value="${labels.clusterType}"></label>
 				 	</div>
 					<combobox id="clusters"  width="100px" visible="false"/>
-					<button id="getClustersBtn" zclass="btn btn-info btn-sm" label="Get clusters" />
+					<button id="getClustersBtn" zclass="btn btn-info btn-sm" label="${labels.getClusters }" />
 				</hbox>	
 				
 				<div zclass="form-actions" id="submitBtnDiv">
@@ -114,7 +114,7 @@
 	
 	<tree id="tree" visible="false" height="504px" multiple="true" checkmark="true">
         <treecols>
-            <treecol id="treeColumn" label="Choose a file to Visualize"/>
+            <treecol id="treeColumn" label="${labels.chooseFile }"/>
         </treecols>
         
         <template name="model">

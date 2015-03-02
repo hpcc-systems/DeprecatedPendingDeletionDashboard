@@ -267,6 +267,10 @@ public class Dashboard {
         }
         return liveCharts;
     }
+    
+    public Portlet getPortlet(int potletId){
+        return this.getPortletList().stream().filter(portlet -> potletId ==((Portlet)portlet).getId()).findFirst().get();
+    }
 
     @Override
     public String toString() {    
