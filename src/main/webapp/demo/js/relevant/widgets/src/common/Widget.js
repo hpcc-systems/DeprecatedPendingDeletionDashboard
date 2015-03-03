@@ -1,3 +1,4 @@
+"use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
         define(["d3/d3"], factory);
@@ -36,7 +37,7 @@
         return null;
     })();
     Widget.prototype.isIE = Widget.prototype.ieVersion !== null;
-    Widget.prototype.svgMarkerGlitch = Widget.prototype.isIE && Widget.prototype.ieVersion <= 11;
+    Widget.prototype.svgMarkerGlitch = Widget.prototype.isIE && Widget.prototype.ieVersion <= 12;
     Widget.prototype.MutationObserver = window.MutationObserver || window.WebKitMutationObserver || window.MozMutationObserver || function (callback) {
         //  Just enough for HTMLOverlay and C3  ---
         this.callback = callback;
@@ -116,25 +117,34 @@
     };
 
     // Serialization  ---
-    Widget.prototype.publish = function (id, defaultValue, type, description, options, ext) {
+    Widget.prototype.publish = function (id, defaultValue, type, description, set, ext) {
         if (this["__meta_" + id] !== undefined) {
             throw id + " is already published."
         }
-        if (type) {
-            this["__meta_" + id] = {
-                id: id,
-                type: type,
-                options: options,
-                description: description,
-                ext: ext || {}
-            }
+        this["__meta_" + id] = {
+            id: id,
+            type: type,
+            defaultValue: defaultValue,
+            description: description,
+            set: set,
+            ext: ext || {}
         }
         this[id] = function (_) {
             if (!arguments.length) return this["_" + id];
             switch (type) {
                 case "set":
-                    if (!options || options.indexOf(_) < 0) {
-                        throw "Invalid value for '" + id + "':  " + _;
+                    if (!set || set.indexOf(_) < 0) {
+                        console.log("Invalid value for '" + id + "':  " + _);
+                    }
+                    break;
+                case "html-color":
+                    var litmus = 'red';
+                    var d = document.createElement('div');
+                    d.style.color=litmus;
+                    d.style.color=_;
+                    //Element's style.color will be reverted to litmus or set to '' if an invalid color is given
+                    if( _ !== litmus && (d.style.color === litmus || d.style.color === '')){
+                        console.log("Invalid value for '" + id + "':  " + _);
                     }
                     break;
                 case "boolean":
@@ -146,11 +156,25 @@
                 case "string":
                     _ = String(_);
                     break;
+                case "array":
+                    if (!(_ instanceof Array)) {
+                        console.log("Invalid value for '" + id);
+                    }
+                    break;
             }
             this["_" + id] = _;
             return this;
         };
         this["_" + id] = defaultValue;
+    };
+
+    Widget.prototype.publishWidget = function (prefix, WidgetType, id) {
+        for (var key in WidgetType.prototype) {
+            if (key.indexOf("__meta") === 0) {
+                var publishItem = WidgetType.prototype[key];
+                this.publishProxy(prefix + "_" + publishItem.id, id, publishItem.method || publishItem.id)
+            }
+        }
     };
 
     Widget.prototype.publishProxy = function (id, proxy, method, _private) {
@@ -171,42 +195,6 @@
             this[proxy][method](_);
             return this;
         };
-    };
-
-    Widget.prototype.discover = function () {
-        var retVal = [];
-        for (var key in this) {
-            if (key.indexOf("__meta_") >= 0) {
-                var item = this;
-                var meta = item[key];
-                while (meta.type === "proxy") {
-                    item = item[meta.proxy];
-                    meta = item["__meta_" + meta.method];
-                }
-                if (meta.id !== this[key].id) {
-                    meta = JSON.parse(JSON.stringify(meta));  //  Clone meta so we can safely replace the id.
-                    meta.id = this[key].id;
-                }
-                retVal.push(meta);
-            }
-        }
-        return retVal;
-    }
-
-    Widget.prototype.serialize = function () {
-        var retVal = {};
-        this.discover().forEach(function (item) {
-            retVal[item.id] = this[item.id]();
-        }, this);
-        return JSON.stringify(retVal);
-    };
-
-    Widget.prototype.deserialize = function (stateJSON) {
-        var state = JSON.parse(stateJSON);
-        for (var key in state) {
-            this[key](state[key]);
-        }
-        return this;
     };
 
     //  Implementation  ---
@@ -423,13 +411,23 @@
         if (this._size.width && this._size.height) {
             var newPos = this.getAbsolutePos(this._overlayElement.node(), this._size.width, this._size.height);
             if (newPos && (this.oldPos === null || this.oldPos === undefined || newPos.x !== this.oldPos.x || newPos.y !== this.oldPos.y || newPos.width !== this.oldPos.width || newPos.height !== this.oldPos.height)) {
+                var xScale = newPos.width / this._size.width;
+                var yScale = newPos.height / this._size.height;
                 this._parentElement
                     .style({
-                        left: newPos.x - newPos.width / 2 + "px",
-                        top: newPos.y - newPos.height / 2 + "px",
-                        width: newPos.width + "px",
-                        height: newPos.height + "px"
+                        left: newPos.x - (newPos.width / xScale) / 2 + "px",
+                        top: newPos.y - (newPos.height / yScale) / 2 + "px",
+                        width: newPos.width / xScale + "px",
+                        height: newPos.height / yScale + "px"
                     })
+                ;
+                var transform = "scale(" + xScale + "," + yScale + ")";
+                this._parentElement
+                    .style("transform", transform)
+                    .style("-moz-transform", transform)
+                    .style("-ms-transform", transform)
+                    .style("-webkit-transform", transform)
+                    .style("-o-transform", transform)
                 ;
             }
             this.oldPos = newPos;

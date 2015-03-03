@@ -20,7 +20,7 @@ public interface DashboardDao {
      * @param layout
      * @throws SQLException
      */
-     int addDashboardDetails(Dashboard dashboard, String applicationId, String sourceId,String userId) throws DataAccessException ;
+     void addDashboardDetails(Dashboard dashboard, String applicationId, String sourceId,String userId) throws DataAccessException ;
     
     /**
      * Fetching DashboardMenuPages details from dashboard_details table.

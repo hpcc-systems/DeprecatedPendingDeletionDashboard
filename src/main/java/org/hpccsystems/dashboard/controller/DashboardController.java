@@ -1277,7 +1277,7 @@ public class DashboardController extends SelectorComposer<Window>{
             
             reorderPortletPanels();
             
-            portlet.setId(widgetService.addWidget(dashboardId, portlet, dashboard.getPortletList().indexOf(portlet)));
+            widgetService.addWidget(dashboardId, portlet, dashboard.getPortletList().indexOf(portlet));
             
             //Updating new widget sequence to DB
             widgetService.updateWidgetSequence(dashboard);

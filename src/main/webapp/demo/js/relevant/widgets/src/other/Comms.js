@@ -1,4 +1,5 @@
-﻿(function (root, factory) {
+"use strict";
+(function (root, factory) {
     if (typeof define === "function" && define.amd) {
         define([], factory);
     } else {
@@ -25,7 +26,7 @@
             tmp = tmp.split("&");
             tmp.map(function (item) {
                 var tmpItem = item.split("=");
-                params[tmpItem[0]] = tmpItem[1];
+                params[decodeURIComponent(tmpItem[0])] = decodeURIComponent(tmpItem[1]);
             });
         }
         this._protocol = parser.protocol;
@@ -106,20 +107,21 @@
         var mapping = this._mappings[resultName];
         if (mapping) {
             response[resultName] = response[resultName].map(function (item) {
-                var row = {};
+                var row = [];
                 if (mapping.x && mapping.x instanceof Array) {
                     //  LINE Mapping  ---
                     row = [];
                     for (var i = 0; i < mapping.x.length; ++i) {
-                        row.push({
-                            label: item[mapping.x[i]],
-                            weight: item[mapping.y[i]]
-                        })
+                        row.push(item[mapping.y[i]]);
                     }
                 } else {
                     //  Regular Mapping  ---
                     for (var key in mapping) {
-                        row[mapping[key]] = item[key];
+                        if (mapping[key] === "label") {
+                            row[0] = item[key];
+                        } else if (mapping[key] === "weight") {
+                            row[1] = item[key];
+                        }
                     }
                 }
                 return row;
@@ -140,7 +142,7 @@
     };
     Comms.prototype = Object.create(ESPUrl.prototype);
 
-    exists = function (prop, scope) {
+    var exists = function (prop, scope) {
         var propParts = prop.split(".");
         var testScope = scope;
         for (var i = 0; i < propParts.length; ++i) {
@@ -153,7 +155,7 @@
         return true;
     };
 
-    serialize = function (obj) {
+    var serialize = function (obj) {
         var str = [];
         for (var key in obj) {
             if (obj.hasOwnProperty(key)) {

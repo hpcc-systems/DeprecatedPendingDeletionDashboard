@@ -1,3 +1,4 @@
+"use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
         define(["../common/HTMLWidget"], factory);
@@ -7,9 +8,9 @@
 }(this, function (HTMLWidget) {
     function Audio() {
         HTMLWidget.call(this);
+        this._class = "other_Audio";
 
         this._tag = "audio";
-        this._class = "audio";
 
         this._source = [];
         this._sections = {};

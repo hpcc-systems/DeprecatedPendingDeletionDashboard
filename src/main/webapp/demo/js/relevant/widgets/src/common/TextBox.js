@@ -1,3 +1,4 @@
+"use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
         define(["./SVGWidget", "./Shape", "./Text", "css!./TextBox"], factory);
@@ -7,15 +8,19 @@
 }(this, function (SVGWidget, Shape, Text) {
     function TextBox() {
         SVGWidget.call(this);
+        this._class = "common_TextBox";
 
-        this._class = "textbox";
         this._shape = new Shape()
             .shape("rect")
+            .color_fill("#dcf1ff")
         ;
         this._text = new Text();
     };
     TextBox.prototype = Object.create(SVGWidget.prototype);
     TextBox.prototype.publishProxy("text", "_text");
+    TextBox.prototype.publishProxy("shape_color_stroke", "_shape", "color_stroke");
+    TextBox.prototype.publishProxy("shape_color_fill", "_shape", "color_fill");
+    TextBox.prototype.publishProxy("text_color_fill", "_text", "color_fill");
     TextBox.prototype.publish("padding_left", 4, "number", "Padding:  Left");
     TextBox.prototype.publish("padding_right", 4, "number", "Padding:  Right");
     TextBox.prototype.publish("padding_top", 4, "number", "Padding:  Top");
@@ -53,20 +58,12 @@
         SVGWidget.prototype.update.apply(this, arguments);
 
         this._text
-            .pos({
-                x: (this._padding_left - this._padding_right) / 2,
-                y: (this._padding_top - this._padding_bottom) / 2
-            })
             .render()
         ;
         var textBBox = this._text.getBBox(true);
-        var bbox = {
-            width: textBBox.width,
-            height: textBBox.height
-        };
         var size = {
-            width: this._fixedSize ? this._fixedSize.width : bbox.width + this._padding_left + this._padding_right,
-            height: this._fixedSize ? this._fixedSize.height : bbox.height + this._padding_top + this._padding_bottom
+            width: this._fixedSize ? this._fixedSize.width : textBBox.width + this._padding_left + this._padding_right,
+            height: this._fixedSize ? this._fixedSize.height : textBBox.height + this._padding_top + this._padding_bottom
         };
         this._shape
             .width(size.width)

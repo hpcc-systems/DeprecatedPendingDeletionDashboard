@@ -1,4 +1,5 @@
-﻿(function (root, factory) {
+"use strict";
+(function (root, factory) {
     if (typeof define === "function" && define.amd) {
         define(["d3/d3", "../common/SVGWidget", "../graph/Graph", "./IGMap", "async!http://maps.google.com/maps/api/js?sensor=false", "css!./GMap"], factory);
     } else {
@@ -8,6 +9,7 @@
     function GMap(target) {
         Graph.call(this);
         IGMap.call(this);
+        this._class = "map_GMap";
     };
     GMap.prototype = Object.create(Graph.prototype);
     GMap.prototype.implements(IGMap.prototype);

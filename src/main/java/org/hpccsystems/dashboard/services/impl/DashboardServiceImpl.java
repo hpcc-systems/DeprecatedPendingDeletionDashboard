@@ -73,11 +73,11 @@ public class DashboardServiceImpl implements DashboardService {
         this.dashboardDao = dashboardDao;
     }
 
-    public int addDashboardDetails(final Dashboard dashboard,
+    public void addDashboardDetails(final Dashboard dashboard,
             final String applicationId, final String sourceId, final String userId)
             throws DataAccessException {
         try {
-        return dashboardDao.addDashboardDetails(dashboard,applicationId, sourceId,userId);
+            dashboardDao.addDashboardDetails(dashboard,applicationId, sourceId,userId);
         }
         catch(DataAccessException ex) {
             LOG.error(Constants.EXCEPTION,ex);

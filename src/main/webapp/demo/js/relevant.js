@@ -33,9 +33,12 @@ function createRelevantChart(divId, reqData) {
         	// size of the diagram
             width = divElement.width();
             height = divElement.height();
-
-         	if(width < 50 ){ width = 400; } 
-        	if(height < 50 ){ height = 385; }
+            
+          //checking the minimum height for browser and component and set the same as window height. 
+        	if(divElement.parent().parent().height()<($(window).height()-150)){fullHeight = divElement.parent().parent().height();}
+        	else{fullHeight = ($(window).height()-150);}
+        	
+        	if(divElement.width()>$(window).width()){fullWidth = $(window).width();}
         	
         	
             var vertices = [];
@@ -76,25 +79,6 @@ function createRelevantChart(divId, reqData) {
                 return retVal;
             }
 
-            doRandom = function() {
-            	console.log("Calling Do Random...");
-                var maxV = Math.floor(Math.random() * 100);
-                var maxE = Math.floor(Math.random() * 100);
-                for (var i = 0; i < maxV; ++i) {
-                    var fromV =  getVertex("v" + i, "", i);
-                }
-                for (var i = 0; i < maxE; ++i) {
-                    var fromIdx = Math.floor(Math.random() * vertices.length);
-                    var toIdx = Math.floor(Math.random() * vertices.length);
-                    getEdge(vertices[fromIdx], vertices[toIdx]);
-                }
-                graph
-                    .data({ vertices: vertices, edges: edges, merge: true })
-                    .render()
-                    //.layout(graph.layout())
-                    .layout(graph.layout(), transitionDuration)
-                ;
-            }
 
             var service = Comms.createESPConnection("http://10.173.147.1:8010/?QuerySetId=roxie&Id=claim_group_data_review_ex_srvc_rmap2.1&Widget=QuerySetDetailsWidget");
 
@@ -162,7 +146,6 @@ function createRelevantChart(divId, reqData) {
                         graph
                             .data({ vertices: vertices, edges: edges, merge: true })
                             .render()
-                            //.layout(graph.layout())
                             .layout(graph.layout(), transitionDuration)
                         ;
                     });
@@ -244,19 +227,63 @@ function createRelevantChart(divId, reqData) {
 			
 			var hot = new Handsontable(container, config);
 			
+			divElement.on("click", ".randomize", function() {
+
+            	console.log("Calling Do Random...");
+                var maxV = Math.floor(Math.random() * 100);
+                var maxE = Math.floor(Math.random() * 100);
+                for (var i = 0; i < maxV; ++i) {
+                    var fromV =  getVertex("v" + i, "", i);
+                }
+                for (var i = 0; i < maxE; ++i) {
+                    var fromIdx = Math.floor(Math.random() * vertices.length);
+                    var toIdx = Math.floor(Math.random() * vertices.length);
+                    getEdge(vertices[fromIdx], vertices[toIdx]);
+                }
+                graph
+                    .data({ vertices: vertices, edges: edges, merge: true })
+                    .render()
+                    .layout(graph.layout(), transitionDuration)
+                ;
+            
+			});
+			
+			divElement.on("click", ".circularize",function() {
+				graph.layout('Circle', transitionDuration);
+			});
+			
+			divElement.on("click", ".forceDirect",function() {
+				graph.layout('ForceDirected', transitionDuration);
+			});
+			
+			divElement.on("click", ".animate",function() {
+				graph.layout('ForceDirected2');
+			});
+			
+			divElement.on("click", ".hieraric",function() {
+				graph.layout('Hierarchy', transitionDuration);
+			});
+			
+			divElement.on("click", ".showHide",function() {
+				graph.showEdges(!graph.showEdges()).render();
+			});
+			
 			divElement.append(jq("<header>" +
 					"<nav>" +
 						"<ul>" +
-							"<li><a id=\"info\" title=\"Data: Randomize\">R</a></li>" +
-							"<li><a title=\"Layout: Circle\">C</a></li>" +
-							"<li><a title=\"Layout: ForceDirected\" >F</a></li>" +
-							"<li><a title=\"Layout: Force Directed (Animated)\">F2</a></li>" +
-							"<li><a title=\"Layout: Hierarchy\">H</a></li>" +
-			                "<li><a title=\"Edges: Show/Hide\">E</a></li>"+
+							"<li><a id=\"info\" class=\"randomize\" title=\"Data: Randomize\">R</a></li>" +
+							"<li><a class=\"circularize\" title=\"Layout: Circle\">C</a></li>" +
+							"<li><a class=\"forceDirect\" title=\"Layout: ForceDirected\" >F</a></li>" +
+							"<li><a class=\"animate\" title=\"Layout: Force Directed (Animated)\">F2</a></li>" +
+							"<li><a class=\"hieraric\" title=\"Layout: Hierarchy\">H</a></li>" +
+			                "<li><a class=\"showHide\" title=\"Edges: Show/Hide\">E</a></li>"+
 						"</ul>" +
 				 	"</nav>" +
 				 "</header>"));
-
+			
         });
         
 }
+
+
+

@@ -1,3 +1,4 @@
+"use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
         define(["d3/d3", "../common/SVGWidget", "./IList", "../common/TextBox", "css!./List"], factory);
@@ -8,8 +9,7 @@
     function List(target) {
         SVGWidget.call(this);
         IList.call(this);
-
-        this._class = "list";
+        this._class = "common_List";
 
         this._listWidgets = {};
     };

@@ -1,25 +1,29 @@
-﻿(function (root, factory) {
+"use strict";
+(function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3/d3", "./Choropleth", "topojson/topojson", "./countries", "./us-states"], factory);
+        define(["d3/d3", "./Choropleth", "topojson/topojson", "./countries"], factory);
     } else {
-        root.ChoroplethCounties = factory(root.d3, root.Choropleth, root.topojson, root.countries, root.usStates);
+        root.ChoroplethCountries = factory(root.d3, root.Choropleth, root.topojson, root.countries);
     }
-}(this, function (d3, Choropleth, topojson, countries, usStates) {
-    function ChoroplethCounties() {
+}(this, function (d3, Choropleth, topojson, countries) {
+    function ChoroplethCountries() {
         Choropleth.call(this);
+        this._class = "map_ChoroplethCountries";
 
         this._dataMap = {};
         this._dataMaxWeight = 0;
         this._dataMinWeight = 0;
-        this.projection("orthographic");
+        this.projection(this._world_projection);
     };
-    ChoroplethCounties.prototype = Object.create(Choropleth.prototype);
+    ChoroplethCountries.prototype = Object.create(Choropleth.prototype);
 
-    ChoroplethCounties.prototype.testData = function () {
+    ChoroplethCountries.prototype.publish("world_projection", "mercator", "set", "Map Projection", ["mercator", "orthographic"]);
+
+    ChoroplethCountries.prototype.testData = function () {
         return this;
     },
 
-    ChoroplethCounties.prototype.data = function (_) {
+    ChoroplethCountries.prototype.data = function (_) {
             var retVal = Choropleth.prototype.data.apply(this, arguments);
         if (arguments.length) {
             this._dataMap = {};
@@ -40,19 +44,15 @@
         return retVal;
     };
 
-    ChoroplethCounties.prototype.enter = function (domNode, element) {
-        var context = this;
+    ChoroplethCountries.prototype.enter = function (domNode, element) {
         Choropleth.prototype.enter.apply(this, arguments);
+        element.classed("map_Choropleth", true);    
+
+        this.projection(this._world_projection);
+
+        var context = this
         this.lookup = {};
-        var stateArray = topojson.feature(usStates.topology, usStates.topology.objects.states).features.map(function (item) {
-            item.category = "State";
-            item.name = usStates.stateNames[item.id].code;
-            context.lookup[item.name] = item;
-            return item;
-        });
-        var countryArray = topojson.feature(countries.topology, countries.topology.objects.countries).features.filter(function (item) {
-            return (item.id !== 840);
-        }).map(function (item) {
+        var countryArray = topojson.feature(countries.topology, countries.topology.objects.countries).features.map(function (item) {
             item.category = "Country";
             if (countries.countryNames[item.id]) {
                 item.name = countries.countryNames[item.id].name;
@@ -60,16 +60,20 @@
             }
             return item;
         });
-        this.ContriesStates = countryArray.concat(stateArray);
-
-        var choroPaths = element.selectAll("path").data(this.ContriesStates);
+        var choroPaths = this._svg.selectAll("path").data(countryArray);
 
         //  Enter  ---
         this.choroPaths = choroPaths.enter().append("path")
             .attr("d", this.d3Path)
             .on("click", function (d) {
                 var code = countries.countryNames[d.id];
-                context.click(context.rowToObj(context._dataMap[code]));
+                if (context._dataMap[code]) {
+                    context.click(context.rowToObj(context._dataMap[code]), "weight");
+                }
+            })
+            .on("dblclick", function (d) {
+                context.zoomToFit(context.active === this ? null : this, 750);
+                context.active = this;
             })
             .attr("id", function (d) {
                 return d.id;
@@ -80,8 +84,9 @@
         ;
     };
 
-    ChoroplethCounties.prototype.update = function (domNode, element) {
+    ChoroplethCountries.prototype.update = function (domNode, element) {
         Choropleth.prototype.update.apply(this, arguments);
+        this.projection(this._world_projection);
 
         var context = this;
 
@@ -93,7 +98,7 @@
                 if (weight === undefined) {
                     return "url(#hash)";
                 }
-                return context.d3Color(context._dataMap[code]);
+                return context._palette(weight, context._dataMinWeight, context._dataMaxWeight);
             })
         ;
 
@@ -108,5 +113,5 @@
         ;
     };
 
-    return ChoroplethCounties;
+    return ChoroplethCountries;
 }));

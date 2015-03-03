@@ -1,3 +1,4 @@
+"use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
         define(["d3/d3", "../common/SVGWidget", "./ITree", "css!./Dendrogram"], factory);
@@ -8,12 +9,13 @@
     function Dendrogram(target) {
         SVGWidget.call(this);
         ITree.call(this);
-
-        this._class = "dendrogram";
+        this._class = "tree_Dendrogram";
     };
     Dendrogram.prototype = Object.create(SVGWidget.prototype);
     Dendrogram.prototype.implements(ITree.prototype);
-
+	
+    Dendrogram.prototype.publish("paletteID", "default", "set", "Palette ID", Dendrogram.prototype._palette.switch());
+	
     Dendrogram.prototype.enter = function (domNode, element) {
         SVGWidget.prototype.enter.apply(this, arguments);
 
@@ -27,8 +29,10 @@
     };
 
     Dendrogram.prototype.update = function (domNode, element) {
+        var context = this;
         SVGWidget.prototype.update.apply(this, arguments);
-
+		
+        this._palette = this._palette.switch(this._paletteID);
         var width = this.width() - 60;  //  Pad to allow text to display
         this.layout
             .size([this.height(), width])
@@ -52,13 +56,21 @@
 
         //  Nodes  ---
         var nodes = this.g.selectAll(".node").data(nodes);
-        var node = nodes.enter().append("g")
+        var node_enter = nodes.enter().append("g")
             .attr("class", "node")
         ;
-        node.append("circle")
+
+        node_enter.on("click", function (d) { context.click(d); });
+        node_enter.append("circle");
+        node_enter.append("text");
+        
+        nodes.select("circle")
             .attr("r", 4.5)
+            .style("fill", function (d) { return context._palette(d.label); })
+            .append("title")
+            .text(function (d) { return d.label; })
         ;
-        node.append("text")
+        nodes.select("text")
             .attr("dx", function (d) { return d.children ? -8 : 8; })
             .attr("dy", 3)
         ;
