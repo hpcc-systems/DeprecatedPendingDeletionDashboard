@@ -399,11 +399,16 @@ public class ChartPanel extends Panel {
             } else if(Constants.CATEGORY_SCORED_SEARCH_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()){
                 //drawScoredSearchTable();
             }else {
-                String chartScript = drawD3Graph();
-                if (chartScript != null) {
-                    Clients.evalJavaScript(chartScript);
-                } else {
-                    throw new WrongValueException("JSON to create chart is null");
+                if(Constants.RELEVANT_CONFIG == chartService.getCharts().get(portlet.getChartType()).getCategory()){
+                    Clients.evalJavaScript("resizeGraph()");
+                }else{
+                    String chartScript = drawD3Graph();
+                    if (chartScript != null) {
+                        Clients.evalJavaScript(chartScript);
+                    } else {
+                        throw new WrongValueException("JSON to create chart is null");
+                    }
+                    
                 }
             }
         });

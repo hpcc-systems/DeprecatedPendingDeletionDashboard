@@ -4,11 +4,11 @@
 
 function createRelevantChart(divId, reqData) {
 	var chartData = jq.parseJSON(reqData);
+	var clonedGraph ;
 	console.log(chartData);	
 	
 	console.log("Calling createRelevantChart...");
 	
-        var graph = null;
         var table = null;
         var doRandom = null;
         var cholderDiv = null;
@@ -34,13 +34,6 @@ function createRelevantChart(divId, reqData) {
             width = divElement.width();
             height = divElement.height();
             
-          //checking the minimum height for browser and component and set the same as window height. 
-        	if(divElement.parent().parent().height()<($(window).height()-150)){fullHeight = divElement.parent().parent().height();}
-        	else{fullHeight = ($(window).height()-150);}
-        	
-        	if(divElement.width()>$(window).width()){fullWidth = $(window).width();}
-        	
-        	
             var vertices = [];
             var vertexMap = [];
             var edges = [];
@@ -81,6 +74,8 @@ function createRelevantChart(divId, reqData) {
 
 
             var service = Comms.createESPConnection("http://10.173.147.1:8010/?QuerySetId=roxie&Id=claim_group_data_review_ex_srvc_rmap2.1&Widget=QuerySetDetailsWidget");
+            
+            
 
             function callService(id, element) {
                 if (element) {
@@ -164,6 +159,7 @@ function createRelevantChart(divId, reqData) {
                 .highlightOnMouseOverVertex(true)
             ;
             graph.vertex_dblclick = function (d) {
+            	clonedGraph = jQuery.extend(true, {}, graph);
                 callService(d._id, d.element());
             };
             
@@ -228,7 +224,6 @@ function createRelevantChart(divId, reqData) {
 			var hot = new Handsontable(container, config);
 			
 			divElement.on("click", ".randomize", function() {
-
             	console.log("Calling Do Random...");
                 var maxV = Math.floor(Math.random() * 100);
                 var maxE = Math.floor(Math.random() * 100);
@@ -248,36 +243,62 @@ function createRelevantChart(divId, reqData) {
             
 			});
 			
-			divElement.on("click", ".circularize",function() {
-				graph.layout('Circle', transitionDuration);
-			});
-			
-			divElement.on("click", ".forceDirect",function() {
-				graph.layout('ForceDirected', transitionDuration);
-			});
-			
-			divElement.on("click", ".animate",function() {
-				graph.layout('ForceDirected2');
-			});
-			
-			divElement.on("click", ".hieraric",function() {
-				graph.layout('Hierarchy', transitionDuration);
-			});
-			
-			divElement.on("click", ".showHide",function() {
-				graph.showEdges(!graph.showEdges()).render();
+			divElement.on("change", ".chartOptions",function() {
+				switch($("#selectbox").val()){
+					case "Circle":
+						graph.layout('Circle', transitionDuration);
+						break;
+						
+					case "Randomize":
+						console.log("Calling Do Random...");
+		                var maxV = Math.floor(Math.random() * 100);
+		                var maxE = Math.floor(Math.random() * 100);
+		                for (var i = 0; i < maxV; ++i) {
+		                    var fromV =  getVertex("v" + i, "", i);
+		                }
+		                for (var i = 0; i < maxE; ++i) {
+		                    var fromIdx = Math.floor(Math.random() * vertices.length);
+		                    var toIdx = Math.floor(Math.random() * vertices.length);
+		                    getEdge(vertices[fromIdx], vertices[toIdx]);
+		                }
+		                graph
+		                    .data({ vertices: vertices, edges: edges, merge: true })
+		                    .render()
+		                    .layout(graph.layout(), transitionDuration)
+		                ;
+						break;
+						
+					case "ForceDirected":
+						graph.layout('ForceDirected', transitionDuration);
+						break;
+						
+					case "Animated":
+						graph.layout('ForceDirected2', transitionDuration);
+						break;
+						
+					case "Hierarchy":
+						graph.layout('Hierarchy', transitionDuration);
+						break;
+						
+					case "Show/Hide":
+						graph.showEdges(!graph.showEdges()).render();
+						break;
+						
+				}
 			});
 			
 			divElement.append(jq("<header>" +
 					"<nav>" +
-						"<ul>" +
-							"<li><a id=\"info\" class=\"randomize\" title=\"Data: Randomize\">R</a></li>" +
-							"<li><a class=\"circularize\" title=\"Layout: Circle\">C</a></li>" +
-							"<li><a class=\"forceDirect\" title=\"Layout: ForceDirected\" >F</a></li>" +
-							"<li><a class=\"animate\" title=\"Layout: Force Directed (Animated)\">F2</a></li>" +
-							"<li><a class=\"hieraric\" title=\"Layout: Hierarchy\">H</a></li>" +
-			                "<li><a class=\"showHide\" title=\"Edges: Show/Hide\">E</a></li>"+
-						"</ul>" +
+						"<a style=\"float:left;\" class=\"back\"> <i class=\"fa fa-arrow-left\"></i></a>"+						
+						"<select style=\"float:left;\" id=\"selectbox\" class=\"chartOptions\">"+
+						"<option value=\"\">-select-</option>"+
+						"<option value=\"Randomize\">R</option>"+
+						"<option value=\"Circle\">C</option>"+
+						"<option value=\"ForceDirected\">F</option>"+
+						"<option value=\"Animated\">F2</option>"+
+						"<option value=\"Hierarchy\">H</option>"+
+						"<option value=\"Show/Hide\">E</option>"+
+						"</select>"+						
 				 	"</nav>" +
 				 "</header>"));
 			
@@ -285,5 +306,9 @@ function createRelevantChart(divId, reqData) {
         
 }
 
-
+function resizeGraph() {
+	if(graph){
+		graph.resize();
+	}
+}
 
