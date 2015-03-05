@@ -7,6 +7,7 @@ function createRelevantChart(divId, reqData) {
 	var clonedGraph ;
 	console.log(chartData);	
 	
+	console.log("file -->"+chartData.files[0]);	
 	console.log("Calling createRelevantChart...");
 	
         var table = null;
@@ -73,10 +74,13 @@ function createRelevantChart(divId, reqData) {
             }
 
 
-            var service = Comms.createESPConnection("http://10.173.147.1:8010/?QuerySetId=roxie&Id=claim_group_data_review_ex_srvc_rmap2.1&Widget=QuerySetDetailsWidget");
+            var url = "https://10.173.147.1:8010/?QuerySetId=roxie&Id=";
+            url = url.concat(chartData.files[0]);
+            url = url.concat("&Widget=QuerySetDetailsWidget");
+            console.log("url -->"+url);
             
+            var service = Comms.createESPConnection(url);
             
-
             function callService(id, element) {
                 if (element) {
                     element.classed("expanding", true);
