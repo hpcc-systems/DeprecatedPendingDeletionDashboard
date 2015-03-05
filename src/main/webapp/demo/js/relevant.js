@@ -293,9 +293,10 @@ function createRelevantChart(divId, reqData) {
 			
 			divElement.append(jq("<header>" +
 					"<nav>" +
-						"<a style=\"float:left;\" class=\"back\"> <i class=\"fa fa-arrow-left\"></i></a>"+						
+						"<a style=\"float:left;\" class=\"back\"> <i class=\"fa fa-arrow-left\"></i></a>"+	
+						"<div style=\"height:37px;border-left:1px solid #000;display:inline;float:left;\"> &nbsp;</div>"+
 						"<select style=\"float:left;\" id=\"selectbox\" class=\"chartOptions\">"+
-						"<option value=\"\">-select-</option>"+
+						"<option value=\"\">-layout-</option>"+
 						"<option value=\"Randomize\">R</option>"+
 						"<option value=\"Circle\">C</option>"+
 						"<option value=\"ForceDirected\">F</option>"+
@@ -315,4 +316,4 @@ function resizeGraph() {
 		graph.resize();
 	}
 }
-
+	
