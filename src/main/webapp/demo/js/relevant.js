@@ -4,7 +4,6 @@
 
 function createRelevantChart(divId, reqData) {
 	var chartData = jq.parseJSON(reqData);
-	var clonedGraph ;
 	console.log(chartData);	
 	
 	console.log("file -->"+chartData.files[0]);	
@@ -72,12 +71,20 @@ function createRelevantChart(divId, reqData) {
                 }
                 return retVal;
             }
-
-
-            var url = "https://10.173.147.1:8010/?QuerySetId=roxie&Id=";
+            var url= "";
+            if(chartData.hpccConnection.isHttps == true){
+            	url = url.concat("https://");
+            }else{
+            	url = url.concat("http://");
+            }
+            url = url.concat(chartData.hpccConnection.serverHost);
+            url = url.concat(":");
+            url = url.concat(chartData.hpccConnection.wsEclPort);
+            url = url.concat("/?QuerySetId=roxie&Id=");
             url = url.concat(chartData.files[0]);
             url = url.concat("&Widget=QuerySetDetailsWidget");
-            console.log("url -->"+url);
+            
+            console.log("url --->"+url);
             
             var service = Comms.createESPConnection(url);
             
@@ -111,6 +118,36 @@ function createRelevantChart(divId, reqData) {
                             element.classed("expanding", false);
                             element.classed("expanded", true);
                         }
+                        response.claim_list.forEach(function (item, i) {
+                            var claim = getVertex("c_" + item.report_no, "\uf0d6", item.report_no, item);
+                            var annotations = [];
+                            if (item.road_accident && item.road_accident !== "0") {
+                                annotations.push({
+                                    "faChar": "\uf018",
+                                    "tooltip": "Road Accident",
+                                    "shape_color_fill": "darkgreen",
+                                    "image_color_fill": "white"
+                                });
+                            }
+                            if (item.third_vehicle && item.third_vehicle !== "0") {
+                                annotations.push({
+                                    "faChar": "\uf1b9",
+                                    "tooltip": "Third Vehicle",
+                                    "shape_color_fill": "navy",
+                                    "image_color_fill": "white"
+                                });
+                            }
+                            if (item.injury_accident && item.injury_accident !== "0") {
+                                annotations.push({
+                                    "faChar": "\uf067",
+                                    "tooltip": "Injury Accident",
+                                    "shape_color_fill": "white",
+                                    "shape_color_stroke": "red",
+                                    "image_color_fill": "red"
+                                });
+                            }
+                            claim.annotation_icons(annotations);
+                        });
                         response.claim_list.forEach(function (item, i) {
                         	getVertex("c_" + item.report_no, chartData.claimImage, item.report_no, item);
                         });
@@ -163,34 +200,28 @@ function createRelevantChart(divId, reqData) {
                 .highlightOnMouseOverVertex(true)
             ;
             graph.vertex_dblclick = function (d) {
-            	clonedGraph = jQuery.extend(true, {}, graph);
+            	d3.event.stopPropagation();
                 callService(d._id, d.element());
             };
             
             graph.vertex_click = function (d) {
             	console.log("Calling graph.vertex_click");
-                /* table
-                    .data([])
-                    .render()
-                ; */
-                var props = d.data();
                 
-                var data = [];
-                for (var key in props) {
-                    data.push([key, props[key]]);
-                }
-                console.log(data);
-                /* table
-                    .data(data)
-                    .render()
-                ; */
+            	var data = [];
+            	var selection = graph.selection();
+                selection.forEach(function (item) {
+                    var props = item.data();
+                   
+                    for (var key in props) {
+                        data.push([key, props[key]]);
+                    }
+                    
+                });
                 hot.loadData(data);
+                console.log(data);
                 hot.render();
             };
 
-            //callService("c_" + "CLM00042945-C034"); 
-            //callService("c_" + chartData.claimId);
-            
             var search = window.location.search.split("?");
             var entity = search[search.length - 1];
             if (!entity) {
@@ -205,14 +236,6 @@ function createRelevantChart(divId, reqData) {
             } else {
                 callService("p_" + entity);
             }
-            
-
-            //  Table  ---
-            /* table = new Table()
-                .target("table")
-                .columns(["Property", "Value"])
-                .render()
-            ; */
             
             var dummyData = [["", ""]];
 			var container = document.getElementById('table');
@@ -297,12 +320,12 @@ function createRelevantChart(divId, reqData) {
 						"<div style=\"height:37px;border-left:1px solid #000;display:inline;float:left;\"> &nbsp;</div>"+
 						"<select style=\"float:left;\" id=\"selectbox\" class=\"chartOptions\">"+
 						"<option value=\"\">-layout-</option>"+
-						"<option value=\"Randomize\">R</option>"+
-						"<option value=\"Circle\">C</option>"+
-						"<option value=\"ForceDirected\">F</option>"+
-						"<option value=\"Animated\">F2</option>"+
-						"<option value=\"Hierarchy\">H</option>"+
-						"<option value=\"Show/Hide\">E</option>"+
+						"<option value=\"Randomize\">Randomize</option>"+
+						"<option value=\"Circle\">Circle</option>"+
+						"<option value=\"ForceDirected\">Force Directed</option>"+
+						"<option value=\"Animated\">Force Directed(Animated)</option>"+
+						"<option value=\"Hierarchy\">Hierarchy</option>"+
+						"<option value=\"Show/Hide\">Show/Hide</option>"+
 						"</select>"+						
 				 	"</nav>" +
 				 "</header>"));

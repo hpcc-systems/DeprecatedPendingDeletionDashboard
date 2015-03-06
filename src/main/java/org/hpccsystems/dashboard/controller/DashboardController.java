@@ -29,6 +29,7 @@ import org.hpccsystems.dashboard.chart.cluster.ClusterData;
 import org.hpccsystems.dashboard.chart.entity.ChartData;
 import org.hpccsystems.dashboard.chart.entity.Field;
 import org.hpccsystems.dashboard.chart.entity.Filter;
+import org.hpccsystems.dashboard.chart.entity.Interactivity;
 import org.hpccsystems.dashboard.chart.entity.RelevantData;
 import org.hpccsystems.dashboard.chart.entity.TableData;
 import org.hpccsystems.dashboard.chart.entity.TextData;
@@ -92,7 +93,6 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Messagebox;
-import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Messagebox.ClickEvent;
 import org.zkoss.zul.Panel;
 import org.zkoss.zul.Popup;
@@ -103,7 +103,6 @@ import org.zkoss.zul.Tabbox;
 import org.zkoss.zul.Tabpanel;
 import org.zkoss.zul.Toolbar;
 import org.zkoss.zul.Window;
-import org.hpccsystems.dashboard.chart.entity.Interactivity;
 
 import com.google.gson.Gson;
 

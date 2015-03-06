@@ -117,6 +117,8 @@ public class Constants {
     public static final String JSON ="json";
     public static final String SCORE = "score";
     public static final String PORTLET_ID = "portletId";
+    public final static String HTTPS = "https://";
+    public final static String HTTP = "http://";
     //For Circuit project
     
     public static final String CIRCUIT_VALIDATE_REQ = "/validate.do";

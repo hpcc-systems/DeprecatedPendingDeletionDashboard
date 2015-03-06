@@ -510,8 +510,8 @@ public class ChartRenderer {
             jsBuilder.append("$.Deferred(function( deferred ){")
                     .append("$( deferred.resolve );")
                     .append("})")
-                .append(").done(function(){")
-                 .append(chartDetails.getConfiguration().getFunctionName())
+                    .append(").done(function(){")
+                    .append(chartDetails.getConfiguration().getFunctionName())
                   .append("('" + divToDraw +  "','"+ chartJson +"')")
             .append("});");
             
@@ -547,8 +547,8 @@ public class ChartRenderer {
                 .append("'),");
             
             jsBuilder.append("$.Deferred(function( deferred ){")
-                    .append("$( deferred.resolve );")
-                    .append("})")
+                .append("$( deferred.resolve );")
+                .append("})")
                 .append(").done(function(){")
                 .append(chartDetails.getConfiguration().getFunctionName())
                 .append("('" + divToDraw +  "','"+ chartJson +"')")
