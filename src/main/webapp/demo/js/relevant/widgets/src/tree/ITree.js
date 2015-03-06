@@ -1,12 +1,15 @@
+"use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define([], factory);
+        define(["../common/Palette"], factory);
     } else {
-        root.ITree = factory();
+        root.ITree = factory(root.Palette);
     }
-}(this, function () {
+}(this, function (Palette) {
     function ITree() {
     };
+
+    ITree.prototype._palette = Palette.ordinal("default");
 
     //  Data ---
     ITree.prototype.testData = function () {
@@ -37,8 +40,6 @@
         this.data(data);
         return this;
     };
-
-    //  Properties  ---
 
     //  Events  ---
     ITree.prototype.click = function (d) {

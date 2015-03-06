@@ -1,26 +1,18 @@
+"use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["./Common"], factory);
+        define(["./CommonND"], factory);
     } else {
-        root.Scatter = factory(root.Common);
+        root.Scatter = factory(root.CommonND);
     }
-}(this, function (Common) {
+}(this, function (CommonND) {
     function Scatter(target) {
-        Common.call(this);
-
+        CommonND.call(this);
         this._class = "c3_Scatter";
+
         this._type = "scatter";
     };
-    Scatter.prototype = Object.create(Common.prototype);
-
-    Scatter.prototype.update = function (domNode, element) {
-        Common.prototype.update.apply(this, arguments);
-        
-        this.c3Chart.load({
-            categories: this.getC3Categories(),
-            rows: this.getC3Rows()
-        });
-    };
+    Scatter.prototype = Object.create(CommonND.prototype);
 
     return Scatter;
 }));

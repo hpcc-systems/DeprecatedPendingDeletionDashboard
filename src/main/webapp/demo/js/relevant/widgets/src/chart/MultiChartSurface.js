@@ -1,17 +1,21 @@
-﻿(function (root, factory) {
+"use strict";
+(function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3/d3", "../common/ResizeSurface", "./MultiChart", "./I2DChart", "../common/Palette"], factory);
+        define(["d3/d3", "../common/ResizeSurface", "./MultiChart", "./INDChart"], factory);
     } else {
-        root.MultiChartSurface = factory(root.d3, root.ResizeSurface, root.MultiChart, root.I2DChart, root.Palette);
+        root.MultiChartSurface = factory(root.d3, root.ResizeSurface, root.MultiChart, root.INDChart);
     }
-}(this, function (d3, ResizeSurface, MultiChart, I2DChart, Palette) {
+}(this, function (d3, ResizeSurface, MultiChart, INDChart) {
     function MultiChartSurface() {
         ResizeSurface.call(this);
-        I2DChart.call(this);
+        INDChart.call(this);
+        this.class = "chart_MultiChartSurface";
 
         this._title = "MultiChartSurface";
-
         this._content = new MultiChart();
+        this._content.click = function (row, column) {
+            context.click(row, column);
+        }
 
         var context = this;
         this._menu.click = function (d) {
@@ -20,8 +24,8 @@
         this.mode("all");
     };
     MultiChartSurface.prototype = Object.create(ResizeSurface.prototype);
-    MultiChartSurface.prototype.implements(I2DChart.prototype);
-    MultiChartSurface.prototype.testData = I2DChart.prototype.testData;
+    MultiChartSurface.prototype.implements(INDChart.prototype);
+    MultiChartSurface.prototype.testData = INDChart.prototype.testData;
 
     MultiChartSurface.prototype.columns = function (_) {
         if (!arguments.length) return this._content.columns();

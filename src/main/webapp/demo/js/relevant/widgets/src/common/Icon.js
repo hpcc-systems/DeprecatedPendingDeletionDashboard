@@ -1,3 +1,4 @@
+"use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
         define(["./SVGWidget", "./Shape", "./FAChar", "css!./Icon"], factory);
@@ -7,16 +8,23 @@
 }(this, function (SVGWidget, Shape, FAChar) {
     function Icon() {
         SVGWidget.call(this);
-        this._class = "icon";
-        this._shape = new Shape();
-        this._faChar = new FAChar();
+        this._class = "common_Icon";
+
+        this._shapeWidget = new Shape();
+        this._faChar = new FAChar()
+            .color_fill("#ffffff")
+        ;
     };
     Icon.prototype = Object.create(SVGWidget.prototype);    
 
-    Icon.prototype.publishProxy("shape", "_shape");
+    Icon.prototype.publish("shape", "circle", "set", "Shape Type", ["circle", "square"]);
     Icon.prototype.publishProxy("faChar", "_faChar", "char");
-    Icon.prototype.publish("padding", 4, "number", "Padding");
-    Icon.prototype.publish("scale", 1, "number", "Scale");
+    Icon.prototype.publishProxy("image_color_fill", "_faChar", "color_fill");
+    Icon.prototype.publish("tooltip", "", "string", "Tooltip");
+    Icon.prototype.publish("diameter", 24, "number", "Diameter");
+    Icon.prototype.publish("padding_percent", 33, "number", "Padding Percent");
+    Icon.prototype.publishProxy("shape_color_fill", "_shapeWidget", "color_fill");
+    Icon.prototype.publishProxy("shape_color_stroke", "_shapeWidget", "color_stroke");
 
     Icon.prototype.testData = function () {
         this._faChar.testData();
@@ -24,12 +32,12 @@
     };
 
     Icon.prototype.intersection = function (pointA, pointB) {
-        return this._shape.intersection(pointA, pointB);
+        return this._shapeWidget.intersection(pointA, pointB);
     };
 
     Icon.prototype.enter = function (domNode, element) {
         SVGWidget.prototype.enter.apply(this, arguments);
-        this._shape
+        this._shapeWidget
             .target(domNode)
             .render()
         ;
@@ -37,21 +45,22 @@
             .target(domNode)
             .render()
         ;
+        this._tooltipElement = element.append("title");
     };
 
     Icon.prototype.update = function (domNode, element) {
         SVGWidget.prototype.update.apply(this, arguments);
         this._faChar
-            .scale(this._scale)
+            .font_size(this._diameter * (100 - this._padding_percent) / 100)
             .render()
         ;
-
-        var bbox = this._faChar.getBBox(true);
-        this._shape
-            .width(bbox.width + this._padding * this._scale)
-            .height(bbox.height + this._padding * this._scale)
+        this._shapeWidget
+            .shape(this._shape)
+            .width(this._diameter)
+            .height(this._diameter)
             .render()
         ;
+        this._tooltipElement.text(this._tooltip);
     };
 
     return Icon;

@@ -1,3 +1,4 @@
+"use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
         define(["../other/Comms", "../common/Widget"], factory);
@@ -7,7 +8,7 @@
 }(this, function (Comms, Widget) {
     var Vertex = null;
     var Edge = null;
-    exists = function (prop, scope) {
+    var exists = function (prop, scope) {
         var propParts = prop.split(".");
         var testScope = scope;
         for (var i = 0; i < propParts.length; ++i) {
@@ -315,6 +316,7 @@
         this.dashboard = dashboard;
         this.id = visualization.id;
         this.label = visualization.label;
+        this.title = visualization.title || visualization.id;
         this.type = visualization.type;
         this.properties = visualization.properties || visualization.source.properties || {};
         this.source = new Source(this, visualization.source);
@@ -333,7 +335,7 @@
                 this.loadWidget("src/chart/MultiChartSurface", function (widget) {
                     widget
                         .chartType(context.properties.charttype || context.type)
-                        .title(context.id)
+                        .title(context.title)
                     ;
                 });
                 break;
@@ -342,7 +344,7 @@
                     widget
                         .mode("multi")
                         .chartType(context.properties.charttype || context.type)
-                        .title(context.id)
+                        .title(context.title)
                     ;
                 });
                 break;
@@ -460,10 +462,10 @@
 
                 var params = this.source.getOutput().getParams();
                 if (exists("widget.title", this)) {
-                    this.widget.title(this.id +(params ? " (" +params + ")": ""));
+                    this.widget.title(this.title + (params ? " (" +params + ")": ""));
                     this.widget.render();
                 } else if (exists("widgetSurface.title", this)) {
-                    this.widgetSurface.title(this.id + (params ? " (" + params + ")" : ""));
+                    this.widgetSurface.title(this.title + (params ? " (" + params + ")" : ""));
                     this.widgetSurface.render();
                 } else {
                     this.widget.render();
@@ -576,7 +578,6 @@
             refresh: refresh ? true : false
         };
         this.filter.forEach(function (item) {
-            context.request[item] = "";
             context.request[item + "_changed"] = false;
         });
         for (var key in request) {
@@ -619,7 +620,7 @@
         this.datasourceTotal = 0;
         dashboard.datasources.forEach(function (item) {
             context.datasources[item.id] = new DataSource(context, item, proxyMappings);
-            ++this.datasourceTotal;
+            ++context.datasourceTotal;
         });
 
         this.visualizations = {};
@@ -739,7 +740,7 @@
         this.dashboards = {};
         this.dashboardArray = [];
         this._jsonParsed.forEach(function (item) {
-            newDashboard = new Dashboard(context, item, context._proxyMappings);
+            var newDashboard = new Dashboard(context, item, context._proxyMappings);
             context.dashboards[item.id] = newDashboard;
             context.dashboardArray.push(newDashboard);
         });

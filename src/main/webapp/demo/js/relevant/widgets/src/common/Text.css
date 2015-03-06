@@ -1,2 +1,4 @@
-.text {
+.common_Text {
+    fill: #000;
+    font-size: 12px;
 }

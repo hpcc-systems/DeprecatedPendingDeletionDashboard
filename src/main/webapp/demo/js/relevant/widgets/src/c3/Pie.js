@@ -1,23 +1,21 @@
+"use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["./Common"], factory);
+        define(["./Common2D"], factory);
     } else {
-        root.Pie = factory(root.Common);
+        root.Pie = factory(root.Common2D);
     }
-}(this, function (Common) {
+}(this, function (Common2D) {
     function Pie(target) {
-        Common.call(this);
+        Common2D.call(this);
+        this._class = "c3_Pie";
 
-        this._class = "c3_pie";
         this._type = "pie";
-        this._config.data = {
-            columns: []
-        };
     };
-    Pie.prototype = Object.create(Common.prototype);
+    Pie.prototype = Object.create(Common2D.prototype);
 
     Pie.prototype.update = function (domNode, element) {
-        Common.prototype.update.apply(this, arguments);
+        Common2D.prototype.update.apply(this, arguments);
         
         var data = this._data.map(function (row, idx) {
             return [row[0], row[1]];

@@ -1,3 +1,4 @@
+"use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
         define(["../common/SVGWidget", "./ISlider", "css!./Slider"], factory);
@@ -8,8 +9,8 @@
     function Slider() {
         SVGWidget.call(this);
         ISlider.call(this);
+        this._class = "other_Slider";
 
-        this._class = "slider";
         this._selectionLabel = "";
 
         this.xScale = d3.scale.linear()

@@ -1,3 +1,4 @@
+"use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
         define(["d3/d3", "../common/SVGWidget", "./IGraph", "./Vertex", "./GraphData", "./GraphLayouts", "../other/Bag", "css!./Graph"], factory);
@@ -8,6 +9,7 @@
     function Graph() {
         SVGWidget.call(this);
         IGraph.call(this);
+        this._class = "graph_Graph";
 
         this.graphData = new GraphData();
         this._transitionDuration = 250;
@@ -18,7 +20,6 @@
             transition: this._transitionDuration
         };
 
-        this._class = "graph";
         this._showEdges = true;
         this._highlightOnMouseOverVertex = false;
         this._highlightOnMouseOverEdge = false;
@@ -338,7 +339,8 @@
                     item.move({ x: pos.x, y: pos.y }, transitionDuration);
                     if (pos.width && pos.height && !item.width() && !item.height()) {
                         item
-                            .size({ width: pos.width, height: pos.height }, transitionDuration)
+                            .width(pos.width)
+                            .height(pos.height)
                             .render()
                         ;
                     }
@@ -378,11 +380,9 @@
                 context._selection.click(d, d3.event);
             })
             .on("click", function (d) {
-                d3.event.stopPropagation();
                 context.vertex_click(d, d3.event);
             })
             .on("dblclick", function (d) {
-                d3.event.stopPropagation();
                 context.vertex_dblclick(d, d3.event);
             })
             .on("mouseover", function (d) {

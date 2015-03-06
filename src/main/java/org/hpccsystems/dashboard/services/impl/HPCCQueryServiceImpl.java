@@ -2,10 +2,8 @@ package org.hpccsystems.dashboard.services.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
-import java.net.MalformedURLException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -44,7 +42,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.chart.entity.AdvancedFilter;
 import org.hpccsystems.dashboard.chart.entity.Attribute;
-import org.hpccsystems.dashboard.chart.entity.ChartData;
 import org.hpccsystems.dashboard.chart.entity.Field;
 import org.hpccsystems.dashboard.chart.entity.HpccConnection;
 import org.hpccsystems.dashboard.chart.entity.Measure;
@@ -73,8 +70,7 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
 
 	private static final Log LOG = LogFactory.getLog(HPCCQueryServiceImpl.class);
 	
-	private final String HTTPS = "https://";
-	private final String HTTP = "http://";
+	
 	private final String AUTHORIZATION= "Authorization";
 	private final String BASIC= "Basic ";
 	private final String INTEGER = "integer";
@@ -125,9 +121,9 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
 			Set<Field> fields = new LinkedHashSet<Field>();			
 			StringBuilder urlBuilder = new StringBuilder();
 			if (hpccConnection.getIsSSL()) {
-				urlBuilder.append(HTTPS);
+				urlBuilder.append(Constants.HTTPS);
 			} else {
-				urlBuilder.append(HTTP);
+				urlBuilder.append(Constants.HTTP);
 			}
             urlBuilder.append(hpccConnection.getHostIp());
 			urlBuilder.append(":");
@@ -221,9 +217,9 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
             StringBuilder urlBuilder = new StringBuilder();
             
             if (hpccConnection.getIsSSL()) {
-                urlBuilder.append(HTTPS);
+                urlBuilder.append(Constants.HTTPS);
             } else {
-                urlBuilder.append(HTTP);
+                urlBuilder.append(Constants.HTTP);
             }
             urlBuilder.append(hpccConnection.getHostIp())
                     .append(":")
@@ -375,9 +371,9 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
     	   }else{
     		   StringBuilder urlBuilder = new StringBuilder();
                if (chartData.getHpccConnection().getIsSSL()) {
-                   urlBuilder.append(HTTPS);
+                   urlBuilder.append(Constants.HTTPS);
                } else {
-                   urlBuilder.append(HTTP);
+                   urlBuilder.append(Constants.HTTP);
                }
                urlBuilder.append(chartData.getHpccConnection().getHostIp())
                        .append(":")
@@ -435,9 +431,9 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
 		StringBuilder urlBuilder = new StringBuilder();
 	     List<XYModel> dataList = null;
         if (chartData.getHpccConnection().getIsSSL()) {
-            urlBuilder.append(HTTPS);
+            urlBuilder.append(Constants.HTTPS);
         } else {
-            urlBuilder.append(HTTP);
+            urlBuilder.append(Constants.HTTP);
         }
         urlBuilder.append(chartData.getHpccConnection().getHostIp())
                 .append(":")
@@ -898,9 +894,9 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
         		
         		StringBuilder urlBuilder = new StringBuilder();
                 if (hpccConnection.getIsSSL()) {
-                    urlBuilder.append(HTTPS);
+                    urlBuilder.append(Constants.HTTPS);
                 } else {
-                    urlBuilder.append(HTTP);
+                    urlBuilder.append(Constants.HTTP);
                 }
     			urlBuilder.append(hpccConnection.getHostIp());
     			urlBuilder.append(":");
@@ -959,9 +955,9 @@ public HashMap<String, HashMap<String, List<Attribute>>> fetchScoredSearchData(S
 	try {
 	StringBuilder urlBuilder = new StringBuilder();
 	if (searchData.getHpccConnection().getIsSSL()) {
-		urlBuilder.append(HTTPS);
+		urlBuilder.append(Constants.HTTPS);
 	} else {
-		urlBuilder.append(HTTP);
+		urlBuilder.append(Constants.HTTP);
 	}
 	urlBuilder.append(searchData.getHpccConnection().getHostIp())
     .append(":")
@@ -1119,9 +1115,9 @@ return resultDataMap;
 		try {
 			StringBuilder urlBuilder = new StringBuilder();
 			if (tableData.getHpccConnection().getIsSSL()) {
-				urlBuilder.append(HTTPS);
+				urlBuilder.append(Constants.HTTPS);
 			} else {
-				urlBuilder.append(HTTP);
+				urlBuilder.append(Constants.HTTP);
 			}
 			urlBuilder.append(tableData.getHpccConnection().getHostIp())
             .append(":")
@@ -1298,9 +1294,9 @@ return resultDataMap;
 			Map<String, Set<String>> inputParamValues) throws IOException, ParserConfigurationException, SAXException {
 		 StringBuilder urlBuilder = new StringBuilder();
          if (hpccConnection.getIsSSL()) {
-             urlBuilder.append(HTTPS);
+             urlBuilder.append(Constants.HTTPS);
          } else {
-             urlBuilder.append(HTTP);
+             urlBuilder.append(Constants.HTTP);
          }
          urlBuilder.append(hpccConnection.getHostIp())
                  .append(":")
@@ -1362,9 +1358,9 @@ return resultDataMap;
 		try {
 			StringBuilder urlBuilder = new StringBuilder();
 			if (treeData.getHpccConnection().getIsSSL()) {
-				urlBuilder.append(HTTPS);
+				urlBuilder.append(Constants.HTTPS);
 			} else {
-				urlBuilder.append(HTTP);
+				urlBuilder.append(Constants.HTTP);
 			}
 			urlBuilder.append(treeData.getHpccConnection().getHostIp())
 					.append(":")

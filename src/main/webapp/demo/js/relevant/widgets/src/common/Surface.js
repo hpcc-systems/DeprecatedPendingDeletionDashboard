@@ -1,3 +1,4 @@
+"use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
         define(["./SVGWidget", "./Icon", "./Shape", "./Text", "./FAChar", "./Menu", "css!./Surface"], factory);
@@ -7,10 +8,11 @@
 }(this, function (SVGWidget, Icon, Shape, Text, FAChar, Menu) {
     function Surface() {
         SVGWidget.call(this);
+        this._class = "common_Surface";
 
-        this._class = "surface";
+        this._menuPadding = 2;
         this._icon = new Icon()
-            .padding(4)
+            .padding_percent(50)
         ;
         this._container = new Shape()
             .class("container")
@@ -25,16 +27,16 @@
         ;
         this._menu = new Menu()
             .faChar("\uf0c9")
-            .padding(4)
+            .padding_percent(0)
         ;
         var context = this;
         this._menu.preShowMenu = function () {
-            if (context._content.hasOverlay()) {
+            if (context._content && context._content.hasOverlay()) {
                 context._content.visible(false);
             }
         }
         this._menu.postHideMenu = function () {
-            if (context._content.hasOverlay()) {
+            if (context._content && context._content.hasOverlay()) {
                 context._content.visible(true);
             }
         }
@@ -48,6 +50,7 @@
     Surface.prototype.publish("faChar", "\uf07b", "string", "Title");
     Surface.prototype.publishProxy("icon_shape", "_icon", "shape");
     Surface.prototype.publish("title", "", "string", "Title");
+    Surface.prototype.publish("menu");
 
     Surface.prototype.menu = function (_) {
         if (!arguments.length) return this._menu.data();
@@ -161,7 +164,7 @@
             .move({ x: -this._size.width / 2 + iconClientSize.width / 2, y: yTitle })
         ;
         this._menu
-            .move({ x: this._size.width / 2 - menuClientSize.width / 2, y: yTitle })
+            .move({ x: this._size.width / 2 - menuClientSize.width / 2 - this._menuPadding, y: yTitle })
         ;
         this._text
             .move({ x: (iconClientSize.width / 2 - menuClientSize.width / 2) / 2, y: yTitle })

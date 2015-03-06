@@ -25,28 +25,25 @@
         div.container {
             width: 800px;
         }
-        .vertex .icon .shape {
+            
+       .graph_Vertex .common_Icon .common_Shape .common_FAChar .common_Text{
             fill: white;
-            stroke: #1f77b4;
         }
-        .vertex .icon .faChar{
-            fill: #1f77b4;
-        }
-        .vertex.expanding .icon .shape {
+        .graph_Vertex.expanding .common_Icon .common_Shape {
             fill: #b41f3a;
             stroke: none;
         }
-        .vertex.expanding .icon .faChar{
+        .graph_Vertex.expanding .common_Icon .common_Shape .common_FAChar .common_Text{
             fill: white;
         }
-        .vertex.expanded .icon .shape {
+        .graph_Vertex.expanded .common_Icon .common_Shape {
             fill: #1f77b4;
             stroke: none;
         }
-        .vertex.expanded .icon .faChar{
+        .graph_Vertex.expanded .common_Icon .common_Shape .common_FAChar .common_Text{
             fill: white;
         }
-        
+           
         ul {
 		  list-style: none;
 		}
@@ -159,3 +156,4 @@
 		.graph .graphVertex .vertex.selected .shape {
     		stroke: red;
 		}
+		

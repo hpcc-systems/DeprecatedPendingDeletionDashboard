@@ -1,45 +1,32 @@
+"use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3/d3", "c3/c3", "../common/HTMLWidget", "../common/Palette", "../chart/I2DChart", "css!c3/c3"], factory);
+        define(["d3/d3", "c3/c3", "../common/HTMLWidget", "css!c3/c3"], factory);
     } else {
-        root.Pie = factory(root.d3, root.c3, root.HTMLWidget, root.Palette, root.I2DChart);
+        root.Pie = factory(root.d3, root.c3, root.HTMLWidget);
     }
-}(this, function (d3, c3, HTMLWidget, Palette, I2DChart) {
+}(this, function (d3, c3, HTMLWidget) {
     function Common(target) {
         HTMLWidget.call(this);
-        I2DChart.call(this);
-        this.d3Color = Palette.ordinal("category20");
 
         this._tag = "div";
-        this._class = "Common";
+        this._class = "c3_Common";
         this._type = "unknown";
         var context = this;
         this._config = {
             axis: {
-                x: {
-                    type: 'category',
-                    tick: {
-                        centered: true,
-                        multiline: false
-                    }
-                }
             },
             legend: {
                 position: 'bottom',
                 show: true
             },
-            color: {
-                pattern: d3.scale.category20().range()
-            },
             data: {
+                columns: [],
                 rows: []
             }
         };
     };
     Common.prototype = Object.create(HTMLWidget.prototype);
-    Common.prototype.implements(I2DChart.prototype);
-
-    Common.prototype.d3Color = Palette.ordinal("category20");
 
     Common.prototype.type = function (_) {
         if (!arguments.length) return this._type;
@@ -71,7 +58,7 @@
     };
 
     Common.prototype.getC3Columns = function (total) {
-        total = total || this._data.length;
+        total = total || this._columns.length;
         var retVal = [];
         for (var i = 1; i < total; ++i) {
             retVal.push(this.getC3Column(i));

@@ -1,3 +1,4 @@
+"use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
         define(["d3/d3", "./XYAxis", "./I2DChart", "css!./Column"], factory);
@@ -8,8 +9,7 @@
     function Column(target) {
         XYAxis.call(this);
         I2DChart.call(this);
-
-        this._class = "column";
+        this._class = "chart_Column";
     };
     Column.prototype = Object.create(XYAxis.prototype);
     Column.prototype.implements(I2DChart.prototype);
@@ -24,7 +24,7 @@
           .enter().append("rect")
             .attr("class", "columnRect")
             .on("click", function (d) {
-                context.click(context.rowToObj(d));
+                context.click(context.rowToObj(d), context._columns[1]);
             })
             .append("title")
         ;
@@ -35,6 +35,7 @@
             .attr("width", this.x.rangeBand())
             .attr("y", function (d) { return context.y(d[1]); })
             .attr("height", function (d) { return height - context.y(d[1]); })
+            .style("fill", function (d) { return context._palette(d[0]); })
         ;
 
         title

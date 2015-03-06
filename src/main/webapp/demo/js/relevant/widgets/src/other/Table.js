@@ -1,3 +1,4 @@
+"use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
         define(["../common/HTMLWidget", "css!./Table"], factory);
@@ -7,9 +8,9 @@
 }(this, function (HTMLWidget) {
     function Table() {
         HTMLWidget.call(this);
+        this._class = "other_Table";
 
         this._tag = "table";
-        this._class = "table";
 
         this._columns = [];
     };

@@ -206,7 +206,7 @@ public class WidgetServiceImpl implements WidgetService {
     }
 
     @Override
-    public Integer addWidget(Integer dashboardId, Portlet portlet,
+    public void addWidget(Integer dashboardId, Portlet portlet,
             Integer sequence) throws JAXBException, DataAccessException, EncryptDecryptException {
         try {
             // Converting Java Objects to XML
@@ -233,7 +233,7 @@ public class WidgetServiceImpl implements WidgetService {
             throw ex;
         }
         try {
-            return widgetDao.addWidget(dashboardId, portlet, sequence);
+             widgetDao.addWidget(dashboardId, portlet, sequence);
         } catch (DataAccessException ex) {
             LOG.error(Constants.EXCEPTION,ex);
             throw ex;

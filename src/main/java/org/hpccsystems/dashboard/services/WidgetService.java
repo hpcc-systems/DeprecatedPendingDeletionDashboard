@@ -39,7 +39,7 @@ public interface WidgetService {
      * @throws EncryptDecryptException 
      * @throws Exception 
      */
-    Integer addWidget(Integer dashboardId, Portlet portlet, Integer sequence)throws JAXBException, DataAccessException, EncryptDecryptException;
+    void addWidget(Integer dashboardId, Portlet portlet, Integer sequence)throws JAXBException, DataAccessException, EncryptDecryptException;
     
     /**
      * @param dashboardId
