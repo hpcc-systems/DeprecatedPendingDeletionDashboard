@@ -20,7 +20,7 @@ public interface DashboardService {
      *     Dashboard ID
      * @throws Exception
      */
-    int addDashboardDetails(Dashboard dashboard,String applicationId, String sourceId,String userId) throws DataAccessException ;
+    void addDashboardDetails(Dashboard dashboard,String applicationId, String sourceId,String userId) throws DataAccessException ;
     
     /**
      * @param applicationId

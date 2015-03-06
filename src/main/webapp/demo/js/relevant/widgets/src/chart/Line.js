@@ -1,21 +1,21 @@
+"use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3/d3", "./XYAxis", "./I2DChart", "../common/Palette", "css!./Line"], factory);
+        define(["d3/d3", "./XYAxis", "./INDChart", "css!./Line"], factory);
     } else {
-        root.Line = factory(root.d3, root.XYAxis, root.I2DChart, root.Palette);
+        root.Line = factory(root.d3, root.XYAxis, root.INDChart);
     }
-}(this, function (d3, XYAxis, I2DChart, Palette) {
+}(this, function (d3, XYAxis, INDChart) {
     function Line(target) {
         XYAxis.call(this);
-        I2DChart.call(this);
-
-        this._class = "line";
+        INDChart.call(this);
+        this._class = "chart_Line";
     };
     Line.prototype = Object.create(XYAxis.prototype);
-    Line.prototype.implements(I2DChart.prototype);
-
-    Line.prototype.d3Color = Palette.ordinal("category20");
-
+    Line.prototype.implements(INDChart.prototype);
+	
+    Line.prototype.publish("paletteID", "default", "set", "Palette ID", Line.prototype._palette.switch());
+	
     Line.prototype.enter = function (domNode, element) {
         XYAxis.prototype.enter.apply(this, arguments);
         var context = this;
@@ -23,6 +23,8 @@
 
     Line.prototype.updateChart = function (domNode, element, margin, width, height) {
         var context = this;
+		
+        this._palette = this._palette.switch(this._paletteID);
         var d3Line = d3.svg.line()
             .x(function (d) {
                 switch (context._xScale) {
@@ -40,8 +42,10 @@
 
         line.enter().append("path")
             .attr("class", "dataLine")
+        ;
+        line 
             .style("stroke", function (d, i) {
-                return context.d3Color(context._columns[i + 1]);
+                return context._palette(context._columns[i + 1]);
             })
             .append("title")
             .text(function(d) { return d; })

@@ -1,21 +1,21 @@
+"use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3/d3", "../common/SVGWidget", "../common/Palette", "./ITree", "../common/Text", "../common/FAChar", "css!./SunburstPartition"], factory);
+        define(["d3/d3", "../common/SVGWidget", "./ITree", "../common/Text", "../common/FAChar", "css!./SunburstPartition"], factory);
     } else {
-        root.SunburstPartition = factory(root.d3, root.SVGWidget, root.Palette, root.ITree, root.Text, root.FAChar);
+        root.SunburstPartition = factory(root.d3, root.SVGWidget, root.ITree, root.Text, root.FAChar);
     }
-}(this, function (d3, SVGWidget, Palette, ITree, Text, FAChar) {
+}(this, function (d3, SVGWidget, ITree, Text, FAChar) {
     function SunburstPartition(target) {
         SVGWidget.call(this);
         ITree.call(this);
-
-        this._class = "sunburst";
+        this._class = "tree_Sunburst";
     };
     SunburstPartition.prototype = Object.create(SVGWidget.prototype);
     SunburstPartition.prototype.implements(ITree.prototype);
-
-    SunburstPartition.prototype.d3Color = Palette.ordinal("category20");
-
+	
+    SunburstPartition.prototype.publish("paletteID", "default", "set", "Palette ID", SunburstPartition.prototype._palette.switch());
+	
     SunburstPartition.prototype.enter = function (domNode, element) {
         var context = this;
 
@@ -45,23 +45,25 @@
 
     SunburstPartition.prototype.update = function (domNode, element) {
         var context = this;
-
+		
+        this._palette = this._palette.switch(this._paletteID);
         var path = this.svg.selectAll("path")
             .data(this.partition.nodes(this._data))
             .enter().append("path")
             .attr("d", this.arc)
-            .style("fill", function (d) { return d.__viz_fill ? d.__viz_fill : context.d3Color(d.label); })
+            .style("fill", function (d) { return d.__viz_fill ? d.__viz_fill : context._palette(d.label); })
             .style("stroke", function (d) {
                 return d.value > 16 ? "white" : "none";
             })
-            .on("click", click)
+            .on("click", function (d) { context.click(d); })
+            .on("dblclick", dblclick)
         ;
 
         path.append("title")
             .text(function (d) { return d.label })
         ;
 
-        function click(d) {
+        function dblclick(d) {
             path.transition()
                 .duration(750)
                 .attrTween("d", arcTween(d))

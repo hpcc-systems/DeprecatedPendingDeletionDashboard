@@ -2,7 +2,9 @@ package org.hpccsystems.dashboard.dao.impl;
 
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -21,6 +23,7 @@ import org.springframework.jdbc.core.JdbcTemplate;
 import org.springframework.jdbc.core.PreparedStatementSetter;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
  
 /**
  * Dao class to do widget related DB hits
@@ -166,30 +169,33 @@ public class WidgetDaoImpl implements WidgetDao{
     }
 
     @Override
-    public Integer addWidget(final Integer dashboardId, final Portlet portlet, final Integer sequence)    throws DataAccessException {
+    public void addWidget(final Integer dashboardId, final Portlet portlet, final Integer sequence)  throws DataAccessException {
 
-        getJdbcTemplate().update(Queries.INSERT_WIDGET_DETAILS,
-                new PreparedStatementSetter() {
-                    public void setValues(PreparedStatement statement)
-                            throws SQLException {
-                        statement.setInt(1, dashboardId);
-                        statement.setString(2, portlet.getName());
-                        statement.setString(3, portlet.getWidgetState());
-                        if (Constants.STATE_EMPTY.equals(portlet.getWidgetState())) {
-                            statement.setInt(4, 0);
-                        } else {
-                            statement.setInt(4, portlet.getChartType());
-                        }
-                        statement.setInt(5, portlet.getColumn());
-                        statement.setInt(6, sequence);
-                        statement.setString(7, portlet.getChartDataXML());
-                        statement.setBoolean(8, portlet.getIsSinglePortlet());  
-                    }
-
-                });
         
-        return jdbcTemplate.queryForInt("select last_insert_id()"); 
-
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("dashboard_id", dashboardId);
+        parameters.put("widget_name", portlet.getName());
+        parameters.put("widget_state", portlet.getWidgetState());
+        
+        if (Constants.STATE_EMPTY.equals(portlet.getWidgetState())) {
+            parameters.put("chart_type", 0);
+        } else {
+            parameters.put("chart_type", portlet.getChartType());
+        }
+       
+        
+        parameters.put("column_identifier", portlet.getColumn());
+        parameters.put("widget_sequence",sequence);
+        parameters.put("chart_data", portlet.getChartDataXML());
+        parameters.put("single_widget",  portlet.getIsSinglePortlet());
+        
+        Number newId = new SimpleJdbcInsert(jdbcTemplate.getDataSource())
+                        .withTableName("widget_details")
+                        .usingGeneratedKeyColumns("widget_id")
+                        .executeAndReturnKey(parameters);
+        
+        portlet.setId(newId.intValue());
+        
     }
     
     @Override

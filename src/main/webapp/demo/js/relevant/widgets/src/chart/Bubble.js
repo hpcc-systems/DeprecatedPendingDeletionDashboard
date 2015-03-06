@@ -1,15 +1,15 @@
+"use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3/d3", "../common/SVGWidget", "./I2DChart", "../common/Palette", "../common/Text", "../common/FAChar", "css!./Bubble"], factory);
+        define(["d3/d3", "../common/SVGWidget", "./I2DChart", "../common/Text", "../common/FAChar", "css!./Bubble"], factory);
     } else {
-        root.Bubble = factory(root.d3, root.SVGWidget, root.I2DChart, root.Palette, root.Text, root.FAChar);
+        root.Bubble = factory(root.d3, root.SVGWidget, root.I2DChart, root.Text, root.FAChar);
     }
-}(this, function (d3, SVGWidget, I2DChart, Palette, Text, FAChar) {
+}(this, function (d3, SVGWidget, I2DChart, Text, FAChar) {
     function Bubble(target) {
         SVGWidget.call(this);
         I2DChart.call(this);
-
-        this._class = "bubble";
+        this._class = "chart_Bubble";
 
         this.labelWidgets = {};
 
@@ -21,9 +21,9 @@
     };
     Bubble.prototype = Object.create(SVGWidget.prototype);
     Bubble.prototype.implements(I2DChart.prototype);
-
-    Bubble.prototype.d3Color = Palette.ordinal("category20");
-
+	
+    Bubble.prototype.publish("paletteID", "default", "set", "Palette ID", Bubble.prototype._palette.switch());
+	
     Bubble.prototype.size = function (_) {
         var retVal = SVGWidget.prototype.size.apply(this, arguments);
         if (arguments.length) {
@@ -37,6 +37,7 @@
     Bubble.prototype.update = function (domNode, element) {
         var context = this;
 
+        this._palette = this._palette.switch(this._paletteID);
         var node = element.selectAll(".node")
             .data(this._data.length ? this.d3Pack.nodes({ children: this.cloneData() }).filter(function (d) { return !d.children; }) : [], function (d) { return d[0]; })            
         ;
@@ -46,13 +47,12 @@
             .attr("class", "node")
             .attr("opacity", 0)
             .on("click", function (d) {
-                context.click(context.rowToObj(d));
+                context.click(context.rowToObj(d), context._columns[1]);
             })
             .each(function (d) {
                 var element = d3.select(this);
                 element.append("circle")
                     .attr("r", function (d) { return d.r; })
-                    .style("fill", function (d) { return context.d3Color(d[0]); })
                     .append("title")
                 ;
                 if (d.__viz_faChar) {
@@ -79,6 +79,7 @@
                 var pos = { x: d.x - context._size.width / 2, y: d.y - context._size.height / 2 }
                 element.select("circle").transition()
                     .attr("transform", function (d) { return "translate(" + pos.x + "," + pos.y + ")"; })
+                    .style("fill", function (d) { return context._palette(d[0]); })
                     .attr("r", function (d) { return d.r; })
                     .select("title")
                         .text(function (d) { return d[0] + " (" + d[1] + ")"; })

@@ -1,3 +1,4 @@
+"use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
         define(["./SVGWidget", "css!./Shape"], factory);
@@ -7,18 +8,20 @@
 }(this, function (SVGWidget) {
     function Shape() {
         SVGWidget.call(this);
-        this._class = "shape";
+        this._class = "common_Shape";
     };
     Shape.prototype = Object.create(SVGWidget.prototype);
 
     Shape.prototype.publish("shape", "circle", "set", "Shape Type", ["circle", "square", "rect", "ellipse"]);
     Shape.prototype.publish("width", 24, "number", "Width");
     Shape.prototype.publish("height", 24, "number", "Height");
+    Shape.prototype.publish("color_stroke", "#1f77b4", "html-color", "Stroke Color", null);
+    Shape.prototype.publish("color_fill", "#1f77b4", "html-color", "Fill Color", null);
 
     Shape.prototype.radius = function (_) {
-        if (!arguments.length) return Math.sqrt(Math.pow(this._width / 2, 2) + Math.pow(this._height / 2, 2));
-        this._width = _ * Math.sqrt(2);
-        this._height = this._width;
+        if (!arguments.length) return Math.max(this._width, this._height) / 2;
+        this._width = _;
+        this._height = _;
         return this;
     };
 
@@ -35,24 +38,28 @@
     };
 
     Shape.prototype.update = function (domNode, element) {
-        var shape = element.selectAll(".shape").data([this._shape], function (d) { return d; });
+        var shape = element.selectAll("rect,circle,ellipse").data([this._shape], function (d) { return d; });
         
         shape.enter().append(this._shape === "square" ? "rect" : this._shape)
-            .attr("class", "shape")
+            .attr("class", "common_Shape")
         ;
         var context = this;
         shape.each(function (d) {
-            var elemeent = d3.select(this);
+            var element = d3.select(this);
+            element.style({
+                fill: context._color_fill !== context.__meta_color_fill.defaultValue ? context._color_fill : null,
+                stroke: context._color_stroke !== context.__meta_color_stroke.defaultValue ? context._color_stroke : null
+            });
             switch (context._shape) {
                 case "circle":
                     var radius = context.radius();
-                    elemeent
+                    element
                         .attr("r", radius)
                     ;
                     break;
                 case "square":
                     var width = Math.max(context._width, context._height);
-                    elemeent
+                    element
                         .attr("x", -width / 2)
                         .attr("y", -width / 2)
                         .attr("width", width)
@@ -60,7 +67,7 @@
                     ;
                     break;
                 case "rect":
-                    elemeent
+                    element
                         .attr("x", -context._width / 2)
                         .attr("y", -context._height / 2)
                         .attr("width", context._width)
@@ -68,7 +75,7 @@
                     ;
                     break;
                 case "ellipse":
-                    elemeent
+                    element
                         .attr("rx", context._width / 2)
                         .attr("ry", context._height / 2)
                     ;

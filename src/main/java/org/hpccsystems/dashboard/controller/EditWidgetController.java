@@ -513,8 +513,8 @@ public class EditWidgetController extends SelectorComposer<Component> {
                     authenticationService.getUserCredential().getUserId(),
                     null,dashboard.getSourceId());
             if (dashboardList.isEmpty()) {
-                dashboard.setDashboardId(dashboardService.addDashboardDetails(dashboard, Constants.CIRCUIT_APPLICATION_ID, dashboard
-                                        .getSourceId(),    authenticationService.getUserCredential().getUserId()));
+                    dashboardService.addDashboardDetails(dashboard, Constants.CIRCUIT_APPLICATION_ID, dashboard
+                                        .getSourceId(),    authenticationService.getUserCredential().getUserId());
                 portlet.setChartData(chartData);
                 widgetService.addWidget(dashboard.getDashboardId(),    portlet, 0);
             } else {

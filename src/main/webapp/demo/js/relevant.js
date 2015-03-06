@@ -6,9 +6,9 @@ function createRelevantChart(divId, reqData) {
 	var chartData = jq.parseJSON(reqData);
 	console.log(chartData);	
 	
+	console.log("file -->"+chartData.files[0]);	
 	console.log("Calling createRelevantChart...");
 	
-        var graph = null;
         var table = null;
         var doRandom = null;
         var cholderDiv = null;
@@ -33,11 +33,7 @@ function createRelevantChart(divId, reqData) {
         	// size of the diagram
             width = divElement.width();
             height = divElement.height();
-
-         	if(width < 50 ){ width = 400; } 
-        	if(height < 50 ){ height = 385; }
-        	
-        	
+            
             var vertices = [];
             var vertexMap = [];
             var edges = [];
@@ -75,29 +71,23 @@ function createRelevantChart(divId, reqData) {
                 }
                 return retVal;
             }
-
-            doRandom = function() {
-            	console.log("Calling Do Random...");
-                var maxV = Math.floor(Math.random() * 100);
-                var maxE = Math.floor(Math.random() * 100);
-                for (var i = 0; i < maxV; ++i) {
-                    var fromV =  getVertex("v" + i, "", i);
-                }
-                for (var i = 0; i < maxE; ++i) {
-                    var fromIdx = Math.floor(Math.random() * vertices.length);
-                    var toIdx = Math.floor(Math.random() * vertices.length);
-                    getEdge(vertices[fromIdx], vertices[toIdx]);
-                }
-                graph
-                    .data({ vertices: vertices, edges: edges, merge: true })
-                    .render()
-                    //.layout(graph.layout())
-                    .layout(graph.layout(), transitionDuration)
-                ;
+            var url= "";
+            if(chartData.hpccConnection.isHttps == true){
+            	url = url.concat("https://");
+            }else{
+            	url = url.concat("http://");
             }
-
-            var service = Comms.createESPConnection("http://10.173.147.1:8010/?QuerySetId=roxie&Id=claim_group_data_review_ex_srvc_rmap2.1&Widget=QuerySetDetailsWidget");
-
+            url = url.concat(chartData.hpccConnection.serverHost);
+            url = url.concat(":");
+            url = url.concat(chartData.hpccConnection.wsEclPort);
+            url = url.concat("/?QuerySetId=roxie&Id=");
+            url = url.concat(chartData.files[0]);
+            url = url.concat("&Widget=QuerySetDetailsWidget");
+            
+            console.log("url --->"+url);
+            
+            var service = Comms.createESPConnection(url);
+            
             function callService(id, element) {
                 if (element) {
                     element.classed("expanding", true);
@@ -128,6 +118,36 @@ function createRelevantChart(divId, reqData) {
                             element.classed("expanding", false);
                             element.classed("expanded", true);
                         }
+                        response.claim_list.forEach(function (item, i) {
+                            var claim = getVertex("c_" + item.report_no, "\uf0d6", item.report_no, item);
+                            var annotations = [];
+                            if (item.road_accident && item.road_accident !== "0") {
+                                annotations.push({
+                                    "faChar": "\uf018",
+                                    "tooltip": "Road Accident",
+                                    "shape_color_fill": "darkgreen",
+                                    "image_color_fill": "white"
+                                });
+                            }
+                            if (item.third_vehicle && item.third_vehicle !== "0") {
+                                annotations.push({
+                                    "faChar": "\uf1b9",
+                                    "tooltip": "Third Vehicle",
+                                    "shape_color_fill": "navy",
+                                    "image_color_fill": "white"
+                                });
+                            }
+                            if (item.injury_accident && item.injury_accident !== "0") {
+                                annotations.push({
+                                    "faChar": "\uf067",
+                                    "tooltip": "Injury Accident",
+                                    "shape_color_fill": "white",
+                                    "shape_color_stroke": "red",
+                                    "image_color_fill": "red"
+                                });
+                            }
+                            claim.annotation_icons(annotations);
+                        });
                         response.claim_list.forEach(function (item, i) {
                         	getVertex("c_" + item.report_no, chartData.claimImage, item.report_no, item);
                         });
@@ -162,7 +182,6 @@ function createRelevantChart(divId, reqData) {
                         graph
                             .data({ vertices: vertices, edges: edges, merge: true })
                             .render()
-                            //.layout(graph.layout())
                             .layout(graph.layout(), transitionDuration)
                         ;
                     });
@@ -181,33 +200,28 @@ function createRelevantChart(divId, reqData) {
                 .highlightOnMouseOverVertex(true)
             ;
             graph.vertex_dblclick = function (d) {
+            	d3.event.stopPropagation();
                 callService(d._id, d.element());
             };
             
             graph.vertex_click = function (d) {
             	console.log("Calling graph.vertex_click");
-                /* table
-                    .data([])
-                    .render()
-                ; */
-                var props = d.data();
                 
-                var data = [];
-                for (var key in props) {
-                    data.push([key, props[key]]);
-                }
-                console.log(data);
-                /* table
-                    .data(data)
-                    .render()
-                ; */
+            	var data = [];
+            	var selection = graph.selection();
+                selection.forEach(function (item) {
+                    var props = item.data();
+                   
+                    for (var key in props) {
+                        data.push([key, props[key]]);
+                    }
+                    
+                });
                 hot.loadData(data);
+                console.log(data);
                 hot.render();
             };
 
-            //callService("c_" + "CLM00042945-C034"); 
-            //callService("c_" + chartData.claimId);
-            
             var search = window.location.search.split("?");
             var entity = search[search.length - 1];
             if (!entity) {
@@ -223,14 +237,6 @@ function createRelevantChart(divId, reqData) {
                 callService("p_" + entity);
             }
             
-
-            //  Table  ---
-            /* table = new Table()
-                .target("table")
-                .columns(["Property", "Value"])
-                .render()
-            ; */
-            
             var dummyData = [["", ""]];
 			var container = document.getElementById('table');
 			var config = {
@@ -244,19 +250,93 @@ function createRelevantChart(divId, reqData) {
 			
 			var hot = new Handsontable(container, config);
 			
+			divElement.on("click", ".randomize", function() {
+            	console.log("Calling Do Random...");
+                var maxV = Math.floor(Math.random() * 100);
+                var maxE = Math.floor(Math.random() * 100);
+                for (var i = 0; i < maxV; ++i) {
+                    var fromV =  getVertex("v" + i, "", i);
+                }
+                for (var i = 0; i < maxE; ++i) {
+                    var fromIdx = Math.floor(Math.random() * vertices.length);
+                    var toIdx = Math.floor(Math.random() * vertices.length);
+                    getEdge(vertices[fromIdx], vertices[toIdx]);
+                }
+                graph
+                    .data({ vertices: vertices, edges: edges, merge: true })
+                    .render()
+                    .layout(graph.layout(), transitionDuration)
+                ;
+            
+			});
+			
+			divElement.on("change", ".chartOptions",function() {
+				switch($("#selectbox").val()){
+					case "Circle":
+						graph.layout('Circle', transitionDuration);
+						break;
+						
+					case "Randomize":
+						console.log("Calling Do Random...");
+		                var maxV = Math.floor(Math.random() * 100);
+		                var maxE = Math.floor(Math.random() * 100);
+		                for (var i = 0; i < maxV; ++i) {
+		                    var fromV =  getVertex("v" + i, "", i);
+		                }
+		                for (var i = 0; i < maxE; ++i) {
+		                    var fromIdx = Math.floor(Math.random() * vertices.length);
+		                    var toIdx = Math.floor(Math.random() * vertices.length);
+		                    getEdge(vertices[fromIdx], vertices[toIdx]);
+		                }
+		                graph
+		                    .data({ vertices: vertices, edges: edges, merge: true })
+		                    .render()
+		                    .layout(graph.layout(), transitionDuration)
+		                ;
+						break;
+						
+					case "ForceDirected":
+						graph.layout('ForceDirected', transitionDuration);
+						break;
+						
+					case "Animated":
+						graph.layout('ForceDirected2', transitionDuration);
+						break;
+						
+					case "Hierarchy":
+						graph.layout('Hierarchy', transitionDuration);
+						break;
+						
+					case "Show/Hide":
+						graph.showEdges(!graph.showEdges()).render();
+						break;
+						
+				}
+			});
+			
 			divElement.append(jq("<header>" +
 					"<nav>" +
-						"<ul>" +
-							"<li><a id=\"info\" title=\"Data: Randomize\">R</a></li>" +
-							"<li><a title=\"Layout: Circle\">C</a></li>" +
-							"<li><a title=\"Layout: ForceDirected\" >F</a></li>" +
-							"<li><a title=\"Layout: Force Directed (Animated)\">F2</a></li>" +
-							"<li><a title=\"Layout: Hierarchy\">H</a></li>" +
-			                "<li><a title=\"Edges: Show/Hide\">E</a></li>"+
-						"</ul>" +
+						"<a style=\"float:left;\" class=\"back\"> <i class=\"fa fa-arrow-left\"></i></a>"+	
+						"<div style=\"height:37px;border-left:1px solid #000;display:inline;float:left;\"> &nbsp;</div>"+
+						"<select style=\"float:left;\" id=\"selectbox\" class=\"chartOptions\">"+
+						"<option value=\"\">-layout-</option>"+
+						"<option value=\"Randomize\">Randomize</option>"+
+						"<option value=\"Circle\">Circle</option>"+
+						"<option value=\"ForceDirected\">Force Directed</option>"+
+						"<option value=\"Animated\">Force Directed(Animated)</option>"+
+						"<option value=\"Hierarchy\">Hierarchy</option>"+
+						"<option value=\"Show/Hide\">Show/Hide</option>"+
+						"</select>"+						
 				 	"</nav>" +
 				 "</header>"));
-
+			
         });
         
 }
+
+function resizeGraph() {
+	if(graph){
+		graph.resize();
+	}
+}
+	

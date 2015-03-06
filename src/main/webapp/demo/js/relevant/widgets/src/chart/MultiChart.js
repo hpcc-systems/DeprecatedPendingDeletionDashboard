@@ -1,13 +1,14 @@
 ﻿(function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3/d3", "../common/SVGWidget", "./I2DChart", "../common/Palette"], factory);
+        define(["d3/d3", "../common/SVGWidget", "./INDChart"], factory);
     } else {
-        root.MultiChart = factory(root.d3, root.SVGWidget, root.I2DChart, root.Palette);
+        root.MultiChart = factory(root.d3, root.SVGWidget, root.INDChart);
     }
-}(this, function (d3, SVGWidget, I2DChart, Palette) {
+}(this, function (d3, SVGWidget, INDChart) {
     function MultiChart() {
         SVGWidget.call(this);
-        I2DChart.call(this);
+        INDChart.call(this);
+        this.class = "chart_MultiChart";
 
         this._chartType = "";
         this._chart = null;
@@ -47,7 +48,7 @@
         this._allCharts["BAR"] = this._allCharts["COLUMN"];
     };
     MultiChart.prototype = Object.create(SVGWidget.prototype);
-    MultiChart.prototype.implements(I2DChart.prototype);
+    MultiChart.prototype.implements(INDChart.prototype);
 
     MultiChart.prototype.columns = function (_) {
         var retVal = SVGWidget.prototype.columns.apply(this, arguments);
@@ -87,8 +88,8 @@
         var context = this;
         require([this._allCharts[chartType].path], function (widgetClass) {
             retVal = new widgetClass();
-            retVal.click = function (d) {
-                context.click(d);
+            retVal.click = function (row, column) {
+                context.click(row, column);
             }
             context._allCharts[chartType].widget = retVal;
             callback(retVal);
@@ -152,7 +153,7 @@
 
     MultiChart.prototype.render = function () {
         SVGWidget.prototype.render.apply(this, arguments);
-        if (this._chartType && this._renderCount == 1) {
+        if (this._chartType && this._renderCount === 1) {
             this.chartType(this._chartType);
         }
         return this;

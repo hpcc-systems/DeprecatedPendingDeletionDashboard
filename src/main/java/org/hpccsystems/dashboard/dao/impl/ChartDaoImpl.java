@@ -1,6 +1,8 @@
 package org.hpccsystems.dashboard.dao.impl;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import javax.sql.DataSource;
 
@@ -11,6 +13,7 @@ import org.hpccsystems.dashboard.rowmapper.ChartRowMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.JdbcTemplate;
+import org.springframework.jdbc.core.simple.SimpleJdbcInsert;
 
 public class ChartDaoImpl implements ChartDao {
     
@@ -24,15 +27,22 @@ public class ChartDaoImpl implements ChartDao {
     @Override
     public int addPlugin(String name, String description, String configData,
             String userId, int category, boolean isPlugin)throws DataAccessException {
-        jdbcTemplate.update(Queries.INSERT_PLUGIN, new Object[] { 
-                name,
-                description,
-                configData,
-                userId,
-                category,
-                isPlugin
-        });    
-        return jdbcTemplate.queryForInt("select last_insert_id()"); 
+        
+        Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put("name", name);
+        parameters.put("description", description);
+        parameters.put("configuration", configData);
+        parameters.put("created_by", userId);
+        parameters.put("category", category);
+        parameters.put("isplugin", isPlugin);
+        
+        Number newId = new SimpleJdbcInsert(jdbcTemplate.getDataSource())
+                        .withTableName("chart_details")
+                        .usingGeneratedKeyColumns("id")
+                        .executeAndReturnKey(parameters);
+        
+        return newId.intValue();
+        
     }
 
     @Override

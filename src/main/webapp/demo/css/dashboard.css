@@ -177,3 +177,17 @@ background: #91C3E0;
 	padding: 10px;
 	font-size: larger;
 }
+
+.z-panelchildren header {
+    background: none repeat scroll 0 0 #eeeeee;
+	left:5px;
+	top:5px;
+}	
+
+.z-panelchildren header nav a{
+	color:#555;
+}
+
+.z-panelchildren header nav .chartOptions{
+	margin-top:7px;
+}

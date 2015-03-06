@@ -1,19 +1,21 @@
+"use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3/d3", "../common/SVGWidget", "../common/Palette", "./ITree", "../common/Text", "../common/FAChar", "css!./CirclePacking"], factory);
+        define(["d3/d3", "../common/SVGWidget", "./ITree", "../common/Text", "../common/FAChar", "css!./CirclePacking"], factory);
     } else {
-        root.CirclePacking = factory(root.d3, root.SVGWidget, root.Palette, root.ITree, root.Text, root.FAChar);
+        root.CirclePacking = factory(root.d3, root.SVGWidget, root.ITree, root.Text, root.FAChar);
     }
-}(this, function (d3, SVGWidget, Palette, ITree, Text, FAChar) {
+}(this, function (d3, SVGWidget, ITree, Text, FAChar) {
     function CirclePacking(target) {
         SVGWidget.call(this);
         ITree.call(this);
-
-        this._class = "circlepacking";
+        this._class = "tree_CirclePacking";
     };
     CirclePacking.prototype = Object.create(SVGWidget.prototype);
     CirclePacking.prototype.implements(ITree.prototype);
-
+	
+    CirclePacking.prototype.publish("paletteID", "default", "set", "Palette ID", CirclePacking.prototype._palette.switch());
+	
     CirclePacking.prototype.enter = function (domNode, element) {
         var context = this;
 
@@ -33,7 +35,8 @@
 
     CirclePacking.prototype.update = function (domNode, element) {
         var context = this;
-
+		
+        this._palette = this._palette.switch(this._paletteID);
         this.svg.selectAll("circle").remove();
         this.svg.selectAll("text").remove();
 
@@ -45,8 +48,11 @@
             .data(nodes)
           .enter().append("circle")
             .attr("class", function (d) { return d.parent ? d.children ? "node" : "node leaf" : "node root"; })
-            .on("click", function (d) { if (focus !== d) context.zoom(d), d3.event.stopPropagation(); })
+            .style("fill", function (d) { return context._palette(d.label); })
+            .on("click", function (d) { context.click(d); })
+            .on("dblclick", function (d) { if (focus !== d) context.zoom(d), d3.event.stopPropagation(); })
         ;
+        this.circle.append("title").text(function (d) { return d.label; });
 
         var text = this.svg.selectAll("text")
             .data(nodes)
@@ -86,9 +92,8 @@
             })
         ;
 
-        var transition = d3.transition()
-            .delay(1000)
-            .duration(3000)
+        var transition = this.svg.transition()
+            .duration(1000)
             .tween("zoom", function (d) {
                 var i = d3.interpolateZoom(context.view, [focus.x, focus.y, focus.r * 2]);
                 return function (t) { context.zoomTo(i(t)); };

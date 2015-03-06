@@ -1,20 +1,35 @@
+"use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3/d3", "./Common", "../common/Palette"], factory);
+        define(["d3/d3", "./Common"], factory);
     } else {
-        root.Pie = factory(root.d3, root.Common, root.Palette);
+        root.Pie = factory(root.d3, root.Common);
     }
-}(this, function (d3, Common, Palette) {
+}(this, function (d3, Common) {
 
     function Pie(tget) {
         Common.call(this);
-        this._class = "google_pie";
+        this._class = "google_Pie";
 
-        this._is3D = true;
     };
     Pie.prototype = Object.create(Common.prototype);
-
-    Pie.prototype.d3Color = Palette.ordinal("category20");
+    
+    Pie.prototype.publish("is3D", true, "boolean", "Enable 3D");
+    Pie.prototype.publish("chartAreaWidth", "80%", "string", "Chart Area Width");
+    Pie.prototype.publish("chartAreaHeight", "80%", "string", "Chart Area Height");
+    Pie.prototype.publish("fontSize", 12, "number", "Font Size");
+    Pie.prototype.publish("fontName", "Calibri", "string", "Font Name");
+    Pie.prototype.publish("pieHole", 0, "number", "Pie Hole Size");
+    
+    Pie.prototype.publish("pieStartAngle", 0, "number", "Pie Start Angle");
+    
+    Pie.prototype.publish("legendAlignment", "center", "set", "Legend Alignment", ["","start","center","end"]);
+    Pie.prototype.publish("legendPosition", "top", "set", "Legend Position", ["","bottom","labeled","left","none","right","top"]);
+    Pie.prototype.publish("legendFontColor", "#000", "html-color", "Legend Font Color");
+    Pie.prototype.publish("legendFontName", "Calibri", "string", "Legend Font Name");
+    Pie.prototype.publish("legendFontSize", 12, "number", "Legend Font Size");
+    Pie.prototype.publish("legendFontBold", true, "boolean", "Legend Font Bold");
+    Pie.prototype.publish("legendFontItalic", true, "boolean", "Legend Font Italic");
 
     Pie.prototype.is3D = function (_) {
         if (!arguments.length) return this._is3D;
@@ -31,26 +46,46 @@
         google.visualization.events.addListener(this.pieChart, "select", function () {
             var selectedItem = context.pieChart.getSelection()[0];
             if (selectedItem) {
-                context.click(context.rowToObj(context._data[selectedItem.row]));
+                context.click(context.rowToObj(context._data[selectedItem.row]), context._columns[1]);
             }
         });
     };
 
-    Pie.prototype.update = function (domNode, element) {
+    Pie.prototype.update = function (domNode, element) {     
+        Common.prototype.update.apply(this, arguments);
+
         var context = this;
 
         var colors = this._data.map(function (row) {
-            return this.d3Color(row[0]);
+            return this._palette(row[0]);
         }, this);
 
         var chartOptions = {
             backgroundColor: "none",
             width: this.width(),
             height: this.height(),
-            chartArea: { width: "100%", height: "100%" },
+            fontSize:this._fontSize,
+            fontName:this._fontName,
+            chartArea: { 
+                width: this._chartAreaWidth, 
+                height: this._chartAreaHeight 
+            },
             colors: colors,
             is3D: this._is3D,
-            legend: { alignment: "center" }
+            pieStartAngle:this._pieStartAngle,
+            legend: { 
+                alignment: this._legendAlignment,
+                position: this._legendPosition,
+                maxLines:2,
+                textStyle: {
+                    color: this._legendFontColor,
+                    fontName: this._legendFontName,
+                    fontSize: this._legendFontSize,
+                    bold: this._legendFontBold,
+                    italic: this._legendFontItalic,
+                }
+            },
+            pieHole:this._pieHole
         };
 
         this.pieChart.draw(this._data_google, chartOptions);

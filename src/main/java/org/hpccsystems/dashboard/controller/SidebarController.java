@@ -293,13 +293,11 @@ public class SidebarController extends GenericForwardComposer<Component>{
             dashboard.setSequence(comp.size());
             // Make entry of new dashboard details into DB
             
-                dashboard.setDashboardId(
-                    dashboardService.addDashboardDetails(
+             dashboardService.addDashboardDetails(
                         dashboard,
                         authenticationService.getUserCredential().getApplicationId(),
                         null,
                         authenticationService.getUserCredential().getUserId()
-                    )
                 );
                 //adding widget details into db while adding new dashboard.
                 widgetService.addWidgetDetails(dashboard.getDashboardId(), dashboard.getPortletList());            
