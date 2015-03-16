@@ -254,7 +254,7 @@ public class Constants {
 	public static final String SCORED_SEARCH = "Scored Search";
 	public static final String ON_ADD_FILTER = "onAddFilter";
 	public static final String ON_DELETE_FILTER = "onDeleteFilter";
-	public static final String GENERIC = "GENERIC";
+	public static final String GENERIC = "generic";
 	public static final String FETCH_INPUT_PARAM = "fetch_input_parameters";
     public static final String ON_SAVE_INTERACTIVITY = "onSaveInteractivity";
     public static final String ON_SELECT_INTERACTIVITY_FILTER = "onSelectInteractivityFilter"; 
