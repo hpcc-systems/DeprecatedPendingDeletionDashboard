@@ -19,6 +19,7 @@ public class Constants {
     public static final String LEVEL_ELEMENT = "levelElement";
     public static final String FILTER = "filter";
     public static final String FIELD = "field";
+    public static final String INPUT_PARAMS = "inputParams";
     public static final String CHART_DATA = "chartData";
     public static final String MEASURE = "measure";
     public static final String ATTRIBUTE = "attribute";

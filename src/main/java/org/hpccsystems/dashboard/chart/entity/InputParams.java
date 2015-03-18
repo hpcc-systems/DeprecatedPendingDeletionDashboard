@@ -1,5 +1,6 @@
 package org.hpccsystems.dashboard.chart.entity;
 
+import java.util.HashMap;
 import java.util.Map;
 
 import javax.xml.bind.annotation.XmlElement;
@@ -18,7 +19,12 @@ public class InputParams {
     }
     
 
-    @XmlElement
+    public InputParams(String key) {
+    	params = new HashMap<String,String>();
+    	params.put(key, null);
+	}
+
+	@XmlElement
     public Map<String, String> getParams() {
         return params;
     }

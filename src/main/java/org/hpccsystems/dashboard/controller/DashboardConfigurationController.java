@@ -210,13 +210,13 @@ public class DashboardConfigurationController extends SelectorComposer<Component
 
     @Listen("onCheck = #commonFiltersCheckbox")
     public void commonFilerToggle() {
-        if( parent instanceof Window && 
+       /* if( parent instanceof Window && 
                 dashboard.hasLiveChart() && dashboard.getCommonHpccConnection() == null) {
             commonFiltersCheckbox.setChecked(false);
             Clients.showNotification(Labels.getLabel("noCommonHpccData"),
                     "warning", commonFiltersCheckbox, "end_center", 5000, true);
             return;
-        }            
+        }            */
         if(!commonFiltersCheckbox.isChecked()){
             EventListener<ClickEvent> removeAllGlobalFilters = new EventListener<ClickEvent>() {
                 @Override

@@ -213,10 +213,10 @@ public class Dashboard {
                 clusters.add(portlet.getChartData().getHpccConnection().getClusterType());
                 hostIps.add(portlet.getChartData().getHpccConnection().getHostIp());
                 //Checks for Roxie Query not to enable Common filter
-                if(portlet.getChartData().getIsQuery()){
+                /*if(portlet.getChartData().getIsQuery()){
                     hasRoxieQuery = true;
                     break;
-                }                
+                }     */           
                 hpccConnection = portlet.getChartData().getHpccConnection();
             }
         }
