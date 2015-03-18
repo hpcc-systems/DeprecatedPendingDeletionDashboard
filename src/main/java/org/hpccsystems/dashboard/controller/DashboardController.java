@@ -311,6 +311,7 @@ public class DashboardController extends SelectorComposer<Window>{
             	addWidget.detach();
             }
             for (Portlet portlet : dashboard.getPortletList()) {  
+            	LOG.debug("chart tuype1 ------>"+portlet.getChartType());
                 if(authenticationService.getUserCredential().hasRole(Constants.ROLE_API_VIEW_DASHBOARD)){
                     panel = new ChartPanel(portlet, Constants.SHOW_NO_BUTTONS);
                 } else if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_EDIT_DASHBOARD) ||

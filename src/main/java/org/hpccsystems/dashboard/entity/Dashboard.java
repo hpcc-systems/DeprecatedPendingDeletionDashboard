@@ -200,7 +200,8 @@ public class Dashboard {
         Set<String> hostIps = new HashSet<String>();
         boolean hasNoLiveChart = true;
         boolean hasRoxieQuery = false;
-
+        boolean hasLogicalFile = false;
+        
         if(this.getPortletList() == null) {
             return null;
         }
@@ -213,14 +214,15 @@ public class Dashboard {
                 clusters.add(portlet.getChartData().getHpccConnection().getClusterType());
                 hostIps.add(portlet.getChartData().getHpccConnection().getHostIp());
                 //Checks for Roxie Query not to enable Common filter
-                /*if(portlet.getChartData().getIsQuery()){
+                if(portlet.getChartData().getIsQuery()){
                     hasRoxieQuery = true;
-                    break;
-                }     */           
+                } else {
+                    hasLogicalFile = true;
+                }
                 hpccConnection = portlet.getChartData().getHpccConnection();
             }
         }
-        if (hasNoLiveChart || hasRoxieQuery) {
+        if (hasNoLiveChart || (hasRoxieQuery&&hasLogicalFile)) {
             return null;
         } else if (clusters.size() == 1 && hostIps.size() == 1) {
             return hpccConnection;

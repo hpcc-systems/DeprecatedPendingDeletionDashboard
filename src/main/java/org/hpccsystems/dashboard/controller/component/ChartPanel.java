@@ -269,7 +269,7 @@ public class ChartPanel extends Panel {
         this.imageContainer.setPack("center");
         
         this.portlet = argPortlet;
-        
+        LOG.debug("chart tuype 2 ------>"+portlet.getChartType());
         this.setBorder("normal");
         this.setWidth("99%");
         this.setStyle("margin-bottom:5px");
@@ -375,6 +375,7 @@ public class ChartPanel extends Panel {
         
         //listener to maximize and minimize window
         resizeBtn.addEventListener(Events.ON_CLICK, maximizeListener ->{
+        if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())) {
             ChartPanel.this.setMaximizable(true);
             if(!ChartPanel.this.isMaximized()){
                 holderDiv.setHeight("");
@@ -413,6 +414,12 @@ public class ChartPanel extends Panel {
                     
                 }
             }
+        }else{
+        	
+        	 Clients.showNotification("Add / Configure the chart before maximizing...",
+                     Clients.NOTIFICATION_TYPE_WARNING, this,"middle_center", 3000, true);
+        	
+        }
         });
         
     }
