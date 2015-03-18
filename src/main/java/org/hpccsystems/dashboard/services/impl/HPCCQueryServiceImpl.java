@@ -862,6 +862,11 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
                 Attribute xColumnName = chartData.getAttribute();
                     lstNmElmntLst = fstElmnt.getElementsByTagName(xColumnName.getColumn());
                     lstNmElmnt = (Element) lstNmElmntLst.item(0);
+                  //workaround as the column name and output tag names differ-case changed
+                    if(lstNmElmnt==null){
+                        lstNmElmntLst = fstElmnt.getElementsByTagName(xColumnName.getColumn().toLowerCase());
+                        lstNmElmnt = (Element) lstNmElmntLst.item(0);
+                    }
                     if (lstNmElmnt != null) {
                         valueList.add(lstNmElmnt.getTextContent());
                     } else {
@@ -873,6 +878,11 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
                 for (Measure measure : chartData.getMeasures()) {
                     lstNmElmntLst = fstElmnt.getElementsByTagName(measure.getColumn());
                     lstNmElmnt = (Element) lstNmElmntLst.item(0);
+                  //workaround as the column name and output tag names differ-case changed
+                    if(lstNmElmnt==null){
+                        lstNmElmntLst = fstElmnt.getElementsByTagName(measure.getColumn().toLowerCase());
+                        lstNmElmnt = (Element) lstNmElmntLst.item(0);
+                    }
                     if (lstNmElmnt != null) {
                         valueList.add(new BigDecimal(lstNmElmnt.getTextContent()));
                     } else {
@@ -1414,7 +1424,6 @@ return resultDataMap;
                                  for (Attribute childAttribute : data.getChildren()) {
                                      Attribute childValue = new Attribute();
                                      lstNmElmntLst = fstElmnt.getElementsByTagName(childAttribute.getColumn());
-                                     
                                      List<Attribute> innerAttributes = new ArrayList<Attribute>();
                                      for (int i = 0; i < lstNmElmntLst.getLength(); i++) {
                                          if(lstNmElmntLst.item(i).getNodeType() == Node.ELEMENT_NODE) {
@@ -1436,6 +1445,12 @@ return resultDataMap;
                              }
                              lstNmElmntLst = fstElmnt.getElementsByTagName(data.getColumn());
                              lstNmElmnt = (Element) lstNmElmntLst.item(0);
+                             
+                           //workaround as the column name and output tag names differ-case changed
+                             if(lstNmElmnt==null){
+                                 lstNmElmntLst = fstElmnt.getElementsByTagName(data.getColumn().toLowerCase());
+                                 lstNmElmnt = (Element) lstNmElmntLst.item(0);
+                             }
 
                              if (lstNmElmnt != null) {
                                  // Rounding off Numeric values
