@@ -305,8 +305,10 @@ public class DashboardController extends SelectorComposer<Window>{
             if(dashboard.getPortletList().size() == 1 && dashboard.getPortletList().get(0).getIsSinglePortlet()){
             	addWidget.detach();
             }
-            for (Portlet portlet : dashboard.getPortletList()) {    
-                if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD) ||
+            for (Portlet portlet : dashboard.getPortletList()) {  
+                if(authenticationService.getUserCredential().hasRole(Constants.ROLE_API_VIEW_DASHBOARD)){
+                    panel = new ChartPanel(portlet, Constants.SHOW_NO_BUTTONS);
+                } else if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_EDIT_DASHBOARD) ||
                         Constants.ROLE_ADMIN.equals(dashboard.getRole()) ) {
                 	panel = new ChartPanel(portlet, Constants.SHOW_ALL_BUTTONS);
                 } else if(Constants.ROLE_CONTRIBUTOR.equals(dashboard.getRole())) {
@@ -330,7 +332,8 @@ public class DashboardController extends SelectorComposer<Window>{
                 
             }
             
-            if(! authenticationService.getUserCredential().getApplicationId().equals(Constants.CIRCUIT_APPLICATION_ID)
+            if(!authenticationService.getUserCredential().hasRole(Constants.ROLE_API_VIEW_DASHBOARD)
+                    && ! authenticationService.getUserCredential().getApplicationId().equals(Constants.CIRCUIT_APPLICATION_ID)
                     && dashboard.getRole().equals(Constants.ROLE_ADMIN)) {
                 dashboardToolbar.setVisible(true);
             }
@@ -1847,6 +1850,16 @@ public class DashboardController extends SelectorComposer<Window>{
         parameters.put(Constants.DASHBOARD, dashboard);
         
         Window window  = (Window) Executions.createComponents("/demo/layout/interactivity/config.zul", this.getSelf(), parameters);
+        window.doModal();
+    }
+    
+    @Listen("onClick = #hyperlinlBtn")
+    public void generateDashboardLink() {
+        final Map<String, Object> parameters = new HashMap<String, Object>();
+        parameters.put(Constants.DASHBOARD, dashboard);
+
+        final Window window = (Window) Executions.createComponents(
+                "/demo/layout/hyperlink/link.zul", this.getSelf(), parameters);
         window.doModal();
     }
 }

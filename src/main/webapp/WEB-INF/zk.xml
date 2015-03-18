@@ -32,6 +32,15 @@
 	    <richlet-name>ViewDashboard</richlet-name>
 	    <url-pattern>/api/view_dashboard/*</url-pattern>
 	</richlet-mapping>
+	
+	<richlet>
+	   <richlet-name>ShareDashboard</richlet-name>
+	   <richlet-class>org.hpccsystems.dashboard.api.richlet.ShareDashboard</richlet-class>
+	</richlet>
+	<richlet-mapping>
+	    <richlet-name>ShareDashboard</richlet-name>
+	    <url-pattern>/api/share_dashboard/*</url-pattern>
+	</richlet-mapping>
 	<!-- API Richlets -->
 	
 	<session-config>

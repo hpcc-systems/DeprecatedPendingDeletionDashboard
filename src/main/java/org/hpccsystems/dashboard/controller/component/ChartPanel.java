@@ -324,6 +324,8 @@ public class ChartPanel extends Panel {
             }
         } else if (Constants.SHOW_EDIT_ONLY == buttonState) {
             toolbar.appendChild(addBtn);
+        }else if(Constants.SHOW_NO_BUTTONS == buttonState){
+            //Do nothing here
         }
         toolbar.appendChild(resizeBtn);
         

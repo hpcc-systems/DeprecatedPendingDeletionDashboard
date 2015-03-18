@@ -149,7 +149,7 @@ public class StringFilterController extends SelectorComposer<Component>{
             return;
         }
         if(!authenticationService.getUserCredential().getApplicationId().equals(Constants.CIRCUIT_APPLICATION_ID) || 
-                authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD)){
+                authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_EDIT_DASHBOARD)){
             doneButton.setDisabled(false);
         }
         //Detaching the filter's popup window

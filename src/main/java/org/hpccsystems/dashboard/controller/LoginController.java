@@ -8,6 +8,7 @@ Copyright (C) 2012 Potix Corporation. All Rights Reserved.
 */
 package org.hpccsystems.dashboard.controller;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,6 +30,7 @@ import org.hpccsystems.dashboard.services.ConditionalGroupService;
 import org.hpccsystems.dashboard.services.DashboardService;
 import org.hpccsystems.dashboard.services.LDAPAuthenticationService;
 import org.hpccsystems.dashboard.services.UserCredential;
+import org.hpccsystems.dashboard.util.DashboardUtil;
 import org.zkoss.util.Locales;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.web.Attributes;
@@ -92,12 +94,14 @@ public class LoginController extends SelectorComposer<Component> {
     @WireVariable
     private ConditionalGroupService  conditionalGroupService; 
         
-    
+    Boolean isDashboardShareURI = null;
+    Map<String, String[]> args = null;
     
     @Override
     public void doAfterCompose(final Component comp) throws Exception {
         super.doAfterCompose(comp);
-        
+        args = Executions.getCurrent().getParameterMap();
+        isDashboardShareURI =Boolean.valueOf(Executions.getCurrent().getParameter(Constants.DASHBOARD_SHARE));
         //setting default language as English
         Session session = Sessions.getCurrent();
         String lang = (String)session.getAttribute("lang");
@@ -156,13 +160,13 @@ public class LoginController extends SelectorComposer<Component> {
     }
 
     @Listen("onClick=#login")
-    public void doLogin() {
+    public void doLogin() throws IOException {
         Boolean isLoginSuccessful = false;
         User user = null;
         if (LOG.isDebugEnabled()) {
             LOG.debug("Handling 'doLogin' in LoginController");
         }
-
+        
         final String name = account.getValue();
         final String passWord = password.getValue();
         if(apps.getSelectedItem() == null){
@@ -209,7 +213,12 @@ public class LoginController extends SelectorComposer<Component> {
         }
 
         LOG.debug("Loged in. sending redirect...");
-        Executions.sendRedirect("/demo/");
+        if(isDashboardShareURI != null && isDashboardShareURI){
+            DashboardUtil.redirectDashboardURI(args);
+        }else{
+            Executions.sendRedirect("/demo/");
+        }
+        
     }
 
     /**Checks for dashboard application create access

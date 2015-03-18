@@ -27,6 +27,7 @@
 					</hbox> 
 					<button id="doneBtn" iconSclass="glyphicon glyphicon-ok" zclass="btn btn-xs btn-success" label="Done" style="float:right; margin:5px"></button>
 				</popup>
+				<button id="hyperlinlBtn" iconSclass="glyphicon glyphicon-export" zclass="btn btn-sm btn-primary" tooltiptext="Share Dashboard"></button>
 				<button id="interactivityBtn" iconSclass="glyphicon glyphicon-cog" zclass="btn btn-sm btn-primary" label=" ${labels.interactivity}"></button>
 				<button id="manageGroups" popup="addGroup, position=after_center" iconSclass="glyphicon glyphicon-dashboard" zclass="btn btn-sm btn-primary" label="${labels.manage_access}"></button>
 				<button id="addWidget" iconSclass="glyphicon glyphicon-plus" zclass="btn btn-sm btn-primary" label="${labels.addWidget}" ></button>

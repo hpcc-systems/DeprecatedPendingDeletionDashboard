@@ -84,7 +84,7 @@ public class AuthenticationServiceImpl implements AuthenticationService,Serializ
 
     public void logout(Object object)throws Exception {
         Sessions.getCurrent().invalidate();
-        if(getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD)){
+        if(getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_EDIT_DASHBOARD)){
              Clients.evalJavaScript("window.open('','_self',''); window.close();");    
         }
         if(object!= null) {                

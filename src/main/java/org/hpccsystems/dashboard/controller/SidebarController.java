@@ -52,8 +52,7 @@ public class SidebarController extends GenericForwardComposer<Component>{
 
     private static final long serialVersionUID = 1L;
     
-    private static final  Log LOG = LogFactory
-            .getLog(SidebarController.class);
+    private static final  Log LOG = LogFactory.getLog(SidebarController.class);
     
     //wire components
     @Wire
@@ -88,8 +87,12 @@ public class SidebarController extends GenericForwardComposer<Component>{
         
         List<Dashboard> sideBarPageList = null;
         try    {
-            //Circuit/External Source Flow    
-            if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD)){
+            //Circuit/External Source Flow   
+            if(authenticationService.getUserCredential().hasRole(Constants.ROLE_API_VIEW_DASHBOARD)){
+                sideBarPageList = getApiViewDashboardList(
+                        authenticationService.getUserCredential().getUserId(),
+                        authenticationService.getUserCredential().getApplicationId());
+            }else if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_EDIT_DASHBOARD)){
                 sideBarPageList = getApiViewDashboardList(
                         authenticationService.getUserCredential().getUserId(),
                         authenticationService.getUserCredential().getApplicationId()
@@ -170,7 +173,7 @@ public class SidebarController extends GenericForwardComposer<Component>{
         navitem.setAttribute(Constants.DASHBOARD_ID, dashboard.getDashboardId());
         navitem.setAttribute(Constants.DASHBOARD_ROLE, dashboard.getRole());
         
-        if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD)){
+        if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_EDIT_DASHBOARD)){
             navitem.addEventListener(Events.ON_CLICK, apiNavItemSelectLisnr);
         }else{
             navitem.addEventListener(Events.ON_CLICK, navItemSelectLisnr);
@@ -366,7 +369,7 @@ public class SidebarController extends GenericForwardComposer<Component>{
                     updateDashboardSequence();
                     return;
                 }
-                if (authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD)) {
+                if (authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_EDIT_DASHBOARD)) {
                     currentNavitem.addEventListener(Events.ON_CLICK,apiNavItemSelectLisnr);
                 } else {
                     currentNavitem.addEventListener(Events.ON_CLICK,navItemSelectLisnr);
