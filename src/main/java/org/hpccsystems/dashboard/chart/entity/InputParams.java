@@ -69,12 +69,11 @@ public class InputParams {
         if (params == null) {
             if (other.params != null)
                 return false;
-        } else if(params.keySet().iterator().next().equals(other.getParams().keySet().iterator().next()))
+        }else if(! params.keySet().iterator().next().equals(other.getParams().keySet().iterator().next()))
             //As each param has only one entry, taking first key
             return false;
         return true;
     }
-    
     
     
 }

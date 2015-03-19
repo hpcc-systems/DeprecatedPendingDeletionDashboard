@@ -19,7 +19,6 @@ public class Constants {
     public static final String LEVEL_ELEMENT = "levelElement";
     public static final String FILTER = "filter";
     public static final String FIELD = "field";
-    public static final String INPUT_PARAM = "inputParam";
     public static final String CHART_DATA = "chartData";
     public static final String MEASURE = "measure";
     public static final String ATTRIBUTE = "attribute";
@@ -263,6 +262,11 @@ public class Constants {
 	public static final String FETCH_INPUT_PARAM = "fetch_input_parameters";
     public static final String ON_SAVE_INTERACTIVITY = "onSaveInteractivity";
     public static final String ON_SELECT_INTERACTIVITY_FILTER = "onSelectInteractivityFilter";
+    
+    
+    public static final String INPUT_PARAM_NAME = "inputParamName";
+    public static final String INPUT_PARAM_VALUE = "inputParamValue";
+    public static final String SELECTED_RADIO_BTN = "selectedRadioBtn";
    
 	
 }

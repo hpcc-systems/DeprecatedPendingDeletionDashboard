@@ -600,13 +600,13 @@ public class ChartPanel extends Panel {
                     fields = new ArrayList<Field>();
                     if (!chartData.getIsQuery()) {
                         fields.addAll(hpccService.getColumns(file, chartData.getHpccConnection()));
-                    } else {
+                    }/* else {
                         // Roxie Query - fetching fields/columns of Roxie queries
                         HPCCQueryService hpccQueryService = (HPCCQueryService) SpringUtil.getBean(Constants.HPCC_QUERY_SERVICE);
                         querySchema = hpccQueryService.getQuerySchema(file, chartData.getHpccConnection(),
                                 chartData.isGenericQuery(), chartData.getInputParamQuery());
                         fields.addAll(querySchema.getFields());
-                    }
+                    }*/
 
                     fieldMap.put(file, fields);
                 }
