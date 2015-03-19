@@ -164,11 +164,11 @@ public class DashboardController extends SelectorComposer<Window>{
     
     Integer panelCount = 0;
     Set<Filter> appliedCommonFilters;
-    Set<InputParams> appliedCommonFiltersForQuery;
+    Map<String, String> appliedCommonInputParam;
     
     Map<String, Set<Field>> commonFields;
     private int drawnLiveChartCount;
-    private Map<String, Map<String,Set<String>>>  commonInputParams = new LinkedHashMap<String, Map<String,Set<String>>>();
+    private Map<String, Map<String,Set<String>>>  commonInputParams;
     private static final String PERCENTAGE_SIGN = "%";
     
     @WireVariable
@@ -546,12 +546,12 @@ public class DashboardController extends SelectorComposer<Window>{
         }
     }    
     
-    private void constructFilterItemForQuery(){        
+    private void constructFilterItemForQuery(Map<String, Map<String,Set<String>>>  newInputParams){        
         Listbox listbox;
         Listitem listitem;
         Tab tab;
         Tabpanel tabpanel;
-        for (Entry<String, Map<String, Set<String>>> entry : commonInputParams.entrySet()) {
+        for (Entry<String, Map<String, Set<String>>> entry : newInputParams.entrySet()) {
             tab = new Tab(entry.getKey());
             tabpanel = new Tabpanel();
             tabpanel.setSclass("collapsiblePanel");
@@ -562,7 +562,7 @@ public class DashboardController extends SelectorComposer<Window>{
             for (Entry<String, Set<String>> inputParamsEntry : entry.getValue().entrySet()) {
             	if(!inputParamsEntry.getValue().isEmpty()){
 	                listitem = new Listitem(inputParamsEntry.getKey());
-	                listitem.setAttribute(Constants.INPUT_PARAMS, inputParamsEntry);
+	                listitem.setAttribute(Constants.INPUT_PARAM, inputParamsEntry);
 	                listbox.appendChild(listitem);
             	}
             }
@@ -607,7 +607,7 @@ public class DashboardController extends SelectorComposer<Window>{
                 filterRows.appendChild(createStringFilterRow(newFilter));
             }
             
-            List<Filter> filtersToReomove = new ArrayList<Filter>();
+            List<Filter> filtersToReomove = null;
             for (Portlet portlet : dashboard.getPortletList()) {
                 if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())
                 		&& Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType())
@@ -642,58 +642,53 @@ public class DashboardController extends SelectorComposer<Window>{
         
         @Override
         public void onEvent(SelectEvent<Component, Object> event) throws Exception {
+            
             Listitem selectedItem = (Listitem) event.getSelectedItems().iterator().next();
             Tabpanel associatedTabpanel = (Tabpanel) selectedItem.getParent().getParent();
-            String inputParamName=null;
-            String fileName = associatedTabpanel.getLinkedTab().getLabel();
-            Entry<String, Set<String>> inputParams =  (Entry<String, Set<String>>) selectedItem.getAttribute(Constants.INPUT_PARAMS);
-            inputParamName=inputParams.getKey();
-            inputParams.getValue();
+            
+            String query = associatedTabpanel.getLinkedTab().getLabel();
+            Entry<String, Set<String>> inputParam =  (Entry<String, Set<String>>) selectedItem.getAttribute(Constants.INPUT_PARAM);
+            inputParam.getValue();
+            
             Popup popup = (Popup) selectedItem.getParent().getParent().getParent().getParent().getParent();
             popup.close();
-            Clients.showNotification(inputParamName, Constants.ERROR_NOTIFICATION, commonFiltersPanel,Constants.POSITION_CENTER, 3000, true);
             
             //Removing selection
             selectedItem.setSelected(false);    
             
-           
+            InputParams selectedParam=new InputParams(inputParam.getKey());
+            selectedParam.setIsCommonInput(true);
             
             //Checking whether filter is applied already
-           /* if(appliedCommonFilters!= null && appliedCommonFilters.contains(newFilter)) {
-                Clients.showNotification("This field is already filtered", Constants.ERROR_NOTIFICATION, commonFiltersPanel,Constants.POSITION_CENTER, 3000, true);
+            if(appliedCommonInputParam!= null && appliedCommonInputParam.keySet().contains(inputParam.getKey())) {
+                Clients.showNotification("This input is already filtered", Constants.ERROR_NOTIFICATION, commonFiltersPanel,Constants.POSITION_CENTER, 3000, true);
                 return;
-            }*/
+            }
+           
+            filterRows.appendChild(createQueryInputFilterRow(inputParam));
             
-          
-            filterRows.appendChild(createStringFilterRowForQuery(inputParams));
-            
-            
-           /* List<Filter> filtersToReomove = new ArrayList<Filter>();
             for (Portlet portlet : dashboard.getPortletList()) {
                 if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())
-                		&& Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType())
+                        && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType())
                                 .getCategory()
                         && portlet.getChartData().getIsFiltered()) {
                     
-                    filtersToReomove = new ArrayList<Filter>();
-                    for (Filter filter : portlet.getChartData().getFilters()) {
+                    List<InputParams> filtersToReomove  = new ArrayList<InputParams>();
+                    portlet.getChartData().getInputParams().forEach(widgetInputParam ->{
                         // overriding the portlet specific filter by selected global/dashboard filter
-                        if (!filter.getIsCommonFilter()
-                        		&& filter.equals(newFilter)) {
-                            filtersToReomove.add(filter);                        
+                        if (!widgetInputParam.getIsCommonInput()
+                                && widgetInputParam.equals(selectedParam)) {
+                            filtersToReomove.add(selectedParam);                        
                         }
-                    }
+                    });
                     
                     //Removing portlet specific filters, when selecting the same global filter
-                    if ( portlet.getChartData().getFilters().removeAll(filtersToReomove) ) {
-                        if(portlet.getChartData().getFilters().isEmpty()){
-                            portlet.getChartData().setIsFiltered(false);
-                        }            
+                    if ( portlet.getChartData().getInputParams().removeAll(filtersToReomove)) {
                         updateWidgets(portlet);
                     }
                 }
                 
-            }*/
+            }
         }
     }; 
     
@@ -792,23 +787,23 @@ public class DashboardController extends SelectorComposer<Window>{
         }
     };
     
-    private Row createStringFilterRowForQuery(Entry<String, Set<String>> inputParam )
+    private Row createQueryInputFilterRow(Entry<String, Set<String>> inputParam )
             throws HpccConnectionException,RemoteException {
         Row row = new Row();
-        InputParams param=new InputParams(inputParam.getKey());
+       
         //if selected any filter values,set Row selected as true
         /*if(filter.getValues() != null && !filter.getValues().isEmpty()){
             row.setAttribute(Constants.ROW_CHECKED, true);
         }else{
             row.setAttribute(Constants.ROW_CHECKED, false);
         }*/
-        if(appliedCommonFiltersForQuery== null ){
-        	appliedCommonFiltersForQuery = new HashSet<InputParams>();
+        if(appliedCommonInputParam== null ){
+        	appliedCommonInputParam = new HashMap<>();
         }
-        Sessions.getCurrent().setAttribute(Constants.COMMON_FILTERS, appliedCommonFiltersForQuery);
-        appliedCommonFiltersForQuery.add(param);
+        Sessions.getCurrent().setAttribute(Constants.COMMON_FILTERS, appliedCommonInputParam);
+        appliedCommonInputParam.put(inputParam.getKey(), null);
         
-        row.setAttribute(Constants.FILTER, inputParam.getKey());
+        row.setAttribute(Constants.INPUT_PARAM, inputParam);
         
         Div div = new Div();
         Label label = new Label(inputParam.getKey());
@@ -820,14 +815,17 @@ public class DashboardController extends SelectorComposer<Window>{
         button.addEventListener(Events.ON_CLICK, removeGlobalFilter);
         div.appendChild(button);
         
+        row.appendChild(div);
+        
         Anchorlayout anchorlayout = new Anchorlayout();
         anchorlayout.setHflex("1");
         
+        Hbox hbox = new Hbox();
+        hbox.appendChild(anchorlayout);
+        
         // Current implementation assumes, in a dashboard, 
         // there are no two widgets drawn such that their file names are same but belong to different HPCC Systems
-        //TODO: Handle same filenames in multiple HPCC Systems
-       
-       
+        
         Set<String> values = new LinkedHashSet<String>();
         values.addAll(inputParam.getValue());
        
@@ -842,50 +840,66 @@ public class DashboardController extends SelectorComposer<Window>{
             
             anchorchildren.appendChild(radio);
             anchorlayout.appendChild(anchorchildren);
-            //To display previously selected filter values
+           /* //To display previously selected filter values
             if(inputParam != null && inputParam.getValue() != null && inputParam.getValue().contains(value)){
             	radio.setChecked(true);
                 row.setAttribute(Constants.ROW_CHECKED, true);
-            }
-        }
-        
-        row.appendChild(div);
-        
-        Hbox hbox = new Hbox();
-        hbox.appendChild(anchorlayout);
-        
-       // if(showApplyButton) {
-            Button applyButton = new Button("Apply");
-            applyButton.setZclass("btn btn-xs");
-            applyButton.setSclass("btn-default");
-            applyButton.addEventListener(Events.ON_CLICK, new EventListener<Event>() {
+            }*/
+            radio.addEventListener(Events.ON_CLICK, new EventListener<Event>() {
 
                 @Override
                 public void onEvent(Event event) throws Exception {
-                    Button button = (Button) event.getTarget();
-                    Row row = (Row) button.getParent().getParent();
+                    Radio radio = (Radio) event.getTarget();
+                    Row row = (Row) radio.getParent().getParent().getParent().getParent();
 
                     row.setAttribute(Constants.ROW_CHECKED, true);
+                    appliedCommonInputParam.put(inputParam.getKey(), value);
                     
-                    Filter filter = (Filter) row.getAttribute(Constants.FILTER);
+                    applyInputParamToPortlets(inputParam.getKey(), value);
                     
-                    if(filter.getValues() != null) {
-                        updateStringFilterToPortlets(filter);
-                        button.setSclass("btn-default");
-                    } else {
-                        Clients.showNotification(Labels.getLabel("selectValueToApply"), "warning", row, "after_center", 2000);
-                    }
+                    button.setSclass("btn-default");
                 }
                 
             });
-            hbox.appendChild(applyButton);
-        //}
-                
+        }
+        
         row.appendChild(hbox);
+        
         return row;
     }    
     
     
+    protected void applyInputParamToPortlets(String paramName, String paramValue) {
+
+        for (Portlet portlet : dashboard.getPortletList()) {
+
+            if (!Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())
+                    || Constants.CATEGORY_TEXT_EDITOR == chartService
+                            .getCharts().get(portlet.getChartType())
+                            .getCategory()) {
+                continue;
+            }
+            ChartData chartData = DashboardUtil.getChartData(portlet);
+            Map<String, String> input = new HashMap<String, String>();
+            input.put(paramName, paramValue);
+            InputParams inputParameter = new InputParams();
+            inputParameter.setParams(input);
+            inputParameter.setIsCommonInput(true);
+
+            chartData.getInputParams().add(inputParameter);
+
+            try {
+                updateWidgets(portlet);
+            } catch (Exception e) {
+                LOG.error("Error Updating Charts", e);
+               Clients.showNotification("Unable to update charts", Clients.NOTIFICATION_TYPE_ERROR, this.getSelf(), Constants.POSITION_CENTER, 5000, true);
+            }
+        }
+    
+        
+    }
+
+
     /**
      * Creates a row of Common filters with a list of Distinct Values 
      * from the specified filter column from all datasets present in the Dashboard
@@ -1377,33 +1391,14 @@ public class DashboardController extends SelectorComposer<Window>{
      */
     private void updateStringFilterToPortlets(Filter filter)  {
         for (Portlet portlet : dashboard.getPortletList()) {
+            
             if(!Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())
-            		|| Constants.CATEGORY_TEXT_EDITOR ==  chartService.getCharts().get(portlet.getChartType())
+                    || Constants.CATEGORY_TEXT_EDITOR ==  chartService.getCharts().get(portlet.getChartType())
                             .getCategory() ){
                 continue;
             }
-            ChartData chartData = null;
-            //TODO enable when common filter enabled for tree
-            if(Constants.CATEGORY_TABLE == chartService.getCharts().get(portlet.getChartType())
-                    .getCategory()){
-                chartData = (TableData) portlet.getChartData();
-            }else if (Constants.CATEGORY_XY_CHART == chartService.getCharts().get(portlet.getChartType())
-                    .getCategory()    || Constants.CATEGORY_PIE == chartService.getCharts().get(portlet.getChartType())
-                            .getCategory() || Constants.CATEGORY_USGEO == chartService.getCharts().get(portlet.getChartType())
-                                    .getCategory()) {
-                chartData =  (XYChartData) portlet.getChartData();
-            } else if (Constants.CATEGORY_HIERARCHY ==  chartService.getCharts().get(portlet.getChartType())
-                    .getCategory()) {    
-                chartData = (TreeData) portlet.getChartData();
-            }else if(Constants.CATEGORY_CLUSTER ==  chartService.getCharts().get(portlet.getChartType())
-                    .getCategory()){
-            	 chartData = (ClusterData) portlet.getChartData();
-            }
-            else if(Constants.CATEGORY_GAUGE ==  chartService.getCharts().get(portlet.getChartType())
-                    .getCategory()){
-            	 chartData = (GaugeChartData) portlet.getChartData();
-            	
-            } 
+            ChartData chartData = DashboardUtil.getChartData(portlet);
+            
             if(filter.getValues().isEmpty()) {
                 //Removing Filter if no values selected
                 if(chartData.getIsFiltered()){
@@ -1590,47 +1585,67 @@ public class DashboardController extends SelectorComposer<Window>{
             
             //Showing Common filters panel
             if(dashboard.getHasCommonFilter()){
-                if(commonFields == null ) {
-                    commonFields  = new LinkedHashMap<String, Set<Field>>();
+                boolean isQueryUsed = false;
+                boolean isFileUsed = false;
+               
+                if(!dashboard.getPortletList().get(0).getChartData().getIsQuery()){
+                    //All charts used logical files
+                    isFileUsed = true;
+                }else{
+                    //All charts used queries
+                    isQueryUsed = true;
                 }
                 
-                // Retrieving missing columns to be displayed in list of common filter columns
-                Map<String,Set<Field>> newCommonFields = new LinkedHashMap<String, Set<Field>>();
-                Set<Field> fields;
-                for (Portlet portlet : dashboard.getPortletList()) {
-                    //Add a condition to validate  all portlets having same hpcc connection for applied filters for dashboard.
-                    if(portlet.getWidgetState().equals(Constants.STATE_LIVE_CHART)
-                    		&& Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType())
-                                    .getCategory()) {
-                    	if(!portlet.getChartData().getIsQuery()){
-                    		 LOG.debug("if-------------------here");
-                    		if(portlet.getChartData().getFields() == null){
-	                    		System.out.println("here3");
-	                    		getfileFields(portlet);
-	                    	}
-	                        for (Map.Entry<String, List<Field>> entry : portlet.getChartData().getFields().entrySet()) {
-	                            if(!commonFields.containsKey(entry.getKey())) {
-	                                fields = new LinkedHashSet<Field>();
-	                                fields.addAll(entry.getValue());
-	                                
-	                                commonFields.put(entry.getKey(), fields);
-	                                newCommonFields.put(entry.getKey(), fields);
-	                            }
-	                        }
-                    	}else{
-                    			getInputParams(portlet);
-                    		
-                    	}
+                if(isFileUsed) {
+                    if(commonFields == null){
+                        commonFields  = new LinkedHashMap<String, Set<Field>>();
                     }
-                }
-                if(!newCommonFields.isEmpty()) {
-                    constructFilterItem(newCommonFields);
+                 // Retrieving missing columns to be displayed in list of common filter columns
+                    Map<String,Set<Field>> newCommonFields = new LinkedHashMap<String, Set<Field>>();
+                    Set<Field> fields;
+                    for (Portlet portlet : dashboard.getPortletList()) {
+                        // Add a condition to validate all portlets having same
+                        // hpcc connection for applied filters for dashboard.
+                        if (portlet.getWidgetState().equals( Constants.STATE_LIVE_CHART)
+                                && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()) {
+                            if (portlet.getChartData().getFields() == null) {
+                                getfileFields(portlet);
+                            }
+                            for (Map.Entry<String, List<Field>> entry : portlet.getChartData().getFields().entrySet()) {
+                                if (!commonFields.containsKey(entry.getKey())) {
+                                    fields = new LinkedHashSet<Field>();
+                                    fields.addAll(entry.getValue());
+
+                                    commonFields.put(entry.getKey(), fields);
+                                    newCommonFields.put(entry.getKey(), fields);
+                                }
+                            }
+                        }
+                    }
+                    if(!newCommonFields.isEmpty()) {
+                        constructFilterItem(newCommonFields);
+                    }
+                }else if(isQueryUsed){
+                    if(commonInputParams == null){
+                        commonInputParams =  new LinkedHashMap<String, Map<String,Set<String>>>();
+                    }
+                    //this holds the fields for newly added charts, to avoid reconstructing listbox with filter columns for existing queries as well
+                    Map<String, Map<String,Set<String>>>  newInputParams = new LinkedHashMap<String, Map<String,Set<String>>>();
+                    for (Portlet portlet : dashboard.getPortletList()) {
+                        if (portlet.getWidgetState().equals( Constants.STATE_LIVE_CHART)
+                                && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()) {
+                            getInputParams(portlet,newInputParams);
+                        }
+                    }
+                    
+                    if(!newInputParams.isEmpty()) {
+                        constructFilterItemForQuery(newInputParams);
+                    }
                 }
                 
                 commonFiltersPanel.setVisible(true);
             } else {  
-                if (filterRows.getChildren() != null && !filterRows.getChildren().isEmpty()
-                            /*&& event.getData().equals(true)*/) {
+                if (filterRows.getChildren() != null && !filterRows.getChildren().isEmpty() ) {
                     removeGlobalFilters();
                 }
             }
@@ -1667,6 +1682,7 @@ public class DashboardController extends SelectorComposer<Window>{
      */
     private void removeGlobalFilters() {
         try {
+            //TODO:Add logic to remove query filter 
             for (Portlet portlet : dashboard.getPortletList()) {
                 if (Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())
                 		&& Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType())
@@ -1713,36 +1729,30 @@ public class DashboardController extends SelectorComposer<Window>{
 		}
 	}
     
-    protected void getInputParams(Portlet portlet) {
-    	// Getting input params  for each query
-    	  try {
-    		  LOG.debug("getInputParam-------------------here");
-		        Set<String> fields = null;
-		        LinkedHashSet<Field> inputParams=null;
-		        QuerySchema querySchema = null;
-		        for (String file : portlet.getChartData().getFiles()) {
-		            fields = new HashSet<String>();
-		                // Roxie Query - fetching fields/columns of Roxie queries
-		            HPCCQueryService hpccQueryService = (HPCCQueryService) SpringUtil
-		                        .getBean(Constants.HPCC_QUERY_SERVICE);
-					querySchema = hpccQueryService.getQuerySchema(file,
-							portlet.getChartData().getHpccConnection(),
-							portlet.getChartData().isGenericQuery(), 
-							portlet.getChartData().getInputParamQuery());
-					
-					 LOG.debug(querySchema.getInputParams());
-	                     if(!commonInputParams.containsKey(file)) {
-	                         commonInputParams.put(file,querySchema.getInputParams());
-	                       //  newCommonFields.put(entry.getKey(), fields);
-	                     }
-				
-		        }
-		        constructFilterItemForQuery();
-        } catch ( Exception e) {
-        	LOG.error(Constants.EXCEPTION,e);
-		}
-		
-	}
+    protected void getInputParams(Portlet portlet,Map<String, Map<String, Set<String>>> newInputParams) {
+        // Getting input params for each query
+        try {
+            QuerySchema querySchema = null;
+            for (String file : portlet.getChartData().getFiles()) {
+                // Roxie Query - fetching fields/columns of Roxie queries
+                HPCCQueryService hpccQueryService = (HPCCQueryService) SpringUtil.getBean(Constants.HPCC_QUERY_SERVICE);
+                querySchema = hpccQueryService.getQuerySchema(file, portlet
+                        .getChartData().getHpccConnection(), portlet
+                        .getChartData().isGenericQuery(), portlet
+                        .getChartData().getInputParamQuery());
+
+                LOG.debug(querySchema.getInputParams());
+                if (!commonInputParams.containsKey(file)) {
+                    commonInputParams.put(file, querySchema.getInputParams());
+                    newInputParams.put(file, querySchema.getInputParams());
+                }
+            }
+
+        } catch (Exception e) {
+            LOG.error(Constants.EXCEPTION, e);
+        }
+
+    }
 
 	/**
      *  When a widget is deleted

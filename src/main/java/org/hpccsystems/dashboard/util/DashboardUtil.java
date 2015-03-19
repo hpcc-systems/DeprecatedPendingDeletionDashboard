@@ -8,13 +8,22 @@ import java.util.Set;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hpccsystems.dashboard.chart.cluster.ClusterData;
+import org.hpccsystems.dashboard.chart.entity.ChartData;
 import org.hpccsystems.dashboard.chart.entity.Filter;
+import org.hpccsystems.dashboard.chart.entity.TableData;
+import org.hpccsystems.dashboard.chart.entity.XYChartData;
+import org.hpccsystems.dashboard.chart.gauge.GaugeChartData;
+import org.hpccsystems.dashboard.chart.tree.entity.TreeData;
 import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.entity.Dashboard;
+import org.hpccsystems.dashboard.entity.Portlet;
+import org.hpccsystems.dashboard.services.ChartService;
 import org.hpccsystems.dashboard.services.DashboardService;
 import org.hpccsystems.dashboard.services.UserCredential;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Sessions;
+import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zkplus.spring.SpringUtil;
 
@@ -104,5 +113,35 @@ public class DashboardUtil {
         
         Executions.sendRedirect(url.toString());
     
+    }
+
+
+    public static ChartData getChartData(Portlet portlet) {
+        
+        ChartService chartService = (ChartService) SpringUtil.getBean("chartService"); 
+        
+        ChartData chartData = null;
+        //TODO enable when common filter enabled for tree
+        if(Constants.CATEGORY_TABLE == chartService.getCharts().get(portlet.getChartType())
+                .getCategory()){
+            chartData = (TableData) portlet.getChartData();
+        }else if (Constants.CATEGORY_XY_CHART == chartService.getCharts().get(portlet.getChartType())
+                .getCategory()    || Constants.CATEGORY_PIE == chartService.getCharts().get(portlet.getChartType())
+                        .getCategory() || Constants.CATEGORY_USGEO == chartService.getCharts().get(portlet.getChartType())
+                                .getCategory()) {
+            chartData =  (XYChartData) portlet.getChartData();
+        } else if (Constants.CATEGORY_HIERARCHY ==  chartService.getCharts().get(portlet.getChartType())
+                .getCategory()) {    
+            chartData = (TreeData) portlet.getChartData();
+        }else if(Constants.CATEGORY_CLUSTER ==  chartService.getCharts().get(portlet.getChartType())
+                .getCategory()){
+             chartData = (ClusterData) portlet.getChartData();
+        }
+        else if(Constants.CATEGORY_GAUGE ==  chartService.getCharts().get(portlet.getChartType())
+                .getCategory()){
+             chartData = (GaugeChartData) portlet.getChartData();
+            
+        } 
+        return chartData;
     }
 }
