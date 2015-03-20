@@ -309,31 +309,12 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
     
     private Set<String> extractValues(XPath xPath, Node row) throws XPathExpressionException {
         Set<String> values = new HashSet<String>();
-        NodeList valueNodes =  (NodeList) xPath.evaluate("field_value", row, XPathConstants.NODESET);
         try {
-            StringBuilder xmlContent = new StringBuilder();
-            xmlContent.append("<field_value>");
-            xmlContent.append(valueNodes.item(0).getTextContent());
-            xmlContent.append("</field_value>");
-            
-            DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-            DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
-            InputSource inputSource = new InputSource();
-            inputSource.setCharacterStream(new StringReader(xmlContent.toString()));
-            Document document = dBuilder.parse(inputSource);
-         
-            document.getDocumentElement().normalize();
-            
-            NodeList nList = document.getElementsByTagName("row");
-         
-            for (int temp = 0; temp < nList.getLength(); temp++) {
-                Node nNode = nList.item(temp);
-                if (nNode.getNodeType() == Node.ELEMENT_NODE) {
-                    Element eElement = (Element) nNode;
-                    values.add(eElement.getElementsByTagName("value").item(0).getTextContent());
-                }
+            NodeList valueNodes =  (NodeList) xPath.evaluate("field_value/Row/value", row, XPathConstants.NODESET);     
+            for (int i = 0; i < valueNodes.getLength(); i++) {
+                values.add(valueNodes.item(i).getTextContent());
             }
-        } catch (ParserConfigurationException | SAXException | IOException e) {
+        } catch (XPathExpressionException e) {
             LOG.error(Constants.EXCEPTION,e);
         }
         return values;
@@ -889,11 +870,6 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
                 Attribute xColumnName = chartData.getAttribute();
                     lstNmElmntLst = fstElmnt.getElementsByTagName(xColumnName.getColumn());
                     lstNmElmnt = (Element) lstNmElmntLst.item(0);
-                  //workaround as the column name and output tag names differ-case changed
-                    if(lstNmElmnt==null){
-                        lstNmElmntLst = fstElmnt.getElementsByTagName(xColumnName.getColumn().toLowerCase());
-                        lstNmElmnt = (Element) lstNmElmntLst.item(0);
-                    }
                     if (lstNmElmnt != null) {
                         valueList.add(lstNmElmnt.getTextContent());
                     } else {
@@ -905,11 +881,6 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
                 for (Measure measure : chartData.getMeasures()) {
                     lstNmElmntLst = fstElmnt.getElementsByTagName(measure.getColumn());
                     lstNmElmnt = (Element) lstNmElmntLst.item(0);
-                  //workaround as the column name and output tag names differ-case changed
-                    if(lstNmElmnt==null){
-                        lstNmElmntLst = fstElmnt.getElementsByTagName(measure.getColumn().toLowerCase());
-                        lstNmElmnt = (Element) lstNmElmntLst.item(0);
-                    }
                     if (lstNmElmnt != null) {
                         valueList.add(new BigDecimal(lstNmElmnt.getTextContent()));
                     } else {
@@ -1474,13 +1445,7 @@ return resultDataMap;
                              lstNmElmntLst = fstElmnt.getElementsByTagName(data.getColumn());
                              lstNmElmnt = (Element) lstNmElmntLst.item(0);
 
-                           //workaround as the column name and output tag names differ-case changed
-                             if(lstNmElmnt==null){
-                                 lstNmElmntLst = fstElmnt.getElementsByTagName(data.getColumn().toLowerCase());
-                                 lstNmElmnt = (Element) lstNmElmntLst.item(0);
-                             }
-
-                             if (lstNmElmnt != null) {
+                            if (lstNmElmnt != null) {
                                  // Rounding off Numeric values
                                  if (tableData.getFields() != null && DashboardUtil.checkRealValue(tableData
                                          .getFields()
