@@ -4,7 +4,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
+import org.hpccsystems.dashboard.chart.entity.InputParam;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
@@ -22,7 +22,7 @@ public class ChartData {
     private Set<Filter> filters;
     private Set<Join> joins;
     private boolean isQuery;
-    private List<InputParams> inputParams;
+    private List<InputParam> inputParams;
     
 	/**
      * Checks the query, whether it has'GENERIC' key.
@@ -114,11 +114,11 @@ public class ChartData {
 
     
     @XmlElement
-    public List<InputParams> getInputParams() {
+    public List<InputParam> getInputParams() {
         return inputParams;
     }
 
-    public void setInputParams(List<InputParams> inputParams) {
+    public void setInputParams(List<InputParam> inputParams) {
         this.inputParams = inputParams;
     }
 

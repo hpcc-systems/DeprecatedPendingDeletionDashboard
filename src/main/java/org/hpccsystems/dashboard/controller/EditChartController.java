@@ -248,6 +248,8 @@ public class EditChartController extends SelectorComposer<Component> {
                 
                 // Constructing Roxie query input parameters
                 if (chartData.getIsQuery()) {
+                    LOG.debug("here -->");
+                    LOG.debug(filterHolder);
                     Events.sendEvent(Constants.CREATE_PARAM_EVENT, filterHolder, null);
                 }
                 

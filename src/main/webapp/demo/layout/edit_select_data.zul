@@ -19,7 +19,7 @@
 				</hbox>
 			
 				<div zclass="form-actions">
-					<button id="proceedBtn" label="${labels.fetchFields}" style="margin-top:10px;"	zclass="btn btn-primary" width="135px" />
+					<button id="proceedBtn" style="margin-top:10px;"	zclass="btn btn-primary" width="135px" />
 				</div>
 			</vbox>
 			

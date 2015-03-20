@@ -2,7 +2,6 @@ package org.hpccsystems.dashboard.services.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.StringReader;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URI;
@@ -46,6 +45,7 @@ import org.hpccsystems.dashboard.chart.entity.Attribute;
 import org.hpccsystems.dashboard.chart.entity.ChartData;
 import org.hpccsystems.dashboard.chart.entity.Field;
 import org.hpccsystems.dashboard.chart.entity.HpccConnection;
+import org.hpccsystems.dashboard.chart.entity.InputParam;
 import org.hpccsystems.dashboard.chart.entity.Measure;
 import org.hpccsystems.dashboard.chart.entity.ScoredSearchData;
 import org.hpccsystems.dashboard.chart.entity.TableData;
@@ -66,7 +66,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.xml.sax.InputSource;
 import org.xml.sax.SAXException;
 
 public class HPCCQueryServiceImpl implements HPCCQueryService {
@@ -248,19 +247,16 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
             }
             
             final InputStream respone = urlConnection.getInputStream();
-            LOG.debug("respone ->" + respone);
             if(respone != null) {
                 final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
                 final DocumentBuilder db = dbf.newDocumentBuilder();
                 final Document doc = db.parse(respone);
-                LOG.debug("doc ->" + respone);
                 XPathFactory xPathFactory = XPathFactory.newInstance();
                 XPath xPath = xPathFactory.newXPath();
                 
                 NodeList rows = (NodeList) xPath.evaluate("/" + inputParamQuery + "Response/Result/Dataset/Row", doc, XPathConstants.NODESET);
                 
                 
-                LOG.debug("rows ->" + respone);
                 String param_type;
                 String field_name;
                 String field_type;
@@ -307,7 +303,7 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
         return querySchema;
     }
     
-    private Set<String> extractValues(XPath xPath, Node row) throws XPathExpressionException {
+    private Set<String> extractValues(XPath xPath, Node row){
         Set<String> values = new HashSet<String>();
         try {
             NodeList valueNodes =  (NodeList) xPath.evaluate("field_value/Row/value", row, XPathConstants.NODESET);     
@@ -478,17 +474,15 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
              urlBuilder.append("&").append(requestbuilder);
              urlBuilder.append(GROUPBY_COLUMN).append("=").append(chartData.getGroupAttribute().getColumn());
          }
-         LOG.debug(chartData.getInputParams());
-         if (chartData.getInputParams() != null && chartData.getInputParams().size() == 1) {
-             Iterator<Entry<String, String>> iterator = chartData.getInputParams().iterator().next().getParams().entrySet().iterator();
+         if (chartData.getInputParams() != null ) {
+             Iterator<InputParam> iterator = chartData.getInputParams().iterator();
              urlBuilder.append("&");
              while (iterator.hasNext()) {
-                 Entry<String, String> entry = (Entry<String, String>) iterator.next();
-                 urlBuilder.append(requestbuilder).append(entry.getKey()).append("=").append(URLEncoder.encode(entry.getValue(),Constants.CHAR_CODE));
-
-                 if (iterator.hasNext()) {
-                     urlBuilder.append("&");
-                 }
+                 InputParam inputParam = iterator.next();
+                     urlBuilder.append(requestbuilder).append(inputParam.getName()).append("=").append(URLEncoder.encode(inputParam.getValue(),Constants.CHAR_CODE));
+                     if (iterator.hasNext()) {
+                         urlBuilder.append("&");
+                     }
              }
          }
          
@@ -624,11 +618,11 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
         
          Map<String,Map<String,List<Object>>> groupedRowData = new LinkedHashMap<String, Map<String,List<Object>>>();
             // Has Input parameter set
-            if (chartData.getInputParams() != null && chartData.getInputParams().size() == 1) {
-                Iterator<Entry<String, String>> iterator = chartData.getInputParams().iterator().next().getParams().entrySet().iterator();
+            if (chartData.getInputParams() != null ) {
+                Iterator<InputParam> iterator = chartData.getInputParams().iterator();
                 while (iterator.hasNext()) {
-                    Entry<String, String> entry = (Entry<String, String>) iterator.next();
-                    urlBuilder.append(entry.getKey()).append("=").append(URLEncoder.encode(entry.getValue(),Constants.CHAR_CODE));
+                    InputParam param =  iterator.next();
+                    urlBuilder.append(param.getName()).append("=").append(URLEncoder.encode(param.getValue(),Constants.CHAR_CODE));
 
                     if (iterator.hasNext()) {
                         urlBuilder.append("&");
@@ -870,6 +864,11 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
                 Attribute xColumnName = chartData.getAttribute();
                     lstNmElmntLst = fstElmnt.getElementsByTagName(xColumnName.getColumn());
                     lstNmElmnt = (Element) lstNmElmntLst.item(0);
+                  //workaround as the column name and output tag names differ-case changed
+                    if(lstNmElmnt==null){
+                        lstNmElmntLst = fstElmnt.getElementsByTagName(xColumnName.getColumn().toLowerCase());
+                        lstNmElmnt = (Element) lstNmElmntLst.item(0);
+                    }
                     if (lstNmElmnt != null) {
                         valueList.add(lstNmElmnt.getTextContent());
                     } else {
@@ -881,6 +880,11 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
                 for (Measure measure : chartData.getMeasures()) {
                     lstNmElmntLst = fstElmnt.getElementsByTagName(measure.getColumn());
                     lstNmElmnt = (Element) lstNmElmntLst.item(0);
+                  //workaround as the column name and output tag names differ-case changed
+                    if(lstNmElmnt==null){
+                        lstNmElmntLst = fstElmnt.getElementsByTagName(measure.getColumn().toLowerCase());
+                        lstNmElmnt = (Element) lstNmElmntLst.item(0);
+                    }
                     if (lstNmElmnt != null) {
                         valueList.add(new BigDecimal(lstNmElmnt.getTextContent()));
                     } else {
@@ -914,13 +918,13 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
         // Don't have any input parameters or has only one Input parameter set
         if (chartData.getInputParams() != null && chartData.getInputParams().size() == 1) {         
             
-            Iterator<Entry<String, String>> iterator = chartData.getInputParams().iterator().next().getParams().entrySet().iterator();
+            Iterator<InputParam> iterator = chartData.getInputParams().iterator();
             while (iterator.hasNext()) {
-                Entry<String, String> entry = (Entry<String, String>) iterator.next();
-                if(entry.getValue() != null && !entry.getValue().isEmpty()){
-                    selectedInputParams.add(entry.getKey());
+                InputParam param = iterator.next();
+                if(param.getValue() != null){
+                    selectedInputParams.add(param.getName());
                 }
-                urlBuilder.append(entry.getKey()).append("=").append(URLEncoder.encode(entry.getValue(),Constants.CHAR_CODE));
+                urlBuilder.append(param.getName()).append("=").append(URLEncoder.encode(param.getValue(),Constants.CHAR_CODE));
 
                 if (iterator.hasNext()) {
                     urlBuilder.append("&");
@@ -1203,10 +1207,10 @@ return resultDataMap;
                 
     
                 if (tableData.getInputParams() != null) {
-                    Iterator<Entry<String, String>> iterator = tableData.getInputParams().iterator().next().getParams().entrySet().iterator();
+                    Iterator<InputParam> iterator = tableData.getInputParams().iterator();
                     while (iterator.hasNext()) {
-                        Entry<String, String> entry = (Entry<String, String>) iterator.next();
-                        urlBuilder.append(entry.getKey()).append("=").append(URLEncoder.encode(entry.getValue(),Constants.CHAR_CODE));               
+                        InputParam param = iterator.next();
+                        urlBuilder.append(param.getName()).append("=").append(URLEncoder.encode(param.getValue(),Constants.CHAR_CODE));               
     
                         if (iterator.hasNext()) {
                             urlBuilder.append("&");
@@ -1362,10 +1366,10 @@ return resultDataMap;
          
 
          if (tableData.getInputParams() != null) {
-             Iterator<Entry<String, String>> iterator = tableData.getInputParams().iterator().next().getParams().entrySet().iterator();
+             Iterator<InputParam> iterator = tableData.getInputParams().iterator();
              while (iterator.hasNext()) {
-                 Entry<String, String> entry = (Entry<String, String>) iterator.next();
-                 urlBuilder.append(requestbuilder).append(entry.getKey()).append("=").append(URLEncoder.encode(entry.getValue(),Constants.CHAR_CODE));               
+                 InputParam param = iterator.next();
+                 urlBuilder.append(requestbuilder).append(param.getName()).append("=").append(URLEncoder.encode(param.getValue(),Constants.CHAR_CODE));               
 
                  if (iterator.hasNext()) {
                      urlBuilder.append("&");
@@ -1445,7 +1449,13 @@ return resultDataMap;
                              lstNmElmntLst = fstElmnt.getElementsByTagName(data.getColumn());
                              lstNmElmnt = (Element) lstNmElmntLst.item(0);
 
-                            if (lstNmElmnt != null) {
+                           //workaround as the column name and output tag names differ-case changed
+                             if(lstNmElmnt==null){
+                                 lstNmElmntLst = fstElmnt.getElementsByTagName(data.getColumn().toLowerCase());
+                                 lstNmElmnt = (Element) lstNmElmntLst.item(0);
+                             }
+
+                             if (lstNmElmnt != null) {
                                  // Rounding off Numeric values
                                  if (tableData.getFields() != null && DashboardUtil.checkRealValue(tableData
                                          .getFields()

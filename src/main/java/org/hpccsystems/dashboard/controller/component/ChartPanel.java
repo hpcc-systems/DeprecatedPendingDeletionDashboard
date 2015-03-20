@@ -23,7 +23,7 @@ import org.hpccsystems.dashboard.chart.cluster.ClusterData;
 import org.hpccsystems.dashboard.chart.entity.Attribute;
 import org.hpccsystems.dashboard.chart.entity.ChartData;
 import org.hpccsystems.dashboard.chart.entity.Field;
-import org.hpccsystems.dashboard.chart.entity.InputParams;
+import org.hpccsystems.dashboard.chart.entity.InputParam;
 import org.hpccsystems.dashboard.chart.entity.RelevantData;
 import org.hpccsystems.dashboard.chart.entity.ScoredSearchData;
 import org.hpccsystems.dashboard.chart.entity.TableData;
@@ -204,11 +204,6 @@ public class ChartPanel extends Panel {
             }else{
                 Map<String,String> inputs = new HashMap<String, String>();
                 
-                //multipleValues object was created for translating multiple value selection into List of Maps
-                // This is currently not being used
-                List<Object> multipleValues = new ArrayList<Object>();
-                
-                String multipleValueParamName = null;
                 
                for ( Component comp : inputListbox.getChildren()) {
                     if(comp instanceof InputListitem) {
@@ -217,24 +212,12 @@ public class ChartPanel extends Panel {
                     }
                 }
                 
-                InputParams inputParams;
-                List<InputParams> paramsList = new ArrayList<InputParams>();
-                if(multipleValues.isEmpty()) {
-                    inputParams = new InputParams(inputs);
-                    paramsList.add(inputParams);
-                } else {
-                    Map<String,String> multiInputs;
-                    for (Object object : multipleValues) {
-                        multiInputs = new HashMap<String, String>();
-                        multiInputs.putAll(inputs);
-                        multiInputs.put(multipleValueParamName, object.toString());
-                        inputParams = new InputParams(multiInputs);
-                        paramsList.add(inputParams);
-                    }
-                }
-                
-                portlet.getChartData().setInputParams(paramsList);
-                
+               InputParam inputparam = null;
+               List<InputParam> paramsList = new ArrayList<InputParam>();
+               for(Entry<String, String> entry : inputs.entrySet()){
+                   inputparam = new InputParam(entry.getKey(),entry.getValue());
+                   paramsList.add(inputparam);
+               }
                 portlet.getChartData().setInputParams(paramsList);
             }
 
@@ -269,7 +252,6 @@ public class ChartPanel extends Panel {
         this.imageContainer.setPack("center");
         
         this.portlet = argPortlet;
-        LOG.debug("chart tuype 2 ------>"+portlet.getChartType());
         this.setBorder("normal");
         this.setWidth("99%");
         this.setStyle("margin-bottom:5px");
@@ -440,26 +422,29 @@ public class ChartPanel extends Panel {
                     constructRelevantInputParam(portlet.getChartData());
                     
                 } else { 
+                  //get input param names
+                    Set<String> inputsName = new HashSet<>();
+                    portlet.getChartData().getInputParams().stream().forEach(inputparam -> {
+                        inputsName.add(inputparam.getName());
+                    });
                     paramValues = hpccQueryService.getInputParamDistinctValues(
                             portlet.getChartData().getFiles().iterator().next(),
-                            portlet.getChartData().getInputParams().iterator().next().getParams().keySet(),
+                            inputsName,
                             portlet.getChartData().getHpccConnection(), portlet.getChartData().isGenericQuery(),
                             portlet.getChartData().getInputParamQuery());
                     
                     if(paramValues != null) {
-                        for (InputParams inputParam : portlet.getChartData().getInputParams()) {
-                            for (Entry<String,String> param : inputParam.getParams().entrySet() ) {
+                        for (InputParam inputParam : portlet.getChartData().getInputParams()) {
                                 
-                                LOG.debug("param.getKey(): "+param.getKey());
-                                LOG.debug("paramValues.get(param.getKey()): "+paramValues.get(param.getKey()));
+                                LOG.debug("param.getKey(): "+inputParam.getName());
+                                LOG.debug("paramValues.get(inputParam.getName()): "+paramValues.get(inputParam.getName()));
                                 LOG.debug("String.valueOf(portlet.getId() + \"_board_\"): "+String.valueOf(portlet.getId() + "_board_"));
                                 
-                                InputListitem listitem = new InputListitem(param.getKey(), paramValues.get(param.getKey()), String.valueOf(portlet.getId() + "_board_"));
-                                if(param.getValue() != null  && !param.getValue().isEmpty()) {
-                                    listitem.setInputValue(param.getValue());
+                                InputListitem listitem = new InputListitem(inputParam.getName(), paramValues.get(inputParam.getName()), String.valueOf(portlet.getId() + "_board_"));
+                                if(inputParam.getValue() != null) {
+                                    listitem.setInputValue(inputParam.getValue());
                                 }
                                 inputListbox.appendChild(listitem);
-                            }
                         }
                     }
                 }

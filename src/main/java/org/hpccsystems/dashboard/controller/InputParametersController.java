@@ -2,7 +2,7 @@ package org.hpccsystems.dashboard.controller;
 
 import java.util.ArrayList;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -11,7 +11,7 @@ import java.util.Set;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.chart.entity.ChartData;
-import org.hpccsystems.dashboard.chart.entity.InputParams;
+import org.hpccsystems.dashboard.chart.entity.InputParam;
 import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.controller.component.InputListitem;
 import org.hpccsystems.dashboard.entity.Portlet;
@@ -82,7 +82,7 @@ public class InputParametersController extends SelectorComposer<Panel>{
         parent = (Component) Executions.getCurrent().getAttribute(Constants.PARENT);
         
         //Event listener to trigger params creation
-        this.getSelf().getParent().addEventListener("onCreateParams", addParamsListener);
+        this.getSelf().getParent().addEventListener(Constants.CREATE_PARAM_EVENT, addParamsListener);
     }
 
     /**Gets input parameters for Roxie query
@@ -111,39 +111,71 @@ public class InputParametersController extends SelectorComposer<Panel>{
 				
 			}
 				
-
-			Map<String, String> parameterMap = new LinkedHashMap<String, String>();
+			 InputParam inputParam = null;
+			 List<InputParam> paramsList = new ArrayList<InputParam>();
 			for (String param : inputParameter) {
 				InputListitem listitem = new InputListitem(param,
 						paramValues.get(param), String.valueOf(portlet.getId()));
 				inputParams.appendChild(listitem);
-				parameterMap.put(param, "");
+				 inputParam = new InputParam(param);
+                 paramsList.add(inputParam);
 			}
-
-			InputParams inputParameters = new InputParams(parameterMap);
-			List<InputParams> paramsList = new ArrayList<InputParams>();
-			paramsList.add(inputParameters);
 
 			chartData.setInputParams(paramsList);
 
 		}else{//Retrieving from DB
-           paramValues = hpccQueryService.getInputParamDistinctValues(
-                    chartData.getFiles().iterator().next(),
-                    chartData.getInputParams().iterator().next().getParams().keySet(),
-                    chartData.getHpccConnection(),chartData.isGenericQuery(),
-                    chartData.getInputParamQuery());
+		    
+		  //get input param names
+            Set<String> inputsName = new HashSet<>();
+            chartData.getInputParams().stream().forEach(inputparam -> {
+                inputsName.add(inputparam.getName());
+            });
+            if(chartData.isGenericQuery()){
+                QuerySchema querySchema = hpccQueryService.getQuerySchema(chartData.getFiles().iterator().next(),
+                        chartData.getHpccConnection(), chartData.isGenericQuery(),
+                        chartData.getInputParamQuery());
+                inputParameter = querySchema.getInputParams().keySet();
+                paramValues = querySchema.getInputParams();
+            }else{
+                inputParameter = hpccQueryService.getInputParameters(chartData
+                        .getFiles().iterator().next(),chartData.getHpccConnection(),
+                        chartData.isGenericQuery(),chartData.getInputParamQuery());
+                
+                paramValues = hpccQueryService.getInputParamDistinctValues(
+                        chartData.getFiles().iterator().next(), inputParameter,
+                        chartData.getHpccConnection(),chartData.isGenericQuery(),
+                        chartData.getInputParamQuery());
+                
+            }
             
-            for (InputParams inputParam : chartData.getInputParams()) {
-                for (Entry<String,String> param : inputParam.getParams().entrySet() ) {
-                    InputListitem listitem = new InputListitem(param.getKey(), 
-                            paramValues.get(param.getKey()), String.valueOf(portlet.getId()));
-                    if(param.getValue() != null 
-                            && !param.getValue().isEmpty()) {
-                        listitem.setInputValue(param.getValue());
+            
+            InputParam inputParam = null;
+            InputParam tempInput = null;
+            InputParam persistedInput = null;
+           for (String param : inputParameter) {
+               InputListitem listitem = new InputListitem(param,
+                       paramValues.get(param), String.valueOf(portlet.getId()));
+               tempInput= new InputParam(param);
+               if(chartData.getInputParams().contains(tempInput)){
+                   persistedInput = chartData.getInputParams().get(chartData.getInputParams().indexOf(tempInput));
+                   if(persistedInput.getValue() != null ) {
+                       listitem.setInputValue(persistedInput.getValue());
+                   }
+               }else{
+                   inputParam = new InputParam(param);
+               }
+               inputParams.appendChild(listitem);
+               
+           }
+
+            /*for (InputParam inputParam : chartData.getInputParams()) {
+                    InputListitem listitem = new InputListitem(inputParam.getName(), 
+                            paramValues.get(inputParam.getName()), String.valueOf(portlet.getId()));
+                    if(inputParam.getValue() != null ) {
+                        listitem.setInputValue(inputParam.getValue());
                     }
                     inputParams.appendChild(listitem);
-                }
-            }
+            }*/
             
         }
         
@@ -151,13 +183,8 @@ public class InputParametersController extends SelectorComposer<Panel>{
     
     @Listen("onClick=#saveParams")
     public void onSaveParameter(Event event){
+        
         Map<String,String> inputs = new HashMap<String, String>();
-        
-        //multipleValues object was created for translating multiple value selection into List of Maps
-        // This is currently not being used
-        List<Object> multipleValues = new ArrayList<Object>();
-        
-        String multipleValueParamName = null;
         
         for ( Component comp : inputParams.getChildren()) {
             if(comp instanceof InputListitem) {
@@ -166,21 +193,12 @@ public class InputParametersController extends SelectorComposer<Panel>{
             }
         }
         
-        InputParams inputParameters;
-        List<InputParams> paramsList = new ArrayList<InputParams>();
-        if(multipleValues.isEmpty()) {
-            inputParameters = new InputParams(inputs);
-            paramsList.add(inputParameters);
-        } else {
-            Map<String,String> multiInputs;
-            for (Object object : multipleValues) {
-                multiInputs = new HashMap<String, String>();
-                multiInputs.putAll(inputs);
-                multiInputs.put(multipleValueParamName, object.toString());
-                inputParameters = new InputParams(multiInputs);
-                paramsList.add(inputParameters);
-            }
-        }
+        InputParam inputparam = null;
+        List<InputParam> paramsList = new ArrayList<InputParam>();
+        for(Entry<String, String> entry : inputs.entrySet()){
+            inputparam = new InputParam(entry.getKey(),entry.getValue());
+            paramsList.add(inputparam);
+        }       
         
         chartData.setInputParams(paramsList);
         

@@ -30,7 +30,7 @@ import org.hpccsystems.dashboard.chart.cluster.ClusterNode;
 import org.hpccsystems.dashboard.chart.cluster.Relation;
 import org.hpccsystems.dashboard.chart.entity.Attribute;
 import org.hpccsystems.dashboard.chart.entity.Filter;
-import org.hpccsystems.dashboard.chart.entity.InputParams;
+import org.hpccsystems.dashboard.chart.entity.InputParam;
 import org.hpccsystems.dashboard.chart.entity.Measure;
 import org.hpccsystems.dashboard.chart.entity.TableData;
 import org.hpccsystems.dashboard.chart.entity.XYChartData;
@@ -260,35 +260,7 @@ public class ChartRenderer {
                 //Adding X Column Name - Only for time series chart
                 row.add(new JsonPrimitive(chartData.getAttribute().getColumn()));
             }
-            
-            if(chartData.getIsQuery() 
-                    && chartData.getInputParams() != null && chartData.getInputParams().size() >1){
-                
-                Map<String, Set<Object>> paramValueMap = new HashMap<String, Set<Object>>();
-                yColumnNames = new ArrayList<YColumn>();
-                InputParams paramGroup = chartData.getInputParams().iterator().next();
-                Set<Object> paramvalueSet = null;
-                for(Entry<String, String> entry : paramGroup.getParams().entrySet()){
-                    paramvalueSet = new HashSet<Object>();
-                    paramValueMap.put(entry.getKey(), paramvalueSet);
-                }
-                Iterator<InputParams> paramIterator = chartData.getInputParams().iterator();
-                while(paramIterator.hasNext()){
-                    
-                    for(Entry<String, String> entry :paramIterator.next().getParams().entrySet()){
-                        paramValueMap.get(entry.getKey()).add(entry.getValue());
-                    }
-                }
-                for (Entry<String, Set<Object>> entry  : paramValueMap.entrySet()) {
-                    if(entry.getValue().size() >1){
-                        for(Object val :entry.getValue()){
-                            row.add(new JsonPrimitive(val.toString()));
-                            yColumnNames.add(new YColumn(val.toString()));
-                        }
-                    }
-                }
-                
-            } else if (chartData.isGrouped()) {
+            if (chartData.isGrouped()) {
                 yColumnNames = new ArrayList<YColumn>();
                 for (String colName : chartData.getGroup().getyColumnNames()) {
                     yColumnNames.add(new YColumn(colName));

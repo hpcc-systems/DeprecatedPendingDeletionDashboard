@@ -9,6 +9,7 @@ import java.util.Set;
 import org.hpccsystems.dashboard.chart.entity.HpccConnection;
 import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.services.ChartService;
+import org.zkoss.util.logging.Log;
 import org.zkoss.zkplus.spring.SpringUtil;
 
 /**
@@ -225,6 +226,11 @@ public class Dashboard {
         if (hasNoLiveChart || (hasRoxieQuery&&hasLogicalFile)) {
             return null;
         } else if (clusters.size() == 1 && hostIps.size() == 1) {
+            if(hasRoxieQuery){
+                hpccConnection.setDatasource(Constants.QUERY);
+            }else if(hasLogicalFile){
+                hpccConnection.setDatasource(Constants.LOGICAL_FILE);
+            }
             return hpccConnection;
         }
 

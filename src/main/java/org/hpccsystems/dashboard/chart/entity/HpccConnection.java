@@ -136,6 +136,7 @@ public class HpccConnection {
         .append(password).append(", isSSL=").append(isHttps)
         .append(", allowInvalidCerts=").append(allowInvalidCerts)
         .append(", roxiePort=").append(wsEclPort)
+        .append(",datasource=").append(datasource)
         .append("]");
         return builder.toString();
     }
