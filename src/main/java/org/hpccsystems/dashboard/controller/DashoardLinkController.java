@@ -5,6 +5,7 @@ import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.services.AuthenticationService;
+import org.hpccsystems.dashboard.util.DashboardUtil;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
@@ -33,23 +34,15 @@ public class DashoardLinkController extends SelectorComposer<Window>{
         if(LOG.isDebugEnabled()){
             LOG.debug("Generating link for dashboard: "+dashboard);
         }
+        
         StringBuilder link = new StringBuilder();
         link.append(Constants.HTTP)
                 .append(Executions.getCurrent().getServerName())
                 .append(":")
                 .append(Executions.getCurrent().getServerPort())
                 .append(Executions.getCurrent().getContextPath())
-                .append("/api/share_dashboard/?")
-                .append(Constants.SOURCE)
-                .append("=")
-                .append(authenticationService.getUserCredential()
-                        .getApplicationId()).append("&")
-                .append(Constants.DB_DASHBOARD_ID).append("=")
-                .append(dashboard.getDashboardId()).append("&")
-                .append(Constants.ROLE_EDIT).append("=")
-                .append(Constants.FALSE).append("&")
-                .append(Constants.DASHBOARD_SHARE).append("=")
-                .append(Constants.TRUE);
+                .append("/api/share/")
+                .append(DashboardUtil.createShareParam(dashboard.getDashboardId().toString()));
         linkTextbox.setValue(link.toString());
        
     }

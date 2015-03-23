@@ -30,7 +30,6 @@ import org.hpccsystems.dashboard.services.ConditionalGroupService;
 import org.hpccsystems.dashboard.services.DashboardService;
 import org.hpccsystems.dashboard.services.LDAPAuthenticationService;
 import org.hpccsystems.dashboard.services.UserCredential;
-import org.hpccsystems.dashboard.util.DashboardUtil;
 import org.zkoss.util.Locales;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.web.Attributes;
@@ -94,14 +93,12 @@ public class LoginController extends SelectorComposer<Component> {
     @WireVariable
     private ConditionalGroupService  conditionalGroupService; 
         
-    Boolean isDashboardShareURI = null;
     Map<String, String[]> args = null;
     
     @Override
     public void doAfterCompose(final Component comp) throws Exception {
         super.doAfterCompose(comp);
         args = Executions.getCurrent().getParameterMap();
-        isDashboardShareURI =Boolean.valueOf(Executions.getCurrent().getParameter(Constants.DASHBOARD_SHARE));
         //setting default language as English
         Session session = Sessions.getCurrent();
         String lang = (String)session.getAttribute("lang");
@@ -113,9 +110,10 @@ public class LoginController extends SelectorComposer<Component> {
             listItemEnglish.setSelected(true);
             listItemEnglish.setValue("English");
         }
+        
         //Redirecting if the user is already logged in.
         if(!authenticationService.getUserCredential().isAnonymous()) {
-            Executions.sendRedirect("/demo/");
+            redirectHome();
             return;
         }
         
@@ -130,6 +128,21 @@ public class LoginController extends SelectorComposer<Component> {
         } catch(Exception ex) {
             Clients.showNotification(Labels.getLabel("unableToRetrieveApplications"), false);
             LOG.error(Constants.EXCEPTION, ex);
+        }
+    }
+
+
+    private void redirectHome() {
+        Session session = Sessions.getCurrent();
+        if(LOG.isDebugEnabled()) {
+            LOG.debug("Request path - " + session.getAttribute(Constants.REQUEST_PATH));
+        }
+        if(session.getAttribute(Constants.REQUEST_PATH) != null) {
+            //When request has a predefined path
+            Executions.sendRedirect(session.getAttribute(Constants.REQUEST_PATH).toString());
+            session.removeAttribute(Constants.REQUEST_PATH);
+        } else {
+            Executions.sendRedirect("/demo/");
         }
     }
     
@@ -213,12 +226,7 @@ public class LoginController extends SelectorComposer<Component> {
         }
 
         LOG.debug("Loged in. sending redirect...");
-        if(isDashboardShareURI != null && isDashboardShareURI){
-            DashboardUtil.redirectDashboardURI(args);
-        }else{
-            Executions.sendRedirect("/demo/");
-        }
-        
+        redirectHome();
     }
 
     /**Checks for dashboard application create access

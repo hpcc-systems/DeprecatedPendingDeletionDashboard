@@ -68,6 +68,9 @@ public class Constants {
     public static final String WINDOWS = "Windows";
     public static final String JAVA_TEMP_DIR = "java.io.tmpdir";
     
+    public static final String REQUEST_PATH = "requestPath";
+    public static final String PARAM_SHARE = "share";
+    
     public static final String CIRCUIT_APPLICATION_ID = "circuit";
     public static final String CIRCUIT_ROLE_CONFIG_CHART = "configureChart";
     public static final String CIRCUIT_ROLE_VIEW_CHART = "viewChart";

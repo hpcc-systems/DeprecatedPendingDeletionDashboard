@@ -42,7 +42,6 @@ import org.zkoss.zk.ui.select.annotation.VariableResolver;
 import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
-import org.zkoss.zkplus.spring.SpringUtil;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.Combobox;
@@ -317,7 +316,11 @@ public class SelectDataController extends SelectorComposer<Component>{
         
         
         if(clusters.getSelectedItem() != null) {
-            hpccConnection.setClusterType(String.valueOf(clusters.getSelectedItem().getValue()));
+            String cluster = clusters.getSelectedItem().getValue();
+            if(LOG.isDebugEnabled()) {
+                LOG.debug("clusters.getSelectedItem().getValue() -> " + cluster);
+            }
+            hpccConnection.setClusterType(cluster);
         }
         
         chartData.setHpccConnection(hpccConnection);

@@ -39,7 +39,7 @@
 	</richlet>
 	<richlet-mapping>
 	    <richlet-name>ShareDashboard</richlet-name>
-	    <url-pattern>/api/share_dashboard/*</url-pattern>
+	    <url-pattern>/api/share/*</url-pattern>
 	</richlet-mapping>
 	<!-- API Richlets -->
 	
