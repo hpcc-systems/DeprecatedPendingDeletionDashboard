@@ -294,16 +294,15 @@ public class EditWidgetController extends SelectorComposer<Component> {
      */
     EventListener<Event> includeDetachListener = new EventListener<Event>() {
         public void onEvent(Event event) throws Exception {
-        	LOG.debug("EditWidgetController ...... Calling event includeDetachListener .............");
+        	
             if (event.getData() != null && event.getData().equals(Constants.EDIT_WINDOW_TYPE_DATA_SELECTION)) {
                 
 				if (chartData.getFiles().size() > 1 ) {
 					LOG.debug("chartData.getFiles().size() > 1: "+chartData.getFiles().size());
                     holderInclude.setSrc("layout/edit_join_data.zul");
                     return;
-                }
+                }				
 				
-				LOG.debug("INCLUDE VAL: "+Constants.EDIT_SCREEN_URL_BY_CATEGORY.get(chartService.getCharts().get(portlet.getChartType()).getCategory()));
                 holderInclude.setSrc(Constants.EDIT_SCREEN_URL_BY_CATEGORY.get(chartService.getCharts().get(portlet.getChartType()).getCategory()));
             }else if(event.getData()!= null
                     && event.getData().equals(Constants.EDIT_WINDOW_JOIN_DATA)) {
@@ -321,7 +320,6 @@ public class EditWidgetController extends SelectorComposer<Component> {
      */
     @Listen("onClick=#doneButton")
     public void closeEditWindow(final MouseEvent event) {
-        LOG.debug("EditWidgetController....... Calling Done Button..... ");
         portlet.setWidgetState(Constants.STATE_LIVE_CHART);
         
         if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_CONFIG_CHART)){    

@@ -8,6 +8,7 @@ import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -16,6 +17,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
+import java.util.stream.Collectors;
 import java.util.Set;
 
 import javax.servlet.http.HttpSession;
@@ -412,16 +415,13 @@ public class DashboardController extends SelectorComposer<Window>{
         
     private void constructDBCommonInputparams() {
         
-        //Map<String, String>  persistedGlobalInputParams = new LinkedHashMap<String,String>();
-        
         List<InputParam> persistedGlobalInputParams  = new ArrayList<InputParam>();
-        QuerySchema querySchema;
-        for (Portlet portlet : dashboard.getPortletList()) {
+        dashboard.getPortletList().forEach(portlet ->{
+            
             if (portlet.getWidgetState().equals( Constants.STATE_LIVE_CHART)
                     && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()) {
                 
-                List<InputParam>  portletInputs = new ArrayList<InputParam>();
-                
+                List<InputParam>  portletInputs = new ArrayList<InputParam>();   
                 portlet.getChartData().getInputParams().stream().forEach(inputparam ->{
                     if(inputparam.getIsCommonInput()
                             && persistedGlobalInputParams.contains(inputparam)){
@@ -437,40 +437,44 @@ public class DashboardController extends SelectorComposer<Window>{
                 
                 portlet.getChartData().setInputParams(portletInputs);
             }
-        }
+            
+        });
+           
         
         if (LOG.isDebugEnabled()) {
             LOG.debug("Persisted Common input params -> "  + persistedGlobalInputParams);
         }
         
-        Set<String> distinctValues = null;
+       
         // Generating applied filter rows, with values
-        for(InputParam globalInput : persistedGlobalInputParams){
-            distinctValues = new HashSet<>();
-            for (Portlet portlet : dashboard.getPortletList()) {
-                if (portlet.getWidgetState().equals( Constants.STATE_LIVE_CHART)
-                        && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()) {
-                  //As joining not allows in Query taking first file
-                    if(portlet.getChartData().getInputParams().contains(globalInput)){
-                        try {
-                            querySchema = hpccQueryService.getQuerySchema(portlet.getChartData().getFiles().get(0), portlet
-                                    .getChartData().getHpccConnection(), portlet
-                                    .getChartData().isGenericQuery(), portlet
-                                    .getChartData().getInputParamQuery());
-                       
-                        distinctValues.addAll(querySchema.getInputParams().get(globalInput.getName())) ;
-                        } catch (Exception e) {
-                           LOG.error(Constants.EXCEPTION,e);
+            persistedGlobalInputParams.stream().forEach(globalInput -> {
+                Set<String> distinctValues = new HashSet<>();
+                dashboard.getPortletList().forEach(portlet ->{
+                    if (portlet.getWidgetState().equals( Constants.STATE_LIVE_CHART)
+                            && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()) {
+                      //As joining not allows in Query taking first file
+                        if(portlet.getChartData().getInputParams().contains(globalInput)){
+                            try {
+                                QuerySchema querySchema = hpccQueryService.getQuerySchema(portlet.getChartData().getFiles().get(0), portlet
+                                        .getChartData().getHpccConnection(), portlet
+                                        .getChartData().isGenericQuery(), portlet
+                                        .getChartData().getInputParamQuery());
+                           
+                            distinctValues.addAll(querySchema.getInputParams().get(globalInput.getName())) ;
+                            } catch (Exception e) {
+                               LOG.error(Constants.EXCEPTION,e);
+                            }
                         }
                     }
+                });
+                try {
+                    filterRows.appendChild(createQueryInputFilterRow(globalInput,distinctValues));
+                } catch (RemoteException | HpccConnectionException e) {
+                    LOG.error(Constants.EXCEPTION,e);
                 }
-            }
-            try {
-                filterRows.appendChild(createQueryInputFilterRow(globalInput,distinctValues));
-            } catch (RemoteException | HpccConnectionException e) {
-                LOG.error(Constants.EXCEPTION,e);
-            }
-        }
+                
+            });
+           
 
         if(commonInputParams == null){
             commonInputParams =  new LinkedHashMap<String, Map<String,Set<String>>>();
@@ -656,12 +660,14 @@ public class DashboardController extends SelectorComposer<Window>{
         Tabpanel tabpanel;
         for (Entry<String, Map<String, Set<String>>> entry : newInputParams.entrySet()) {
             tab = new Tab(entry.getKey());
+            tab.setAttribute(Constants.INPUT_PARAM_NAMES,entry.getValue().keySet());
             tabpanel = new Tabpanel();
             tabpanel.setSclass("collapsiblePanel");
             listbox = new Listbox();
             listbox.setMultiple(false);
             listbox.setVflex(true);
             listbox.addEventListener(Events.ON_SELECT, paramsSelectListener);
+            
             LOG.debug("values -->"+entry.getValue());
             for (Entry<String, Set<String>> inputParamsEntry : entry.getValue().entrySet()) {
             	if(!inputParamsEntry.getValue().isEmpty()){
@@ -819,7 +825,7 @@ public class DashboardController extends SelectorComposer<Window>{
             LOG.debug("Updating charts in portlet - " + portlet);
         }
         Portalchildren children = portalChildren.get(portlet.getColumn());
-        LOG.debug("portalchildren in updateWidgets()-->"+children);
+        
         ChartPanel panel =null;
         for (Component comp : children.getChildren()) {
             panel = (ChartPanel) comp;
@@ -869,7 +875,6 @@ public class DashboardController extends SelectorComposer<Window>{
         @Override
         public void onEvent(Event event) throws Exception {
             Portlet portlet = (Portlet) event.getData();
-            LOG.debug("DashboardController....... Calling onDrawingLiveChart");
             Map<String, Set<Field>> newFiles;
             Map<String, Map<String,Set<String>>> newInputParams;
             if(dashboard.getHasCommonFilter() && 
@@ -972,8 +977,8 @@ public class DashboardController extends SelectorComposer<Window>{
                     Row row = (Row) radio.getParent().getParent().getParent().getParent();
 
                     row.setAttribute(Constants.ROW_CHECKED, true);
-                    appliedCommonInputParam.add(inputparam);
-                    
+                    inputparam.setValue(radio.getLabel());
+                    inputparam.setIsCommonInput(true);
                     applyInputParamToPortlets(inputparam);
                     
                     button.setSclass("btn-default");
@@ -1006,19 +1011,19 @@ public class DashboardController extends SelectorComposer<Window>{
                 continue;
             }
             ChartData chartData = DashboardUtil.getChartData(portlet);
-            InputParam inputParameter = new InputParam();
-            inputParameter.setName(inputparam.getName());
-            inputParameter.setValue(inputparam.getValue());
-            inputParameter.setIsCommonInput(true);
 
             if(chartData.getInputParams() == null){
                 List<InputParam>  inputs = new ArrayList<InputParam>();
                 chartData.setInputParams(inputs);
             }
-            chartData.getInputParams().add(inputParameter);
+            if(chartData.getInputParams().contains(inputparam))
+            {
+                chartData.getInputParams().remove(inputparam);
+            }
+            //TODO:appending inputparam twice need to check
+            chartData.getInputParams().add(inputparam);
             LOG.debug("portlet filtering -->"+portlet.getChartData());
             try {
-                
                 updateWidgets(portlet);
             } catch (Exception e) {
                 LOG.error("Error Updating Charts", e);
@@ -1450,9 +1455,33 @@ public class DashboardController extends SelectorComposer<Window>{
             
             Row removedRow = (Row) event.getTarget().getParent().getParent();
             Boolean rowChecked = (Boolean)removedRow.getAttribute(Constants.ROW_CHECKED);
+            
+            boolean isQueryUsed = false;
+            boolean isFileUsed = false;
+            if(!dashboard.getPortletList().get(0).getChartData().getIsQuery()){
+                //All charts used logical files
+                isFileUsed = true;
+            }else{
+                //All charts used queries
+                isQueryUsed = true;
+            }
             //refresh the portlets, if the removed row/filter has any checked values
             if(rowChecked){
-            Iterator<Portlet> iterator = removeFilter(removedRow).iterator();
+                Iterator<Portlet> iterator =null;
+                if(isFileUsed){
+                    iterator = removeFilter(removedRow).iterator();
+                    
+                    Filter removedFilter = (Filter)removedRow.getAttribute(Constants.FILTER);
+                    //Need To remove the filter from applied filter set
+                    appliedCommonFilters.remove(removedFilter);
+                }else if(isQueryUsed){
+                    iterator = removeInputparam(removedRow).iterator();
+                    
+                    String removedInput =  removedRow.getAttribute(Constants.INPUT_PARAM_NAME).toString();
+                    InputParam removedInputparam = new InputParam(removedInput);
+                    //Need To remove the filter from applied inputparam set
+                    appliedCommonInputParam.remove(removedInputparam);
+                }
             
             // refreshing the chart && updating DB
             while (iterator.hasNext()) {
@@ -1460,11 +1489,6 @@ public class DashboardController extends SelectorComposer<Window>{
                 updateWidgets(portlet);
                 }
             }
-            //appending the removed filter to list of columns
-            Filter removedFilter = (Filter)removedRow.getAttribute(Constants.FILTER);
-            
-            //Need To remove the filter from applied filter set
-            appliedCommonFilters.remove(removedFilter);
             
             //Removing the Filter row in UI
             removedRow.detach();
@@ -1562,6 +1586,28 @@ public class DashboardController extends SelectorComposer<Window>{
         }
     }
     
+    /**
+     * Returns the list of portlets which has the removed inputparam
+     * @param removedRow
+     * @return  Set<Portlet>
+     */
+    private  Set<Portlet>  removeInputparam(Row removedRow) {
+        
+        String removedInput =  removedRow.getAttribute(Constants.INPUT_PARAM_NAME).toString();
+        InputParam removedInputparam = new InputParam(removedInput);
+        Set<Portlet> portletsToRefresh = dashboard.getPortletList().stream().filter(portlet ->
+        (Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())
+                && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()
+                && portlet.getChartData().getInputParams().contains(removedInputparam))).collect(Collectors.toSet());
+        
+        portletsToRefresh.forEach(portlet ->{
+            portlet.getChartData().getInputParams().remove(removedInputparam);
+        });
+        return portletsToRefresh;
+    
+    }
+
+
     /**
      * Event to be triggered onClick of 'Add Widget' Button
      */
@@ -1812,29 +1858,25 @@ public class DashboardController extends SelectorComposer<Window>{
      */
     private void removeGlobalFilters() {
         try {
-            //TODO:Add logic to remove query filter 
-            for (Portlet portlet : dashboard.getPortletList()) {
-                if (Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())
-                		&& Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType())
-                                .getCategory()) {
-                    for (Filter filter : appliedCommonFilters) {
-                        // removing global filter object from filterlist
-                        if (portlet.getChartData().getIsFiltered()
-                                && portlet.getChartData().getFilters().contains(filter)) {
-                            portlet.getChartData().getFilters().remove(filter);
-                            if (portlet.getChartData().getFilters().isEmpty()) {
-                                portlet.getChartData().setIsFiltered(false);
-                            }
-                        }
-                    }
-                    // refreshing the chart && updating DB
-                    updateWidgets(portlet);
-                }
+            boolean isQueryUsed = false;
+            boolean isFileUsed = false;
+            if(!dashboard.getPortletList().get(0).getChartData().getIsQuery()){
+                //All charts used logical files
+                isFileUsed = true;
+            }else{
+                //All charts used queries
+                isQueryUsed = true;
+            }
+            if(isFileUsed){
+                removeFilterUpdateWidget();
+               
+            }else if(isQueryUsed){
+                removeInputparamUpdateWidget();
             }
             Sessions.getCurrent().removeAttribute(Constants.COMMON_FILTERS);
             // Removing common filters Row from UI
             filterRows.getChildren().clear();
-            // making common filters panel unvisible
+            // making common filters panel invisible
             commonFiltersPanel.setVisible(false);
             dashboard.setHasCommonFilter(false);
             
@@ -1843,6 +1885,58 @@ public class DashboardController extends SelectorComposer<Window>{
         }
     }
     
+    private void removeInputparamUpdateWidget() {
+        dashboard.getPortletList().stream().forEach(portlet ->{
+            if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())
+                    && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()){
+                appliedCommonInputParam.stream().forEach(inputparam ->{
+                    if(portlet.getChartData().getInputParams().contains(inputparam)){
+                        portlet.getChartData().getInputParams().remove(inputparam);
+                    }
+                });
+                try {
+                    // refreshing the chart && updating DB
+                    updateWidgets(portlet);
+                } catch (Exception e) {
+                    LOG.error(Constants.EXCEPTION,e);
+                    Clients.showNotification(Labels.getLabel("unableToUpdateWidget"),
+                            Clients.NOTIFICATION_TYPE_ERROR, this.getSelf(), Constants.POSITION_CENTER, 3000, true);
+                }
+            }
+        });
+        
+    }
+
+
+    private void removeFilterUpdateWidget() {
+        dashboard.getPortletList().stream().forEach(portlet ->{
+            if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())
+                    && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()){
+                appliedCommonFilters.stream().forEach(filter ->{
+                    if(portlet.getChartData().getIsFiltered()
+                            && portlet.getChartData().getFilters().contains(filter)){
+                        portlet.getChartData().getInputParams().remove(filter);
+                        if (portlet.getChartData().getFilters().isEmpty()) {
+                            portlet.getChartData().setIsFiltered(false);
+                        }
+                    }
+                });
+              
+                try {
+                    // refreshing the chart && updating DB
+                    updateWidgets(portlet);
+                } catch (Exception e) {
+                    LOG.error(Constants.EXCEPTION,e);
+                    Clients.showNotification(Labels.getLabel("unableToUpdateWidget"),
+                            Clients.NOTIFICATION_TYPE_ERROR, this.getSelf(), Constants.POSITION_CENTER, 3000, true);
+                }
+            }
+            
+        });
+        
+    }
+
+
     protected void getfileFields(Portlet portlet) {
     	// Getting fields for each files
     	  try {
@@ -1936,6 +2030,7 @@ public class DashboardController extends SelectorComposer<Window>{
      */
     final EventListener<Event> onPanelReset = new EventListener<Event>() {
         
+        @SuppressWarnings("unchecked")
         @Override
         public void onEvent(Event event) throws Exception {
             Portlet deletedPortlet = (Portlet) event.getData();
@@ -1962,64 +2057,26 @@ public class DashboardController extends SelectorComposer<Window>{
                 }
                 
                 //Removing Displayed columns
-                Tab tab;
-                List<Component> componentsToDetach = new ArrayList<Component>();
-                for(Component component : commonFilterTabbox.getFirstChild().getChildren()) {
-                    tab = (Tab) component;
-                    if(files.contains(tab.getLabel())) {
-                        componentsToDetach.add(tab);
-                        componentsToDetach.add(tab.getLinkedPanel());
-                        if(!deletedPortlet.getChartData().getIsQuery()){
-                            commonFields.remove(tab.getLabel());
-                        }else {
-                            commonInputParams.remove(tab.getLabel());
-                        }
-                        
-                    }
-                }
-                for(Component component: componentsToDetach) {
-                    component.detach();
-                }
-                if(!deletedPortlet.getChartData().getIsQuery()){
-                    //Remove applied filters
-                    Set<Filter> filtersToRemove = new HashSet<Filter>();
-                    if(appliedCommonFilters!= null){
-                    for (Filter filter : appliedCommonFilters) {
-                        if(files.contains(filter.getFileName())) {
-                            filtersToRemove.add(filter);
-                        }
-                    }}
-                    
-                    Row row;
-                    Filter rowFilter;
-                    List<Row> rowsToDelete = new ArrayList<Row>();
-                    for (Filter filter : filtersToRemove) {
-                        for (Component component : filterRows.getChildren()) {
-                            row = (Row) component;
-                            rowFilter = (Filter) row.getAttribute(Constants.FILTER);
-                            if(filter.equals(rowFilter)) {
-                                rowsToDelete.add(row);
-                            }
-                        }
-                    }
-                    for (Row row2 : rowsToDelete) {
-                        row2.detach();
-                    }
-                }else{/*
-                  //Removing applied common input param
-                   Set<InputParam> inputparamToRemove = new HashSet<InputParam>();
-                   
-                   if(appliedCommonInputParam != null){
-                       for (InputParam inputparam : appliedCommonInputParam) {
-                           if(files.contains(filter.getFileName())) {
-                               filtersToRemove.add(filter);
-                           }
-                       }
-                    }
-                */}
+                List<Component> componentsToDetach = null;
                
-                
-                
+                if(!deletedPortlet.getChartData().getIsQuery()){
+                    componentsToDetach = getFileTabsToDetach(files);
+                    for(Component component: componentsToDetach) {
+                        component.detach();
+                    }
+                    removeAppliedFileFilterRow(files);
+                }else{
+                    componentsToDetach = getQueryTabsToDetach(files);
+                   Set<String> deletedQueriesInputParams = new HashSet<String>();
+                    for(Component component: componentsToDetach) {
+                        if(component instanceof Tab){
+                            deletedQueriesInputParams.addAll((Collection<? extends String>) component.getAttribute(Constants.INPUT_PARAM_NAMES));
+                        }
+                        component.detach();
+                    }
+                    removeAppliedQueryFilterRow(deletedQueriesInputParams);
+                }
+               
             }
             
             deletedPortlet.setChartData(null);
@@ -2048,6 +2105,7 @@ public class DashboardController extends SelectorComposer<Window>{
         Filter filter = (Filter) rowToRemove.getAttribute(Constants.FILTER);
         for (Portlet portlet : dashboard.getPortletList()) {
             if (Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())
+                    && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()
                     && portlet.getChartData().getIsFiltered()) {
                 // removing global filter object from filter list
                 if (portlet.getChartData().getFilters().contains(filter)) {
@@ -2065,6 +2123,133 @@ public class DashboardController extends SelectorComposer<Window>{
     }
     
     
+    /**
+     * Removing applied common input param
+     * @param deletedQueriesInputParams
+     * @param files
+     */
+    @SuppressWarnings("unchecked")
+    protected void removeAppliedQueryFilterRow( Set<String> deletedQueriesInputParams) {
+        Set<InputParam> inputparamToRemove = new HashSet<InputParam>();
+        if(appliedCommonInputParam != null){
+           
+            Component otherCompWithSameInputparam = null;
+            for (InputParam inputparam : appliedCommonInputParam) {
+                try{
+                   final String appliedInput = deletedQueriesInputParams.stream().filter(input ->inputparam.getName().equals(input)).findFirst().get();
+                    if(appliedInput != null){
+                        //Check any other query has the same input param
+                        otherCompWithSameInputparam =  commonFilterTabbox.getFirstChild().getChildren().stream().filter(component ->
+                        (((Set<String>)component.getAttribute(Constants.INPUT_PARAM_NAMES)).contains(appliedInput))).findFirst().get();
+                        if(otherCompWithSameInputparam == null){
+                            inputparamToRemove.add(inputparam);
+                        }else{
+                            //Don't remove the inputparam as other query has same column
+                        }
+                    }else{
+                        //Do nothing as this inputaparam not present in other queries
+                    }
+                }catch(NoSuchElementException e){
+                    LOG.error(Constants.EXCEPTION,e);
+                }
+            }
+         }
+        //Collects the filter rows which has the inputparam of deleted widget query's inputparam
+        //and deletes those rows
+        if(!inputparamToRemove.isEmpty()){
+            List<Component> rowsToDelete = new ArrayList<Component>();
+            Component row = null;
+            for (InputParam inputparam  : inputparamToRemove) {
+                row = filterRows.getChildren().stream().filter(component ->
+                (component.getAttribute(Constants.INPUT_PARAM_NAME).equals(inputparam.getName()))).findFirst().get();
+                if(row != null){
+                    rowsToDelete.add(row);
+                }
+            }
+            for (Component row2 : rowsToDelete) {
+                row2.detach();
+            }
+        }
+        
+    }
+
+
+    /**Removes the filter row from common filter panel, while deleting a widget.
+     * The removing filter used the file used by the deleted widget
+     * @param files
+     */
+    protected void removeAppliedFileFilterRow( List<String> files) {
+        //Remove applied filters
+        Set<Filter> filtersToRemove = new HashSet<Filter>();
+        if(appliedCommonFilters!= null){
+        for (Filter filter : appliedCommonFilters) {
+            if(files.contains(filter.getFileName())) {
+                filtersToRemove.add(filter);
+            }
+        }}
+        
+        Row row;
+        Filter rowFilter;
+        List<Row> rowsToDelete = new ArrayList<Row>();
+        for (Filter filter : filtersToRemove) {
+            for (Component component : filterRows.getChildren()) {
+                row = (Row) component;
+                rowFilter = (Filter) row.getAttribute(Constants.FILTER);
+                if(filter.equals(rowFilter)) {
+                    rowsToDelete.add(row);
+                }
+            }
+        }
+        for (Row row2 : rowsToDelete) {
+            row2.detach();
+        }
+        
+    }
+
+
+    /**
+     * Iterates the common filter tabs for Queries.And returns the tabs
+     * which used the deleted portlet's query
+     * @param files
+     * @return List<Component>
+     */
+    protected List<Component> getQueryTabsToDetach(List<String> queries) {
+
+        List<Component> componentsToDetach = new ArrayList<Component>();
+        Tab tab;
+        for(Component component : commonFilterTabbox.getFirstChild().getChildren()) {
+            tab = (Tab) component;
+            if(queries.contains(tab.getLabel())) {
+                componentsToDetach.add(tab);
+                componentsToDetach.add(tab.getLinkedPanel());
+                commonInputParams.remove(tab.getLabel());
+            }
+        }
+        return componentsToDetach;
+    }
+
+
+    /**
+     * Iterates the common filter tabs for logical files.And returns the tabs
+     * which used the deleted portlet's logical file
+     * @param files
+     * @return List<Component>
+     */
+    protected List<Component> getFileTabsToDetach(List<String> files) {
+        List<Component> componentsToDetach = new ArrayList<Component>();
+        Tab tab;
+        for(Component component : commonFilterTabbox.getFirstChild().getChildren()) {
+            tab = (Tab) component;
+            if(files.contains(tab.getLabel())) {
+                componentsToDetach.add(tab);
+                componentsToDetach.add(tab.getLinkedPanel());
+                commonFields.remove(tab.getLabel());
+            }
+        }
+        return componentsToDetach;
+    }
+
+
     @Listen("onPortalMove = portallayout")
     public void onPanelMove(final PortalMoveEvent event) {
         if(LOG.isDebugEnabled()) {

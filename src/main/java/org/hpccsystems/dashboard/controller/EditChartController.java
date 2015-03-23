@@ -248,7 +248,6 @@ public class EditChartController extends SelectorComposer<Component> {
                 
                 // Constructing Roxie query input parameters
                 if (chartData.getIsQuery()) {
-                    LOG.debug("here -->");
                     LOG.debug(filterHolder);
                     Events.sendEvent(Constants.CREATE_PARAM_EVENT, filterHolder, null);
                 }
@@ -283,7 +282,7 @@ public class EditChartController extends SelectorComposer<Component> {
             for (Map.Entry<String, List<Field>> entry : chartData.getFields().entrySet()) {
                 for (Field field : entry.getValue()) {
                     if (attribute.getFileName().equals(entry.getKey()) 
-                            && attribute.getColumn().equals(field.getColumnName().trim())) {
+                            && attribute.getColumn().trim().equals(field.getColumnName().trim())) {
                         xColumnExist = true;
                     }
                     if(chartData.isGrouped() &&
@@ -357,6 +356,7 @@ public class EditChartController extends SelectorComposer<Component> {
         }
         
         //Create Measures and Attributes
+        LOG.debug("chartData.getFields() -->"+chartData.getFields());
         UiGenerator.generateTabboxChildren(measureTabbox, attributeTabbox, chartData.getFields(), !chartData.getIsQuery());
 
         if(LOG.isDebugEnabled()){

@@ -149,7 +149,6 @@ public class InputParametersController extends SelectorComposer<Panel>{
             }
             
             
-            InputParam inputParam = null;
             InputParam tempInput = null;
             InputParam persistedInput = null;
            for (String param : inputParameter) {
@@ -161,22 +160,10 @@ public class InputParametersController extends SelectorComposer<Panel>{
                    if(persistedInput.getValue() != null ) {
                        listitem.setInputValue(persistedInput.getValue());
                    }
-               }else{
-                   inputParam = new InputParam(param);
                }
-               inputParams.appendChild(listitem);
-               
+               inputParams.appendChild(listitem);               
            }
 
-            /*for (InputParam inputParam : chartData.getInputParams()) {
-                    InputListitem listitem = new InputListitem(inputParam.getName(), 
-                            paramValues.get(inputParam.getName()), String.valueOf(portlet.getId()));
-                    if(inputParam.getValue() != null ) {
-                        listitem.setInputValue(inputParam.getValue());
-                    }
-                    inputParams.appendChild(listitem);
-            }*/
-            
         }
         
     }

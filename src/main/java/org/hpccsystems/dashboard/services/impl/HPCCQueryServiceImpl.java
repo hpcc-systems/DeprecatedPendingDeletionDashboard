@@ -289,6 +289,14 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
                     }
                 }
             }
+            
+            //hardcoding the fields and inputparams
+            fields.add(new Field("bmk_quarter",  "unsigned"));
+            fields.add(new Field("attrname ",  "string"));
+            Set<String> values = new HashSet<String>();
+            values.add("GA");
+            values.add("CA");
+            inputParams.put("inqstate", values);
         } catch (NumberFormatException e) {
             throw e;
         } catch (SAXException | IOException | ParserConfigurationException | XPathExpressionException e) {
@@ -299,7 +307,7 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
                 throw new HpccConnectionException(e.getMessage());
             }
         }
-        
+        LOG.debug("Generic querySchema ---->{}"+ querySchema);
         return querySchema;
     }
     
