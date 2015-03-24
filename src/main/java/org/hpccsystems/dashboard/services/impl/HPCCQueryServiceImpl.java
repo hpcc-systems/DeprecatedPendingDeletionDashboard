@@ -288,15 +288,8 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
                         break;
                     }
                 }
-            }
+            }            
             
-            //hardcoding the fields and inputparams
-            fields.add(new Field("bmk_quarter",  "unsigned"));
-            fields.add(new Field("attrname ",  "string"));
-            Set<String> values = new HashSet<String>();
-            values.add("GA");
-            values.add("CA");
-            inputParams.put("inqstate", values);
         } catch (NumberFormatException e) {
             throw e;
         } catch (SAXException | IOException | ParserConfigurationException | XPathExpressionException e) {

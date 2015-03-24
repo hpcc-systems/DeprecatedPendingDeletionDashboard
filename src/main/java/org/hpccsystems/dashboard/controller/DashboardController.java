@@ -1580,7 +1580,8 @@ public class DashboardController extends SelectorComposer<Window>{
                     updateWidgets(portlet);
                 } catch (Exception e) {
                     LOG.error("Error Updating Charts", e);
-                    //TODO: Show Notification
+                    Clients.showNotification(Labels.getLabel("unableToUpdateWidget"),
+                            Clients.NOTIFICATION_TYPE_ERROR, this.getSelf(), Constants.POSITION_CENTER, 3000, true);
                 }
             }
         }
