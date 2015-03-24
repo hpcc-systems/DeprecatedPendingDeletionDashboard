@@ -547,11 +547,6 @@ public class EditTableController extends SelectorComposer<Component> {
             tableData.setInputParams(paramsList);
             
         } else {//Retrieving from DB
-            //get input param names
-            Set<String> inputsName = new HashSet<>();
-            tableData.getInputParams().stream().forEach(inputparam -> {
-                inputsName.add(inputparam.getName());
-            });
             
             paramValues.entrySet().forEach(entry ->{
                 InputListitem listitem = new InputListitem(

@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -422,30 +423,32 @@ public class ChartPanel extends Panel {
                     constructRelevantInputParam(portlet.getChartData());
                     
                 } else { 
-                  //get input param names
-                    Set<String> inputsName = new HashSet<>();
-                    portlet.getChartData().getInputParams().stream().forEach(inputparam -> {
-                        inputsName.add(inputparam.getName());
-                    });
-                    paramValues = hpccQueryService.getInputParamDistinctValues(
-                            portlet.getChartData().getFiles().iterator().next(),
-                            inputsName,
-                            portlet.getChartData().getHpccConnection(), portlet.getChartData().isGenericQuery(),
-                            portlet.getChartData().getInputParamQuery());
-                    
+                 
+                    //Taking first query, as joining not allows for queries
+                    QuerySchema querySchema = hpccQueryService
+                            .getQuerySchema(portlet.getChartData().getFiles().iterator().next(), portlet.getChartData().getHpccConnection(), portlet
+                                    .getChartData().isGenericQuery(), portlet.getChartData().getInputParamQuery());
+                    paramValues = querySchema.getInputParams();
                     if(paramValues != null) {
-                        for (InputParam inputParam : portlet.getChartData().getInputParams()) {
-                                
-                                LOG.debug("param.getKey(): "+inputParam.getName());
-                                LOG.debug("paramValues.get(inputParam.getName()): "+paramValues.get(inputParam.getName()));
-                                LOG.debug("String.valueOf(portlet.getId() + \"_board_\"): "+String.valueOf(portlet.getId() + "_board_"));
-                                
-                                InputListitem listitem = new InputListitem(inputParam.getName(), paramValues.get(inputParam.getName()), String.valueOf(portlet.getId() + "_board_"));
-                                if(inputParam.getValue() != null) {
-                                    listitem.setInputValue(inputParam.getValue());
-                                }
-                                inputListbox.appendChild(listitem);
-                        }
+                        paramValues.entrySet().forEach(entry ->{
+                            InputListitem listitem = new InputListitem(
+                                    entry.getKey(), entry.getValue(), String.valueOf(portlet.getId() + "_board_"));
+                            inputListbox.appendChild(listitem);
+                            try{
+                             InputParam appliedInput = portlet.getChartData() .getInputParams() .stream()
+                                            .filter(input -> input.getName().equals(
+                                                    entry.getKey())).findAny().get();
+                             if (appliedInput != null && appliedInput.getValue() != null) {
+                                 listitem.setInputValue(appliedInput.getValue());
+                             }
+                            }catch(NoSuchElementException e){
+                                //Need not to log.This occurs when an inputparam from Hpcc is not found in portlet's
+                                //applied inputparam
+                            }
+                                    
+                            
+                        });
+                        
                     }
                 }
             } catch (Exception e) {
@@ -520,6 +523,7 @@ public class ChartPanel extends Panel {
             popup.setZclass("popup");
             popup.setWidth("250px");
             popup.setHeight("270px");
+            popup.setStyle("overflow:auto");
             caption.appendChild(popup);
             inputParamBtn.setPopup(popup);         
             
