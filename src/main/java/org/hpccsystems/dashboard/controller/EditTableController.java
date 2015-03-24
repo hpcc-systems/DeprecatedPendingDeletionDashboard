@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -530,10 +531,9 @@ public class EditTableController extends SelectorComposer<Component> {
      */
     private void constructInputParameters(QuerySchema querySchema) throws Exception {
         
-   	 Map<String,Set<String>> paramValues = null;
+   	 Map<String,Set<String>> paramValues = querySchema.getInputParams();
    	 
         if(tableData.getInputParams() == null) {        	
-        	paramValues = querySchema.getInputParams();
             
             InputParam inputParam = null;
             List<InputParam> paramsList = new ArrayList<InputParam>();
@@ -552,21 +552,25 @@ public class EditTableController extends SelectorComposer<Component> {
             tableData.getInputParams().stream().forEach(inputparam -> {
                 inputsName.add(inputparam.getName());
             });
-            paramValues = hpccQueryService.getInputParamDistinctValues(
-                    tableData.getFiles().iterator().next(),
-                    inputsName,
-                    tableData.getHpccConnection(),tableData.isGenericQuery(),
-                    tableData.getInputParamQuery());
             
-            for (InputParam inputParam : tableData.getInputParams()) {
+            paramValues.entrySet().forEach(entry ->{
                 InputListitem listitem = new InputListitem(
-                        inputParam.getName(), paramValues.get(inputParam.getName()), 
-                        String.valueOf(portlet.getId()));
-                if (inputParam.getValue() != null) {
-                    listitem.setInputValue(inputParam.getValue());
-                }
+                        entry.getKey(), entry.getValue(), String.valueOf(portlet.getId()));
                 inputParams.appendChild(listitem);
-            }
+                try{
+                 InputParam appliedInput = tableData .getInputParams() .stream()
+                                .filter(input -> input.getName().equals(
+                                        entry.getKey())).findAny().get();
+                 if (appliedInput != null && appliedInput.getValue() != null) {
+                     listitem.setInputValue(appliedInput.getValue());
+                 }
+                }catch(NoSuchElementException e){
+                    //Need not to log.This occurs when an inputparam from Hpcc is not found in portlet's
+                    //applied inputparam
+                }
+                        
+                
+            });
             
         }
         
