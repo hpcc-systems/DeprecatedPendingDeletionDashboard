@@ -4,8 +4,8 @@
 	<borderlayout if="${not (sessionScope.userCredential.hasRole('viewChart') or sessionScope.userCredential.hasRole('configureChart')) 
 							and (
 									(not sessionScope.userCredential.anonymous) or 
-									(sessionScope.userCredential.getApplicationId().equals('circuit') and sessionScope.userCredential.hasRole('viewDashboard'))
-								)}" >
+									(sessionScope.userCredential.getApplicationId().equals('circuit') and sessionScope.userCredential.hasRole('ApiViewDashboard'))
+								)}"  apply="org.hpccsystems.dashboard.controller.HomeController">
 		<north height="70px" style="background-color: #292929;" border="none" zclass="banner" >		
 			<include src="/demo/layout/banner.zul" />
 		</north>
