@@ -271,6 +271,7 @@ public class Constants {
     public static final String INPUT_PARAM_VALUE = "inputParamValue";
     public static final String SELECTED_RADIO_BTN = "selectedRadioBtn";
     public static final String INPUT_PARAM_NAMES = "inputParamNames";
+    public static final String INPUT_PARAM_QUERY = "inputParamQuery";
    
 	
 }

@@ -188,7 +188,7 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
                 queryData = getGenericQuerySchema(queryName,hpccConnection,inputParamQuery);
             }else{
                 queryData =  new QuerySchema();
-                fields = getColumns(queryName, hpccConnection, isGenericQuery, inputParamQuery);
+                fields =  getNongenericQueryColumns(hpccConnection,queryName); 
                 queryData.setFields(fields);
                 Set<String> inputParams = getInputParameters(queryName,hpccConnection,isGenericQuery,inputParamQuery);
                 queryData.setInputParams(getInputParamDistinctValues(queryName,

@@ -488,7 +488,6 @@ public class DashboardController extends SelectorComposer<Window>{
                 getInputParams(portlet,newInputParams);
             }
         }
-        LOG.debug("newInputParams --->"+newInputParams);
         if(!newInputParams.isEmpty()) {
             constructFilterItemForQuery(newInputParams);
         }
@@ -661,6 +660,7 @@ public class DashboardController extends SelectorComposer<Window>{
         for (Entry<String, Map<String, Set<String>>> entry : newInputParams.entrySet()) {
             tab = new Tab(entry.getKey());
             tab.setAttribute(Constants.INPUT_PARAM_NAMES,entry.getValue().keySet());
+            tab.setAttribute(Constants.INPUT_PARAM_QUERY,entry.getKey());
             tabpanel = new Tabpanel();
             tabpanel.setSclass("collapsiblePanel");
             listbox = new Listbox();
@@ -668,7 +668,6 @@ public class DashboardController extends SelectorComposer<Window>{
             listbox.setVflex(true);
             listbox.addEventListener(Events.ON_SELECT, paramsSelectListener);
             
-            LOG.debug("values -->"+entry.getValue());
             for (Entry<String, Set<String>> inputParamsEntry : entry.getValue().entrySet()) {
             	if(!inputParamsEntry.getValue().isEmpty()){
 	                listitem = new Listitem(inputParamsEntry.getKey());
@@ -897,13 +896,13 @@ public class DashboardController extends SelectorComposer<Window>{
                 }else{
                     newInputParams = new HashMap<String, Map<String,Set<String>>>();
                     for (String fileName : portlet.getChartData().getFiles()) {
-                       QuerySchema querySchema = hpccQueryService.getQuerySchema(fileName, portlet
-                                .getChartData().getHpccConnection(), portlet
-                                .getChartData().isGenericQuery(), portlet
-                                .getChartData().getInputParamQuery());
-                      
                         //Checking if the query is already present in filters
                         if(!commonInputParams.containsKey(fileName)) {
+                           QuerySchema querySchema = hpccQueryService.getQuerySchema(fileName, portlet
+                                    .getChartData().getHpccConnection(), portlet
+                                    .getChartData().isGenericQuery(), portlet
+                                    .getChartData().getInputParamQuery());
+                      
                             newInputParams.put(fileName, querySchema.getInputParams());
                         }
                     }
@@ -912,6 +911,7 @@ public class DashboardController extends SelectorComposer<Window>{
             }
         }
     };
+    private Portlet portlet;
     
     private Row createQueryInputFilterRow(InputParam inputparam, Set<String> inputDistinctValues)
             throws HpccConnectionException,RemoteException {
@@ -1000,6 +1000,7 @@ public class DashboardController extends SelectorComposer<Window>{
     }    
     
     
+    @SuppressWarnings("unchecked")
     protected void applyInputParamToPortlets(InputParam inputparam) {
 
         for (Portlet portlet : dashboard.getPortletList()) {
@@ -1011,24 +1012,34 @@ public class DashboardController extends SelectorComposer<Window>{
                 continue;
             }
             ChartData chartData = DashboardUtil.getChartData(portlet);
-
-            if(chartData.getInputParams() == null){
-                List<InputParam>  inputs = new ArrayList<InputParam>();
-                chartData.setInputParams(inputs);
-            }
-            if(chartData.getInputParams().contains(inputparam))
-            {
-                chartData.getInputParams().remove(inputparam);
-            }
-            //TODO:appending inputparam twice need to check
-            chartData.getInputParams().add(inputparam);
-            LOG.debug("portlet filtering -->"+portlet.getChartData());
-            try {
-                updateWidgets(portlet);
-            } catch (Exception e) {
-                LOG.error("Error Updating Charts", e);
-               Clients.showNotification("Unable to update charts", Clients.NOTIFICATION_TYPE_ERROR, this.getSelf(), Constants.POSITION_CENTER, 5000, true);
-            }
+           
+            boolean hasSelectedInputparam =false;
+            //Checks this portlet query has inputparam with selected inputparam name
+             for(String file : chartData.getFiles()){
+                   Component tab = commonFilterTabbox.getFirstChild().getChildren().stream().filter(component ->
+                    (component.getAttribute(Constants.INPUT_PARAM_QUERY).equals(file))).findFirst().get();
+                  if(((Set<String>)tab.getAttribute(Constants.INPUT_PARAM_NAMES)).contains(inputparam.getName())){
+                      hasSelectedInputparam = true;
+                  }
+              }
+             if(hasSelectedInputparam){
+                 if(chartData.getInputParams() == null){
+                     List<InputParam>  inputs = new ArrayList<InputParam>();
+                     chartData.setInputParams(inputs);
+                 }
+                 if(chartData.getInputParams().contains(inputparam)) {
+                     chartData.getInputParams().remove(inputparam);
+                 }
+                 chartData.getInputParams().add(inputparam);
+                 try {
+                     updateWidgets(portlet);
+                 } catch (Exception e) {
+                     LOG.error("Error Updating Charts", e);
+                    Clients.showNotification("Unable to update charts", Clients.NOTIFICATION_TYPE_ERROR, this.getSelf(), Constants.POSITION_CENTER, 5000, true);
+                 }
+             }
+            
+           
         }
     
         
@@ -1592,14 +1603,14 @@ public class DashboardController extends SelectorComposer<Window>{
      * @param removedRow
      * @return  Set<Portlet>
      */
-    private  Set<Portlet>  removeInputparam(Row removedRow) {
+    private  List<Portlet>  removeInputparam(Row removedRow) {
         
         String removedInput =  removedRow.getAttribute(Constants.INPUT_PARAM_NAME).toString();
         InputParam removedInputparam = new InputParam(removedInput);
-        Set<Portlet> portletsToRefresh = dashboard.getPortletList().stream().filter(portlet ->
+        List<Portlet> portletsToRefresh = dashboard.getPortletList().stream().filter(portlet ->
         (Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())
                 && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()
-                && portlet.getChartData().getInputParams().contains(removedInputparam))).collect(Collectors.toSet());
+                && portlet.getChartData().getInputParams().contains(removedInputparam))).collect(Collectors.toList());
         
         portletsToRefresh.forEach(portlet ->{
             portlet.getChartData().getInputParams().remove(removedInputparam);
@@ -1847,7 +1858,8 @@ public class DashboardController extends SelectorComposer<Window>{
                 widgetService.updateWidgetSequence(dashboard);
             }catch(DataAccessException ex){
                 LOG.error("Exception while configuring Dashboard in onLayoutChange()", ex);
-                //TODO: Notify
+                Clients.showNotification(Labels.getLabel("unableToUpdateWidget"),
+                        Clients.NOTIFICATION_TYPE_ERROR, DashboardController.this.getSelf(), Constants.POSITION_CENTER, 3000, true);
             }
         }        
     };
@@ -2060,13 +2072,13 @@ public class DashboardController extends SelectorComposer<Window>{
                 //Removing Displayed columns
                 List<Component> componentsToDetach = null;
                
-                if(!deletedPortlet.getChartData().getIsQuery()){
+                if(!files.isEmpty() && !deletedPortlet.getChartData().getIsQuery()){
                     componentsToDetach = getFileTabsToDetach(files);
                     for(Component component: componentsToDetach) {
                         component.detach();
                     }
                     removeAppliedFileFilterRow(files);
-                }else{
+                }else if(!files.isEmpty()){
                     componentsToDetach = getQueryTabsToDetach(files);
                    Set<String> deletedQueriesInputParams = new HashSet<String>();
                     for(Component component: componentsToDetach) {
