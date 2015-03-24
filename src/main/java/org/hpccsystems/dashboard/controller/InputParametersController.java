@@ -93,23 +93,12 @@ public class InputParametersController extends SelectorComposer<Panel>{
       	 Set<String> inputParameter =  null;
       	 
 		if (chartData.getInputParams() == null) {
-			if(chartData.isGenericQuery()){
-				QuerySchema querySchema = hpccQueryService.getQuerySchema(chartData.getFiles().iterator().next(),
-						chartData.getHpccConnection(), chartData.isGenericQuery(),
-						chartData.getInputParamQuery());
+			QuerySchema querySchema = hpccQueryService.getQuerySchema(chartData.getFiles().iterator().next(),
+				chartData.getHpccConnection(), chartData.isGenericQuery(),
+				chartData.getInputParamQuery());
 				inputParameter = querySchema.getInputParams().keySet();
 				paramValues = querySchema.getInputParams();
-			}else{
-				inputParameter = hpccQueryService.getInputParameters(chartData
-						.getFiles().iterator().next(),chartData.getHpccConnection(),
-						chartData.isGenericQuery(),chartData.getInputParamQuery());
-				
-				paramValues = hpccQueryService.getInputParamDistinctValues(
-						chartData.getFiles().iterator().next(), inputParameter,
-						chartData.getHpccConnection(),chartData.isGenericQuery(),
-						chartData.getInputParamQuery());
-				
-			}
+			
 				
 			 InputParam inputParam = null;
 			 List<InputParam> paramsList = new ArrayList<InputParam>();
@@ -130,23 +119,11 @@ public class InputParametersController extends SelectorComposer<Panel>{
             chartData.getInputParams().stream().forEach(inputparam -> {
                 inputsName.add(inputparam.getName());
             });
-            if(chartData.isGenericQuery()){
-                QuerySchema querySchema = hpccQueryService.getQuerySchema(chartData.getFiles().iterator().next(),
-                        chartData.getHpccConnection(), chartData.isGenericQuery(),
-                        chartData.getInputParamQuery());
-                inputParameter = querySchema.getInputParams().keySet();
-                paramValues = querySchema.getInputParams();
-            }else{
-                inputParameter = hpccQueryService.getInputParameters(chartData
-                        .getFiles().iterator().next(),chartData.getHpccConnection(),
-                        chartData.isGenericQuery(),chartData.getInputParamQuery());
-                
-                paramValues = hpccQueryService.getInputParamDistinctValues(
-                        chartData.getFiles().iterator().next(), inputParameter,
-                        chartData.getHpccConnection(),chartData.isGenericQuery(),
-                        chartData.getInputParamQuery());
-                
-            }
+            QuerySchema querySchema = hpccQueryService.getQuerySchema(chartData.getFiles().iterator().next(),
+                    chartData.getHpccConnection(), chartData.isGenericQuery(),
+                    chartData.getInputParamQuery());
+             inputParameter = querySchema.getInputParams().keySet();
+             paramValues = querySchema.getInputParams();
             
             
             InputParam tempInput = null;

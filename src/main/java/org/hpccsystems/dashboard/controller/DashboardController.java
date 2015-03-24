@@ -447,15 +447,21 @@ public class DashboardController extends SelectorComposer<Window>{
         
        
         // Generating applied filter rows, with values
-            persistedGlobalInputParams.stream().forEach(globalInput -> {
+      
+        // Getting all columns.This holds the fields for newly added charts, to avoid reconstructing listbox 
+        //with filter columns for existing queries as well
+        Map<String, Map<String,Set<String>>>  newInputParams = new LinkedHashMap<String, Map<String,Set<String>>>();
+        boolean isInputparamCollected = false;
+        for(InputParam globalInput : persistedGlobalInputParams){
                 Set<String> distinctValues = new HashSet<>();
-                dashboard.getPortletList().forEach(portlet ->{
+                for(Portlet portlet : dashboard.getPortletList()){
                     if (portlet.getWidgetState().equals( Constants.STATE_LIVE_CHART)
                             && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()) {
+                        QuerySchema querySchema =null;
                       //As joining not allows in Query taking first file
                         if(portlet.getChartData().getInputParams().contains(globalInput)){
                             try {
-                                QuerySchema querySchema = hpccQueryService.getQuerySchema(portlet.getChartData().getFiles().get(0), portlet
+                                querySchema = hpccQueryService.getQuerySchema(portlet.getChartData().getFiles().get(0), portlet
                                         .getChartData().getHpccConnection(), portlet
                                         .getChartData().isGenericQuery(), portlet
                                         .getChartData().getInputParamQuery());
@@ -465,29 +471,26 @@ public class DashboardController extends SelectorComposer<Window>{
                                LOG.error(Constants.EXCEPTION,e);
                             }
                         }
+                        //collects the input param for all the portlets 
+                        if(!isInputparamCollected){
+                            getInputParams(portlet,newInputParams,querySchema);
+                        }
+                         
                     }
-                });
+                }
+                isInputparamCollected = true;
                 try {
                     filterRows.appendChild(createQueryInputFilterRow(globalInput,distinctValues));
                 } catch (RemoteException | HpccConnectionException e) {
                     LOG.error(Constants.EXCEPTION,e);
                 }
-                
-            });
+            }
            
 
         if(commonInputParams == null){
             commonInputParams =  new LinkedHashMap<String, Map<String,Set<String>>>();
         }
-            // Getting all columns
-        //this holds the fields for newly added charts, to avoid reconstructing listbox with filter columns for existing queries as well
-        Map<String, Map<String,Set<String>>>  newInputParams = new LinkedHashMap<String, Map<String,Set<String>>>();
-        for (Portlet portlet : dashboard.getPortletList()) {
-            if (portlet.getWidgetState().equals( Constants.STATE_LIVE_CHART)
-                    && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()) {
-                getInputParams(portlet,newInputParams);
-            }
-        }
+           
         if(!newInputParams.isEmpty()) {
             constructFilterItemForQuery(newInputParams);
         }
@@ -1822,7 +1825,7 @@ public class DashboardController extends SelectorComposer<Window>{
                     for (Portlet portlet : dashboard.getPortletList()) {
                         if (portlet.getWidgetState().equals( Constants.STATE_LIVE_CHART)
                                 && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()) {
-                            getInputParams(portlet,newInputParams);
+                            getInputParams(portlet,newInputParams,null);
                         }
                     }
                     
@@ -1966,17 +1969,18 @@ public class DashboardController extends SelectorComposer<Window>{
 		}
 	}
     
-    protected void getInputParams(Portlet portlet,Map<String, Map<String, Set<String>>> newInputParams) {
+    protected void getInputParams(Portlet portlet, Map<String, Map<String, Set<String>>> newInputParams,
+            QuerySchema querySchema) {
         // Getting input params for each query
         try {
-            QuerySchema querySchema = null;
             for (String file : portlet.getChartData().getFiles()) {
                 // Roxie Query - fetching fields/columns of Roxie queries
-               
+               if(querySchema == null){
                 querySchema = hpccQueryService.getQuerySchema(file, portlet
                         .getChartData().getHpccConnection(), portlet
                         .getChartData().isGenericQuery(), portlet
                         .getChartData().getInputParamQuery());
+               }
 
                 if (!commonInputParams.containsKey(file)) {
                     commonInputParams.put(file, querySchema.getInputParams());

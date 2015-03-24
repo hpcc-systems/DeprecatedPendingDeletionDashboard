@@ -424,10 +424,10 @@ public class EditWidgetController extends SelectorComposer<Component> {
         
         final Include include = (Include) Selectors.iterable(this.getSelf().getPage(), "#mainInclude").iterator().next();
         Window window = (Window) include.getChildren().iterator().next();
-        Events.sendEvent("onDrawingLiveChart", window, portlet);
+        Events.postEvent("onDrawingLiveChart", window, portlet);
         
         //Send event to create input params
-        Events.sendEvent("onDrawingQueryChart", chartPanel, null);
+        Events.postEvent("onDrawingQueryChart", chartPanel, null);
         
         LOG.debug("Closing the editPortletWindow.detach() ..... ");
         
