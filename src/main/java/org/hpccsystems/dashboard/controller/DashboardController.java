@@ -984,8 +984,6 @@ public class DashboardController extends SelectorComposer<Window>{
                     inputparam.setIsCommonInput(true);
                     applyInputParamToPortlets(inputparam);
                     
-                    button.setSclass("btn-default");
-                    
                    if(row.getAttribute(Constants.SELECTED_RADIO_BTN) != null){
                       ( (Radio)row.getAttribute(Constants.SELECTED_RADIO_BTN)).setSelected(false);
                    }
