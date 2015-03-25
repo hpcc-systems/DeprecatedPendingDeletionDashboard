@@ -537,6 +537,7 @@ public class ChartPanel extends Panel {
                             Clients.showBusy(popup, "Fetching Input Parameters");
                             Events.echoEvent(new Event("onAddInputParams", inputListbox,popup));
                         }
+                     
                 }
             });
             

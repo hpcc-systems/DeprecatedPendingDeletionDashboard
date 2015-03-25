@@ -298,6 +298,26 @@ public class Dashboard {
         return buffer.toString();        
         
     }
+
+    public String getUsedFileType() {
+        ChartService chartService = (ChartService) SpringUtil.getBean("chartService");
+        if(!this.getHasCommonFilter()){
+            return "";
+        }else{
+            for(Portlet portlet : this.getPortletList()){
+                if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())
+                        && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()) {
+                    if(portlet.getChartData().getIsQuery()){
+                        
+                    }
+                   
+                }
+            }
+        }
+        
+        
+        return null;
+    }
     
     
 }

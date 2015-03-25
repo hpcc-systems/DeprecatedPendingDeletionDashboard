@@ -313,18 +313,18 @@ public class DashboardController extends SelectorComposer<Window>{
             //Checking for Common filters
             //Removing AddWidget , Configure Dashboard buttons for Single layout
             if(dashboard.getPortletList().size() == 1 && dashboard.getPortletList().get(0).getIsSinglePortlet()){
-            	addWidget.detach();
+                addWidget.detach();
             }
             for (Portlet portlet : dashboard.getPortletList()) {  
                 if(authenticationService.getUserCredential().hasRole(Constants.ROLE_API_VIEW_DASHBOARD)){
                     panel = new ChartPanel(portlet, Constants.SHOW_NO_BUTTONS);
                 } else if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_EDIT_DASHBOARD) ||
                         Constants.ROLE_ADMIN.equals(dashboard.getRole()) ) {
-                	panel = new ChartPanel(portlet, Constants.SHOW_ALL_BUTTONS);
+                    panel = new ChartPanel(portlet, Constants.SHOW_ALL_BUTTONS);
                 } else if(Constants.ROLE_CONTRIBUTOR.equals(dashboard.getRole())) {
-                	 panel = new ChartPanel(portlet, Constants.SHOW_EDIT_ONLY);
+                     panel = new ChartPanel(portlet, Constants.SHOW_EDIT_ONLY);
                 } else {
-               		panel = new ChartPanel(portlet, Constants.SHOW_NO_BUTTONS);                    
+                    panel = new ChartPanel(portlet, Constants.SHOW_NO_BUTTONS);                    
                 }
                                 
                 portalChildren.get(portlet.getColumn()).appendChild(panel);
@@ -452,6 +452,10 @@ public class DashboardController extends SelectorComposer<Window>{
         //with filter columns for existing queries as well
         Map<String, Map<String,Set<String>>>  newInputParams = new LinkedHashMap<String, Map<String,Set<String>>>();
         boolean isInputparamCollected = false;
+
+        if(commonInputParams == null){
+            commonInputParams =  new LinkedHashMap<String, Map<String,Set<String>>>();
+        }
         for(InputParam globalInput : persistedGlobalInputParams){
                 Set<String> distinctValues = new HashSet<>();
                 for(Portlet portlet : dashboard.getPortletList()){
@@ -487,12 +491,18 @@ public class DashboardController extends SelectorComposer<Window>{
             }
            
 
-        if(commonInputParams == null){
-            commonInputParams =  new LinkedHashMap<String, Map<String,Set<String>>>();
-        }
            
         if(!newInputParams.isEmpty()) {
             constructFilterItemForQuery(newInputParams);
+        }else{
+           dashboard.getPortletList().stream().forEach(portlet ->{
+               if (Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())
+                       && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()){
+                   getInputParams(portlet,newInputParams,null);
+               }
+           });
+           
+           constructFilterItemForQuery(newInputParams);
         }
         
     }
@@ -672,12 +682,12 @@ public class DashboardController extends SelectorComposer<Window>{
             listbox.addEventListener(Events.ON_SELECT, paramsSelectListener);
             
             for (Entry<String, Set<String>> inputParamsEntry : entry.getValue().entrySet()) {
-            	if(!inputParamsEntry.getValue().isEmpty()){
-	                listitem = new Listitem(inputParamsEntry.getKey());
-	                listitem.setAttribute(Constants.INPUT_PARAM_NAME, inputParamsEntry.getKey());
-	                 listitem.setAttribute(Constants.INPUT_PARAM_VALUE, inputParamsEntry.getValue());
-	                listbox.appendChild(listitem);
-            	}
+                if(!inputParamsEntry.getValue().isEmpty()){
+                    listitem = new Listitem(inputParamsEntry.getKey());
+                    listitem.setAttribute(Constants.INPUT_PARAM_NAME, inputParamsEntry.getKey());
+                     listitem.setAttribute(Constants.INPUT_PARAM_VALUE, inputParamsEntry.getValue());
+                    listbox.appendChild(listitem);
+                }
             }
             tabpanel.appendChild(listbox);
             commonFilterTabbox.getFirstChild().appendChild(tab);
@@ -723,7 +733,7 @@ public class DashboardController extends SelectorComposer<Window>{
             List<Filter> filtersToReomove = null;
             for (Portlet portlet : dashboard.getPortletList()) {
                 if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())
-                		&& Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType())
+                        && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType())
                                 .getCategory()
                         && portlet.getChartData().getIsFiltered()) {
                     
@@ -731,7 +741,7 @@ public class DashboardController extends SelectorComposer<Window>{
                     for (Filter filter : portlet.getChartData().getFilters()) {
                         // overriding the portlet specific filter by selected global/dashboard filter
                         if (!filter.getIsCommonFilter()
-                        		&& filter.equals(newFilter)) {
+                                && filter.equals(newFilter)) {
                             filtersToReomove.add(filter);                        
                         }
                     }
@@ -853,12 +863,12 @@ public class DashboardController extends SelectorComposer<Window>{
         
             } else if (Constants.CATEGORY_HIERARCHY ==  chartService.getCharts().get(portlet.getChartType())
                     .getCategory()) {  
-            	//setting tree data into session with id as 'dashboardId_portletId'
-            	HttpSession httpSession = (HttpSession) Executions.getCurrent().getSession().getNativeSession();
-            	StringBuilder builder = new StringBuilder();
-            	builder.append(dashboardId).append("_").append(portlet.getId());
-        		httpSession.setAttribute(builder.toString(), (TreeData) portlet.getChartData());
-        		
+                //setting tree data into session with id as 'dashboardId_portletId'
+                HttpSession httpSession = (HttpSession) Executions.getCurrent().getSession().getNativeSession();
+                StringBuilder builder = new StringBuilder();
+                builder.append(dashboardId).append("_").append(portlet.getId());
+                httpSession.setAttribute(builder.toString(), (TreeData) portlet.getChartData());
+                
                 chartRenderer.constructTreeJSON((TreeData) portlet.getChartData(), portlet,builder.toString());
             }
                 
@@ -914,7 +924,6 @@ public class DashboardController extends SelectorComposer<Window>{
             }
         }
     };
-    private Portlet portlet;
     
     private Row createQueryInputFilterRow(InputParam inputparam, Set<String> inputDistinctValues)
             throws HpccConnectionException,RemoteException {
@@ -927,7 +936,7 @@ public class DashboardController extends SelectorComposer<Window>{
             row.setAttribute(Constants.ROW_CHECKED, false);
         }
         if(appliedCommonInputParam== null ){
-        	appliedCommonInputParam = new HashSet<InputParam>();
+            appliedCommonInputParam = new HashSet<InputParam>();
         }
         Sessions.getCurrent().setAttribute(Constants.COMMON_FILTERS, appliedCommonInputParam);
         appliedCommonInputParam.add(inputparam);
@@ -968,7 +977,7 @@ public class DashboardController extends SelectorComposer<Window>{
             anchorlayout.appendChild(anchorchildren);
             //To display previously selected filter values
             if(value.equals(inputparam.getValue())){
-            	radio.setChecked(true);
+                radio.setChecked(true);
                 row.setAttribute(Constants.ROW_CHECKED, true);
                 row.setAttribute(Constants.SELECTED_RADIO_BTN, radio);
             }
@@ -1016,13 +1025,18 @@ public class DashboardController extends SelectorComposer<Window>{
            
             boolean hasSelectedInputparam =false;
             //Checks this portlet query has inputparam with selected inputparam name
-             for(String file : chartData.getFiles()){
-                   Component tab = commonFilterTabbox.getFirstChild().getChildren().stream().filter(component ->
-                    (component.getAttribute(Constants.INPUT_PARAM_QUERY).equals(file))).findFirst().get();
-                  if(((Set<String>)tab.getAttribute(Constants.INPUT_PARAM_NAMES)).contains(inputparam.getName())){
-                      hasSelectedInputparam = true;
-                  }
-              }
+            try{
+                for(String file : chartData.getFiles()){
+                    Component tab = commonFilterTabbox.getFirstChild().getChildren().stream().filter(component ->
+                     (component.getAttribute(Constants.INPUT_PARAM_QUERY).equals(file))).findFirst().get();
+                   if(((Set<String>)tab.getAttribute(Constants.INPUT_PARAM_NAMES)).contains(inputparam.getName())){
+                       hasSelectedInputparam = true;
+                   }
+               }
+            }catch(NoSuchElementException e){
+                //Need not to log this exception
+            }
+             
              if(hasSelectedInputparam){
                  if(chartData.getInputParams() == null){
                      List<InputParam>  inputs = new ArrayList<InputParam>();
@@ -1093,7 +1107,7 @@ public class DashboardController extends SelectorComposer<Window>{
         Set<String> values = new LinkedHashSet<String>();
         for (Portlet portlet : dashboard.getPortletList()) {
             if(portlet.getWidgetState().equals(Constants.STATE_LIVE_CHART)
-            		&& Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType())
+                    && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType())
                             .getCategory()
                     && portlet.getChartData().getFiles().contains(filter.getFileName())) {
                 values.addAll(
@@ -1401,7 +1415,7 @@ public class DashboardController extends SelectorComposer<Window>{
         
         for (Portlet portlet : dashboard.getPortletList()) {
             if(!Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())
-            		|| Constants.CATEGORY_TEXT_EDITOR ==  chartService.getCharts().get(portlet.getChartType())
+                    || Constants.CATEGORY_TEXT_EDITOR ==  chartService.getCharts().get(portlet.getChartType())
                             .getCategory()) {
                 continue;
             }
@@ -1421,16 +1435,16 @@ public class DashboardController extends SelectorComposer<Window>{
                 chartData = (TableData) portlet.getChartData();                
             }else if(Constants.CATEGORY_CLUSTER ==  chartService.getCharts().get(portlet.getChartType())
                     .getCategory()){
-            	 chartData = (ClusterData) portlet.getChartData();
+                 chartData = (ClusterData) portlet.getChartData();
             }
             else if(Constants.CATEGORY_GAUGE ==  chartService.getCharts().get(portlet.getChartType())
                     .getCategory()){
-            	 chartData = (GaugeChartData) portlet.getChartData();
-            	
+                 chartData = (GaugeChartData) portlet.getChartData();
+                
             } else if(Constants.CATEGORY_TEXT_EDITOR ==  chartService.getCharts().get(portlet.getChartType())
                     .getCategory()){
-            	 chartData = (TextData) portlet.getChartData();
-            	
+                 chartData = (TextData) portlet.getChartData();
+                
             }
             
             if(chartData.getFiles().contains(filter.getFileName())) {
@@ -1745,7 +1759,7 @@ public class DashboardController extends SelectorComposer<Window>{
     final EventListener<Event> onLayoutChange = new EventListener<Event>() {
 
         @Override
-        public void onEvent(Event event) throws Exception {        	
+        public void onEvent(Event event) throws Exception {         
         
             // Check if any visible panels are hidden when layout is changed
             if(dashboard.getColumnCount() < oldColumnCount) {
@@ -1776,7 +1790,6 @@ public class DashboardController extends SelectorComposer<Window>{
             if(dashboard.getHasCommonFilter()){
                 boolean isQueryUsed = false;
                 boolean isFileUsed = false;
-               
                 if(!dashboard.getPortletList().get(0).getChartData().getIsQuery()){
                     //All charts used logical files
                     isFileUsed = true;
@@ -1952,20 +1965,20 @@ public class DashboardController extends SelectorComposer<Window>{
 
 
     protected void getfileFields(Portlet portlet) {
-    	// Getting fields for each files
-    	  try {
-		        Map<String, List<Field>> fieldMap = new LinkedHashMap<String, List<Field>>();
-		        List<Field> fields = null;
-		        for (String file : portlet.getChartData().getFiles()) {
-		            fields = new ArrayList<Field>();
-	            	fields.addAll(hpccService.getColumns(file, portlet.getChartData().getHpccConnection()));				
-		            fieldMap.put(file, fields);
-		        }
-		        portlet.getChartData().setFields(fieldMap);
+        // Getting fields for each files
+          try {
+                Map<String, List<Field>> fieldMap = new LinkedHashMap<String, List<Field>>();
+                List<Field> fields = null;
+                for (String file : portlet.getChartData().getFiles()) {
+                    fields = new ArrayList<Field>();
+                    fields.addAll(hpccService.getColumns(file, portlet.getChartData().getHpccConnection()));                
+                    fieldMap.put(file, fields);
+                }
+                portlet.getChartData().setFields(fieldMap);
         } catch ( Exception e) {
-        	LOG.error(Constants.EXCEPTION,e);
-		}
-	}
+            LOG.error(Constants.EXCEPTION,e);
+        }
+    }
     
     protected void getInputParams(Portlet portlet, Map<String, Map<String, Set<String>>> newInputParams,
             QuerySchema querySchema) {
@@ -1992,7 +2005,7 @@ public class DashboardController extends SelectorComposer<Window>{
 
     }
 
-	/**
+    /**
      *  When a widget is deleted
      */
     final EventListener<Event> onPanelClose = new EventListener<Event>() {
@@ -2053,9 +2066,9 @@ public class DashboardController extends SelectorComposer<Window>{
 
             //Logic assumes no same filenames in different HPCC Systems in a single dashboard
             //TODO: Fix
-			if (Constants.STATE_LIVE_CHART.equals(deletedPortlet.getWidgetState())
-					&& Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(deletedPortlet.getChartType())
-							.getCategory()) {
+            if (Constants.STATE_LIVE_CHART.equals(deletedPortlet.getWidgetState())
+                    && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(deletedPortlet.getChartType())
+                            .getCategory()) {
                 //Files being detached from Dashboard
                 List<String> files = new ArrayList<String>();
                 files.addAll(deletedPortlet.getChartData().getFiles());
@@ -2063,8 +2076,8 @@ public class DashboardController extends SelectorComposer<Window>{
                 for (String deletedFile : deletedPortlet.getChartData().getFiles()) {
                     for (Portlet portlet : dashboard.getPortletList()) {
                         if(portlet.getWidgetState().equals(Constants.STATE_LIVE_CHART) 
-                        		&& Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(
-                        				portlet.getChartType()).getCategory()
+                                && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(
+                                        portlet.getChartType()).getCategory()
                                 && portlet.getChartData().getFiles().contains(deletedFile)) {
                             files.remove(deletedFile);
                         }

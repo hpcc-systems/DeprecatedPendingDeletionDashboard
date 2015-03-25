@@ -63,14 +63,19 @@ public class InputListitem extends Listitem {
             listcell.appendChild(popup);
             listcell.appendChild(playBtn);
             
-            final Label label = new Label();
+          /*  final Label label = new Label();
             label.setSclass("form-control input-sm");
-            listcell.appendChild(label);
+             listcell.appendChild(label);*/
+            Textbox textbox = new Textbox();
+            textbox.setSclass("form-control input-sm");
+            listcell.appendChild(textbox);
+            
+           
             
             popupListbox.addEventListener(Events.ON_SELECT, new EventListener<Event>() {
                 @Override
                 public void onEvent(Event event) throws Exception {
-                    label.setValue(popupListbox.getSelectedItem().getLabel());    
+                    textbox.setValue(popupListbox.getSelectedItem().getLabel());    
                     popup.close();
                 }
             });
@@ -79,7 +84,7 @@ public class InputListitem extends Listitem {
                 @Override
                 public void onEvent(Event event) throws Exception {
                     popupListbox.setSelectedItem(null);
-                    label.setValue(null);
+                    textbox.setValue(null);
                     popup.close();
                 }
                 

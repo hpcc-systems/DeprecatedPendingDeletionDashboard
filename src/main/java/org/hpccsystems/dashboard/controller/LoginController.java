@@ -138,9 +138,10 @@ public class LoginController extends SelectorComposer<Component> {
             LOG.debug("Request path - " + session.getAttribute(Constants.REQUEST_PATH));
         }
         if(session.getAttribute(Constants.REQUEST_PATH) != null) {
+            String requestPath = session.getAttribute(Constants.REQUEST_PATH).toString();
             //When request has a predefined path
-            Executions.sendRedirect(session.getAttribute(Constants.REQUEST_PATH).toString());
             session.removeAttribute(Constants.REQUEST_PATH);
+            Executions.sendRedirect(requestPath);          
         } else {
             Executions.sendRedirect("/demo/");
         }
