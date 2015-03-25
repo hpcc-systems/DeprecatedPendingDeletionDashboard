@@ -92,6 +92,7 @@ import org.zkoss.zul.Vbox;
 import org.zkoss.zul.Window;
 
 import com.google.gson.Gson;
+import com.mysql.jdbc.StringUtils;
 
 
 /**
@@ -413,7 +414,7 @@ public class ChartPanel extends Panel {
         @Override
         public void onEvent(Event event) throws Exception {
             HPCCQueryService hpccQueryService = (HPCCQueryService) SpringUtil.getBean(Constants.HPCC_QUERY_SERVICE);
-            
+            inputListbox.getChildren().clear();
             Map<String, Set<String>> paramValues = null;
             try {
                 
@@ -438,7 +439,7 @@ public class ChartPanel extends Panel {
                              InputParam appliedInput = portlet.getChartData() .getInputParams() .stream()
                                             .filter(input -> input.getName().equals(
                                                     entry.getKey())).findAny().get();
-                             if (appliedInput != null && appliedInput.getValue() != null) {
+                             if (appliedInput != null && !StringUtils.isNullOrEmpty(appliedInput.getValue())) {
                                  listitem.setInputValue(appliedInput.getValue());
                              }
                             }catch(NoSuchElementException e){
@@ -531,9 +532,10 @@ public class ChartPanel extends Panel {
                 @Override
                 public void onEvent(MouseEvent event) throws Exception {
                     Boolean hasParamValues = (Boolean)inputListbox.getAttribute(Constants.HAS_INPUT_PARAM_VALUES);
+                    Boolean hasCommonFilter = (Boolean)ChartPanel.this.getAttribute(Constants.COMMON_FILTERS_ENABLED);
                      if(Constants.RELEVANT_CONFIG == chartService.getCharts().get(portlet.getChartType()).getCategory()
                              || (portlet.getChartData().getInputParams() != null 
-                             && (hasParamValues == null || !hasParamValues))){
+                             && ((hasCommonFilter != null && hasCommonFilter)  || hasParamValues == null || !hasParamValues))){
                             Clients.showBusy(popup, "Fetching Input Parameters");
                             Events.echoEvent(new Event("onAddInputParams", inputListbox,popup));
                         }

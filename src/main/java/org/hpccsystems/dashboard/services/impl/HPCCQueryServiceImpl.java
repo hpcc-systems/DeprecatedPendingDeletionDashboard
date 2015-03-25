@@ -37,7 +37,6 @@ import javax.xml.xpath.XPathExpressionException;
 import javax.xml.xpath.XPathFactory;
 
 import org.apache.commons.codec.binary.Base64;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.chart.entity.AdvancedFilter;
@@ -67,6 +66,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import com.mysql.jdbc.StringUtils;
 
 public class HPCCQueryServiceImpl implements HPCCQueryService {
 
@@ -480,10 +480,12 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
              urlBuilder.append("&");
              while (iterator.hasNext()) {
                  InputParam inputParam = iterator.next();
+                 if(!StringUtils.isNullOrEmpty(inputParam.getValue())){
                      urlBuilder.append(requestbuilder).append(inputParam.getName()).append("=").append(URLEncoder.encode(inputParam.getValue(),Constants.CHAR_CODE));
                      if (iterator.hasNext()) {
                          urlBuilder.append("&");
                      }
+                 }
              }
          }
          
@@ -623,10 +625,11 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
                 Iterator<InputParam> iterator = chartData.getInputParams().iterator();
                 while (iterator.hasNext()) {
                     InputParam param =  iterator.next();
-                    urlBuilder.append(param.getName()).append("=").append(URLEncoder.encode(param.getValue(),Constants.CHAR_CODE));
-
-                    if (iterator.hasNext()) {
-                        urlBuilder.append("&");
+                    if(!StringUtils.isNullOrEmpty(param.getValue())){
+                        urlBuilder.append(param.getName()).append("=").append(URLEncoder.encode(param.getValue(),Constants.CHAR_CODE));
+                        if (iterator.hasNext()) {
+                            urlBuilder.append("&");
+                        }
                     }
                 }
             }
@@ -914,13 +917,13 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
             Iterator<InputParam> iterator = chartData.getInputParams().iterator();
             while (iterator.hasNext()) {
                 InputParam param = iterator.next();
-                if(param.getValue() != null){
+                if(!StringUtils.isNullOrEmpty(param.getValue())){
                     selectedInputParams.add(param.getName());
-                }
-                urlBuilder.append(param.getName()).append("=").append(URLEncoder.encode(param.getValue(),Constants.CHAR_CODE));
-
-                if (iterator.hasNext()) {
-                    urlBuilder.append("&");
+                    urlBuilder.append(param.getName()).append("=").append(URLEncoder.encode(param.getValue(),Constants.CHAR_CODE));
+    
+                    if (iterator.hasNext()) {
+                        urlBuilder.append("&");
+                    }
                 }
             }                     
         }
@@ -1203,10 +1206,12 @@ return resultDataMap;
                     Iterator<InputParam> iterator = tableData.getInputParams().iterator();
                     while (iterator.hasNext()) {
                         InputParam param = iterator.next();
-                        urlBuilder.append(param.getName()).append("=").append(URLEncoder.encode(param.getValue(),Constants.CHAR_CODE));               
-    
-                        if (iterator.hasNext()) {
-                            urlBuilder.append("&");
+                        if(!StringUtils.isNullOrEmpty(param.getValue())){
+                            urlBuilder.append(param.getName()).append("=").append(URLEncoder.encode(param.getValue(),Constants.CHAR_CODE));               
+        
+                            if (iterator.hasNext()) {
+                                urlBuilder.append("&");
+                            }
                         }
                     }
                 }
@@ -1362,10 +1367,12 @@ return resultDataMap;
              Iterator<InputParam> iterator = tableData.getInputParams().iterator();
              while (iterator.hasNext()) {
                  InputParam param = iterator.next();
-                 urlBuilder.append(requestbuilder).append(param.getName()).append("=").append(URLEncoder.encode(param.getValue(),Constants.CHAR_CODE));               
+                 if(!StringUtils.isNullOrEmpty(param.getValue())){
+                     urlBuilder.append(requestbuilder).append(param.getName()).append("=").append(URLEncoder.encode(param.getValue(),Constants.CHAR_CODE));
 
-                 if (iterator.hasNext()) {
-                     urlBuilder.append("&");
+                     if (iterator.hasNext()) {
+                         urlBuilder.append("&");
+                     }
                  }
              }
          }
@@ -1557,7 +1564,7 @@ return resultDataMap;
 
                      fstElmnt = (Element) fstNode;
                      for (Entry<String,Set<String>> entry: inputParamValues.entrySet()) {
-                         lstNmElmntLst = fstElmnt.getElementsByTagName(StringUtils.removeEndIgnoreCase(entry.getKey(), "in"));
+                         lstNmElmntLst = fstElmnt.getElementsByTagName(org.apache.commons.lang.StringUtils.removeEndIgnoreCase(entry.getKey(), "in"));
                          lstNmElmnt = (Element) lstNmElmntLst.item(0);
                          if (lstNmElmnt != null) {
                              entry.getValue().add(lstNmElmnt.getTextContent());

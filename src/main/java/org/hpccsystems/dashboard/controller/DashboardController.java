@@ -372,12 +372,14 @@ public class DashboardController extends SelectorComposer<Window>{
         //Setting common HpccObject to Session
         if(dashboard.getHasCommonFilter()) {
             setCommonHpccConnection();
+            setPanelCommonfilterIndicator();
         } else {
             Sessions.getCurrent().setAttribute(Constants.HPCC_CONNECTION, null);
         }
         
         //Showing common filters panel true for new Dashboards
         if(dashboard.getHasCommonFilter()) {
+            
             commonFiltersPanel.setVisible(true);
         }
     }
@@ -883,6 +885,16 @@ public class DashboardController extends SelectorComposer<Window>{
                     Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState()) 
                     && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType())
                             .getCategory()) {
+                
+                //As dashboard has commonfilter enabled,setting ''hasCommonFileter' true for the  chart panel
+                //It will tell whether to fetch the fresh hpcc data while selecting the inputparam button.
+                List<Component> chartPanels = portalChildren.get(portlet.getColumn()).getChildren();
+                ChartPanel presentChartpanel = (ChartPanel) chartPanels.stream()
+                        .filter(panel -> portlet.getId().equals(
+                                ((ChartPanel) panel).getPortlet().getId()))
+                        .findFirst().get();
+                presentChartpanel.setAttribute(Constants.COMMON_FILTERS_ENABLED, true);
+                
                 newFiles = new LinkedHashMap<String, Set<Field>>();
                 Set<Field> fieldSet;
                 if(!portlet.getChartData().getIsQuery()){
@@ -1770,6 +1782,8 @@ public class DashboardController extends SelectorComposer<Window>{
             //Showing Common filters panel
             if(dashboard.getHasCommonFilter()){
                 
+                setPanelCommonfilterIndicator();
+                
                 if(Constants.LOGICAL_FILE.equals(dashboard.getFileType())) {
                     if(commonFields == null){
                         commonFields  = new LinkedHashMap<String, Set<Field>>();
@@ -1819,6 +1833,7 @@ public class DashboardController extends SelectorComposer<Window>{
                 
                 commonFiltersPanel.setVisible(true);
             } else {  
+                resetPanelCommonfilterIndicator();
                 if (filterRows.getChildren() != null && !filterRows.getChildren().isEmpty() ) {
                     removeGlobalFilters();
                 }
@@ -1875,6 +1890,43 @@ public class DashboardController extends SelectorComposer<Window>{
         }
     }
     
+  //As dashboard has commonfilter enabled,setting 'hasCommonFileter' false for the  chartpanel
+    //It will tell whether to fetch the fresh hpcc data while selecting the inputparam button.
+    protected void resetPanelCommonfilterIndicator() {
+        portalChildren.stream().forEach(portalChild ->{
+            portalChild.getChildren().stream().forEach(childComp ->{
+               ChartPanel panel = ((ChartPanel)childComp);
+                if(panel instanceof ChartPanel 
+                        &&  Constants.STATE_LIVE_CHART.equals(panel.getPortlet().getWidgetState())
+                        && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(
+                                panel.getPortlet().getChartType()).getCategory()){
+                    panel.setAttribute(Constants.COMMON_FILTERS_ENABLED, false);
+                }
+                
+            });
+        });
+    }
+
+
+    //As dashboard has commonfilter enabled,setting 'hasCommonFileter' true for the  chartpanel
+    //It will decide not to fetch the fresh hpcc data while selecting the inputparam button.
+    protected void setPanelCommonfilterIndicator() {        
+        portalChildren.stream().forEach(portalChild ->{
+            portalChild.getChildren().stream().forEach(childComp ->{
+               ChartPanel panel = ((ChartPanel)childComp);
+                if(panel instanceof ChartPanel 
+                        &&  Constants.STATE_LIVE_CHART.equals(panel.getPortlet().getWidgetState())
+                        && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(
+                                panel.getPortlet().getChartType()).getCategory()){
+                    panel.setAttribute(Constants.COMMON_FILTERS_ENABLED, true);
+                }
+                
+            });
+        });
+        
+    }
+
+
     private void removeInputparamUpdateWidget() {
         dashboard.getPortletList().stream().forEach(portlet ->{
             if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())
