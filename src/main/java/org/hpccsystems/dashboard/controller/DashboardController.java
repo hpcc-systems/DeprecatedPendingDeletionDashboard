@@ -201,7 +201,7 @@ public class DashboardController extends SelectorComposer<Window>{
                             .filter(panel -> portlet.getId().equals(
                                     ((ChartPanel) panel).getPortlet().getId()))
                             .findFirst().get();
-                   selectedTablePanel.drawTableWidget();
+                   selectedTablePanel.drawTableWidget(true);
         });
     };
     
@@ -390,23 +390,13 @@ public class DashboardController extends SelectorComposer<Window>{
 
         if (dashboard.getHasCommonFilter()) {
 
-            commonFiltersPanel.setVisible(true);
-            
-            boolean isQueryUsed = false;
-            boolean isFileUsed = false;
-           
-            if(!dashboard.getPortletList().get(0).getChartData().getIsQuery()){
-                //All charts used logical files
-                isFileUsed = true;
-            }else{
-                //All charts used queries
-                isQueryUsed = true;
-            }
-            
-            if(isFileUsed) {
+            commonFiltersPanel.setVisible(true);            
+            //All charts used logical files
+            if(Constants.LOGICAL_FILE.equals(dashboard.getFileType())) {
                 constructDBCommonFilters();
                 
-            }else if(isQueryUsed){
+            }else if(Constants.QUERY.equals(dashboard.getFileType())){
+                //All charts used queries
                 constructDBCommonInputparams();
             }
           
@@ -851,7 +841,7 @@ public class DashboardController extends SelectorComposer<Window>{
         
         if(Constants.CATEGORY_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()){    
             //Refreshing table with updated filter values
-            panel.drawTableWidget();
+            panel.drawTableWidget(true);
         }else{
             ChartRenderer chartRenderer = (ChartRenderer) SpringUtil.getBean("chartRenderer");
             //Refreshing chart with updated filter values
@@ -1482,25 +1472,16 @@ public class DashboardController extends SelectorComposer<Window>{
             Row removedRow = (Row) event.getTarget().getParent().getParent();
             Boolean rowChecked = (Boolean)removedRow.getAttribute(Constants.ROW_CHECKED);
             
-            boolean isQueryUsed = false;
-            boolean isFileUsed = false;
-            if(!dashboard.getPortletList().get(0).getChartData().getIsQuery()){
-                //All charts used logical files
-                isFileUsed = true;
-            }else{
-                //All charts used queries
-                isQueryUsed = true;
-            }
             //refresh the portlets, if the removed row/filter has any checked values
             if(rowChecked){
                 Iterator<Portlet> iterator =null;
-                if(isFileUsed){
+                if(Constants.LOGICAL_FILE.equals(dashboard.getFileType())){
                     iterator = removeFilter(removedRow).iterator();
                     
                     Filter removedFilter = (Filter)removedRow.getAttribute(Constants.FILTER);
                     //Need To remove the filter from applied filter set
                     appliedCommonFilters.remove(removedFilter);
-                }else if(isQueryUsed){
+                }else if(Constants.QUERY.equals(dashboard.getFileType())){
                     iterator = removeInputparam(removedRow).iterator();
                     
                     String removedInput =  removedRow.getAttribute(Constants.INPUT_PARAM_NAME).toString();
@@ -1788,17 +1769,8 @@ public class DashboardController extends SelectorComposer<Window>{
             
             //Showing Common filters panel
             if(dashboard.getHasCommonFilter()){
-                boolean isQueryUsed = false;
-                boolean isFileUsed = false;
-                if(!dashboard.getPortletList().get(0).getChartData().getIsQuery()){
-                    //All charts used logical files
-                    isFileUsed = true;
-                }else{
-                    //All charts used queries
-                    isQueryUsed = true;
-                }
                 
-                if(isFileUsed) {
+                if(Constants.LOGICAL_FILE.equals(dashboard.getFileType())) {
                     if(commonFields == null){
                         commonFields  = new LinkedHashMap<String, Set<Field>>();
                     }
@@ -1827,7 +1799,7 @@ public class DashboardController extends SelectorComposer<Window>{
                     if(!newCommonFields.isEmpty()) {
                         constructFilterItem(newCommonFields);
                     }
-                }else if(isQueryUsed){
+                }else if(Constants.QUERY.equals(dashboard.getFileType())){
                     if(commonInputParams == null){
                         commonInputParams =  new LinkedHashMap<String, Map<String,Set<String>>>();
                     }
@@ -1885,19 +1857,10 @@ public class DashboardController extends SelectorComposer<Window>{
      */
     private void removeGlobalFilters() {
         try {
-            boolean isQueryUsed = false;
-            boolean isFileUsed = false;
-            if(!dashboard.getPortletList().get(0).getChartData().getIsQuery()){
-                //All charts used logical files
-                isFileUsed = true;
-            }else{
-                //All charts used queries
-                isQueryUsed = true;
-            }
-            if(isFileUsed){
+            if(Constants.LOGICAL_FILE.equals(dashboard.getFileType())){
                 removeFilterUpdateWidget();
                
-            }else if(isQueryUsed){
+            }else if(Constants.QUERY.equals(dashboard.getFileType())){
                 removeInputparamUpdateWidget();
             }
             Sessions.getCurrent().removeAttribute(Constants.COMMON_FILTERS);

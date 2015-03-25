@@ -379,7 +379,7 @@ public class ChartPanel extends Panel {
             }
             
             if (Constants.CATEGORY_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()) {
-                drawTableWidget();
+                drawTableWidget(false);
             } else if (Constants.CATEGORY_TEXT_EDITOR == chartService.getCharts().get(portlet.getChartType()).getCategory()) {
                 //onCreateDocumentWidget();
             } else if(Constants.CATEGORY_SCORED_SEARCH_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()){
@@ -631,7 +631,7 @@ public class ChartPanel extends Panel {
 
             // To construct Table Widget
             if (Constants.CATEGORY_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()) {
-                drawTableWidget();
+                drawTableWidget(true);
             } else if (Constants.CATEGORY_TEXT_EDITOR == chartService.getCharts().get(portlet.getChartType()).getCategory()) {
                 onCreateDocumentWidget();
             } else if(Constants.CATEGORY_SCORED_SEARCH_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()){
@@ -884,14 +884,14 @@ public class ChartPanel extends Panel {
     }
     
     //To construct Table Widget
-    public void drawTableWidget(){
+    public void drawTableWidget(boolean refreshData){
         TableRenderer tableRenderer = (TableRenderer) SpringUtil.getBean("tableRenderer");
         
         if(LOG.isDebugEnabled()) {
             LOG.debug("Fields -> " + portlet.getChartData().getFields());
         }
         
-        Vbox vbox = tableRenderer.constructTableWidget(portlet, (TableData) portlet.getChartData(), false);
+        Vbox vbox = tableRenderer.constructTableWidget(portlet, (TableData) portlet.getChartData(), refreshData);
                 
         chartDiv.getChildren().clear();
         chartDiv.appendChild(vbox);

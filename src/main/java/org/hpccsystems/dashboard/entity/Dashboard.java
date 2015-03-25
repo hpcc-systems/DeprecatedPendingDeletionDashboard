@@ -299,23 +299,22 @@ public class Dashboard {
         
     }
 
-    public String getUsedFileType() {
+    public String getFileType() {
         ChartService chartService = (ChartService) SpringUtil.getBean("chartService");
-        if(!this.getHasCommonFilter()){
-            return "";
-        }else{
+        if(this.getHasCommonFilter()){
             for(Portlet portlet : this.getPortletList()){
                 if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())
                         && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()) {
-                    if(portlet.getChartData().getIsQuery()){
-                        
+                    if(!portlet.getChartData().getIsQuery()){
+                        //used logical files for all the charts
+                        return Constants.LOGICAL_FILE;
+                    }else{
+                      //used queries for all the charts
+                        return Constants.QUERY;
                     }
-                   
                 }
             }
         }
-        
-        
         return null;
     }
     

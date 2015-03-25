@@ -54,13 +54,13 @@ public class TableRenderer {
      * @return Table as Listbox
      */
     public Vbox constructTableWidget(final Portlet portlet,
-            TableData chartData, Boolean isEditing) {
+            TableData chartData, boolean refreshData) {
 
         HPCCService hpccService = (HPCCService) SpringUtil.getBean(Constants.HPCC_SERVICE);
 
         Map<String, List<Attribute>> tableDataMap = chartData.getHpccTableData();
         try {
-            if(tableDataMap == null){
+            if(refreshData || tableDataMap == null){
                 tableDataMap = hpccService.fetchTableData(chartData);
             }
         } catch (Exception e) {
