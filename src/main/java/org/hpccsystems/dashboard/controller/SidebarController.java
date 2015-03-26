@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.xml.rpc.ServiceException;
 
@@ -95,18 +96,27 @@ public class SidebarController extends GenericForwardComposer<Component>{
         try {
             //Circuit/External Source Flow   
             if(authenticationService.getUserCredential().hasRole(Constants.ROLE_API_VIEW_DASHBOARD)){
-                String sharedDashboard = DashboardUtil.extractShareParam(Executions.getCurrent().getParameterMap().get(Constants.PARAM_SHARE)[0]);
-                List<String> dashboards = new ArrayList<String>();
-                dashboards.add(sharedDashboard);
-                
-                sideBarPageList = getApiViewDashboardList(
-                        authenticationService.getUserCredential().getUserId(),
+                String sharedDashboardId = DashboardUtil.extractShareParam(Executions.getCurrent().getParameterMap().get(Constants.PARAM_SHARE)[0]);
+                Dashboard shareDashboard = new Dashboard();
+                shareDashboard.setDashboardId(Integer.valueOf(sharedDashboardId));
+                List<String> groupIds = getGroupIds(); 
+                //TODO:need to check the filtering dashbords by application id
+                List<Dashboard> shareDashboardList = dashboardService.retrieveDashboards(
                         authenticationService.getUserCredential().getApplicationId(),
-                        dashboards
-                     );
-                if(sideBarPageList == null || sideBarPageList.isEmpty()) {
-                    throw new Exception("No Dashboards found");
+                        authenticationService.getUserCredential().getUserId(), 
+                        groupIds); 
+                if(shareDashboardList.contains(shareDashboard)){
+                    sideBarPageList = shareDashboardList
+                            .stream()
+                            .filter(searchDashboard -> (searchDashboard
+                                    .getDashboardId().equals(shareDashboard
+                                    .getDashboardId())))
+                            .collect(Collectors.toList());
+                }else{
+                    Clients.showNotification("Not authorized to view this Dashboard", true);
+                    return;
                 }
+                
             }else if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_EDIT_DASHBOARD)){
                 String[] dashboardIdArray = (String[])Executions.getCurrent().getParameterValues(Constants.DB_DASHBOARD_ID);
                 List<String> dashboardIdList =Arrays.asList(dashboardIdArray);
