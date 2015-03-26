@@ -87,7 +87,7 @@ public class NumericFilterController extends SelectorComposer<Component>{
             //}
         } catch(Exception e) {
             if(!authenticationService.getUserCredential().getApplicationId().equals(Constants.CIRCUIT_APPLICATION_ID) || 
-                    authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD)){
+                    authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_EDIT_DASHBOARD)){
                 Clients.showNotification(Labels.getLabel("unableToFetchDataForFilterColumn"), 
                         "error", doneButton.getParent().getParent().getParent(), "middle_center", 3000, true);
             }else{
@@ -197,7 +197,7 @@ public class NumericFilterController extends SelectorComposer<Component>{
             Events.echoEvent(new Event("onDrawChart", parent));
         } catch(Exception ex) {
             if(!authenticationService.getUserCredential().getApplicationId().equals(Constants.CIRCUIT_APPLICATION_ID) || 
-                    authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD)){
+                    authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_EDIT_DASHBOARD)){
                 Clients.showNotification(Labels.getLabel("unableToFetchColumnData"), "error", 
                         doneButton.getParent().getParent().getParent(), "middle_center", 3000, true);            
             }else{
@@ -208,7 +208,7 @@ public class NumericFilterController extends SelectorComposer<Component>{
         }        
         
         if(!authenticationService.getUserCredential().getApplicationId().equals(Constants.CIRCUIT_APPLICATION_ID) || 
-                authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD)){
+                authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_EDIT_DASHBOARD)){
             doneButton.setDisabled(false);    
         }
         

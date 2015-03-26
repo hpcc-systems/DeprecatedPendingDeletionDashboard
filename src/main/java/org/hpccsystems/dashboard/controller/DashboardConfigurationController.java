@@ -139,6 +139,7 @@ public class DashboardConfigurationController extends SelectorComposer<Component
             this.getSelf().detach();
         } else {
             //Creating new Board
+            boolean siglePortletEnabled = false;
             if(validateDashboardName()) {
                 dashboard = new Dashboard();
                 // Setting ADMIN role as the dashboard is being created
@@ -152,16 +153,12 @@ public class DashboardConfigurationController extends SelectorComposer<Component
                 
                 //Deciding Columns and rows
                 Integer panelCount = null;
-               if( dashboard.getColumnCount() == 1){
-                    panelCount = 2;
-                } else if (dashboard.getColumnCount() == 2){
-                    panelCount = 4;
-                } else if (dashboard.getColumnCount() == 3){
-                    panelCount = 9;
-                } else if(dashboard.getColumnCount() == 0){
+                panelCount = dashboard.getColumnCount();
+                if(dashboard.getColumnCount() == 0){
                	 panelCount = 1;
                	 //for single layout,column & row will be one
                	 dashboard.setColumnCount(1);
+               	siglePortletEnabled = true;
                }
                 
                 if(LOG.isDebugEnabled()){
@@ -175,7 +172,7 @@ public class DashboardConfigurationController extends SelectorComposer<Component
                         //generating portlet id
                         portlet.setColumn(i - 1);
                         portlet.setWidgetState(Constants.STATE_EMPTY);
-                        if(panelCount == 1){
+                        if(panelCount == 1 && siglePortletEnabled){
                         	portlet.setIsSinglePortlet(true);
                     	}
                         dashboard.getPortletList().add(portlet);
@@ -210,7 +207,7 @@ public class DashboardConfigurationController extends SelectorComposer<Component
 
     @Listen("onCheck = #commonFiltersCheckbox")
     public void commonFilerToggle() {
-        if( parent instanceof Window && 
+       if( parent instanceof Window && 
                 dashboard.hasLiveChart() && dashboard.getCommonHpccConnection() == null) {
             commonFiltersCheckbox.setChecked(false);
             Clients.showNotification(Labels.getLabel("noCommonHpccData"),

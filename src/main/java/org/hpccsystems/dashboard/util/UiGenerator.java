@@ -110,13 +110,13 @@ public class UiGenerator {
                 listItem.setDraggable("true");
                 if(DashboardUtil.checkNumeric(field.getDataType())){
                     listItem.setAttribute(Constants.COLUMN_DATA_TYPE, Constants.DATA_TYPE_NUMERIC);
-                    final Measure measure = new Measure(field.getColumnName(), "sum");
+                    final Measure measure = new Measure(field.getColumnName(), Constants.NONE);
                     listItem.setAttribute(Constants.MEASURE, measure);
                     
                     final Popup popup = new Popup();
                     popup.setWidth("100px");
                     popup.setZclass(Constants.STYLE_POPUP);
-                    final Button button = new Button("Sum");
+                    final Button button = new Button("None");
                     button.setZclass("btn btn-xs");
                     button.setStyle("font-size: 10px; float: right;");
                     button.setPopup(popup);

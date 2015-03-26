@@ -3,6 +3,8 @@ package org.hpccsystems.dashboard.chart.entity;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.hpccsystems.dashboard.common.Constants;
+
 @XmlRootElement
 public class Measure {
 
@@ -118,7 +120,7 @@ public class Measure {
 
     public String getLabel() {
         return getDisplayYColumnName() != null ? getDisplayYColumnName() :
-             getAggregateFunction() != null ? getColumn() + "_" + getAggregateFunction() :
+             (getAggregateFunction() != null && !Constants.NONE.equals(getAggregateFunction())) ? getColumn() + "_" + getAggregateFunction() :
                  getColumn();
     }
 }

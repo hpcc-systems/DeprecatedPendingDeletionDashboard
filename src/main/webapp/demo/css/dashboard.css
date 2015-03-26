@@ -23,6 +23,14 @@ display:none;
 	padding: 0;
 }
 
+.dashboard-body .dashboard-body-inner:last-child {
+	height: 100%;
+}
+
+.z-portallayout.z-portallayout-vertical {
+	min-height: 100%;
+}
+
 .img-btn {
 	font-size: 16px;
 	padding: 0;

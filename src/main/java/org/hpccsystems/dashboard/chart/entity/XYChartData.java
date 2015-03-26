@@ -107,7 +107,7 @@ public class XYChartData extends ChartData {
                 .append(", isGrouped=").append(isGrouped).append(", group=")
                 .append(group).append(", yAxisMinVal=").append(yAxisMinVal)
                 .append(", isAxisrotated=").append(isAxisrotated)
-                .append(", yAxisMaxVal=").append(yAxisMaxVal).append("]");
+                .append(", yAxisMaxVal=").append(yAxisMaxVal).append(", inputParams=").append(this.getInputParams()).append("]");
         return buffer.toString();
     }
 

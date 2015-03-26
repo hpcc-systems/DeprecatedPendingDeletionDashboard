@@ -7,6 +7,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
 import java.util.Set;
 
 import org.apache.commons.logging.Log;
@@ -15,7 +16,7 @@ import org.hpccsystems.dashboard.api.entity.ApiChartConfiguration;
 import org.hpccsystems.dashboard.chart.entity.Attribute;
 import org.hpccsystems.dashboard.chart.entity.Field;
 import org.hpccsystems.dashboard.chart.entity.Filter;
-import org.hpccsystems.dashboard.chart.entity.InputParams;
+import org.hpccsystems.dashboard.chart.entity.InputParam;
 import org.hpccsystems.dashboard.chart.entity.TableData;
 import org.hpccsystems.dashboard.chart.utils.TableRenderer;
 import org.hpccsystems.dashboard.common.Constants;
@@ -381,12 +382,6 @@ public class EditTableController extends SelectorComposer<Component> {
     public void onSaveParameter(Event event){
         Map<String,String> inputs = new HashMap<String, String>();
         
-        //multipleValues object was created for translating multiple value selection into List of Maps
-        // This is currently not being used
-        List<Object> multipleValues = new ArrayList<Object>();
-        
-        String multipleValueParamName = null;
-        
         for ( Component comp : inputParams.getChildren()) {
             if(comp instanceof InputListitem) {
                 InputListitem listitem = (InputListitem) comp;
@@ -394,20 +389,11 @@ public class EditTableController extends SelectorComposer<Component> {
             }
         }
         
-        InputParams inputParams;
-        List<InputParams> paramsList = new ArrayList<InputParams>();
-        if(multipleValues.isEmpty()) {
-            inputParams = new InputParams(inputs);
-            paramsList.add(inputParams);
-        } else {
-            Map<String,String> multiInputs;
-            for (Object object : multipleValues) {
-                multiInputs = new HashMap<String, String>();
-                multiInputs.putAll(inputs);
-                multiInputs.put(multipleValueParamName, object.toString());
-                inputParams = new InputParams(multiInputs);
-                paramsList.add(inputParams);
-            }
+        InputParam inputparam = null;
+        List<InputParam> paramsList = new ArrayList<InputParam>();
+        for(Entry<String, String> entry : inputs.entrySet()){
+            inputparam = new InputParam(entry.getKey(),entry.getValue());
+            paramsList.add(inputparam);
         }
         
         tableData.setInputParams(paramsList);
@@ -545,43 +531,41 @@ public class EditTableController extends SelectorComposer<Component> {
      */
     private void constructInputParameters(QuerySchema querySchema) throws Exception {
         
-   	 Map<String,Set<String>> paramValues = null;
+   	 Map<String,Set<String>> paramValues = querySchema.getInputParams();
    	 
         if(tableData.getInputParams() == null) {        	
-        	paramValues = querySchema.getInputParams();
             
-            Map<String, String> parameterMap = new LinkedHashMap<String, String>();
-            
+            InputParam inputParam = null;
+            List<InputParam> paramsList = new ArrayList<InputParam>();
             for(Entry<String, Set<String>> entry : paramValues.entrySet()){
             	 InputListitem listitem = new InputListitem(entry.getKey(), entry.getValue(), String.valueOf(portlet.getId()));
                  inputParams.appendChild(listitem);
-                 parameterMap.put(entry.getKey(), "");
+                 inputParam = new InputParam(entry.getKey());
+                 paramsList.add(inputParam);
             }
-            
-            InputParams inputParams = new InputParams(parameterMap);
-            List<InputParams> paramsList = new ArrayList<InputParams>();
-            paramsList.add(inputParams);
             
             tableData.setInputParams(paramsList);
             
         } else {//Retrieving from DB
-            paramValues = hpccQueryService.getInputParamDistinctValues(
-                    tableData.getFiles().iterator().next(),
-                    tableData.getInputParams().iterator().next().getParams().keySet(),
-                    tableData.getHpccConnection(),tableData.isGenericQuery(),
-                    tableData.getInputParamQuery());
             
-            for (InputParams inputParam : tableData.getInputParams()) {
-                for (Entry<String,String> param : inputParam.getParams().entrySet() ) {
-                    InputListitem listitem = new InputListitem(param.getKey(), 
-                            paramValues.get(param.getKey()), String.valueOf(portlet.getId()));
-                    if(param.getValue() != null 
-                            && !param.getValue().isEmpty()) {
-                        listitem.setInputValue(param.getValue());
-                    }
-                    inputParams.appendChild(listitem);
+            paramValues.entrySet().forEach(entry ->{
+                InputListitem listitem = new InputListitem(
+                        entry.getKey(), entry.getValue(), String.valueOf(portlet.getId()));
+                inputParams.appendChild(listitem);
+                try{
+                 InputParam appliedInput = tableData .getInputParams() .stream()
+                                .filter(input -> input.getName().equals(
+                                        entry.getKey())).findAny().get();
+                 if (appliedInput != null && appliedInput.getValue() != null) {
+                     listitem.setInputValue(appliedInput.getValue());
+                 }
+                }catch(NoSuchElementException e){
+                    //Need not to log.This occurs when an inputparam from Hpcc is not found in portlet's
+                    //applied inputparam
                 }
-            }
+                        
+                
+            });
             
         }
         

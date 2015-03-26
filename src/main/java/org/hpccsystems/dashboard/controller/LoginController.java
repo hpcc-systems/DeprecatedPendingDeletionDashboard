@@ -8,6 +8,7 @@ Copyright (C) 2012 Potix Corporation. All Rights Reserved.
 */
 package org.hpccsystems.dashboard.controller;
 
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -92,12 +93,12 @@ public class LoginController extends SelectorComposer<Component> {
     @WireVariable
     private ConditionalGroupService  conditionalGroupService; 
         
-    
+    Map<String, String[]> args = null;
     
     @Override
     public void doAfterCompose(final Component comp) throws Exception {
         super.doAfterCompose(comp);
-        
+        args = Executions.getCurrent().getParameterMap();
         //setting default language as English
         Session session = Sessions.getCurrent();
         String lang = (String)session.getAttribute("lang");
@@ -109,9 +110,10 @@ public class LoginController extends SelectorComposer<Component> {
             listItemEnglish.setSelected(true);
             listItemEnglish.setValue("English");
         }
+        
         //Redirecting if the user is already logged in.
         if(!authenticationService.getUserCredential().isAnonymous()) {
-            Executions.sendRedirect("/demo/");
+            redirectHome();
             return;
         }
         
@@ -126,6 +128,22 @@ public class LoginController extends SelectorComposer<Component> {
         } catch(Exception ex) {
             Clients.showNotification(Labels.getLabel("unableToRetrieveApplications"), false);
             LOG.error(Constants.EXCEPTION, ex);
+        }
+    }
+
+
+    private void redirectHome() {
+        Session session = Sessions.getCurrent();
+        if(LOG.isDebugEnabled()) {
+            LOG.debug("Request path - " + session.getAttribute(Constants.REQUEST_PATH));
+        }
+        if(session.getAttribute(Constants.REQUEST_PATH) != null) {
+            String requestPath = session.getAttribute(Constants.REQUEST_PATH).toString();
+            //When request has a predefined path
+            session.removeAttribute(Constants.REQUEST_PATH);
+            Executions.sendRedirect(requestPath);          
+        } else {
+            Executions.sendRedirect("/demo/");
         }
     }
     
@@ -156,13 +174,13 @@ public class LoginController extends SelectorComposer<Component> {
     }
 
     @Listen("onClick=#login")
-    public void doLogin() {
+    public void doLogin() throws IOException {
         Boolean isLoginSuccessful = false;
         User user = null;
         if (LOG.isDebugEnabled()) {
             LOG.debug("Handling 'doLogin' in LoginController");
         }
-
+        
         final String name = account.getValue();
         final String passWord = password.getValue();
         if(apps.getSelectedItem() == null){
@@ -209,7 +227,7 @@ public class LoginController extends SelectorComposer<Component> {
         }
 
         LOG.debug("Loged in. sending redirect...");
-        Executions.sendRedirect("/demo/");
+        redirectHome();
     }
 
     /**Checks for dashboard application create access

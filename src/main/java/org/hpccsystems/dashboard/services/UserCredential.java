@@ -85,4 +85,11 @@ public class UserCredential implements Serializable {
         return buffer.toString();
     }
 
+
+    public void removeRole(String role) {
+        if(roles != null) {
+            roles.remove(role);
+        }
+    }
+
 }

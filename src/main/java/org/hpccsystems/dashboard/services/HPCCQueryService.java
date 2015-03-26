@@ -9,6 +9,7 @@ import java.util.Map;
 import java.util.Set;
 
 import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.hpccsystems.dashboard.chart.entity.Attribute;
 import org.hpccsystems.dashboard.chart.entity.Field;
@@ -31,7 +32,7 @@ public interface HPCCQueryService {
 	
 	QuerySchema getQuerySchema(String queryName, HpccConnection hpccConnection,boolean isGenericQuery,String inputParamQuery) throws Exception;
 
-    List<XYModel> getChartData(XYChartData data) throws HpccConnectionException, NumberFormatException;
+    List<XYModel> getChartData(XYChartData data) throws HpccConnectionException, NumberFormatException, XPathExpressionException;
 
     Set<String> getInputParameters(final String queryName, final HpccConnection hpccConnection,boolean isGenericQuery,String inputParamQuery) throws Exception;
 

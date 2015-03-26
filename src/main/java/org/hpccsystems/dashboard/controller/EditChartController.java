@@ -248,6 +248,7 @@ public class EditChartController extends SelectorComposer<Component> {
                 
                 // Constructing Roxie query input parameters
                 if (chartData.getIsQuery()) {
+                    LOG.debug(filterHolder);
                     Events.sendEvent(Constants.CREATE_PARAM_EVENT, filterHolder, null);
                 }
                 
@@ -281,7 +282,7 @@ public class EditChartController extends SelectorComposer<Component> {
             for (Map.Entry<String, List<Field>> entry : chartData.getFields().entrySet()) {
                 for (Field field : entry.getValue()) {
                     if (attribute.getFileName().equals(entry.getKey()) 
-                            && attribute.getColumn().equals(field.getColumnName().trim())) {
+                            && attribute.getColumn().trim().equals(field.getColumnName().trim())) {
                         xColumnExist = true;
                     }
                     if(chartData.isGrouped() &&
@@ -321,6 +322,9 @@ public class EditChartController extends SelectorComposer<Component> {
                     }
                 }
                 if (yColumnExist) {
+                    if(Constants.NONE.equals(measure.getAggregateFunction())) {
+                        yAxisListbox.getParent().setAttribute(Constants.NONE, true);
+                    }
                     createYListChild(measure);
                     isScendaryMeasurePresent = !isScendaryMeasurePresent ? measure.isSecondary():true;
                 } else {
@@ -355,6 +359,7 @@ public class EditChartController extends SelectorComposer<Component> {
         }
         
         //Create Measures and Attributes
+        LOG.debug("chartData.getFields() -->"+chartData.getFields());
         UiGenerator.generateTabboxChildren(measureTabbox, attributeTabbox, chartData.getFields(), !chartData.getIsQuery());
 
         if(LOG.isDebugEnabled()){
@@ -374,6 +379,7 @@ public class EditChartController extends SelectorComposer<Component> {
     @Listen("onDrop = #yAxisListbox, #y2AxisListbox")
     public void onDropToYAxisListbox(final DropEvent dropEvent) {
         final Listbox target = (Listbox) dropEvent.getTarget();
+        final Vbox targetParent = (Vbox) target.getParent();
         
         final Listitem draggedListitem = (Listitem) ((DropEvent) dropEvent).getDragged();
         Tabpanel tabpanel = (Tabpanel) draggedListitem.getParent().getParent();
@@ -405,9 +411,9 @@ public class EditChartController extends SelectorComposer<Component> {
             return;
         }
         if(!chartData.getMeasures().isEmpty() 
-                && target.getAttribute(Constants.NONE) != null
+                && targetParent.getAttribute(Constants.NONE) != null
                 && !Constants.NONE.equals(measure.getAggregateFunction())
-                && target.getAttribute(Constants.NONE).equals(true)) {
+                && targetParent.getAttribute(Constants.NONE).equals(true)) {
             Clients.showNotification(Labels.getLabel("aggregationNotAllowed"), Constants.ERROR_NOTIFICATION, yAxisListbox, Constants.POSITION_END_CENTER, 3000, true);
             return;
         }
@@ -415,11 +421,11 @@ public class EditChartController extends SelectorComposer<Component> {
         //Handling No aggregation
         if(Constants.NONE.equals(measure.getAggregateFunction())) {
             if(!chartData.getMeasures().isEmpty() 
-                    && target.getAttribute(Constants.NONE) == null) {
+                    && targetParent.getAttribute(Constants.NONE) == null) {
                 Clients.showNotification(Labels.getLabel("aggregationNotAllowed"), Constants.ERROR_NOTIFICATION, yAxisListbox, Constants.POSITION_END_CENTER, 3000, true);
                 return;
             }
-            target.setAttribute(Constants.NONE, true);
+            targetParent.setAttribute(Constants.NONE, true);
         }
         
         createYListChild(newMeasure);

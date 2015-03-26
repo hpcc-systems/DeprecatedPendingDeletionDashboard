@@ -1,0 +1,10 @@
+<window apply="org.hpccsystems.dashboard.controller.DashoardLinkController" width="450px" closable="true" sclass="panel">
+	<caption iconSclass="glyphicon glyphicon-export">
+		<label zclass="h5">${labels.dashboardLink}</label>
+	</caption>
+	
+	 <div style="margin:7px">
+       <textbox zclass="form-control" height="100px" multiline="true" id="linkTextbox"></textbox>
+      </div>
+	
+</window>

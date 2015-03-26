@@ -10,6 +10,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.Map.Entry;
 import java.util.Set;
 
@@ -23,7 +24,7 @@ import org.hpccsystems.dashboard.chart.cluster.ClusterData;
 import org.hpccsystems.dashboard.chart.entity.Attribute;
 import org.hpccsystems.dashboard.chart.entity.ChartData;
 import org.hpccsystems.dashboard.chart.entity.Field;
-import org.hpccsystems.dashboard.chart.entity.InputParams;
+import org.hpccsystems.dashboard.chart.entity.InputParam;
 import org.hpccsystems.dashboard.chart.entity.RelevantData;
 import org.hpccsystems.dashboard.chart.entity.ScoredSearchData;
 import org.hpccsystems.dashboard.chart.entity.TableData;
@@ -91,6 +92,7 @@ import org.zkoss.zul.Vbox;
 import org.zkoss.zul.Window;
 
 import com.google.gson.Gson;
+import com.mysql.jdbc.StringUtils;
 
 
 /**
@@ -204,11 +206,6 @@ public class ChartPanel extends Panel {
             }else{
                 Map<String,String> inputs = new HashMap<String, String>();
                 
-                //multipleValues object was created for translating multiple value selection into List of Maps
-                // This is currently not being used
-                List<Object> multipleValues = new ArrayList<Object>();
-                
-                String multipleValueParamName = null;
                 
                for ( Component comp : inputListbox.getChildren()) {
                     if(comp instanceof InputListitem) {
@@ -217,24 +214,12 @@ public class ChartPanel extends Panel {
                     }
                 }
                 
-                InputParams inputParams;
-                List<InputParams> paramsList = new ArrayList<InputParams>();
-                if(multipleValues.isEmpty()) {
-                    inputParams = new InputParams(inputs);
-                    paramsList.add(inputParams);
-                } else {
-                    Map<String,String> multiInputs;
-                    for (Object object : multipleValues) {
-                        multiInputs = new HashMap<String, String>();
-                        multiInputs.putAll(inputs);
-                        multiInputs.put(multipleValueParamName, object.toString());
-                        inputParams = new InputParams(multiInputs);
-                        paramsList.add(inputParams);
-                    }
-                }
-                
-                portlet.getChartData().setInputParams(paramsList);
-                
+               InputParam inputparam = null;
+               List<InputParam> paramsList = new ArrayList<InputParam>();
+               for(Entry<String, String> entry : inputs.entrySet()){
+                   inputparam = new InputParam(entry.getKey(),entry.getValue());
+                   paramsList.add(inputparam);
+               }
                 portlet.getChartData().setInputParams(paramsList);
             }
 
@@ -269,7 +254,6 @@ public class ChartPanel extends Panel {
         this.imageContainer.setPack("center");
         
         this.portlet = argPortlet;
-        
         this.setBorder("normal");
         this.setWidth("99%");
         this.setStyle("margin-bottom:5px");
@@ -312,7 +296,7 @@ public class ChartPanel extends Panel {
         resizeBtn.setTooltiptext("Maximize window");
         
         //Shows Input parameters for Quieries(Roxie/Thor)
-        onDrawingQueryChart();
+        onDrawingQueryChart(buttonState);
         
         if(Constants.SHOW_ALL_BUTTONS == buttonState) {
         	addBtn.setTooltiptext("Add Chart");
@@ -324,6 +308,8 @@ public class ChartPanel extends Panel {
             }
         } else if (Constants.SHOW_EDIT_ONLY == buttonState) {
             toolbar.appendChild(addBtn);
+        }else if(Constants.SHOW_NO_BUTTONS == buttonState){
+            //Do nothing here
         }
         toolbar.appendChild(resizeBtn);
         
@@ -373,6 +359,7 @@ public class ChartPanel extends Panel {
         
         //listener to maximize and minimize window
         resizeBtn.addEventListener(Events.ON_CLICK, maximizeListener ->{
+        if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())) {
             ChartPanel.this.setMaximizable(true);
             if(!ChartPanel.this.isMaximized()){
                 holderDiv.setHeight("");
@@ -393,7 +380,7 @@ public class ChartPanel extends Panel {
             }
             
             if (Constants.CATEGORY_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()) {
-                drawTableWidget();
+                drawTableWidget(false);
             } else if (Constants.CATEGORY_TEXT_EDITOR == chartService.getCharts().get(portlet.getChartType()).getCategory()) {
                 //onCreateDocumentWidget();
             } else if(Constants.CATEGORY_SCORED_SEARCH_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()){
@@ -411,6 +398,12 @@ public class ChartPanel extends Panel {
                     
                 }
             }
+        }else{
+        	
+        	 Clients.showNotification("Add / Configure the chart before maximizing...",
+                     Clients.NOTIFICATION_TYPE_WARNING, this,"middle_center", 3000, true);
+        	
+        }
         });
         
     }
@@ -421,7 +414,7 @@ public class ChartPanel extends Panel {
         @Override
         public void onEvent(Event event) throws Exception {
             HPCCQueryService hpccQueryService = (HPCCQueryService) SpringUtil.getBean(Constants.HPCC_QUERY_SERVICE);
-            
+            inputListbox.getChildren().clear();
             Map<String, Set<String>> paramValues = null;
             try {
                 
@@ -431,27 +424,32 @@ public class ChartPanel extends Panel {
                     constructRelevantInputParam(portlet.getChartData());
                     
                 } else { 
-                    paramValues = hpccQueryService.getInputParamDistinctValues(
-                            portlet.getChartData().getFiles().iterator().next(),
-                            portlet.getChartData().getInputParams().iterator().next().getParams().keySet(),
-                            portlet.getChartData().getHpccConnection(), portlet.getChartData().isGenericQuery(),
-                            portlet.getChartData().getInputParamQuery());
-                    
+                 
+                    //Taking first query, as joining not allows for queries
+                    QuerySchema querySchema = hpccQueryService
+                            .getQuerySchema(portlet.getChartData().getFiles().iterator().next(), portlet.getChartData().getHpccConnection(), portlet
+                                    .getChartData().isGenericQuery(), portlet.getChartData().getInputParamQuery());
+                    paramValues = querySchema.getInputParams();
                     if(paramValues != null) {
-                        for (InputParams inputParam : portlet.getChartData().getInputParams()) {
-                            for (Entry<String,String> param : inputParam.getParams().entrySet() ) {
-                                
-                                LOG.debug("param.getKey(): "+param.getKey());
-                                LOG.debug("paramValues.get(param.getKey()): "+paramValues.get(param.getKey()));
-                                LOG.debug("String.valueOf(portlet.getId() + \"_board_\"): "+String.valueOf(portlet.getId() + "_board_"));
-                                
-                                InputListitem listitem = new InputListitem(param.getKey(), paramValues.get(param.getKey()), String.valueOf(portlet.getId() + "_board_"));
-                                if(param.getValue() != null  && !param.getValue().isEmpty()) {
-                                    listitem.setInputValue(param.getValue());
-                                }
-                                inputListbox.appendChild(listitem);
+                        paramValues.entrySet().forEach(entry ->{
+                            InputListitem listitem = new InputListitem(
+                                    entry.getKey(), entry.getValue(), String.valueOf(portlet.getId() + "_board_"));
+                            inputListbox.appendChild(listitem);
+                            try{
+                             InputParam appliedInput = portlet.getChartData() .getInputParams() .stream()
+                                            .filter(input -> input.getName().equals(
+                                                    entry.getKey())).findAny().get();
+                             if (appliedInput != null && !StringUtils.isNullOrEmpty(appliedInput.getValue())) {
+                                 listitem.setInputValue(appliedInput.getValue());
+                             }
+                            }catch(NoSuchElementException e){
+                                //Need not to log.This occurs when an inputparam from Hpcc is not found in portlet's
+                                //applied inputparam
                             }
-                        }
+                                    
+                            
+                        });
+                        
                     }
                 }
             } catch (Exception e) {
@@ -502,7 +500,7 @@ public class ChartPanel extends Panel {
             inputListbox.appendChild(listitem);
     }; 
     
-    public void onDrawingQueryChart() {
+    public void onDrawingQueryChart(final int buttonState) {
         if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState()) && portlet.getChartData().getIsQuery() 
                 && (Constants.CATEGORY_HIERARCHY !=  chartService.getCharts().get(portlet.getChartType())
                         .getCategory() && Constants.CATEGORY_SCORED_SEARCH_TABLE !=  chartService.getCharts().get(portlet.getChartType())
@@ -513,9 +511,9 @@ public class ChartPanel extends Panel {
             }
             
             inputParamBtn = new Button();
-            if(!toolbar.getChildren().isEmpty()) {
+            if(Constants.SHOW_ALL_BUTTONS == buttonState && !toolbar.getChildren().isEmpty()) {
                 toolbar.insertBefore(inputParamBtn, toolbar.getFirstChild());
-            } else {
+            } else if(Constants.SHOW_ALL_BUTTONS == buttonState){
                 toolbar.appendChild(inputParamBtn);
             }
             inputParamBtn.setSclass(INPUT_PARAM_STYLE);
@@ -526,6 +524,7 @@ public class ChartPanel extends Panel {
             popup.setZclass("popup");
             popup.setWidth("250px");
             popup.setHeight("270px");
+            popup.setStyle("overflow:auto");
             caption.appendChild(popup);
             inputParamBtn.setPopup(popup);         
             
@@ -533,12 +532,14 @@ public class ChartPanel extends Panel {
                 @Override
                 public void onEvent(MouseEvent event) throws Exception {
                     Boolean hasParamValues = (Boolean)inputListbox.getAttribute(Constants.HAS_INPUT_PARAM_VALUES);
+                    Boolean hasCommonFilter = (Boolean)ChartPanel.this.getAttribute(Constants.COMMON_FILTERS_ENABLED);
                      if(Constants.RELEVANT_CONFIG == chartService.getCharts().get(portlet.getChartType()).getCategory()
                              || (portlet.getChartData().getInputParams() != null 
-                             && (hasParamValues == null || !hasParamValues))){
+                             && ((hasCommonFilter != null && hasCommonFilter)  || hasParamValues == null || !hasParamValues))){
                             Clients.showBusy(popup, "Fetching Input Parameters");
                             Events.echoEvent(new Event("onAddInputParams", inputListbox,popup));
                         }
+                     
                 }
             });
             
@@ -632,7 +633,7 @@ public class ChartPanel extends Panel {
 
             // To construct Table Widget
             if (Constants.CATEGORY_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()) {
-                drawTableWidget();
+                drawTableWidget(true);
             } else if (Constants.CATEGORY_TEXT_EDITOR == chartService.getCharts().get(portlet.getChartType()).getCategory()) {
                 onCreateDocumentWidget();
             } else if(Constants.CATEGORY_SCORED_SEARCH_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()){
@@ -885,14 +886,14 @@ public class ChartPanel extends Panel {
     }
     
     //To construct Table Widget
-    public void drawTableWidget(){
+    public void drawTableWidget(boolean refreshData){
         TableRenderer tableRenderer = (TableRenderer) SpringUtil.getBean("tableRenderer");
         
         if(LOG.isDebugEnabled()) {
             LOG.debug("Fields -> " + portlet.getChartData().getFields());
         }
         
-        Vbox vbox = tableRenderer.constructTableWidget(portlet, (TableData) portlet.getChartData(), false);
+        Vbox vbox = tableRenderer.constructTableWidget(portlet, (TableData) portlet.getChartData(), refreshData);
                 
         chartDiv.getChildren().clear();
         chartDiv.appendChild(vbox);

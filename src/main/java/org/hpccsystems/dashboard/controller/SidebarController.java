@@ -7,6 +7,7 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import javax.xml.rpc.ServiceException;
 
@@ -18,6 +19,7 @@ import org.hpccsystems.dashboard.services.AuthenticationService;
 import org.hpccsystems.dashboard.services.DashboardService;
 import org.hpccsystems.dashboard.services.GroupService;
 import org.hpccsystems.dashboard.services.WidgetService;
+import org.hpccsystems.dashboard.util.DashboardUtil;
 import org.springframework.dao.DataAccessException;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
@@ -52,8 +54,7 @@ public class SidebarController extends GenericForwardComposer<Component>{
 
     private static final long serialVersionUID = 1L;
     
-    private static final  Log LOG = LogFactory
-            .getLog(SidebarController.class);
+    private static final  Log LOG = LogFactory.getLog(SidebarController.class);
     
     //wire components
     @Wire
@@ -86,13 +87,43 @@ public class SidebarController extends GenericForwardComposer<Component>{
         // Wire Spring Bean
         Selectors.wireVariables(navBar, this, Selectors.newVariableResolvers(getClass(), null));
         
+        if(LOG.isDebugEnabled()) {
+            LOG.debug("Request path - " + Executions.getCurrent().getParameterMap());
+        }
+        
+        
         List<Dashboard> sideBarPageList = null;
-        try    {
-            //Circuit/External Source Flow    
-            if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD)){
+        try {
+            //Circuit/External Source Flow   
+            if(authenticationService.getUserCredential().hasRole(Constants.ROLE_API_VIEW_DASHBOARD)){
+                String sharedDashboardId = DashboardUtil.extractShareParam(Executions.getCurrent().getParameterMap().get(Constants.PARAM_SHARE)[0]);
+                Dashboard shareDashboard = new Dashboard();
+                shareDashboard.setDashboardId(Integer.valueOf(sharedDashboardId));
+                List<String> groupIds = getGroupIds(); 
+                //TODO:need to check the filtering dashbords by application id
+                List<Dashboard> shareDashboardList = dashboardService.retrieveDashboards(
+                        authenticationService.getUserCredential().getApplicationId(),
+                        authenticationService.getUserCredential().getUserId(), 
+                        groupIds); 
+                if(shareDashboardList.contains(shareDashboard)){
+                    sideBarPageList = shareDashboardList
+                            .stream()
+                            .filter(searchDashboard -> (searchDashboard
+                                    .getDashboardId().equals(shareDashboard
+                                    .getDashboardId())))
+                            .collect(Collectors.toList());
+                }else{
+                    Clients.showNotification("Not authorized to view this Dashboard", true);
+                    return;
+                }
+                
+            }else if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_EDIT_DASHBOARD)){
+                String[] dashboardIdArray = (String[])Executions.getCurrent().getParameterValues(Constants.DB_DASHBOARD_ID);
+                List<String> dashboardIdList =Arrays.asList(dashboardIdArray);
                 sideBarPageList = getApiViewDashboardList(
                         authenticationService.getUserCredential().getUserId(),
-                        authenticationService.getUserCredential().getApplicationId()
+                        authenticationService.getUserCredential().getApplicationId(),
+                        dashboardIdList
                     );                
             } else {
                 //Dashboard Flow
@@ -122,7 +153,7 @@ public class SidebarController extends GenericForwardComposer<Component>{
         Boolean firstSet = false;
         Dashboard entry=null;
         Navitem navitem=null;
-        if(sideBarPageList != null){
+        
         for (final Iterator<Dashboard> iter = sideBarPageList.iterator(); iter.hasNext();) {
             entry = (Dashboard) iter.next();
             navitem  = constructNavItem(entry);
@@ -133,7 +164,7 @@ public class SidebarController extends GenericForwardComposer<Component>{
                 firstNavitem = navitem;
                 firstSet = !firstSet;
             }
-        }}
+        }
         
         // Displaying first menu item as default page
         if(firstSet) {
@@ -170,7 +201,7 @@ public class SidebarController extends GenericForwardComposer<Component>{
         navitem.setAttribute(Constants.DASHBOARD_ID, dashboard.getDashboardId());
         navitem.setAttribute(Constants.DASHBOARD_ROLE, dashboard.getRole());
         
-        if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD)){
+        if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_EDIT_DASHBOARD)){
             navitem.addEventListener(Events.ON_CLICK, apiNavItemSelectLisnr);
         }else{
             navitem.addEventListener(Events.ON_CLICK, navItemSelectLisnr);
@@ -366,7 +397,7 @@ public class SidebarController extends GenericForwardComposer<Component>{
                     updateDashboardSequence();
                     return;
                 }
-                if (authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_DASHBOARD)) {
+                if (authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_EDIT_DASHBOARD)) {
                     currentNavitem.addEventListener(Events.ON_CLICK,apiNavItemSelectLisnr);
                 } else {
                     currentNavitem.addEventListener(Events.ON_CLICK,navItemSelectLisnr);
@@ -393,10 +424,7 @@ public class SidebarController extends GenericForwardComposer<Component>{
     }
 
     
-    private List<Dashboard> getApiViewDashboardList(final String userId,final String applicationId)throws DataAccessException {
-        String[] dashboardIdArray = (String[])Executions.getCurrent().getParameterValues(Constants.DB_DASHBOARD_ID);
-        List<String> dashboardIdList =Arrays.asList(dashboardIdArray);
-
+    private List<Dashboard> getApiViewDashboardList(final String userId,final String applicationId,  List<String> dashboardIdList)throws DataAccessException {
         
         if(LOG.isDebugEnabled()){
             LOG.debug("Requested Dashboard Id : "+dashboardIdList);

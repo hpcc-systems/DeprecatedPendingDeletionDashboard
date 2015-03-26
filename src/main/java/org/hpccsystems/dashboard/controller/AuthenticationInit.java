@@ -1,6 +1,7 @@
 package org.hpccsystems.dashboard.controller;
 
 import java.util.Map;
+
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.services.AuthenticationService;
@@ -25,7 +26,9 @@ public class AuthenticationInit implements Initiator {
                     LOG.debug("Annonimity of user.." + cre.isAnonymous());
                     LOG.debug("Credentials - Account ->" + cre.getUserId() );
                     LOG.debug("Credentials - Name ->" + cre.getUserName() );
+                    LOG.debug("Request path ->" + page.getRequestPath());
                 }
+                
                 //Redirects to login page
                 Executions.sendRedirect("/login.zhtml");
                 return;

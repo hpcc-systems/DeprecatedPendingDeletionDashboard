@@ -17,6 +17,7 @@ import org.hpccsystems.dashboard.chart.entity.Field;
 import org.hpccsystems.dashboard.chart.entity.Filter;
 import org.hpccsystems.dashboard.chart.entity.HpccConnection;
 import org.hpccsystems.dashboard.chart.entity.HpccConnections;
+import org.hpccsystems.dashboard.chart.entity.InputParam;
 import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.entity.FileMeta;
 import org.hpccsystems.dashboard.entity.Portlet;
@@ -120,6 +121,8 @@ public class SelectDataController extends SelectorComposer<Component>{
     private Vbox defaultsContainer;
     @Wire
     private Combobox defaultConnections;
+    @Wire
+    private Button proceedBtn;
     
     private ChartData chartData;
     private Window parentWindow;
@@ -137,6 +140,14 @@ public class SelectDataController extends SelectorComposer<Component>{
         
         //Hides Hpcc data select page,Because common filters enabled
         if (hpccConnection != null) { 
+            if(Constants.LOGICAL_FILE.equals(hpccConnection.getDatasource())){
+                proceedBtn.setLabel(Labels.getLabel("fetchFields"));
+                chartData.setIsQuery(false);
+            }else if(Constants.QUERY.equals(hpccConnection.getDatasource())){
+                proceedBtn.setLabel(Labels.getLabel("fetchQueries"));
+                chartData.setIsQuery(true);
+            }
+                    
             editHpccVbox.setVisible(false);
             viewHpccVbox.setVisible(true);
             defaultsContainer.setVisible(false);
@@ -186,12 +197,12 @@ public class SelectDataController extends SelectorComposer<Component>{
                 editHpccVbox.setVisible(true);
             }
             
+          //selecting 'logical file' as default
+            fileType.setSelectedIndex(0);
+            //If chartData is null, chart category is not added in EditWidgetController
+            chartData.setIsQuery(false);
         }      
         
-        //selecting 'logical file' as default
-        fileType.setSelectedIndex(0);
-        //If chartData is null, chart category is not added in EditWidgetController
-        chartData.setIsQuery(false);
                 
         if(LOG.isDebugEnabled()) {
             LOG.debug("Checkbox" + sslCheckbox);
@@ -201,11 +212,18 @@ public class SelectDataController extends SelectorComposer<Component>{
 
     @Listen("onClick = #proceedBtn")
     public void onProcced(Event event) {
+        LOG.debug("data source -->"+hpccConnection.getDatasource());
         chartData.setHpccConnection(hpccConnection);
-        
-        if(constructFileBrowser(hpccConnection)) {
-            Button btn = (Button) event.getTarget();
-            btn.setDisabled(true);
+        if(Constants.LOGICAL_FILE.equals(hpccConnection.getDatasource())){
+            if(constructFileBrowser(hpccConnection)) {
+                Button btn = (Button) event.getTarget();
+                btn.setDisabled(true);
+            }
+        }else if(Constants.QUERY.equals(hpccConnection.getDatasource())){
+            if(constructQueryBrowser(hpccConnection)) {
+                Button btn = (Button) event.getTarget();
+                btn.setDisabled(true);
+            }
         }
     }
     
@@ -298,7 +316,11 @@ public class SelectDataController extends SelectorComposer<Component>{
         
         
         if(clusters.getSelectedItem() != null) {
-            hpccConnection.setClusterType(String.valueOf(clusters.getSelectedItem().getValue()));
+            String cluster = clusters.getSelectedItem().getValue();
+            if(LOG.isDebugEnabled()) {
+                LOG.debug("clusters.getSelectedItem().getValue() -> " + cluster);
+            }
+            hpccConnection.setClusterType(cluster);
         }
         
         chartData.setHpccConnection(hpccConnection);
@@ -561,23 +583,39 @@ public class SelectDataController extends SelectorComposer<Component>{
             
             //Setting fields to ChartData
             chartData.setFields(fieldMap);
-            
-           if (Sessions.getCurrent().getAttribute(Constants.COMMON_FILTERS) != null) {
-                // Setting common filters for Newly created chart
-                @SuppressWarnings("unchecked")
-                Set<Filter> filterSet = (Set<Filter>) Sessions.getCurrent().getAttribute(Constants.COMMON_FILTERS);
-                for (Filter filter : filterSet) {
-                    if( (Constants.DATA_TYPE_STRING.equals(filter.getType()) && (filter.getValues() != null)) ||
-                            (Constants.DATA_TYPE_NUMERIC.equals(filter.getType()) && filter.getStartValue() != null && filter.getEndValue() != null) ) {
-                        for (Map.Entry<String, List<Field>> entry : chartData.getFields().entrySet()) {
-                            if(filter.getFileName().equals(entry.getKey())) {
-                                for (Field field : entry.getValue()) {
-                                    if(filter.getColumn().equals(field.getColumnName())) {
-                                        chartData.setIsFiltered(true);
-                                        chartData.getFilters().add(filter);
+            if(!chartData.getIsQuery()){
+               if (Sessions.getCurrent().getAttribute(Constants.COMMON_FILTERS) != null) {
+                    // Setting common filters for Newly created chart
+                    @SuppressWarnings("unchecked")
+                    Set<Filter> filterSet = (Set<Filter>) Sessions.getCurrent().getAttribute(Constants.COMMON_FILTERS);
+                    for (Filter filter : filterSet) {
+                        if( (Constants.DATA_TYPE_STRING.equals(filter.getType()) && (filter.getValues() != null)) ||
+                                (Constants.DATA_TYPE_NUMERIC.equals(filter.getType()) && filter.getStartValue() != null && filter.getEndValue() != null) ) {
+                            for (Map.Entry<String, List<Field>> entry : chartData.getFields().entrySet()) {
+                                if(filter.getFileName().equals(entry.getKey())) {
+                                    for (Field field : entry.getValue()) {
+                                        if(filter.getColumn().equals(field.getColumnName())) {
+                                            chartData.setIsFiltered(true);
+                                            chartData.getFilters().add(filter);
+                                        }
                                     }
                                 }
                             }
+                        }
+                    }
+                }
+            }else{
+                if (Sessions.getCurrent().getAttribute(Constants.COMMON_FILTERS) != null) {
+                    // Setting common filters for Newly created chart
+                    @SuppressWarnings("unchecked")
+                    Set<InputParam> inputParamrSet = (Set<InputParam>) Sessions.getCurrent().getAttribute(Constants.COMMON_FILTERS);
+                   Set<String> inputsName =  querySchema.getInputParams().keySet();
+                   if(chartData.getInputParams() == null){
+                       chartData.setInputParams(new ArrayList<InputParam>());
+                   }
+                    for (InputParam inpuparam : inputParamrSet) {
+                        if(inputsName.contains(inpuparam.getName())){
+                            chartData.getInputParams().add(inpuparam);
                         }
                     }
                 }

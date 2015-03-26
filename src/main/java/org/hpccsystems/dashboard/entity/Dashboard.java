@@ -9,6 +9,7 @@ import java.util.Set;
 import org.hpccsystems.dashboard.chart.entity.HpccConnection;
 import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.services.ChartService;
+import org.zkoss.util.logging.Log;
 import org.zkoss.zkplus.spring.SpringUtil;
 
 /**
@@ -200,7 +201,8 @@ public class Dashboard {
         Set<String> hostIps = new HashSet<String>();
         boolean hasNoLiveChart = true;
         boolean hasRoxieQuery = false;
-
+        boolean hasLogicalFile = false;
+        
         if(this.getPortletList() == null) {
             return null;
         }
@@ -215,14 +217,20 @@ public class Dashboard {
                 //Checks for Roxie Query not to enable Common filter
                 if(portlet.getChartData().getIsQuery()){
                     hasRoxieQuery = true;
-                    break;
-                }                
+                } else {
+                    hasLogicalFile = true;
+                }
                 hpccConnection = portlet.getChartData().getHpccConnection();
             }
         }
-        if (hasNoLiveChart || hasRoxieQuery) {
+        if (hasNoLiveChart || (hasRoxieQuery&&hasLogicalFile)) {
             return null;
         } else if (clusters.size() == 1 && hostIps.size() == 1) {
+            if(hasRoxieQuery){
+                hpccConnection.setDatasource(Constants.QUERY);
+            }else if(hasLogicalFile){
+                hpccConnection.setDatasource(Constants.LOGICAL_FILE);
+            }
             return hpccConnection;
         }
 
@@ -289,6 +297,25 @@ public class Dashboard {
         
         return buffer.toString();        
         
+    }
+
+    public String getFileType() {
+        ChartService chartService = (ChartService) SpringUtil.getBean("chartService");
+        if(this.getHasCommonFilter()){
+            for(Portlet portlet : this.getPortletList()){
+                if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())
+                        && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()) {
+                    if(!portlet.getChartData().getIsQuery()){
+                        //used logical files for all the charts
+                        return Constants.LOGICAL_FILE;
+                    }else{
+                      //used queries for all the charts
+                        return Constants.QUERY;
+                    }
+                }
+            }
+        }
+        return null;
     }
     
     

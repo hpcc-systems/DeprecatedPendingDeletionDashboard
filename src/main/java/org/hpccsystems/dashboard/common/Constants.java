@@ -68,10 +68,14 @@ public class Constants {
     public static final String WINDOWS = "Windows";
     public static final String JAVA_TEMP_DIR = "java.io.tmpdir";
     
+    public static final String REQUEST_PATH = "requestPath";
+    public static final String PARAM_SHARE = "share";
+    
     public static final String CIRCUIT_APPLICATION_ID = "circuit";
     public static final String CIRCUIT_ROLE_CONFIG_CHART = "configureChart";
     public static final String CIRCUIT_ROLE_VIEW_CHART = "viewChart";
-    public static final String CIRCUIT_ROLE_VIEW_DASHBOARD = "viewDashboard";
+    public static final String CIRCUIT_ROLE_VIEW_EDIT_DASHBOARD = "viewEditDashboard";
+    public static final String ROLE_API_VIEW_DASHBOARD = "ApiViewDashboard";
     public static final String CIRCUIT_DELETE_REQ = "/delete.do";
     public static final String CIRCUIT_CHARTLIST_REQ = "/chartList.do";
     public static final String CIRCUIT_SEARCH_REQ  = "/search.do";    
@@ -88,6 +92,7 @@ public class Constants {
     public static final String VALUE ="value";
     public static final String LABEL = "label";
     public static final String CHART_LIST = "chartList";
+    public static final String ROLE_EDIT = "hasEditRole";
     public static final String SOURCE = "source";
     public static final String SOURCE_ID = "source_id";
     public static final String SOURCEID="sourceid"; 
@@ -99,6 +104,7 @@ public class Constants {
     public static final String CREDENTIAL="credential";
     public static final String INVALID_USER="Invalid User";
     
+    public static final String DASHBOARD_SHARE = "canShareDashboard"; 
 
     public static final String EDIT_WINDOW_CHART_DIV = "chart";
     
@@ -239,6 +245,7 @@ public class Constants {
 	public static final String INPUT_PARAM_BTN = "isInputParamBtn";
 	
 	public static final String TRUE = "true";
+	public static final String FALSE = "false";
 	
 	//EVENTS
 	public static final String DRAW_CHART_EVENT = "onDrawChart";
@@ -254,9 +261,17 @@ public class Constants {
 	public static final String SCORED_SEARCH = "Scored Search";
 	public static final String ON_ADD_FILTER = "onAddFilter";
 	public static final String ON_DELETE_FILTER = "onDeleteFilter";
-	public static final String GENERIC = "GENERIC";
+	public static final String GENERIC = "generic";
 	public static final String FETCH_INPUT_PARAM = "fetch_input_parameters";
     public static final String ON_SAVE_INTERACTIVITY = "onSaveInteractivity";
-    public static final String ON_SELECT_INTERACTIVITY_FILTER = "onSelectInteractivityFilter"; 
+    public static final String ON_SELECT_INTERACTIVITY_FILTER = "onSelectInteractivityFilter";
+    
+    
+    public static final String INPUT_PARAM_NAME = "inputParamName";
+    public static final String INPUT_PARAM_VALUE = "inputParamValue";
+    public static final String SELECTED_RADIO_BTN = "selectedRadioBtn";
+    public static final String INPUT_PARAM_NAMES = "inputParamNames";
+    public static final String INPUT_PARAM_QUERY = "inputParamQuery";
+   
 	
 }
