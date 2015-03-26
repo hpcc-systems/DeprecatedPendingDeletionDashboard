@@ -296,7 +296,7 @@ public class ChartPanel extends Panel {
         resizeBtn.setTooltiptext("Maximize window");
         
         //Shows Input parameters for Quieries(Roxie/Thor)
-        onDrawingQueryChart();
+        onDrawingQueryChart(buttonState);
         
         if(Constants.SHOW_ALL_BUTTONS == buttonState) {
         	addBtn.setTooltiptext("Add Chart");
@@ -500,7 +500,7 @@ public class ChartPanel extends Panel {
             inputListbox.appendChild(listitem);
     }; 
     
-    public void onDrawingQueryChart() {
+    public void onDrawingQueryChart(final int buttonState) {
         if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState()) && portlet.getChartData().getIsQuery() 
                 && (Constants.CATEGORY_HIERARCHY !=  chartService.getCharts().get(portlet.getChartType())
                         .getCategory() && Constants.CATEGORY_SCORED_SEARCH_TABLE !=  chartService.getCharts().get(portlet.getChartType())
@@ -511,9 +511,9 @@ public class ChartPanel extends Panel {
             }
             
             inputParamBtn = new Button();
-            if(!toolbar.getChildren().isEmpty()) {
+            if(Constants.SHOW_ALL_BUTTONS == buttonState && !toolbar.getChildren().isEmpty()) {
                 toolbar.insertBefore(inputParamBtn, toolbar.getFirstChild());
-            } else {
+            } else if(Constants.SHOW_ALL_BUTTONS == buttonState){
                 toolbar.appendChild(inputParamBtn);
             }
             inputParamBtn.setSclass(INPUT_PARAM_STYLE);
