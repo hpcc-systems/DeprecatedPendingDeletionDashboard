@@ -322,6 +322,9 @@ public class EditChartController extends SelectorComposer<Component> {
                     }
                 }
                 if (yColumnExist) {
+                    if(Constants.NONE.equals(measure.getAggregateFunction())) {
+                        yAxisListbox.getParent().setAttribute(Constants.NONE, true);
+                    }
                     createYListChild(measure);
                     isScendaryMeasurePresent = !isScendaryMeasurePresent ? measure.isSecondary():true;
                 } else {
@@ -376,6 +379,7 @@ public class EditChartController extends SelectorComposer<Component> {
     @Listen("onDrop = #yAxisListbox, #y2AxisListbox")
     public void onDropToYAxisListbox(final DropEvent dropEvent) {
         final Listbox target = (Listbox) dropEvent.getTarget();
+        final Vbox targetParent = (Vbox) target.getParent();
         
         final Listitem draggedListitem = (Listitem) ((DropEvent) dropEvent).getDragged();
         Tabpanel tabpanel = (Tabpanel) draggedListitem.getParent().getParent();
@@ -407,9 +411,9 @@ public class EditChartController extends SelectorComposer<Component> {
             return;
         }
         if(!chartData.getMeasures().isEmpty() 
-                && target.getAttribute(Constants.NONE) != null
+                && targetParent.getAttribute(Constants.NONE) != null
                 && !Constants.NONE.equals(measure.getAggregateFunction())
-                && target.getAttribute(Constants.NONE).equals(true)) {
+                && targetParent.getAttribute(Constants.NONE).equals(true)) {
             Clients.showNotification(Labels.getLabel("aggregationNotAllowed"), Constants.ERROR_NOTIFICATION, yAxisListbox, Constants.POSITION_END_CENTER, 3000, true);
             return;
         }
@@ -417,11 +421,11 @@ public class EditChartController extends SelectorComposer<Component> {
         //Handling No aggregation
         if(Constants.NONE.equals(measure.getAggregateFunction())) {
             if(!chartData.getMeasures().isEmpty() 
-                    && target.getAttribute(Constants.NONE) == null) {
+                    && targetParent.getAttribute(Constants.NONE) == null) {
                 Clients.showNotification(Labels.getLabel("aggregationNotAllowed"), Constants.ERROR_NOTIFICATION, yAxisListbox, Constants.POSITION_END_CENTER, 3000, true);
                 return;
             }
-            target.setAttribute(Constants.NONE, true);
+            targetParent.setAttribute(Constants.NONE, true);
         }
         
         createYListChild(newMeasure);
