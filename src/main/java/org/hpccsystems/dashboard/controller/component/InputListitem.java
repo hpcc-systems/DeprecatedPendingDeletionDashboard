@@ -1,5 +1,8 @@
 package org.hpccsystems.dashboard.controller.component;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 
 import org.zkoss.zk.ui.Component;
@@ -42,18 +45,20 @@ public class InputListitem extends Listitem {
             popupListbox.setMultiple(false);
             popupListbox.setCheckmark(true);
             
-            
             Listhead listhead = new Listhead();
             Listheader listheader = new Listheader();
             listheader.setLabel(paramName);
             Button clearButton = new Button("Clear");
             clearButton.setZclass("clear-text-btn btn btn-link btn-sm");
             listheader.appendChild(clearButton);
-            listheader.setSort("auto");
+            
             listhead.appendChild(listheader);
             popupListbox.appendChild(listhead);
             
-            for (String value : values) {
+            //Sorting the values of inputparamere
+            List<String> sortedValues = new ArrayList<String>(values);
+            Collections.sort(sortedValues);
+            for (String value : sortedValues) {
                 popupListbox.appendChild(new Listitem(value));
             }
             
