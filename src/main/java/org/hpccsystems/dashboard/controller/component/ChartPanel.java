@@ -511,7 +511,6 @@ public class ChartPanel extends Panel {
      */
     protected void removeExistingInputparam() {
             List<Component> removableItem = new ArrayList<Component>();
-            inputListbox.getChildren().clear();
             removableItem.addAll(inputListbox.getChildren().stream().filter(comp ->
             (comp instanceof InputListitem)).collect(Collectors.toList()));
             
