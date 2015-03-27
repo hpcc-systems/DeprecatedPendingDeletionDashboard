@@ -313,7 +313,19 @@ public class DashboardController extends SelectorComposer<Window>{
             }
             
             ChartPanel panel = null;
-            //Checking for Common filters
+            //Common Query filters
+            //Adding Query params from session
+            if(userCredential.hasRole(Constants.ROLE_API_VIEW_DASHBOARD)) {
+                RequestParams requestParams = (RequestParams) Sessions.getCurrent().getAttribute(Constants.REQUEST_PRAMS);
+                if(requestParams.hasInputParams()) {
+                    dashboard.setCommonQueryFilters(requestParams.getInputParams());
+                    for (InputParam inputparam : requestParams.getInputParams()) {
+                        applyInputParamToPortlets(inputparam, false);
+                    }
+                }
+            }
+            
+            
             //Removing AddWidget , Configure Dashboard buttons for Single layout
             if(dashboard.getPortletList().size() == 1 && dashboard.getPortletList().get(0).getIsSinglePortlet()){
                 addWidget.detach();
@@ -349,14 +361,6 @@ public class DashboardController extends SelectorComposer<Window>{
                     && ! userCredential.getApplicationId().equals(Constants.CIRCUIT_APPLICATION_ID)
                     && dashboard.getRole().equals(Constants.ROLE_ADMIN)) {
                 dashboardToolbar.setVisible(true);
-            }
-            
-            //Adding Query params from session
-            if(userCredential.hasRole(Constants.ROLE_API_VIEW_DASHBOARD)) {
-                RequestParams requestParams = (RequestParams) Sessions.getCurrent().getAttribute(Constants.REQUEST_PRAMS);
-                if(requestParams.hasInputParams()) {
-                    dashboard.setCommonQueryFilters(requestParams.getInputParams());
-                }
             }
             
         } else {
@@ -1009,7 +1013,7 @@ public class DashboardController extends SelectorComposer<Window>{
                     row.setAttribute(Constants.ROW_CHECKED, true);
                     inputparam.setValue(radio.getLabel());
                     inputparam.setIsCommonInput(true);
-                    applyInputParamToPortlets(inputparam);
+                    applyInputParamToPortlets(inputparam, true);
                     
                    if(row.getAttribute(Constants.SELECTED_RADIO_BTN) != null){
                       ( (Radio)row.getAttribute(Constants.SELECTED_RADIO_BTN)).setSelected(false);
@@ -1029,7 +1033,7 @@ public class DashboardController extends SelectorComposer<Window>{
     
     
     @SuppressWarnings("unchecked")
-    protected void applyInputParamToPortlets(InputParam inputparam) {
+    protected void applyInputParamToPortlets(InputParam inputparam, boolean redrawCharts) {
 
         for (Portlet portlet : dashboard.getPortletList()) {
 
@@ -1064,11 +1068,13 @@ public class DashboardController extends SelectorComposer<Window>{
                      chartData.getInputParams().remove(inputparam);
                  }
                  chartData.getInputParams().add(inputparam);
-                 try {
-                     updateWidgets(portlet);
-                 } catch (Exception e) {
-                     LOG.error("Error Updating Charts", e);
-                    Clients.showNotification("Unable to update charts", Clients.NOTIFICATION_TYPE_ERROR, this.getSelf(), Constants.POSITION_CENTER, 5000, true);
+                 if(redrawCharts) {
+                     try {
+                         updateWidgets(portlet);
+                     } catch (Exception e) {
+                         LOG.error("Error Updating Charts", e);
+                        Clients.showNotification("Unable to update charts", Clients.NOTIFICATION_TYPE_ERROR, this.getSelf(), Constants.POSITION_CENTER, 5000, true);
+                     }
                  }
              }
             
