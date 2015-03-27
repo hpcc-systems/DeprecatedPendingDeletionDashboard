@@ -63,7 +63,10 @@ public class InputListitem extends Listitem {
             listcell.appendChild(popup);
             listcell.appendChild(playBtn);
             
-            final Label label = new Label();
+            
+            /*final Label label = new Label();
+            label.setSclass("form-control input-sm");*/
+            Textbox label = new Textbox();
             label.setSclass("form-control input-sm");
             listcell.appendChild(label);
             

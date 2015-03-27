@@ -327,16 +327,7 @@ public class ChartPanel extends Panel {
 
         // Creating panel contents
         final Panelchildren panelchildren = new Panelchildren();
-        if(portlet.getIsSinglePortlet()){
-        	Toolkit tk = Toolkit.getDefaultToolkit();
-        	Dimension d = tk.getScreenSize();
-        	StringBuilder sb = new StringBuilder();
-        	sb.append(d.height-254);
-        	sb.append("px");
-        	holderDiv.setHeight(sb.toString());
-        }else{
-            holderDiv.setHeight("385px");
-        }
+        	setHeight();
         panelchildren.appendChild(holderDiv);
         this.appendChild(panelchildren);
         
@@ -378,7 +369,7 @@ public class ChartPanel extends Panel {
                 resizeBtn.setTooltiptext("Minimize window");
             }else{
                 holderDiv.setVflex(null);
-                holderDiv.setHeight("385px");
+                setHeight();
                 ChartPanel.this.setMaximized(false);
                 resizeBtn.setSclass(RESIZE_MAX_STYLE);
                 resizeBtn.setTooltiptext("Maximize window");
@@ -411,6 +402,15 @@ public class ChartPanel extends Panel {
         }
         });
         
+    }
+
+    private void setHeight() {
+        Toolkit tk = Toolkit.getDefaultToolkit();
+        Dimension d = tk.getScreenSize();
+        StringBuilder sb = new StringBuilder();
+        sb.append(d.height-260);
+        sb.append("px");
+        holderDiv.setHeight(sb.toString());
     }
     
     //Adds input parameters to display in chart/portlet

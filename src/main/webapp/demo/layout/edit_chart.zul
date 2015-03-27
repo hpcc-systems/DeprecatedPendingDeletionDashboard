@@ -93,7 +93,7 @@
 					</panelchildren>
 				</panel>
 
-				<vbox height="180px">
+				<vbox height="160px">
 					<panel vflex="1" title="${labels.chartAttributes}" sclass="editPanel">
 						<caption>
 							<popup id="dateFormatPopup" zclass="popup">
