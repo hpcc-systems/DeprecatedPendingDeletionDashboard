@@ -299,7 +299,11 @@ public class ChartPanel extends Panel {
         onDrawingQueryChart(buttonState);
         
         if(Constants.SHOW_ALL_BUTTONS == buttonState) {
-        	addBtn.setTooltiptext("Add Chart");
+        	if(Constants.STATE_EMPTY.equals(portlet.getWidgetState())){
+        	    addBtn.setTooltiptext("Add Chart");
+            }else{
+                addBtn.setTooltiptext("Configure Chart");
+            }
             toolbar.appendChild(addBtn);
             AuthenticationService authenticationService = (AuthenticationService)SpringUtil.getBean("authenticationService");
             if(!Constants.CIRCUIT_APPLICATION_ID.equals(authenticationService.getUserCredential().getApplicationId())){
@@ -519,6 +523,8 @@ public class ChartPanel extends Panel {
             inputParamBtn.setSclass(INPUT_PARAM_STYLE);
             inputParamBtn.setZclass("btn btn-sm btn-primary");
             inputParamBtn.setAttribute(Constants.INPUT_PARAM_BTN, true); 
+            inputParamBtn.setTooltiptext("Configure filter");
+            
             
             final Popup popup = new Popup();
             popup.setZclass("popup");
