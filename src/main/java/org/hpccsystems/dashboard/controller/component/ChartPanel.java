@@ -1080,6 +1080,7 @@ public class ChartPanel extends Panel {
         chartDiv.detach();
         
         addBtn.setSclass(ADD_STYLE);
+        addBtn.setTooltiptext("Add Chart");
         
         resetBtn.setDisabled(true);
         addBtn.removeEventListener(Events.ON_CLICK, editListener);
