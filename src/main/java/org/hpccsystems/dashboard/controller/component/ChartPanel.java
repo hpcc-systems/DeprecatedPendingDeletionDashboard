@@ -10,9 +10,10 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.JAXBException;
@@ -77,15 +78,15 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listhead;
 import org.zkoss.zul.Listheader;
 import org.zkoss.zul.Messagebox;
+import org.zkoss.zul.Messagebox.ClickEvent;
+import org.zkoss.zul.Panel;
+import org.zkoss.zul.Panelchildren;
+import org.zkoss.zul.Popup;
 import org.zkoss.zul.Tab;
 import org.zkoss.zul.Tabbox;
 import org.zkoss.zul.Tabpanel;
 import org.zkoss.zul.Tabpanels;
 import org.zkoss.zul.Tabs;
-import org.zkoss.zul.Messagebox.ClickEvent;
-import org.zkoss.zul.Panel;
-import org.zkoss.zul.Panelchildren;
-import org.zkoss.zul.Popup;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Toolbar;
 import org.zkoss.zul.Vbox;
@@ -418,7 +419,7 @@ public class ChartPanel extends Panel {
         @Override
         public void onEvent(Event event) throws Exception {
             HPCCQueryService hpccQueryService = (HPCCQueryService) SpringUtil.getBean(Constants.HPCC_QUERY_SERVICE);
-            inputListbox.getChildren().clear();
+            removeExistingInputparam();            
             Map<String, Set<String>> paramValues = null;
             try {
                 
@@ -504,6 +505,22 @@ public class ChartPanel extends Panel {
             inputListbox.appendChild(listitem);
     }; 
     
+    /**
+     * Removes the inputparameters which are already existing in the input param popup
+     * and leaves the header part
+     */
+    protected void removeExistingInputparam() {
+            List<Component> removableItem = new ArrayList<Component>();
+            inputListbox.getChildren().clear();
+            removableItem.addAll(inputListbox.getChildren().stream().filter(comp ->
+            (comp instanceof InputListitem)).collect(Collectors.toList()));
+            
+            removableItem.stream().forEach(component ->{
+                component.detach();
+            });
+        }
+    
+
     public void onDrawingQueryChart(final int buttonState) {
         if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState()) && portlet.getChartData().getIsQuery() 
                 && (Constants.CATEGORY_HIERARCHY !=  chartService.getCharts().get(portlet.getChartType())
