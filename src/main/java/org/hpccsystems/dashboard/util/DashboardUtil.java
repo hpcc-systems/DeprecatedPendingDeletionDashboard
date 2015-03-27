@@ -2,6 +2,7 @@ package org.hpccsystems.dashboard.util;
 
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -28,6 +29,7 @@ import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Sessions;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zkplus.spring.SpringUtil;
+
 
 public class DashboardUtil { 
 
@@ -152,13 +154,17 @@ public class DashboardUtil {
     public static String createShareParams(String dashboardId, List<InputParam> params) {
         StringBuilder builder = new StringBuilder();
         
-        builder.append("id=").append(dashboardId)
-            .append("&");
+        builder.append("id=").append(dashboardId);
         
         if(params != null) {
-            for (InputParam param : params) {
-                builder.append("param.").append(param.getName()).append("=").append(param.getValue())
-                    .append("&");
+            builder.append("&");
+            Iterator<InputParam> paramItr = params.iterator();
+            while(paramItr.hasNext()){
+                InputParam param = paramItr.next();
+                builder.append("param.").append(param.getName()).append("=").append(param.getValue());
+                if(paramItr.hasNext()){
+                    builder.append("&");
+                }                
             }
         }
         

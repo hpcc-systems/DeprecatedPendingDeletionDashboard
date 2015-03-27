@@ -109,7 +109,7 @@
 						</panelchildren>
 					</panel>
 
-					<panel height="80px" title="Group" sclass="editPanel"
+					<panel  vflex="1" title="Group" sclass="editPanel"
 						if="${$composer.showGroupPanel}">
 						<panelchildren>
 							<listbox width="200px" vflex="1" id="groupListbox" droppable="true">
