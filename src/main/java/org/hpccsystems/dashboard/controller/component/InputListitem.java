@@ -42,12 +42,14 @@ public class InputListitem extends Listitem {
             popupListbox.setMultiple(false);
             popupListbox.setCheckmark(true);
             
+            
             Listhead listhead = new Listhead();
             Listheader listheader = new Listheader();
             listheader.setLabel(paramName);
             Button clearButton = new Button("Clear");
             clearButton.setZclass("clear-text-btn btn btn-link btn-sm");
             listheader.appendChild(clearButton);
+            listheader.setSort("auto");
             listhead.appendChild(listheader);
             popupListbox.appendChild(listhead);
             

@@ -327,7 +327,7 @@ public class ChartPanel extends Panel {
 
         // Creating panel contents
         final Panelchildren panelchildren = new Panelchildren();
-        	setHeight();
+       	setHeight();
         panelchildren.appendChild(holderDiv);
         this.appendChild(panelchildren);
         
