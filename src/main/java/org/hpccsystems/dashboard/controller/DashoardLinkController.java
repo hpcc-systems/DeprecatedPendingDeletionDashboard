@@ -41,8 +41,8 @@ public class DashoardLinkController extends SelectorComposer<Window>{
                 .append(":")
                 .append(Executions.getCurrent().getServerPort())
                 .append(Executions.getCurrent().getContextPath())
-                .append("/api/share/")
-                .append(DashboardUtil.createShareParam(dashboard.getDashboardId().toString()));
+                .append("/api/share/?")
+                .append(DashboardUtil.createShareParams(dashboard.getDashboardId().toString(), dashboard.getCommonQueryFilters()));
         linkTextbox.setValue(link.toString());
        
     }

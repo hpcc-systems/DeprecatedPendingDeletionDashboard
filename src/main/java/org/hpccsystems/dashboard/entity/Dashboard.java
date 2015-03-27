@@ -7,9 +7,9 @@ import java.util.List;
 import java.util.Set;
 
 import org.hpccsystems.dashboard.chart.entity.HpccConnection;
+import org.hpccsystems.dashboard.chart.entity.InputParam;
 import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.services.ChartService;
-import org.zkoss.util.logging.Log;
 import org.zkoss.zkplus.spring.SpringUtil;
 
 /**
@@ -29,6 +29,8 @@ public class Dashboard {
     private boolean hasCommonFilter = false;
     private Integer visibility;
     private String role;
+    
+    private List<InputParam> commonQueryFilters; 
     
 
 	public String getDashboardState() {
@@ -317,6 +319,13 @@ public class Dashboard {
         }
         return null;
     }
-    
+
+    public List<InputParam> getCommonQueryFilters() {
+        return commonQueryFilters;
+    }
+
+    public void setCommonQueryFilters(List<InputParam> commonQueryFilters) {
+        this.commonQueryFilters = commonQueryFilters;
+    }   
     
 }

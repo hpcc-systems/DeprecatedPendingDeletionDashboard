@@ -54,8 +54,7 @@ public class EncryptDecrypt {
                      dcipher = Cipher.getInstance(key.getAlgorithm());
 
                      // Prepare the parameters to the cipthers
-                     AlgorithmParameterSpec paramSpec = new PBEParameterSpec(salt,
-                                  iterationCount);
+                     AlgorithmParameterSpec paramSpec = new PBEParameterSpec(salt, iterationCount);
 
                      ecipher.init(Cipher.ENCRYPT_MODE, key, paramSpec);
                      dcipher.init(Cipher.DECRYPT_MODE, key, paramSpec);

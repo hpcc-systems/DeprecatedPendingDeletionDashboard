@@ -49,6 +49,7 @@ import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.Group;
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.entity.QuerySchema;
+import org.hpccsystems.dashboard.entity.RequestParams;
 import org.hpccsystems.dashboard.exception.EncryptDecryptException;
 import org.hpccsystems.dashboard.exception.HpccConnectionException;
 import org.hpccsystems.dashboard.services.AuthenticationService;
@@ -58,6 +59,7 @@ import org.hpccsystems.dashboard.services.DashboardService;
 import org.hpccsystems.dashboard.services.GroupService;
 import org.hpccsystems.dashboard.services.HPCCQueryService;
 import org.hpccsystems.dashboard.services.HPCCService;
+import org.hpccsystems.dashboard.services.UserCredential;
 import org.hpccsystems.dashboard.services.WidgetService;
 import org.hpccsystems.dashboard.util.DashboardUtil;
 import org.springframework.dao.DataAccessException;
@@ -238,6 +240,7 @@ public class DashboardController extends SelectorComposer<Window>{
         dashboardId =(Integer) Executions.getCurrent().getAttribute(Constants.ACTIVE_DASHBOARD_ID);
         dashboardRole = (String)Executions.getCurrent().getAttribute(Constants.ACTIVE_DASHBOARD_ROLE);
         
+        UserCredential userCredential = authenticationService.getUserCredential();
         //For the first Dashboard, getting Id from Session
         if(dashboardId == null ){
             dashboardId = (Integer) Sessions.getCurrent().getAttribute(Constants.ACTIVE_DASHBOARD_ID);
@@ -296,7 +299,7 @@ public class DashboardController extends SelectorComposer<Window>{
                 count ++;
             }        
 
-            try    {
+            try {
                 dashboard.setPortletList((ArrayList<Portlet>) widgetService.retriveWidgetDetails(dashboardId));
             } catch(DataAccessException ex) {
                 Clients.showNotification(
@@ -316,9 +319,9 @@ public class DashboardController extends SelectorComposer<Window>{
                 addWidget.detach();
             }
             for (Portlet portlet : dashboard.getPortletList()) {  
-                if(authenticationService.getUserCredential().hasRole(Constants.ROLE_API_VIEW_DASHBOARD)){
+                if(userCredential.hasRole(Constants.ROLE_API_VIEW_DASHBOARD)){
                     panel = new ChartPanel(portlet, Constants.SHOW_NO_BUTTONS);
-                } else if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_EDIT_DASHBOARD) ||
+                } else if(userCredential.hasRole(Constants.CIRCUIT_ROLE_VIEW_EDIT_DASHBOARD) ||
                         Constants.ROLE_ADMIN.equals(dashboard.getRole()) ) {
                     panel = new ChartPanel(portlet, Constants.SHOW_ALL_BUTTONS);
                 } else if(Constants.ROLE_CONTRIBUTOR.equals(dashboard.getRole())) {
@@ -342,10 +345,18 @@ public class DashboardController extends SelectorComposer<Window>{
                 
             }
             
-            if(!authenticationService.getUserCredential().hasRole(Constants.ROLE_API_VIEW_DASHBOARD)
-                    && ! authenticationService.getUserCredential().getApplicationId().equals(Constants.CIRCUIT_APPLICATION_ID)
+            if(!userCredential.hasRole(Constants.ROLE_API_VIEW_DASHBOARD)
+                    && ! userCredential.getApplicationId().equals(Constants.CIRCUIT_APPLICATION_ID)
                     && dashboard.getRole().equals(Constants.ROLE_ADMIN)) {
                 dashboardToolbar.setVisible(true);
+            }
+            
+            //Adding Query params from session
+            if(userCredential.hasRole(Constants.ROLE_API_VIEW_DASHBOARD)) {
+                RequestParams requestParams = (RequestParams) Sessions.getCurrent().getAttribute(Constants.REQUEST_PRAMS);
+                if(requestParams.hasInputParams()) {
+                    dashboard.setCommonQueryFilters(requestParams.getInputParams());
+                }
             }
             
         } else {
@@ -407,36 +418,41 @@ public class DashboardController extends SelectorComposer<Window>{
         
     private void constructDBCommonInputparams() {
         
-        List<InputParam> persistedGlobalInputParams  = new ArrayList<InputParam>();
-        dashboard.getPortletList().forEach(portlet ->{
-            
-            if (portlet.getWidgetState().equals( Constants.STATE_LIVE_CHART)
-                    && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()) {
+        final List<InputParam> persistedGlobalInputParams  = new ArrayList<InputParam>();
+        
+        if(dashboard.getCommonQueryFilters() != null) {
+            persistedGlobalInputParams.addAll(dashboard.getCommonQueryFilters());
+        } else {
+            dashboard.getPortletList().forEach( portlet -> {
                 
-                List<InputParam>  portletInputs = new ArrayList<InputParam>();   
-                portlet.getChartData().getInputParams().stream().forEach(inputparam ->{
-                    if(inputparam.getIsCommonInput()
-                            && persistedGlobalInputParams.contains(inputparam)){
-                        portletInputs.add(persistedGlobalInputParams
-                                .get(persistedGlobalInputParams.indexOf(inputparam)));
-                    }else{
-                        portletInputs.add(inputparam);
-                        if (inputparam.getIsCommonInput()) {
-                            persistedGlobalInputParams.add(inputparam);
+                if (portlet.getWidgetState().equals( Constants.STATE_LIVE_CHART)
+                        && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()) {
+                    
+                    List<InputParam>  portletInputs = new ArrayList<InputParam>();   
+                    portlet.getChartData().getInputParams().stream().forEach(inputparam -> {
+                        if(inputparam.getIsCommonInput()
+                                && persistedGlobalInputParams.contains(inputparam)){
+                            portletInputs.add(persistedGlobalInputParams
+                                    .get(persistedGlobalInputParams.indexOf(inputparam)));
+                        }else{
+                            portletInputs.add(inputparam);
+                            if (inputparam.getIsCommonInput()) {
+                                persistedGlobalInputParams.add(inputparam);
+                            }
                         }
-                    }
-                });
+                    });
+                    
+                    portlet.getChartData().setInputParams(portletInputs);
+                }
                 
-                portlet.getChartData().setInputParams(portletInputs);
-            }
-            
-        });
-           
+            });
+               
+            dashboard.setCommonQueryFilters(persistedGlobalInputParams);
+        }
         
         if (LOG.isDebugEnabled()) {
             LOG.debug("Persisted Common input params -> "  + persistedGlobalInputParams);
         }
-        
        
         // Generating applied filter rows, with values
       

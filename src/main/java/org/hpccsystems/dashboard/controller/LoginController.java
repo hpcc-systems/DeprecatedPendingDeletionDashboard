@@ -135,16 +135,9 @@ public class LoginController extends SelectorComposer<Component> {
     private void redirectHome() {
         Session session = Sessions.getCurrent();
         if(LOG.isDebugEnabled()) {
-            LOG.debug("Request path - " + session.getAttribute(Constants.REQUEST_PATH));
+            LOG.debug("Request path - " + session.getAttribute(Constants.REQUEST_PRAMS));
         }
-        if(session.getAttribute(Constants.REQUEST_PATH) != null) {
-            String requestPath = session.getAttribute(Constants.REQUEST_PATH).toString();
-            //When request has a predefined path
-            session.removeAttribute(Constants.REQUEST_PATH);
-            Executions.sendRedirect(requestPath);          
-        } else {
-            Executions.sendRedirect("/demo/");
-        }
+        Executions.sendRedirect("/demo/");
     }
     
     
