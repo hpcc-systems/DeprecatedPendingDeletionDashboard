@@ -49,6 +49,7 @@ import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.Group;
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.entity.QuerySchema;
+import org.hpccsystems.dashboard.entity.RequestParams;
 import org.hpccsystems.dashboard.exception.EncryptDecryptException;
 import org.hpccsystems.dashboard.exception.HpccConnectionException;
 import org.hpccsystems.dashboard.services.AuthenticationService;
@@ -58,6 +59,7 @@ import org.hpccsystems.dashboard.services.DashboardService;
 import org.hpccsystems.dashboard.services.GroupService;
 import org.hpccsystems.dashboard.services.HPCCQueryService;
 import org.hpccsystems.dashboard.services.HPCCService;
+import org.hpccsystems.dashboard.services.UserCredential;
 import org.hpccsystems.dashboard.services.WidgetService;
 import org.hpccsystems.dashboard.util.DashboardUtil;
 import org.springframework.dao.DataAccessException;
@@ -191,6 +193,8 @@ public class DashboardController extends SelectorComposer<Window>{
     @WireVariable
     private HPCCQueryService hpccQueryService;
     
+    UserCredential userCredential;
+    
     EventListener<Event> redrawInteractivityTable = (event) -> {
         @SuppressWarnings("unchecked")
         List<Portlet> selectedtables = (List<Portlet>) event.getData();
@@ -238,6 +242,8 @@ public class DashboardController extends SelectorComposer<Window>{
         dashboardId =(Integer) Executions.getCurrent().getAttribute(Constants.ACTIVE_DASHBOARD_ID);
         dashboardRole = (String)Executions.getCurrent().getAttribute(Constants.ACTIVE_DASHBOARD_ROLE);
         
+        userCredential = authenticationService.getUserCredential();
+       
         //For the first Dashboard, getting Id from Session
         if(dashboardId == null ){
             dashboardId = (Integer) Sessions.getCurrent().getAttribute(Constants.ACTIVE_DASHBOARD_ID);
@@ -296,7 +302,7 @@ public class DashboardController extends SelectorComposer<Window>{
                 count ++;
             }        
 
-            try    {
+            try {
                 dashboard.setPortletList((ArrayList<Portlet>) widgetService.retriveWidgetDetails(dashboardId));
             } catch(DataAccessException ex) {
                 Clients.showNotification(
@@ -310,15 +316,29 @@ public class DashboardController extends SelectorComposer<Window>{
             }
             
             ChartPanel panel = null;
-            //Checking for Common filters
+            //Common Query filters
+            //Adding Query params from session
+            if(userCredential.hasRole(Constants.ROLE_API_VIEW_DASHBOARD)) {
+                commonFiltersPanel.setVisible(false);
+                RequestParams requestParams = (RequestParams) Sessions.getCurrent().getAttribute(Constants.REQUEST_PRAMS);
+                if(requestParams.hasInputParams()) {
+                    dashboard.setHasCommonFilter(true);
+                    dashboard.setCommonQueryFilters(requestParams.getInputParams());
+                    for (InputParam inputparam : requestParams.getInputParams()) {
+                        applyInputParamToPortlets(inputparam, false);
+                    }
+                }
+            }
+            
+            
             //Removing AddWidget , Configure Dashboard buttons for Single layout
             if(dashboard.getPortletList().size() == 1 && dashboard.getPortletList().get(0).getIsSinglePortlet()){
                 addWidget.detach();
             }
             for (Portlet portlet : dashboard.getPortletList()) {  
-                if(authenticationService.getUserCredential().hasRole(Constants.ROLE_API_VIEW_DASHBOARD)){
+                if(userCredential.hasRole(Constants.ROLE_API_VIEW_DASHBOARD)){
                     panel = new ChartPanel(portlet, Constants.SHOW_NO_BUTTONS);
-                } else if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_EDIT_DASHBOARD) ||
+                } else if(userCredential.hasRole(Constants.CIRCUIT_ROLE_VIEW_EDIT_DASHBOARD) ||
                         Constants.ROLE_ADMIN.equals(dashboard.getRole()) ) {
                     panel = new ChartPanel(portlet, Constants.SHOW_ALL_BUTTONS);
                 } else if(Constants.ROLE_CONTRIBUTOR.equals(dashboard.getRole())) {
@@ -342,8 +362,8 @@ public class DashboardController extends SelectorComposer<Window>{
                 
             }
             
-            if(!authenticationService.getUserCredential().hasRole(Constants.ROLE_API_VIEW_DASHBOARD)
-                    && ! authenticationService.getUserCredential().getApplicationId().equals(Constants.CIRCUIT_APPLICATION_ID)
+            if(!userCredential.hasRole(Constants.ROLE_API_VIEW_DASHBOARD)
+                    && ! userCredential.getApplicationId().equals(Constants.CIRCUIT_APPLICATION_ID)
                     && dashboard.getRole().equals(Constants.ROLE_ADMIN)) {
                 dashboardToolbar.setVisible(true);
             }
@@ -378,8 +398,7 @@ public class DashboardController extends SelectorComposer<Window>{
         }
         
         //Showing common filters panel true for new Dashboards
-        if(dashboard.getHasCommonFilter()) {
-            
+        if(!userCredential.hasRole(Constants.ROLE_API_VIEW_DASHBOARD) && dashboard.getHasCommonFilter()) {
             commonFiltersPanel.setVisible(true);
         }
     }
@@ -391,8 +410,9 @@ public class DashboardController extends SelectorComposer<Window>{
     private void constructCommonFilterPanel() throws HpccConnectionException,RemoteException {
 
         if (dashboard.getHasCommonFilter()) {
-
-            commonFiltersPanel.setVisible(true);            
+            if(!userCredential.hasRole(Constants.ROLE_API_VIEW_DASHBOARD)){
+                commonFiltersPanel.setVisible(true);
+            }
             //All charts used logical files
             if(Constants.LOGICAL_FILE.equals(dashboard.getFileType())) {
                 constructDBCommonFilters();
@@ -407,36 +427,41 @@ public class DashboardController extends SelectorComposer<Window>{
         
     private void constructDBCommonInputparams() {
         
-        List<InputParam> persistedGlobalInputParams  = new ArrayList<InputParam>();
-        dashboard.getPortletList().forEach(portlet ->{
-            
-            if (portlet.getWidgetState().equals( Constants.STATE_LIVE_CHART)
-                    && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()) {
+        final List<InputParam> persistedGlobalInputParams  = new ArrayList<InputParam>();
+        
+        if(dashboard.getCommonQueryFilters() != null) {
+            persistedGlobalInputParams.addAll(dashboard.getCommonQueryFilters());
+        } else {
+            dashboard.getPortletList().forEach( portlet -> {
                 
-                List<InputParam>  portletInputs = new ArrayList<InputParam>();   
-                portlet.getChartData().getInputParams().stream().forEach(inputparam ->{
-                    if(inputparam.getIsCommonInput()
-                            && persistedGlobalInputParams.contains(inputparam)){
-                        portletInputs.add(persistedGlobalInputParams
-                                .get(persistedGlobalInputParams.indexOf(inputparam)));
-                    }else{
-                        portletInputs.add(inputparam);
-                        if (inputparam.getIsCommonInput()) {
-                            persistedGlobalInputParams.add(inputparam);
+                if (portlet.getWidgetState().equals( Constants.STATE_LIVE_CHART)
+                        && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()) {
+                    
+                    List<InputParam>  portletInputs = new ArrayList<InputParam>();   
+                    portlet.getChartData().getInputParams().stream().forEach(inputparam -> {
+                        if(inputparam.getIsCommonInput()
+                                && persistedGlobalInputParams.contains(inputparam)){
+                            portletInputs.add(persistedGlobalInputParams
+                                    .get(persistedGlobalInputParams.indexOf(inputparam)));
+                        }else{
+                            portletInputs.add(inputparam);
+                            if (inputparam.getIsCommonInput()) {
+                                persistedGlobalInputParams.add(inputparam);
+                            }
                         }
-                    }
-                });
+                    });
+                    
+                    portlet.getChartData().setInputParams(portletInputs);
+                }
                 
-                portlet.getChartData().setInputParams(portletInputs);
-            }
-            
-        });
-           
+            });
+               
+            dashboard.setCommonQueryFilters(persistedGlobalInputParams);
+        }
         
         if (LOG.isDebugEnabled()) {
             LOG.debug("Persisted Common input params -> "  + persistedGlobalInputParams);
         }
-        
        
         // Generating applied filter rows, with values
       
@@ -993,7 +1018,7 @@ public class DashboardController extends SelectorComposer<Window>{
                     row.setAttribute(Constants.ROW_CHECKED, true);
                     inputparam.setValue(radio.getLabel());
                     inputparam.setIsCommonInput(true);
-                    applyInputParamToPortlets(inputparam);
+                    applyInputParamToPortlets(inputparam, true);
                     
                    if(row.getAttribute(Constants.SELECTED_RADIO_BTN) != null){
                       ( (Radio)row.getAttribute(Constants.SELECTED_RADIO_BTN)).setSelected(false);
@@ -1013,7 +1038,7 @@ public class DashboardController extends SelectorComposer<Window>{
     
     
     @SuppressWarnings("unchecked")
-    protected void applyInputParamToPortlets(InputParam inputparam) {
+    protected void applyInputParamToPortlets(InputParam inputparam, boolean redrawCharts) {
 
         for (Portlet portlet : dashboard.getPortletList()) {
 
@@ -1026,6 +1051,9 @@ public class DashboardController extends SelectorComposer<Window>{
             ChartData chartData = DashboardUtil.getChartData(portlet);
            
             boolean hasSelectedInputparam =false;
+            if(userCredential.hasRole(Constants.ROLE_API_VIEW_DASHBOARD)){
+                hasSelectedInputparam = true;
+            }
             //Checks this portlet query has inputparam with selected inputparam name
             try{
                 for(String file : chartData.getFiles()){
@@ -1048,11 +1076,13 @@ public class DashboardController extends SelectorComposer<Window>{
                      chartData.getInputParams().remove(inputparam);
                  }
                  chartData.getInputParams().add(inputparam);
-                 try {
-                     updateWidgets(portlet);
-                 } catch (Exception e) {
-                     LOG.error("Error Updating Charts", e);
-                    Clients.showNotification("Unable to update charts", Clients.NOTIFICATION_TYPE_ERROR, this.getSelf(), Constants.POSITION_CENTER, 5000, true);
+                 if(redrawCharts) {
+                     try {
+                         updateWidgets(portlet);
+                     } catch (Exception e) {
+                         LOG.error("Error Updating Charts", e);
+                        Clients.showNotification("Unable to update charts", Clients.NOTIFICATION_TYPE_ERROR, this.getSelf(), Constants.POSITION_CENTER, 5000, true);
+                     }
                  }
              }
             
@@ -1615,6 +1645,7 @@ public class DashboardController extends SelectorComposer<Window>{
         
         String removedInput =  removedRow.getAttribute(Constants.INPUT_PARAM_NAME).toString();
         InputParam removedInputparam = new InputParam(removedInput);
+        dashboard.getCommonQueryFilters().remove(removedInputparam);
         List<Portlet> portletsToRefresh = dashboard.getPortletList().stream().filter(portlet ->
         (Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())
                 && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()
@@ -1830,8 +1861,9 @@ public class DashboardController extends SelectorComposer<Window>{
                         constructFilterItemForQuery(newInputParams);
                     }
                 }
-                
-                commonFiltersPanel.setVisible(true);
+                if(!userCredential.hasRole(Constants.ROLE_API_VIEW_DASHBOARD)){
+                    commonFiltersPanel.setVisible(true);
+                }
             } else {  
                 resetPanelCommonfilterIndicator();
                 if (filterRows.getChildren() != null && !filterRows.getChildren().isEmpty() ) {
@@ -1932,6 +1964,7 @@ public class DashboardController extends SelectorComposer<Window>{
             if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())
                     && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()){
                 appliedCommonInputParam.stream().forEach(inputparam ->{
+                    dashboard.getCommonQueryFilters().remove(inputparam);
                     if(portlet.getChartData().getInputParams().contains(inputparam)){
                         portlet.getChartData().getInputParams().remove(inputparam);
                     }

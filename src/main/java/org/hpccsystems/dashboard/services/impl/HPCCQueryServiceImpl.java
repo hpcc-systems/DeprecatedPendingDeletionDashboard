@@ -212,7 +212,7 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
     private QuerySchema getGenericQuerySchema(String queryName, HpccConnection hpccConnection,String inputParamQuery) throws HpccConnectionException {
         QuerySchema querySchema = new QuerySchema();
         Set<Field> fields = new LinkedHashSet<Field>();
-        Map<String,Set<String>> inputParams = new HashMap<String, Set<String>>();
+        Map<String,Set<String>> inputParams = new TreeMap<String, Set<String>>();
         querySchema.setFields(fields);
         querySchema.setInputParams(inputParams);
         
@@ -1494,7 +1494,7 @@ return resultDataMap;
             String queryName, Set<String> inputParams,
             HpccConnection hpccConnection,boolean isGenericQuery, String inputParamQuery) throws Exception {
             
-            Map<String,Set<String>> inputParamValues = new HashMap<String, Set<String>>();          
+            Map<String,Set<String>> inputParamValues = new TreeMap<String, Set<String>>();    
                 
         try {
                 if(isGenericQuery){

@@ -10,9 +10,10 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.NoSuchElementException;
 import java.util.Map.Entry;
+import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.JAXBException;
@@ -77,15 +78,15 @@ import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listhead;
 import org.zkoss.zul.Listheader;
 import org.zkoss.zul.Messagebox;
+import org.zkoss.zul.Messagebox.ClickEvent;
+import org.zkoss.zul.Panel;
+import org.zkoss.zul.Panelchildren;
+import org.zkoss.zul.Popup;
 import org.zkoss.zul.Tab;
 import org.zkoss.zul.Tabbox;
 import org.zkoss.zul.Tabpanel;
 import org.zkoss.zul.Tabpanels;
 import org.zkoss.zul.Tabs;
-import org.zkoss.zul.Messagebox.ClickEvent;
-import org.zkoss.zul.Panel;
-import org.zkoss.zul.Panelchildren;
-import org.zkoss.zul.Popup;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Toolbar;
 import org.zkoss.zul.Vbox;
@@ -299,7 +300,11 @@ public class ChartPanel extends Panel {
         onDrawingQueryChart(buttonState);
         
         if(Constants.SHOW_ALL_BUTTONS == buttonState) {
-        	addBtn.setTooltiptext("Add Chart");
+        	if(Constants.STATE_EMPTY.equals(portlet.getWidgetState())){
+        	    addBtn.setTooltiptext("Add Chart");
+            }else{
+                addBtn.setTooltiptext("Configure Chart");
+            }
             toolbar.appendChild(addBtn);
             AuthenticationService authenticationService = (AuthenticationService)SpringUtil.getBean("authenticationService");
             if(!Constants.CIRCUIT_APPLICATION_ID.equals(authenticationService.getUserCredential().getApplicationId())){
@@ -322,16 +327,7 @@ public class ChartPanel extends Panel {
 
         // Creating panel contents
         final Panelchildren panelchildren = new Panelchildren();
-        if(portlet.getIsSinglePortlet()){
-        	Toolkit tk = Toolkit.getDefaultToolkit();
-        	Dimension d = tk.getScreenSize();
-        	StringBuilder sb = new StringBuilder();
-        	sb.append(d.height-254);
-        	sb.append("px");
-        	holderDiv.setHeight(sb.toString());
-        }else{
-            holderDiv.setHeight("385px");
-        }
+       	setHeight();
         panelchildren.appendChild(holderDiv);
         this.appendChild(panelchildren);
         
@@ -373,7 +369,7 @@ public class ChartPanel extends Panel {
                 resizeBtn.setTooltiptext("Minimize window");
             }else{
                 holderDiv.setVflex(null);
-                holderDiv.setHeight("385px");
+                setHeight();
                 ChartPanel.this.setMaximized(false);
                 resizeBtn.setSclass(RESIZE_MAX_STYLE);
                 resizeBtn.setTooltiptext("Maximize window");
@@ -407,6 +403,15 @@ public class ChartPanel extends Panel {
         });
         
     }
+
+    private void setHeight() {
+        Toolkit tk = Toolkit.getDefaultToolkit();
+        Dimension d = tk.getScreenSize();
+        StringBuilder sb = new StringBuilder();
+        sb.append(d.height-260);
+        sb.append("px");
+        holderDiv.setHeight(sb.toString());
+    }
     
     //Adds input parameters to display in chart/portlet
     EventListener<Event> onAddInputParams = new EventListener<Event>() {
@@ -414,7 +419,7 @@ public class ChartPanel extends Panel {
         @Override
         public void onEvent(Event event) throws Exception {
             HPCCQueryService hpccQueryService = (HPCCQueryService) SpringUtil.getBean(Constants.HPCC_QUERY_SERVICE);
-            inputListbox.getChildren().clear();
+            removeExistingInputparam();            
             Map<String, Set<String>> paramValues = null;
             try {
                 
@@ -500,6 +505,21 @@ public class ChartPanel extends Panel {
             inputListbox.appendChild(listitem);
     }; 
     
+    /**
+     * Removes the inputparameters which are already existing in the input param popup
+     * and leaves the header part
+     */
+    protected void removeExistingInputparam() {
+            List<Component> removableItem = new ArrayList<Component>();
+            removableItem.addAll(inputListbox.getChildren().stream().filter(comp ->
+            (comp instanceof InputListitem)).collect(Collectors.toList()));
+            
+            removableItem.stream().forEach(component ->{
+                component.detach();
+            });
+        }
+    
+
     public void onDrawingQueryChart(final int buttonState) {
         if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState()) && portlet.getChartData().getIsQuery() 
                 && (Constants.CATEGORY_HIERARCHY !=  chartService.getCharts().get(portlet.getChartType())
@@ -519,6 +539,8 @@ public class ChartPanel extends Panel {
             inputParamBtn.setSclass(INPUT_PARAM_STYLE);
             inputParamBtn.setZclass("btn btn-sm btn-primary");
             inputParamBtn.setAttribute(Constants.INPUT_PARAM_BTN, true); 
+            inputParamBtn.setTooltiptext("Configure filter");
+            
             
             final Popup popup = new Popup();
             popup.setZclass("popup");
@@ -1058,6 +1080,7 @@ public class ChartPanel extends Panel {
         chartDiv.detach();
         
         addBtn.setSclass(ADD_STYLE);
+        addBtn.setTooltiptext("Add Chart");
         
         resetBtn.setDisabled(true);
         addBtn.removeEventListener(Events.ON_CLICK, editListener);

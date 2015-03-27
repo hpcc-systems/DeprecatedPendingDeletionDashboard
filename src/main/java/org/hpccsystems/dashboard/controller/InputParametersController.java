@@ -7,6 +7,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
+import java.util.TreeMap;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -89,7 +90,7 @@ public class InputParametersController extends SelectorComposer<Panel>{
      * @throws Exception
      */
     private void constructInputParameters() throws Exception {
-    	Map<String,Set<String>> paramValues = null;
+    	TreeMap<String,Set<String>> paramValues = null;
       	 Set<String> inputParameter =  null;
       	 
 		if (chartData.getInputParams() == null) {
@@ -97,7 +98,7 @@ public class InputParametersController extends SelectorComposer<Panel>{
 				chartData.getHpccConnection(), chartData.isGenericQuery(),
 				chartData.getInputParamQuery());
 				inputParameter = querySchema.getInputParams().keySet();
-				paramValues = querySchema.getInputParams();
+				paramValues = (TreeMap<String, Set<String>>) querySchema.getInputParams();
 			
 				
 			 InputParam inputParam = null;
@@ -123,7 +124,7 @@ public class InputParametersController extends SelectorComposer<Panel>{
                     chartData.getHpccConnection(), chartData.isGenericQuery(),
                     chartData.getInputParamQuery());
              inputParameter = querySchema.getInputParams().keySet();
-             paramValues = querySchema.getInputParams();
+             paramValues = (TreeMap<String, Set<String>>) querySchema.getInputParams();
             
             
             InputParam tempInput = null;

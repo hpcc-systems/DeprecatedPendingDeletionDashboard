@@ -15,11 +15,11 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.entity.Dashboard;
+import org.hpccsystems.dashboard.entity.RequestParams;
 import org.hpccsystems.dashboard.services.AuthenticationService;
 import org.hpccsystems.dashboard.services.DashboardService;
 import org.hpccsystems.dashboard.services.GroupService;
 import org.hpccsystems.dashboard.services.WidgetService;
-import org.hpccsystems.dashboard.util.DashboardUtil;
 import org.springframework.dao.DataAccessException;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
@@ -96,7 +96,9 @@ public class SidebarController extends GenericForwardComposer<Component>{
         try {
             //Circuit/External Source Flow   
             if(authenticationService.getUserCredential().hasRole(Constants.ROLE_API_VIEW_DASHBOARD)){
-                String sharedDashboardId = DashboardUtil.extractShareParam(Executions.getCurrent().getParameterMap().get(Constants.PARAM_SHARE)[0]);
+                RequestParams requestParams = (RequestParams) Sessions.getCurrent().getAttribute(Constants.REQUEST_PRAMS);
+                String sharedDashboardId = requestParams.getDashbaordId();
+                
                 Dashboard shareDashboard = new Dashboard();
                 shareDashboard.setDashboardId(Integer.valueOf(sharedDashboardId));
                 List<String> groupIds = getGroupIds(); 
