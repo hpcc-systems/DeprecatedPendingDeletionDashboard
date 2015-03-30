@@ -2,6 +2,7 @@ package org.hpccsystems.dashboard.controller;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -134,7 +135,6 @@ public class EditChartController extends SelectorComposer<Component> {
 
     private XYChartData chartData;
     private Button doneButton;
-
     private Portlet portlet;
     private ChartDetails chartDetails;
     
@@ -336,7 +336,7 @@ public class EditChartController extends SelectorComposer<Component> {
                     if(Constants.NONE.equals(measure.getAggregateFunction())) {
                         yAxisListbox.getParent().setAttribute(Constants.NONE, true);
                     }
-                    createYListChild(measure);
+                    createYListChild(measure ,null);
                     isScendaryMeasurePresent = !isScendaryMeasurePresent ? measure.isSecondary():true;
                 } else {
                     columnList.add(measure.getColumn());
@@ -389,7 +389,18 @@ public class EditChartController extends SelectorComposer<Component> {
      */
     @Listen("onDrop = #yAxisListbox, #y2AxisListbox")
     public void onDropToYAxisListbox(final DropEvent dropEvent) {
-        final Listbox target = (Listbox) dropEvent.getTarget();
+        if("yAxisListbox".equals(dropEvent.getDragged().getParent().getId()) ||
+                "y2AxisListbox".equals(dropEvent.getDragged().getParent().getId())) {
+            processYAxisDropOnListbox(dropEvent, (Listbox) dropEvent.getTarget());
+        }
+        else{
+            Listbox target = (Listbox) dropEvent.getTarget();
+            processYAxisDrop(dropEvent, target); 
+        }
+       
+    }
+
+    private void processYAxisDrop(final DropEvent dropEvent, Listbox target) {
         final Vbox targetParent = (Vbox) target.getParent();
         
         final Listitem draggedListitem = (Listitem) ((DropEvent) dropEvent).getDragged();
@@ -439,7 +450,7 @@ public class EditChartController extends SelectorComposer<Component> {
             targetParent.setAttribute(Constants.NONE, true);
         }
         
-        createYListChild(newMeasure);
+        createYListChild(newMeasure,target);
         chartData.getMeasures().add(newMeasure);
         if (chartData.isDrawable()) {
             constructChart();
@@ -571,12 +582,15 @@ public class EditChartController extends SelectorComposer<Component> {
         }
     }
 
-    private void createYListChild(Measure measure) {
+    private void createYListChild(Measure measure , Listbox target) {
         Listitem yAxisItem = new Listitem();
         final Textbox textBox = new Textbox();
         textBox.setInplace(true);
         textBox.setStyle("border: none;    color: black; width: 150px;");
         yAxisItem.setAttribute(Constants.MEASURE, measure);
+        yAxisItem.setDraggable(TRUE);
+        yAxisItem.setDroppable(TRUE);
+        yAxisItem.addEventListener(Events.ON_DROP, yAxisItemSwapListener);
         Listcell listcell = new Listcell();
         //For roxie query, no aggregate function supported
         if(measure.getAggregateFunction() == null){
@@ -602,10 +616,50 @@ public class EditChartController extends SelectorComposer<Component> {
             yAxisItem.setParent(yAxisListbox);
         }
         
-        
+     
         if(Constants.NONE.equals(measure.getAggregateFunction())) {
             yAxisListbox.setAttribute(Constants.NONE, true);
         }
+    }
+    
+    private EventListener<DropEvent> yAxisItemSwapListener = new EventListener<DropEvent>() {
+        public void onEvent(final DropEvent event)  {
+            
+            Listitem dropped = (Listitem) event.getTarget();
+            
+            if("yAxisListbox".equals(event.getDragged().getParent().getId()) ||
+                    "y2AxisListbox".equals(event.getDragged().getParent().getId())) {
+                processYAxisDropOnListitem(event,dropped);
+            } else {
+                processYAxisDrop(event, dropped.getListbox());
+            }
+         
+        }
+    };
+ 
+    private void processYAxisDropOnListitem(DropEvent event,Listitem dropped){
+        Listitem dragged = (Listitem) event.getDragged();
+        Measure measure1 = (Measure) dragged.getAttribute(Constants.MEASURE);
+        Measure measure2 = (Measure) dropped.getAttribute(Constants.MEASURE);
+        dropped.getListbox().insertBefore(dragged, dropped); 
+        
+        Collections.swap(chartData.getMeasures(), 
+                chartData.getMeasures().indexOf(measure1),
+                chartData.getMeasures().indexOf(measure2));
+        
+      
+    }
+    
+    private void processYAxisDropOnListbox(DropEvent event,Listbox dropped){
+        Listitem dragged = (Listitem) event.getDragged();
+        Measure measure1 = (Measure) dragged.getAttribute(Constants.MEASURE);
+        Measure measure2 = chartData.getMeasures().get(chartData.getMeasures().size() - 1);
+        
+        Collections.swap(chartData.getMeasures(), 
+                chartData.getMeasures().indexOf(measure1),
+                chartData.getMeasures().indexOf(measure2));
+        
+        dropped.appendChild(dragged);
     }
 
     // Event Listener for Change of YColumn title text
@@ -620,7 +674,8 @@ public class EditChartController extends SelectorComposer<Component> {
             measure.setDisplayYColumnName(textBox.getValue());
         }
     };
-
+    
+   
     private EventListener<Event> yAxisItemDetachListener = new EventListener<Event>() {
         public void onEvent(final Event event)  {
             Listitem yAxisItem = (Listitem) event.getTarget().getParent().getParent();

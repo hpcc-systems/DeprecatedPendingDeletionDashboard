@@ -231,8 +231,8 @@ public class EditTableController extends SelectorComposer<Component> {
                     //Dropped on List box
                     targetList.appendChild(draggedItem);
                 } else {
-                    //Dropped on List item
-                    targetList.insertBefore(draggedItem, event.getTarget());
+                    // Dropped on List item
+                        targetList.insertBefore(draggedItem, event.getTarget());
                 }
             } else {
                 //Dragged from Source List
@@ -245,8 +245,10 @@ public class EditTableController extends SelectorComposer<Component> {
                         targetList.appendChild(createTargetListItem(attribute));
                     } else {
                         //Dropped on Listitem
-                        targetList.insertBefore(createTargetListItem(attribute), event.getTarget());
-                    }
+                            targetList.insertBefore(createTargetListItem(attribute), event.getTarget());   
+                        }
+                     
+                  
                 } else {
                 	 Clients.showNotification("Column exists", "error", targetList, "middle_center", 3000, true);
                 }
