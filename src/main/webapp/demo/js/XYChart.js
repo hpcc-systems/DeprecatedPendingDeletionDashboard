@@ -54,6 +54,8 @@ function createXYChart (divId, chartData) {
 	
 	var xAxisType = 'categorized';
 	var timeFormat = null, timeColumnName = null, xAxisDisplayFormat = null,yMin=null,yMax=null;y2Max=null;y2Min=null;
+	var yThreshold = null;
+	var y2Threshold = null;
 	if(response.timeseries.isEnabled) {
 		xAxisType = 'timeseries';
 		timeFormat = response.timeseries.format;
@@ -73,6 +75,13 @@ function createXYChart (divId, chartData) {
 	if(response.y2Max) {
 		y2Max=response.y2Max;
 	}
+	if(response.yThreshold){
+		yThreshold = response.yThreshold;
+	}
+	if(response.y2Threshold){
+		y2Threshold = response.y2Threshold;
+	}
+
 	c3JSON = {
 			data: {
 				x: timeColumnName,
@@ -130,6 +139,7 @@ function createXYChart (divId, chartData) {
 		        },		       
 		       rotated: rotateAxis
 			},
+			
 			tooltip: {
 		        format: {
 		            value: d3.format('f')
@@ -150,4 +160,13 @@ function createXYChart (divId, chartData) {
 	console.log(JSON.stringify(c3JSON));
 	
 	var chart = c3.generate(c3JSON);
+	
+	if(yThreshold && !y2Threshold){
+		chart.ygrids.add([{value: yThreshold, text: yThreshold+' - '+response.primaryYAxisLabel,position: 'start'}]);
+	}else if(yThreshold && y2Threshold){
+		chart.ygrids.add([{value: yThreshold, text: yThreshold+' - '+response.primaryYAxisLabel,position: 'start'},
+		                  {value: y2Threshold, text: y2Threshold+' - '+response.secondaryYAxisLabel,axis: 'y2',position: 'end'}]);
+	}else if(!yThreshold && y2Threshold){
+		chart.ygrids.add([{value: y2Threshold, text: y2Threshold+' - '+response.secondaryYAxisLabel,axis: 'y2',position: 'middle'}]);
+	}
 }

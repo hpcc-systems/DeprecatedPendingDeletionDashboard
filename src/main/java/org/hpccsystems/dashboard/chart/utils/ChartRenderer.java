@@ -79,6 +79,13 @@ public class ChartRenderer {
     private static final String CHART_TYPES = "chartTypes";
     private static final String AXES = "axes";
 	private static final String ROTATE_AXIS= "rotateAxis";
+	
+	private static final String Y_MIN = "yMin";
+	private static final String Y_MAX = "yMax";
+	private static final String Y2_MIN = "y2Min";
+	private static final String Y2_MAX = "y2Max";
+	private static final String Y_THRESHOLD = "yThreshold";
+	private static final String Y2_THRESHOLD = "y2Threshold";
     
     private HPCCService hpccService;
     private ChartService chartService;
@@ -337,10 +344,12 @@ public class ChartRenderer {
         header.add("xCategoryLabels", xValues);
         header.add("states", geoRows);
         
-        header.addProperty(Constants.Y_MIN, chartData.getyAxisMinVal());
-        header.addProperty(Constants.Y_MAX, chartData.getyAxisMaxVal());
-        header.addProperty(Constants.Y2_MIN, chartData.getY2AxisMinVal());
-        header.addProperty(Constants.Y2_MAX, chartData.getY2AxisMaxVal());
+        header.addProperty(Y_MIN, chartData.getyAxisMinVal());
+        header.addProperty(Y_MAX, chartData.getyAxisMaxVal());
+        header.addProperty(Y2_MIN, chartData.getY2AxisMinVal());
+        header.addProperty(Y2_MAX, chartData.getY2AxisMaxVal());
+        header.addProperty(Y_THRESHOLD, chartData.getyThresholdVal());
+        header.addProperty(Y2_THRESHOLD, chartData.getY2ThresholdVal());
 
         String data = header.toString();
         if (LOG.isDebugEnabled()) {
