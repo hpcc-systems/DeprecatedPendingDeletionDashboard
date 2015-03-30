@@ -336,7 +336,7 @@ public class EditChartController extends SelectorComposer<Component> {
                     if(Constants.NONE.equals(measure.getAggregateFunction())) {
                         yAxisListbox.getParent().setAttribute(Constants.NONE, true);
                     }
-                    createYListChild(measure ,null);
+                    createYListChild(measure);
                     isScendaryMeasurePresent = !isScendaryMeasurePresent ? measure.isSecondary():true;
                 } else {
                     columnList.add(measure.getColumn());
@@ -450,7 +450,7 @@ public class EditChartController extends SelectorComposer<Component> {
             targetParent.setAttribute(Constants.NONE, true);
         }
         
-        createYListChild(newMeasure,target);
+        createYListChild(newMeasure);
         chartData.getMeasures().add(newMeasure);
         if (chartData.isDrawable()) {
             constructChart();
@@ -582,7 +582,7 @@ public class EditChartController extends SelectorComposer<Component> {
         }
     }
 
-    private void createYListChild(Measure measure , Listbox target) {
+    private void createYListChild(Measure measure) {
         Listitem yAxisItem = new Listitem();
         final Textbox textBox = new Textbox();
         textBox.setInplace(true);
