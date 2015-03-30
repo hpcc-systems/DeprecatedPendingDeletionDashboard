@@ -359,7 +359,9 @@ public class ChartPanel extends Panel {
             ChartPanel.this.setMaximizable(true);
             if(!ChartPanel.this.isMaximized()){
                 holderDiv.setHeight("");
-                if ((Constants.CATEGORY_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory())||(Constants.CATEGORY_TEXT_EDITOR == chartService.getCharts().get(portlet.getChartType()).getCategory())||(Constants.CATEGORY_SCORED_SEARCH_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory())) {
+                if ((Constants.CATEGORY_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory())
+                        ||(Constants.CATEGORY_TEXT_EDITOR == chartService.getCharts().get(portlet.getChartType()).getCategory())
+                        ||(Constants.CATEGORY_SCORED_SEARCH_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory())) {
                 	holderDiv.setHeight(String.valueOf(UiGenerator.getScreenSize().height-250)+"px");
                 } else {
                 	holderDiv.setVflex("1");	

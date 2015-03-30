@@ -435,7 +435,8 @@ public class DashboardController extends SelectorComposer<Window>{
             dashboard.getPortletList().forEach( portlet -> {
                 
                 if (portlet.getWidgetState().equals( Constants.STATE_LIVE_CHART)
-                        && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()) {
+                        && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()
+                        && Constants.CATEGORY_SCORED_SEARCH_TABLE != chartService.getCharts().get(portlet.getChartType()).getCategory()) {
                     
                     List<InputParam>  portletInputs = new ArrayList<InputParam>();   
                     portlet.getChartData().getInputParams().stream().forEach(inputparam -> {
@@ -477,7 +478,8 @@ public class DashboardController extends SelectorComposer<Window>{
                 Set<String> distinctValues = new HashSet<>();
                 for(Portlet portlet : dashboard.getPortletList()){
                     if (portlet.getWidgetState().equals( Constants.STATE_LIVE_CHART)
-                            && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()) {
+                            && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()
+                            && Constants.CATEGORY_SCORED_SEARCH_TABLE != chartService.getCharts().get(portlet.getChartType()).getCategory()) {
                         QuerySchema querySchema =null;
                       //As joining not allows in Query taking first file
                         if(portlet.getChartData().getInputParams().contains(globalInput)){
@@ -514,7 +516,8 @@ public class DashboardController extends SelectorComposer<Window>{
         }else{
            dashboard.getPortletList().stream().forEach(portlet ->{
                if (Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())
-                       && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()){
+                       && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()
+                       && Constants.CATEGORY_SCORED_SEARCH_TABLE != chartService.getCharts().get(portlet.getChartType()).getCategory()){
                    getInputParams(portlet,newInputParams,null);
                }
            });
@@ -532,7 +535,8 @@ public class DashboardController extends SelectorComposer<Window>{
         // instance
         for (Portlet portlet : dashboard.getPortletList()) {
             if (Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())
-                    && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()                        
+                    && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()  
+                    && Constants.CATEGORY_SCORED_SEARCH_TABLE != chartService.getCharts().get(portlet.getChartType()).getCategory()
                     && portlet.getChartData().getIsFiltered()) {
                 filters = new LinkedHashSet<Filter>();
                 for (Filter filter : portlet.getChartData().getFilters()) {
@@ -576,8 +580,8 @@ public class DashboardController extends SelectorComposer<Window>{
             Set<Field> fieldSet;
             for (Portlet portlet : dashboard.getPortletList()) {
                 if (Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())
-                        && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType())
-                                .getCategory()) {
+                        && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()
+                        && Constants.CATEGORY_SCORED_SEARCH_TABLE != chartService.getCharts().get(portlet.getChartType()).getCategory()) {
                     for (Map.Entry<String, List<Field>> entry : portlet
                             .getChartData().getFields().entrySet()) {
                         fieldSet = new LinkedHashSet<Field>();
@@ -750,8 +754,8 @@ public class DashboardController extends SelectorComposer<Window>{
             List<Filter> filtersToReomove = null;
             for (Portlet portlet : dashboard.getPortletList()) {
                 if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())
-                        && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType())
-                                .getCategory()
+                        && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()
+                        && Constants.CATEGORY_SCORED_SEARCH_TABLE != chartService.getCharts().get(portlet.getChartType()).getCategory()
                         && portlet.getChartData().getIsFiltered()) {
                     
                     filtersToReomove = new ArrayList<Filter>();
@@ -808,8 +812,8 @@ public class DashboardController extends SelectorComposer<Window>{
             
             for (Portlet portlet : dashboard.getPortletList()) {
                 if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())
-                        && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType())
-                                .getCategory()
+                        && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()
+                        && Constants.CATEGORY_SCORED_SEARCH_TABLE != chartService.getCharts().get(portlet.getChartType()).getCategory()
                         && portlet.getChartData().getIsFiltered()) {
                     
                     List<InputParam> filtersToReomove  = new ArrayList<InputParam>();
@@ -908,8 +912,8 @@ public class DashboardController extends SelectorComposer<Window>{
             Map<String, Map<String,Set<String>>> newInputParams;
             if(dashboard.getHasCommonFilter() && 
                     Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState()) 
-                    && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType())
-                            .getCategory()) {
+                    && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()
+                    && Constants.CATEGORY_SCORED_SEARCH_TABLE != chartService.getCharts().get(portlet.getChartType()).getCategory()) {
                 
                 //As dashboard has commonfilter enabled,setting ''hasCommonFileter' true for the  chart panel
                 //It will tell whether to fetch the fresh hpcc data while selecting the inputparam button.
@@ -1043,9 +1047,8 @@ public class DashboardController extends SelectorComposer<Window>{
         for (Portlet portlet : dashboard.getPortletList()) {
 
             if (!Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())
-                    || Constants.CATEGORY_TEXT_EDITOR == chartService
-                            .getCharts().get(portlet.getChartType())
-                            .getCategory()) {
+                    || Constants.CATEGORY_TEXT_EDITOR == chartService.getCharts().get(portlet.getChartType()).getCategory()
+                    || Constants.CATEGORY_SCORED_SEARCH_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()) {
                 continue;
             }
             ChartData chartData = DashboardUtil.getChartData(portlet);
@@ -1139,8 +1142,8 @@ public class DashboardController extends SelectorComposer<Window>{
         Set<String> values = new LinkedHashSet<String>();
         for (Portlet portlet : dashboard.getPortletList()) {
             if(portlet.getWidgetState().equals(Constants.STATE_LIVE_CHART)
-                    && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType())
-                            .getCategory()
+                    && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()
+                    && Constants.CATEGORY_SCORED_SEARCH_TABLE != chartService.getCharts().get(portlet.getChartType()).getCategory()
                     && portlet.getChartData().getFiles().contains(filter.getFileName())) {
                 values.addAll(
                         hpccService.getDistinctValues(filter.getColumn(), filter.getFileName(),portlet.getChartData(), false));
@@ -1447,8 +1450,8 @@ public class DashboardController extends SelectorComposer<Window>{
         
         for (Portlet portlet : dashboard.getPortletList()) {
             if(!Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())
-                    || Constants.CATEGORY_TEXT_EDITOR ==  chartService.getCharts().get(portlet.getChartType())
-                            .getCategory()) {
+                    || Constants.CATEGORY_TEXT_EDITOR ==  chartService.getCharts().get(portlet.getChartType()).getCategory()
+                    || Constants.CATEGORY_SCORED_SEARCH_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()) {
                 continue;
             }
             
@@ -1473,11 +1476,7 @@ public class DashboardController extends SelectorComposer<Window>{
                     .getCategory()){
                  chartData = (GaugeChartData) portlet.getChartData();
                 
-            } else if(Constants.CATEGORY_TEXT_EDITOR ==  chartService.getCharts().get(portlet.getChartType())
-                    .getCategory()){
-                 chartData = (TextData) portlet.getChartData();
-                
-            }
+            } 
             
             if(chartData.getFiles().contains(filter.getFileName())) {
                 //Overriding filter if applied already
@@ -1596,8 +1595,8 @@ public class DashboardController extends SelectorComposer<Window>{
         for (Portlet portlet : dashboard.getPortletList()) {
             
             if(!Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())
-                    || Constants.CATEGORY_TEXT_EDITOR ==  chartService.getCharts().get(portlet.getChartType())
-                            .getCategory() ){
+                    || Constants.CATEGORY_TEXT_EDITOR ==  chartService.getCharts().get(portlet.getChartType()) .getCategory() 
+                    || Constants.CATEGORY_SCORED_SEARCH_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()){
                 continue;
             }
             ChartData chartData = DashboardUtil.getChartData(portlet);
@@ -1649,6 +1648,7 @@ public class DashboardController extends SelectorComposer<Window>{
         List<Portlet> portletsToRefresh = dashboard.getPortletList().stream().filter(portlet ->
         (Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())
                 && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()
+                && Constants.CATEGORY_SCORED_SEARCH_TABLE != chartService.getCharts().get(portlet.getChartType()).getCategory()
                 && portlet.getChartData().getInputParams().contains(removedInputparam))).collect(Collectors.toList());
         
         portletsToRefresh.forEach(portlet ->{
@@ -1826,7 +1826,8 @@ public class DashboardController extends SelectorComposer<Window>{
                         // Add a condition to validate all portlets having same
                         // hpcc connection for applied filters for dashboard.
                         if (portlet.getWidgetState().equals( Constants.STATE_LIVE_CHART)
-                                && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()) {
+                                && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()
+                                && Constants.CATEGORY_SCORED_SEARCH_TABLE != chartService.getCharts().get(portlet.getChartType()).getCategory()) {
                             if (portlet.getChartData().getFields() == null) {
                                 getfileFields(portlet);
                             }
@@ -1852,7 +1853,8 @@ public class DashboardController extends SelectorComposer<Window>{
                     Map<String, Map<String,Set<String>>>  newInputParams = new LinkedHashMap<String, Map<String,Set<String>>>();
                     for (Portlet portlet : dashboard.getPortletList()) {
                         if (portlet.getWidgetState().equals( Constants.STATE_LIVE_CHART)
-                                && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()) {
+                                && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()
+                                && Constants.CATEGORY_SCORED_SEARCH_TABLE != chartService.getCharts().get(portlet.getChartType()).getCategory()) {
                             getInputParams(portlet,newInputParams,null);
                         }
                     }
@@ -1930,8 +1932,8 @@ public class DashboardController extends SelectorComposer<Window>{
                ChartPanel panel = ((ChartPanel)childComp);
                 if(panel instanceof ChartPanel 
                         &&  Constants.STATE_LIVE_CHART.equals(panel.getPortlet().getWidgetState())
-                        && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(
-                                panel.getPortlet().getChartType()).getCategory()){
+                        && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(panel.getPortlet().getChartType()).getCategory()
+                        && Constants.CATEGORY_SCORED_SEARCH_TABLE != chartService.getCharts().get(panel.getPortlet().getChartType()).getCategory()){
                     panel.setAttribute(Constants.COMMON_FILTERS_ENABLED, false);
                 }
                 
@@ -1948,8 +1950,8 @@ public class DashboardController extends SelectorComposer<Window>{
                ChartPanel panel = ((ChartPanel)childComp);
                 if(panel instanceof ChartPanel 
                         &&  Constants.STATE_LIVE_CHART.equals(panel.getPortlet().getWidgetState())
-                        && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(
-                                panel.getPortlet().getChartType()).getCategory()){
+                        && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(panel.getPortlet().getChartType()).getCategory()
+                        && Constants.CATEGORY_SCORED_SEARCH_TABLE != chartService.getCharts().get(panel.getPortlet().getChartType()).getCategory()){
                     panel.setAttribute(Constants.COMMON_FILTERS_ENABLED, true);
                 }
                 
@@ -1962,7 +1964,8 @@ public class DashboardController extends SelectorComposer<Window>{
     private void removeInputparamUpdateWidget() {
         dashboard.getPortletList().stream().forEach(portlet ->{
             if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())
-                    && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()){
+                    && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()
+                    && Constants.CATEGORY_SCORED_SEARCH_TABLE != chartService.getCharts().get(portlet.getChartType()).getCategory()){
                 appliedCommonInputParam.stream().forEach(inputparam ->{
                     dashboard.getCommonQueryFilters().remove(inputparam);
                     if(portlet.getChartData().getInputParams().contains(inputparam)){
@@ -1986,7 +1989,8 @@ public class DashboardController extends SelectorComposer<Window>{
     private void removeFilterUpdateWidget() {
         dashboard.getPortletList().stream().forEach(portlet ->{
             if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())
-                    && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()){
+                    && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()
+                    && Constants.CATEGORY_SCORED_SEARCH_TABLE != chartService.getCharts().get(portlet.getChartType()).getCategory()){
                 appliedCommonFilters.stream().forEach(filter ->{
                     if(portlet.getChartData().getIsFiltered()
                             && portlet.getChartData().getFilters().contains(filter)){
@@ -2115,8 +2119,8 @@ public class DashboardController extends SelectorComposer<Window>{
             //Logic assumes no same filenames in different HPCC Systems in a single dashboard
             //TODO: Fix
             if (Constants.STATE_LIVE_CHART.equals(deletedPortlet.getWidgetState())
-                    && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(deletedPortlet.getChartType())
-                            .getCategory()) {
+                    && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(deletedPortlet.getChartType()).getCategory()
+                    && Constants.CATEGORY_SCORED_SEARCH_TABLE != chartService.getCharts().get(deletedPortlet.getChartType()).getCategory()) {
                 //Files being detached from Dashboard
                 List<String> files = new ArrayList<String>();
                 files.addAll(deletedPortlet.getChartData().getFiles());
@@ -2124,8 +2128,8 @@ public class DashboardController extends SelectorComposer<Window>{
                 for (String deletedFile : deletedPortlet.getChartData().getFiles()) {
                     for (Portlet portlet : dashboard.getPortletList()) {
                         if(portlet.getWidgetState().equals(Constants.STATE_LIVE_CHART) 
-                                && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(
-                                        portlet.getChartType()).getCategory()
+                                && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()
+                                && Constants.CATEGORY_SCORED_SEARCH_TABLE != chartService.getCharts().get(portlet.getChartType()).getCategory()
                                 && portlet.getChartData().getFiles().contains(deletedFile)) {
                             files.remove(deletedFile);
                         }
@@ -2182,6 +2186,7 @@ public class DashboardController extends SelectorComposer<Window>{
         for (Portlet portlet : dashboard.getPortletList()) {
             if (Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())
                     && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()
+                    && Constants.CATEGORY_SCORED_SEARCH_TABLE != chartService.getCharts().get(portlet.getChartType()).getCategory()
                     && portlet.getChartData().getIsFiltered()) {
                 // removing global filter object from filter list
                 if (portlet.getChartData().getFilters().contains(filter)) {
