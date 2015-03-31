@@ -107,7 +107,7 @@ function createXYChart (divId, chartData) {
 					max: yMax,
 		            padding: {top:0, bottom:0},
 					tick: {
-		                format: d3.formatPrefix(".2s")
+		                format: d3.format(",.2r")
 		            },
 		            label: {
 		                text: response.primaryYAxisLabel,
@@ -130,7 +130,7 @@ function createXYChart (divId, chartData) {
 					max: y2Max,
 		            padding: {top:0, bottom:0},
 					tick: {
-		                format: d3.formatPrefix(".2s")
+		                format: d3.format(",.2r")
 		            },
 		            label: {
 		                text: response.secondaryYAxisLabel		                
