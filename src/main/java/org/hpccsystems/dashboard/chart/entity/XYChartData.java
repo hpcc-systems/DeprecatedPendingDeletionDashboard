@@ -21,8 +21,10 @@ public class XYChartData extends ChartData {
 	private BigDecimal y2AxisMinVal; 
 	private BigDecimal y2AxisMaxVal;
 	private boolean isAxisrotated;  
-	private Double yThresholdVal;
-	private Double y2ThresholdVal;
+	private Double yThresholdValMin;
+    private Double yThresholdValMax;
+	private Double y2ThresholdValMin;
+	private Double y2ThresholdValMax;
 
 	
 
@@ -94,23 +96,39 @@ public class XYChartData extends ChartData {
 	public void setyAxisMaxVal(BigDecimal yAxisMaxVal) {
 		this.yAxisMaxVal = yAxisMaxVal;
 	}
-	@XmlElement
-    public Double getyThresholdVal() {
-        return yThresholdVal;
-    }
+	   @XmlElement
+	   public Double getyThresholdValMin() {
+	        return yThresholdValMin;
+	    }
 
-    public void setyThresholdVal(Double yThresholdVal) {
-        this.yThresholdVal = yThresholdVal;
-    }
+	    public void setyThresholdValMin(Double yThresholdValMin) {
+	        this.yThresholdValMin = yThresholdValMin;
+	    }
+	    @XmlElement
+	    public Double getyThresholdValMax() {
+	        return yThresholdValMax;
+	    }
 
-    @XmlElement
-    public Double getY2ThresholdVal() {
-        return y2ThresholdVal;
-    }
+	    public void setyThresholdValMax(Double yThresholdValMax) {
+	        this.yThresholdValMax = yThresholdValMax;
+	    }
+	    @XmlElement
+	    public Double getY2ThresholdValMin() {
+	        return y2ThresholdValMin;
+	    }
 
-    public void setY2ThresholdVal(Double y2ThresholdVal) {
-        this.y2ThresholdVal = y2ThresholdVal;
-    }
+	    public void setY2ThresholdValMin(Double y2ThresholdValMin) {
+	        this.y2ThresholdValMin = y2ThresholdValMin;
+	    }
+	    @XmlElement
+	    public Double getY2ThresholdVaMaxl() {
+	        return y2ThresholdValMax;
+	    }
+
+	    public void setY2ThresholdVaMaxl(Double y2ThresholdVaMaxl) {
+	        this.y2ThresholdValMax = y2ThresholdVaMaxl;
+	    }
+	
 
     @XmlElement
     public boolean getIsAxisrotated() {
@@ -129,8 +147,10 @@ public class XYChartData extends ChartData {
                 .append(group).append(", yAxisMinVal=").append(yAxisMinVal)
                 .append(", isAxisrotated=").append(isAxisrotated)
                 .append(", yAxisMaxVal=").append(yAxisMaxVal)
-                 .append(", yThresholdVal=").append(yThresholdVal)
-                  .append(", y2ThresholdVal=").append(y2ThresholdVal).append(", inputParams=").append(this.getInputParams()).append("]");
+                 .append(", yThresholdValMin=").append(yThresholdValMin)
+                  .append(", yThresholdValMax=").append(yThresholdValMax)
+                   .append(", y2ThresholdValMin=").append(y2ThresholdValMin)
+                  .append(", y2ThresholdValMax=").append(yThresholdValMax).append(", inputParams=").append(this.getInputParams()).append("]");
         return buffer.toString();
     }
 

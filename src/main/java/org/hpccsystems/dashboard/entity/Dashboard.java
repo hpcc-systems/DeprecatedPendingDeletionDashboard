@@ -11,6 +11,7 @@ import org.hpccsystems.dashboard.chart.entity.InputParam;
 import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.services.ChartService;
 import org.zkoss.zkplus.spring.SpringUtil;
+import org.zkoss.zul.Panel;
 
 /**
  * This class is model for Dashboard.
@@ -29,6 +30,7 @@ public class Dashboard {
     private boolean hasCommonFilter = false;
     private Integer visibility;
     private String role;
+  
     
     private List<InputParam> commonQueryFilters; 
     
@@ -327,6 +329,6 @@ public class Dashboard {
 
     public void setCommonQueryFilters(List<InputParam> commonQueryFilters) {
         this.commonQueryFilters = commonQueryFilters;
-    }   
-    
+    }
+
 }

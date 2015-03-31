@@ -1871,6 +1871,8 @@ public class DashboardController extends SelectorComposer<Window>{
                 if (filterRows.getChildren() != null && !filterRows.getChildren().isEmpty() ) {
                     removeGlobalFilters();
                 }
+                // making common filters panel invisible
+                commonFiltersPanel.setVisible(false);
             }
             
             //Show/Hide Manage groups for dashboard
@@ -1915,8 +1917,6 @@ public class DashboardController extends SelectorComposer<Window>{
             Sessions.getCurrent().removeAttribute(Constants.COMMON_FILTERS);
             // Removing common filters Row from UI
             filterRows.getChildren().clear();
-            // making common filters panel invisible
-            commonFiltersPanel.setVisible(false);
             dashboard.setHasCommonFilter(false);
             
         } catch (Exception e) {

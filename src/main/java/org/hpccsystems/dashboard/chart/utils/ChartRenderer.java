@@ -84,8 +84,10 @@ public class ChartRenderer {
 	private static final String Y_MAX = "yMax";
 	private static final String Y2_MIN = "y2Min";
 	private static final String Y2_MAX = "y2Max";
-	private static final String Y_THRESHOLD = "yThreshold";
-	private static final String Y2_THRESHOLD = "y2Threshold";
+	private static final String Y_THRESHOLD_MIN = "yThresholdMin";
+	private static final String Y2_THRESHOLD_MIN = "y2ThresholdMin";
+	private static final String Y_THRESHOLD_MAX= "yThresholdMax";
+    private static final String Y2_THRESHOLD_MAX = "y2ThresholdMax";
     
     private HPCCService hpccService;
     private ChartService chartService;
@@ -348,8 +350,10 @@ public class ChartRenderer {
         header.addProperty(Y_MAX, chartData.getyAxisMaxVal());
         header.addProperty(Y2_MIN, chartData.getY2AxisMinVal());
         header.addProperty(Y2_MAX, chartData.getY2AxisMaxVal());
-        header.addProperty(Y_THRESHOLD, chartData.getyThresholdVal());
-        header.addProperty(Y2_THRESHOLD, chartData.getY2ThresholdVal());
+        header.addProperty(Y_THRESHOLD_MIN, chartData.getyThresholdValMin());
+        header.addProperty(Y_THRESHOLD_MAX, chartData.getyThresholdValMax());
+        header.addProperty(Y2_THRESHOLD_MIN, chartData.getY2ThresholdValMin());
+        header.addProperty(Y2_THRESHOLD_MAX, chartData.getY2ThresholdVaMaxl());
 
         String data = header.toString();
         if (LOG.isDebugEnabled()) {

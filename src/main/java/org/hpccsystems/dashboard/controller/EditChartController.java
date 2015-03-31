@@ -111,9 +111,7 @@ public class EditChartController extends SelectorComposer<Component> {
     @Wire
     private Doublebox y2AxisMaxVal;
     @Wire
-    private Listitem y2MinMax;
-    @Wire
-    private Listitem y2AxisThresholdItem;
+    private Listbox y2MinMax;
     @Wire
     private Vbox measureContainer;
     @Wire
@@ -127,9 +125,13 @@ public class EditChartController extends SelectorComposer<Component> {
     @Wire
     private Listitem rotateAxisListItem;
     @Wire
-    private Doublebox yAxisThreshold;
+    private Doublebox yAxisThresholdMin;
     @Wire
-    private Doublebox y2AxisThreshold;
+    private Doublebox yAxisThresholdMax;
+    @Wire
+    private Doublebox y2AxisThresholdMin;
+    @Wire
+    private Doublebox y2AxisThresholdMax;
     
     private DateFormatBox dateFormatBox;
 
@@ -193,11 +195,17 @@ public class EditChartController extends SelectorComposer<Component> {
         	yAxisMinVal.setValue(chartData.getyAxisMinVal().doubleValue());
         }
         
-        if(chartData.getyThresholdVal() != null){
-            yAxisThreshold.setValue(chartData.getyThresholdVal());
+        if(chartData.getyThresholdValMin() != null){
+            yAxisThresholdMin.setValue(chartData.getyThresholdValMin());
         }
-        if(chartData.getY2ThresholdVal() != null){
-            y2AxisThreshold.setValue(chartData.getY2ThresholdVal() );
+        if(chartData.getyThresholdValMax() != null){
+            yAxisThresholdMax.setValue(chartData.getyThresholdValMax());
+        }
+        if(chartData.getY2ThresholdValMin() != null){
+            y2AxisThresholdMin.setValue(chartData.getY2ThresholdValMin());
+        }
+        if(chartData.getY2ThresholdVaMaxl() != null){
+            y2AxisThresholdMax.setValue(chartData.getY2ThresholdVaMaxl());
         }
 
         //Setting params for filter include
@@ -882,15 +890,25 @@ public class EditChartController extends SelectorComposer<Component> {
     	}else{
     	    chartData.setY2AxisMaxVal(null);
     	}
-    	if(checkNullEmpty(yAxisThreshold.getValue())){
-            chartData.setyThresholdVal(yAxisThreshold.getValue());
+    	if(checkNullEmpty(yAxisThresholdMin.getValue())){
+            chartData.setyThresholdValMin(yAxisThresholdMin.getValue());
         }else{
-            chartData.setyThresholdVal(null);
+            chartData.setyThresholdValMin(null);
         }
-    	if(checkNullEmpty(y2AxisThreshold.getValue())){
-            chartData.setY2ThresholdVal(y2AxisThreshold.getValue());
+    	if(checkNullEmpty(yAxisThresholdMax.getValue())){
+            chartData.setyThresholdValMax(yAxisThresholdMax.getValue());
         }else{
-            chartData.setY2ThresholdVal(null);
+            chartData.setyThresholdValMax(null);
+        }
+    	if(checkNullEmpty(y2AxisThresholdMin.getValue())){
+            chartData.setY2ThresholdValMin(y2AxisThresholdMin.getValue());
+        }else{
+            chartData.setY2ThresholdValMin(null);
+        }
+    	if(checkNullEmpty(y2AxisThresholdMax.getValue())){
+            chartData.setY2ThresholdVaMaxl(y2AxisThresholdMax.getValue());
+        }else{
+            chartData.setY2ThresholdVaMaxl(null);
         }
     	if (chartData.isDrawable()) {
             constructChart();
@@ -916,8 +934,8 @@ public class EditChartController extends SelectorComposer<Component> {
     public void onCheckSecondaryAxis() {
         if(secondAxisCheck.isChecked()) {
             y2MinMax.setVisible(true);
+            y2MinMax.setVisible(true);
             y2AxisListbox.setVisible(true);
-            y2AxisThresholdItem.setVisible(true);
             measureContainer.invalidate();
         } else {
             if(!y2AxisListbox.getChildren().isEmpty()) {
@@ -928,12 +946,14 @@ public class EditChartController extends SelectorComposer<Component> {
                     }
                 }
             }
-            y2AxisThresholdItem.setValue(null);
+            y2AxisThresholdMin.setValue(null);
+            y2AxisThresholdMax.setValue(null);
             y2AxisMinVal.setValue(null);
             y2AxisMaxVal.setValue(null);
             y2MinMax.setVisible(false);
             y2AxisListbox.setVisible(false);
-            y2AxisThresholdItem.setVisible(false);
+            y2AxisThresholdMin.setVisible(false);
+            y2AxisThresholdMax.setVisible(false);
             measureContainer.invalidate();
         }
     }
