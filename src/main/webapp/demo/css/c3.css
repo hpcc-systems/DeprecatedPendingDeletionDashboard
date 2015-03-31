@@ -201,3 +201,15 @@
   fill: #000;
   font-size: 28px;
 }
+
+
+/*-- CSS for Y axis Threshold  Start--*/
+
+.c3-ygrid-line.gridy line {
+           stroke: #7B68EE;
+       }
+
+.c3-ygrid-line.gridy2 line {
+           stroke: #FF69B4;
+       }
+/*-- CSS for Y axis Threshold End--*/
