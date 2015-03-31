@@ -250,10 +250,6 @@ public class Constants {
 	public static final String DRAW_CHART_EVENT = "onDrawChart";
 	public static final String CREATE_FILTER_EVENT = "onFilterAdded";
 	public static final String CREATE_PARAM_EVENT = "onCreateParams";
-	public static final String Y_MIN = "yMin";
-	public static final String Y_MAX = "yMax";
-	public static final String Y2_MIN = "y2Min";
-	public static final String Y2_MAX = "y2Max";
 	public static final String COMMON_FILTERS_ENABLED = "isCommonFilterEnabled";
 	public static final String HAS_INPUT_PARAM_VALUES = "hasInputParamValues";
 	public static final String API_FILTER_EVENT = "onEnableApiFilter";

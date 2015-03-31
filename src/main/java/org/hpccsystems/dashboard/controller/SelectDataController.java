@@ -584,7 +584,7 @@ public class SelectDataController extends SelectorComposer<Component>{
             //Setting fields to ChartData
             chartData.setFields(fieldMap);
             if(!chartData.getIsQuery()){
-               if (Sessions.getCurrent().getAttribute(Constants.COMMON_FILTERS) != null) {
+               if (Sessions.getCurrent().getAttribute(Constants.COMMON_FILTERS) != null ) {
                     // Setting common filters for Newly created chart
                     @SuppressWarnings("unchecked")
                     Set<Filter> filterSet = (Set<Filter>) Sessions.getCurrent().getAttribute(Constants.COMMON_FILTERS);
@@ -605,7 +605,8 @@ public class SelectDataController extends SelectorComposer<Component>{
                     }
                 }
             }else{
-                if (Sessions.getCurrent().getAttribute(Constants.COMMON_FILTERS) != null) {
+                if (Sessions.getCurrent().getAttribute(Constants.COMMON_FILTERS) != null && 
+                        Constants.CATEGORY_SCORED_SEARCH_TABLE != chartService.getCharts().get(portlet.getChartType()).getCategory()) {
                     // Setting common filters for Newly created chart
                     @SuppressWarnings("unchecked")
                     Set<InputParam> inputParamrSet = (Set<InputParam>) Sessions.getCurrent().getAttribute(Constants.COMMON_FILTERS);

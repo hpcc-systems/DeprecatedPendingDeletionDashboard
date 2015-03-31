@@ -211,8 +211,8 @@ public class Dashboard {
        ChartService chartService = (ChartService) SpringUtil.getBean("chartService");
         for (Portlet portlet : this.getPortletList()) {
             if (portlet.getWidgetState().equals(Constants.STATE_LIVE_CHART)
-            		&& Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType())
-                            .getCategory()) {
+            		&& Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()
+                     && Constants.CATEGORY_SCORED_SEARCH_TABLE != chartService.getCharts().get(portlet.getChartType()).getCategory()) {
                 hasNoLiveChart = false;
                 clusters.add(portlet.getChartData().getHpccConnection().getClusterType());
                 hostIps.add(portlet.getChartData().getHpccConnection().getHostIp());
@@ -306,7 +306,8 @@ public class Dashboard {
         if(this.getHasCommonFilter()){
             for(Portlet portlet : this.getPortletList()){
                 if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())
-                        && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()) {
+                        && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()
+                        && Constants.CATEGORY_SCORED_SEARCH_TABLE != chartService.getCharts().get(portlet.getChartType()).getCategory()) {
                     if(!portlet.getChartData().getIsQuery()){
                         //used logical files for all the charts
                         return Constants.LOGICAL_FILE;

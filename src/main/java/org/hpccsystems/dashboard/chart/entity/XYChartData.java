@@ -20,16 +20,11 @@ public class XYChartData extends ChartData {
 	private BigDecimal yAxisMaxVal;
 	private BigDecimal y2AxisMinVal; 
 	private BigDecimal y2AxisMaxVal;
-	private boolean isAxisrotated;    
+	private boolean isAxisrotated;  
+	private Double yThresholdVal;
+	private Double y2ThresholdVal;
 
-	 @XmlElement
-    public boolean getIsAxisrotated() {
-		return isAxisrotated;
-	}
-
-	public void setIsAxisrotated(boolean isAxisrotated) {
-		this.isAxisrotated = isAxisrotated;
-	}
+	
 
 	public XYChartData() {
     }
@@ -99,6 +94,32 @@ public class XYChartData extends ChartData {
 	public void setyAxisMaxVal(BigDecimal yAxisMaxVal) {
 		this.yAxisMaxVal = yAxisMaxVal;
 	}
+	@XmlElement
+    public Double getyThresholdVal() {
+        return yThresholdVal;
+    }
+
+    public void setyThresholdVal(Double yThresholdVal) {
+        this.yThresholdVal = yThresholdVal;
+    }
+
+    @XmlElement
+    public Double getY2ThresholdVal() {
+        return y2ThresholdVal;
+    }
+
+    public void setY2ThresholdVal(Double y2ThresholdVal) {
+        this.y2ThresholdVal = y2ThresholdVal;
+    }
+
+    @XmlElement
+    public boolean getIsAxisrotated() {
+        return isAxisrotated;
+    }
+
+    public void setIsAxisrotated(boolean isAxisrotated) {
+        this.isAxisrotated = isAxisrotated;
+    }
     @Override
     public String toString() {
         StringBuilder buffer = new StringBuilder();
@@ -107,7 +128,9 @@ public class XYChartData extends ChartData {
                 .append(", isGrouped=").append(isGrouped).append(", group=")
                 .append(group).append(", yAxisMinVal=").append(yAxisMinVal)
                 .append(", isAxisrotated=").append(isAxisrotated)
-                .append(", yAxisMaxVal=").append(yAxisMaxVal).append(", inputParams=").append(this.getInputParams()).append("]");
+                .append(", yAxisMaxVal=").append(yAxisMaxVal)
+                 .append(", yThresholdVal=").append(yThresholdVal)
+                  .append(", y2ThresholdVal=").append(y2ThresholdVal).append(", inputParams=").append(this.getInputParams()).append("]");
         return buffer.toString();
     }
 

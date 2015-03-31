@@ -2,6 +2,7 @@ package org.hpccsystems.dashboard.controller;
 
 import java.math.BigDecimal;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -110,9 +111,9 @@ public class EditChartController extends SelectorComposer<Component> {
     @Wire
     private Doublebox y2AxisMaxVal;
     @Wire
-    private Listitem y2min; 
+    private Listitem y2MinMax;
     @Wire
-    private Listitem y2max; 
+    private Listitem y2AxisThresholdItem;
     @Wire
     private Vbox measureContainer;
     @Wire
@@ -125,12 +126,15 @@ public class EditChartController extends SelectorComposer<Component> {
     private Checkbox rotateAxis;
     @Wire
     private Listitem rotateAxisListItem;
+    @Wire
+    private Doublebox yAxisThreshold;
+    @Wire
+    private Doublebox y2AxisThreshold;
     
     private DateFormatBox dateFormatBox;
 
     private XYChartData chartData;
     private Button doneButton;
-
     private Portlet portlet;
     private ChartDetails chartDetails;
     
@@ -187,6 +191,13 @@ public class EditChartController extends SelectorComposer<Component> {
         }
         if(chartData.getyAxisMinVal() != null){
         	yAxisMinVal.setValue(chartData.getyAxisMinVal().doubleValue());
+        }
+        
+        if(chartData.getyThresholdVal() != null){
+            yAxisThreshold.setValue(chartData.getyThresholdVal());
+        }
+        if(chartData.getY2ThresholdVal() != null){
+            y2AxisThreshold.setValue(chartData.getY2ThresholdVal() );
         }
 
         //Setting params for filter include
@@ -378,7 +389,18 @@ public class EditChartController extends SelectorComposer<Component> {
      */
     @Listen("onDrop = #yAxisListbox, #y2AxisListbox")
     public void onDropToYAxisListbox(final DropEvent dropEvent) {
-        final Listbox target = (Listbox) dropEvent.getTarget();
+        if("yAxisListbox".equals(dropEvent.getDragged().getParent().getId()) ||
+                "y2AxisListbox".equals(dropEvent.getDragged().getParent().getId())) {
+            processYAxisDropOnListbox(dropEvent, (Listbox) dropEvent.getTarget());
+        }
+        else{
+            Listbox target = (Listbox) dropEvent.getTarget();
+            processYAxisDrop(dropEvent, target); 
+        }
+       
+    }
+
+    private void processYAxisDrop(final DropEvent dropEvent, Listbox target) {
         final Vbox targetParent = (Vbox) target.getParent();
         
         final Listitem draggedListitem = (Listitem) ((DropEvent) dropEvent).getDragged();
@@ -566,6 +588,9 @@ public class EditChartController extends SelectorComposer<Component> {
         textBox.setInplace(true);
         textBox.setStyle("border: none;    color: black; width: 150px;");
         yAxisItem.setAttribute(Constants.MEASURE, measure);
+        yAxisItem.setDraggable(TRUE);
+        yAxisItem.setDroppable(TRUE);
+        yAxisItem.addEventListener(Events.ON_DROP, yAxisItemSwapListener);
         Listcell listcell = new Listcell();
         //For roxie query, no aggregate function supported
         if(measure.getAggregateFunction() == null){
@@ -591,10 +616,50 @@ public class EditChartController extends SelectorComposer<Component> {
             yAxisItem.setParent(yAxisListbox);
         }
         
-        
+     
         if(Constants.NONE.equals(measure.getAggregateFunction())) {
             yAxisListbox.setAttribute(Constants.NONE, true);
         }
+    }
+    
+    private EventListener<DropEvent> yAxisItemSwapListener = new EventListener<DropEvent>() {
+        public void onEvent(final DropEvent event)  {
+            
+            Listitem dropped = (Listitem) event.getTarget();
+            
+            if("yAxisListbox".equals(event.getDragged().getParent().getId()) ||
+                    "y2AxisListbox".equals(event.getDragged().getParent().getId())) {
+                processYAxisDropOnListitem(event,dropped);
+            } else {
+                processYAxisDrop(event, dropped.getListbox());
+            }
+         
+        }
+    };
+ 
+    private void processYAxisDropOnListitem(DropEvent event,Listitem dropped){
+        Listitem dragged = (Listitem) event.getDragged();
+        Measure measure1 = (Measure) dragged.getAttribute(Constants.MEASURE);
+        Measure measure2 = (Measure) dropped.getAttribute(Constants.MEASURE);
+        dropped.getListbox().insertBefore(dragged, dropped); 
+        
+        Collections.swap(chartData.getMeasures(), 
+                chartData.getMeasures().indexOf(measure1),
+                chartData.getMeasures().indexOf(measure2));
+        
+      
+    }
+    
+    private void processYAxisDropOnListbox(DropEvent event,Listbox dropped){
+        Listitem dragged = (Listitem) event.getDragged();
+        Measure measure1 = (Measure) dragged.getAttribute(Constants.MEASURE);
+        Measure measure2 = chartData.getMeasures().get(chartData.getMeasures().size() - 1);
+        
+        Collections.swap(chartData.getMeasures(), 
+                chartData.getMeasures().indexOf(measure1),
+                chartData.getMeasures().indexOf(measure2));
+        
+        dropped.appendChild(dragged);
     }
 
     // Event Listener for Change of YColumn title text
@@ -609,7 +674,8 @@ public class EditChartController extends SelectorComposer<Component> {
             measure.setDisplayYColumnName(textBox.getValue());
         }
     };
-
+    
+   
     private EventListener<Event> yAxisItemDetachListener = new EventListener<Event>() {
         public void onEvent(final Event event)  {
             Listitem yAxisItem = (Listitem) event.getTarget().getParent().getParent();
@@ -796,23 +862,47 @@ public class EditChartController extends SelectorComposer<Component> {
     
     @Listen("onClick = #minMaxSaveBtn")
     public void onSaveYAxisMinMaxValue(Event event){
-    	if(yAxisMinVal.getValue() != null){
+    	if(checkNullEmpty(yAxisMinVal.getValue())){
     		chartData.setyAxisMinVal(new BigDecimal(yAxisMinVal.getValue()));
+    	}else{
+    	    chartData.setyAxisMinVal(null);
     	}
-    	if(yAxisMaxVal.getValue() != null){
+    	if(checkNullEmpty(yAxisMaxVal.getValue())){
     		chartData.setyAxisMaxVal(new BigDecimal(yAxisMaxVal.getValue()));
+    	}else{
+    	    chartData.setyAxisMaxVal(null);
     	}
-    	if(y2AxisMinVal.getValue() != null){
+    	if(checkNullEmpty(y2AxisMinVal.getValue())){
     	    chartData.setY2AxisMinVal(new BigDecimal(y2AxisMinVal.getValue()));
+    	}else{
+    	    chartData.setY2AxisMinVal(null);
     	}
-    	if(y2AxisMaxVal.getValue() != null){
+    	if(checkNullEmpty(y2AxisMaxVal.getValue())){
     	    chartData.setY2AxisMaxVal(new BigDecimal(y2AxisMaxVal.getValue()));
+    	}else{
+    	    chartData.setY2AxisMaxVal(null);
     	}
-    	
+    	if(checkNullEmpty(yAxisThreshold.getValue())){
+            chartData.setyThresholdVal(yAxisThreshold.getValue());
+        }else{
+            chartData.setyThresholdVal(null);
+        }
+    	if(checkNullEmpty(y2AxisThreshold.getValue())){
+            chartData.setY2ThresholdVal(y2AxisThreshold.getValue());
+        }else{
+            chartData.setY2ThresholdVal(null);
+        }
     	if (chartData.isDrawable()) {
             constructChart();
         }  	
     	minMaxPopup.close();
+    }
+
+    private boolean checkNullEmpty(Object obj) {
+        if(obj != null && !obj.toString().isEmpty()){
+            return true;
+        }
+        return false;
     }
 
     public boolean isQueryDataSource() {
@@ -825,9 +915,9 @@ public class EditChartController extends SelectorComposer<Component> {
     @Listen("onCheck = #secondAxisCheck")
     public void onCheckSecondaryAxis() {
         if(secondAxisCheck.isChecked()) {
-            y2min.setVisible(true);
-            y2max.setVisible(true);
+            y2MinMax.setVisible(true);
             y2AxisListbox.setVisible(true);
+            y2AxisThresholdItem.setVisible(true);
             measureContainer.invalidate();
         } else {
             if(!y2AxisListbox.getChildren().isEmpty()) {
@@ -838,9 +928,12 @@ public class EditChartController extends SelectorComposer<Component> {
                     }
                 }
             }
-            y2min.setVisible(false);
-            y2max.setVisible(false);
+            y2AxisThresholdItem.setValue(null);
+            y2AxisMinVal.setValue(null);
+            y2AxisMaxVal.setValue(null);
+            y2MinMax.setVisible(false);
             y2AxisListbox.setVisible(false);
+            y2AxisThresholdItem.setVisible(false);
             measureContainer.invalidate();
         }
     }
