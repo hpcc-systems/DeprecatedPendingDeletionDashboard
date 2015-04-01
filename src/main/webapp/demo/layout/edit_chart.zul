@@ -25,8 +25,8 @@
 			<vbox spacing="0em">	
 				<panel height="180px" title="${labels.chartMeasures}" sclass="editPanel">
 				<caption>
-					<popup id="minMaxPopup" zclass="popup" width="190px">
-						<listbox >
+					<popup id="minMaxPopup" zclass="popup" width="220px">
+						<listbox id="primaryListbox" style="overflow:auto">
 							<listhead>
 								<listheader label="Chart Measure Options">
 									<button id="minMaxSaveBtn" sclass="glyphicon glyphicon-ok btn btn-link img-btn" style="float:right"></button>
@@ -34,7 +34,7 @@
 							</listhead>
 							<listitem>
 								<listcell>
-									<checkbox id="secondAxisCheck" label="Enable Second Y Axis" zclass="checkbox"></checkbox>
+									<checkbox id="secondAxisCheck" label="${labels.enableSecAxis}" zclass="checkbox"></checkbox>
 								</listcell>
 							</listitem>
 							
@@ -43,53 +43,113 @@
 									<checkbox id="rotateAxis" label="${labels.rotateAxis}" zclass="checkbox"></checkbox>
 								</listcell>
 							</listitem>
+							</listbox>
+							<listbox>
+							<listhead>
+								<listheader label="${labels.primaryAxis}">
+								</listheader> 
+							</listhead>
 							<listitem>
-							<listcell>
-								<grid hflex="1" zclass="grid">
-									<columns hflex="1">
-										<column label="${labels.yAxisStart}"/>
-										<column label="${labels.yAxisEnd}"/>
-									</columns>
-									<rows id="rows">
-										<row>
-										<doublebox id="yAxisMinVal" zclass="form-control" hflex="1"></doublebox>  
-										<doublebox id="yAxisMaxVal" zclass="form-control" hflex="1"></doublebox>
-										</row>
-									</rows>
-								</grid>
-							</listcell>
+								<listcell>
+									<hbox hflex="1">
+										<label
+											value="${labels.yAxisStart}" />
+										<doublebox id="yAxisMinVal"
+											zclass="form-control" hflex="1">
+										</doublebox>
+									</hbox>
+								</listcell>
+							</listitem>
+
+							<listitem>
+								<listcell>
+									<hbox hflex="1">
+										<label
+											value="${labels.yAxisEnd}" />
+										<doublebox id="yAxisMaxVal"
+											zclass="form-control" hflex="1">
+										</doublebox>
+									</hbox>
+								</listcell>
 							</listitem>
 							<listitem>
 								<listcell>
-									<vbox hflex="1">
-										<label value="${labels.yAxisThreshold}"/>
-										<doublebox id="yAxisThreshold" zclass="form-control" hflex="1"></doublebox>  
-									</vbox>
-								</listcell> 
+									<hbox hflex="1">
+										<label
+											value="${labels.yAxisThresholdMin}" />
+										<doublebox
+											id="yAxisThresholdMin" zclass="form-control" hflex="1">
+										</doublebox>
+									</hbox>
+								</listcell>
 							</listitem>
-							<listitem id="y2MinMax" visible="false"> 
-							<listcell>
-								<grid hflex="1" zclass="grid">
-									<columns hflex="1">
-										<column label="${labels.y2AxisStart}"/>
-										<column label="${labels.y2AxisEnd}"/>
-									</columns>
-									<rows id="secondaryAxisrows">
-										<row>
-										<doublebox id="y2AxisMinVal" zclass="form-control" hflex="1"></doublebox>  
-										<doublebox id="y2AxisMaxVal" zclass="form-control" hflex="1"></doublebox>
-										</row>
-									</rows>
-								</grid>
-							</listcell>
-							</listitem>
-							<listitem id="y2AxisThresholdItem" visible="false">
+							<listitem>
 								<listcell>
-									<vbox hflex="1">
-										<label value="${labels.y2AxisThreshold}"/>
-										<doublebox id="y2AxisThreshold" zclass="form-control" hflex="1"></doublebox>  
-									</vbox>
-								</listcell> 
+									<hbox hflex="1">
+										<label
+											value="${labels.yAxisThresholdMax}" />
+										<doublebox
+											id="yAxisThresholdMax" zclass="form-control" hflex="1">
+										</doublebox>
+									</hbox>
+								</listcell>
+							</listitem>
+							
+							</listbox>
+							<listbox id="y2MinMax" visible="false">
+							<listhead>
+								<listheader label="${labels.secondaryAxis}">
+								</listheader> 
+							</listhead>
+								<listitem>
+								<listcell>
+									<checkbox id="secondAxisHideCheck" label="${labels.hideAxis}" zclass="checkbox"></checkbox>
+								</listcell>
+							</listitem>
+							<listitem>
+								<listcell>
+									<hbox hflex="1">
+										<label
+											value="${labels.yAxisStart}" />
+										<doublebox id="y2AxisMinVal"
+											zclass="form-control" hflex="1">
+										</doublebox>
+									</hbox>
+								</listcell>
+							</listitem>
+
+							<listitem>
+								<listcell>
+									<hbox hflex="1">
+										<label
+											value="${labels.yAxisEnd}" />
+										<doublebox id="y2AxisMaxVal"
+											zclass="form-control" hflex="1">
+										</doublebox>
+									</hbox>
+								</listcell>
+							</listitem>
+							<listitem>
+								<listcell>
+									<hbox hflex="1">
+										<label
+											value="${labels.yAxisThresholdMin}" />
+										<doublebox
+											id="y2AxisThresholdMin" zclass="form-control" hflex="1">
+										</doublebox>
+									</hbox>
+								</listcell>
+							</listitem>
+							<listitem>
+								<listcell>
+									<hbox hflex="1">
+										<label
+											value="${labels.yAxisThresholdMax}" />
+										<doublebox
+											id="y2AxisThresholdMax" zclass="form-control" hflex="1">
+										</doublebox>
+									</hbox>
+								</listcell>
 							</listitem>
 							
 						 </listbox>						
