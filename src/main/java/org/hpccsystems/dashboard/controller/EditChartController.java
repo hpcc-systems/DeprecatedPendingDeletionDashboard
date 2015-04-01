@@ -210,7 +210,7 @@ public class EditChartController extends SelectorComposer<Component> {
             y2AxisThresholdMax.setValue(chartData.getY2ThresholdVaMaxl());
         }
         
-        if(chartData.getHideY2Axis()){
+        if(chartData.getHideY2Axis() != null && chartData.getHideY2Axis()){
             secondAxisHideCheck.setChecked(true);
         }
         //Setting params for filter include
