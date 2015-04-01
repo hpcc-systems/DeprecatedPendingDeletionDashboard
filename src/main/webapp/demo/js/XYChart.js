@@ -143,7 +143,7 @@ function createXYChart (divId, chartData) {
 		            label: {
 		                text: response.secondaryYAxisLabel		                
 		            },
-		            show: showSecondAxis		            
+		            show: !response.hideY2Axis		            
 		        },		       
 		       rotated: rotateAxis
 			},

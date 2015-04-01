@@ -25,6 +25,7 @@ public class XYChartData extends ChartData {
     private Double yThresholdValMax;
 	private Double y2ThresholdValMin;
 	private Double y2ThresholdValMax;
+	private Boolean hideY2Axis;
 
 	
 
@@ -190,6 +191,15 @@ public class XYChartData extends ChartData {
         this.groupAttribute = groupAttribute;
     }
     
+    @XmlElement
+    public Boolean getHideY2Axis() {
+        return hideY2Axis;
+    }
+
+    public void setHideY2Axis(Boolean hideY2Axis) {
+        this.hideY2Axis = hideY2Axis;
+    }
+    
     public boolean hasAttribute(Attribute attribute) {
         if(attribute == null) {
             return false;
@@ -251,4 +261,6 @@ public class XYChartData extends ChartData {
         labels[1] = secondaryLabel.toString();
         return labels;
     }
+
+  
 }

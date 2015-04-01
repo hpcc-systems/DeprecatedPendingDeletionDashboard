@@ -34,7 +34,7 @@
 							</listhead>
 							<listitem>
 								<listcell>
-									<checkbox id="secondAxisCheck" label="Enable Second Y Axis" zclass="checkbox"></checkbox>
+									<checkbox id="secondAxisCheck" label="${labels.enableSecAxis}" zclass="checkbox"></checkbox>
 								</listcell>
 							</listitem>
 							
@@ -101,6 +101,11 @@
 								<listheader label="${labels.secondaryAxis}">
 								</listheader> 
 							</listhead>
+								<listitem>
+								<listcell>
+									<checkbox id="secondAxisHideCheck" label="${labels.hideAxis}" zclass="checkbox"></checkbox>
+								</listcell>
+							</listitem>
 							<listitem>
 								<listcell>
 									<hbox hflex="1">

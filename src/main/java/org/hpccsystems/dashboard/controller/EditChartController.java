@@ -121,6 +121,8 @@ public class EditChartController extends SelectorComposer<Component> {
     @Wire
     private Checkbox secondAxisCheck;
     @Wire
+    private Checkbox secondAxisHideCheck ;
+    @Wire
     private Checkbox rotateAxis;
     @Wire
     private Listitem rotateAxisListItem;
@@ -207,7 +209,10 @@ public class EditChartController extends SelectorComposer<Component> {
         if(chartData.getY2ThresholdVaMaxl() != null){
             y2AxisThresholdMax.setValue(chartData.getY2ThresholdVaMaxl());
         }
-
+        
+        if(chartData.getHideY2Axis()){
+            secondAxisHideCheck.setChecked(true);
+        }
         //Setting params for filter include
         filterHolder.setDynamicProperty(Constants.BUSY_COMPONENT, chart);
         filterHolder.setDynamicProperty(Constants.PARENT, this.getSelf());
@@ -966,5 +971,17 @@ public class EditChartController extends SelectorComposer<Component> {
     		 chartData.setIsAxisrotated(false);
     	 }
     }
+    
+    @Listen("onCheck = #secondAxisHideCheck")
+    public void onCheckSecondAxisHideCheck(){
+        
+        if(secondAxisHideCheck.isChecked()) {
+            chartData.setHideY2Axis(true);
+        }else{
+            chartData.setHideY2Axis(false);
+        }
+    }
+    
+    
 }
 
