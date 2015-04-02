@@ -49,6 +49,8 @@ import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.Combobox;
+import org.zkoss.zul.Comboitem;
+import org.zkoss.zul.ComboitemRenderer;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Doublebox;
 import org.zkoss.zul.Include;
@@ -234,8 +236,18 @@ public class EditChartController extends SelectorComposer<Component> {
         
         if(chartData.getHideY2Axis() != null && chartData.getHideY2Axis()){
             secondAxisHideCheck.setChecked(true);
-          
         }
+        if(droppedMeasures != null){
+            yThresholdCombo.setModel(droppedMeasures);
+            yThresholdCombo.setItemRenderer(new ComboitemRenderer<Measure>() {
+
+                @Override
+                public void render(Comboitem comboitem, Measure measure, int index) throws Exception {
+                    comboitem.setLabel(measure.getColumn());
+                }
+            });
+        }
+     
         //Setting params for filter include
         filterHolder.setDynamicProperty(Constants.BUSY_COMPONENT, chart);
         filterHolder.setDynamicProperty(Constants.PARENT, this.getSelf());
@@ -906,10 +918,19 @@ public class EditChartController extends SelectorComposer<Component> {
         chartData.setY2AxisMinVal(getNumber(y2AxisMinVal.getValue()));
         chartData.setY2AxisMaxVal(getNumber(y2AxisMaxVal.getValue()));
     	
-        chartData.setyThresholdValMin((Double) checkNullEmpty(yAxisThresholdMin.getValue()));
-        chartData.setyThresholdValMax((Double) checkNullEmpty(yAxisThresholdMax.getValue()));
-        chartData.setY2ThresholdValMin((Double) checkNullEmpty(y2AxisThresholdMin.getValue()));
-        chartData.setY2ThresholdVaMaxl((Double) checkNullEmpty(y2AxisThresholdMax.getValue()));
+        if(chartData.getDynamicYThresholdEnabled() && yThresholdCombo.getSelectedItem().getValue()!=null  ) {
+                chartData.setThreshold((Measure)yThresholdCombo.getSelectedItem().getValue());
+                chartData.setyThresholdValMin(null);
+                chartData.setyThresholdValMax(null);
+                chartData.setY2ThresholdValMin(null);
+                chartData.setY2ThresholdVaMaxl(null);
+        } else {
+            chartData.setyThresholdValMin((Double) checkNullEmpty(yAxisThresholdMin.getValue()));
+            chartData.setyThresholdValMax((Double) checkNullEmpty(yAxisThresholdMax.getValue()));
+            chartData.setY2ThresholdValMin((Double) checkNullEmpty(y2AxisThresholdMin.getValue()));
+            chartData.setY2ThresholdVaMaxl((Double) checkNullEmpty(y2AxisThresholdMax.getValue()));
+            chartData.setThreshold(null);
+        }
         
         if (chartData.isDrawable()) {
             constructChart();
@@ -928,9 +949,9 @@ public class EditChartController extends SelectorComposer<Component> {
     
     private Object checkNullEmpty(Object obj, boolean isNumber) {
         if(obj != null && !obj.toString().isEmpty()) {
-            return null;
+            return isNumber ? new BigDecimal(obj.toString()) : obj;
         }
-        return isNumber ? new BigDecimal(yAxisMaxVal.getValue()) : obj;
+        return null;
     }
 
     public boolean isQueryDataSource() {
@@ -1001,20 +1022,7 @@ public class EditChartController extends SelectorComposer<Component> {
             chartData.setDynamicYThresholdEnabled(false);
         }
     }
-    
-  /*  @Listen("onCheck = #y2ThresholdCheckBox")
-    public void onCheckY2ThresholdCheckBox(){
-        if(y2ThresholdCheckBox.isChecked()) {
-            y2ThresholdCombo.setVisible(true);
-            y2MinMaxThreshold.setVisible(false);
-            chartData.setDynamicY2ThresholdEnabled(true);
-        }else{
-            y2ThresholdCombo.setVisible(false);
-            y2MinMaxThreshold.setVisible(true);
-            chartData.setDynamicY2ThresholdEnabled(false);
-        }
-    }*/
-    
+
     
 }
 
