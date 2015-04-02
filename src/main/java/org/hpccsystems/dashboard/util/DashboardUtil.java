@@ -151,7 +151,7 @@ public class DashboardUtil {
         return chartData;
     }
     
-    public static String createShareParams(String dashboardId, List<InputParam> params) {
+    public static String createShareParams(String dashboardId, Set<InputParam> params) {
         StringBuilder builder = new StringBuilder();
         
         builder.append("id=").append(dashboardId);

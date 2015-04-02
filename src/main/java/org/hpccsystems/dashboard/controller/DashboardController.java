@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.JAXBException;
@@ -37,7 +37,6 @@ import org.hpccsystems.dashboard.chart.entity.InputParam;
 import org.hpccsystems.dashboard.chart.entity.Interactivity;
 import org.hpccsystems.dashboard.chart.entity.RelevantData;
 import org.hpccsystems.dashboard.chart.entity.TableData;
-import org.hpccsystems.dashboard.chart.entity.TextData;
 import org.hpccsystems.dashboard.chart.entity.XYChartData;
 import org.hpccsystems.dashboard.chart.gauge.GaugeChartData;
 import org.hpccsystems.dashboard.chart.tree.entity.TreeData;
@@ -323,7 +322,7 @@ public class DashboardController extends SelectorComposer<Window>{
                 RequestParams requestParams = (RequestParams) Sessions.getCurrent().getAttribute(Constants.REQUEST_PRAMS);
                 if(requestParams.hasInputParams()) {
                     dashboard.setHasCommonFilter(true);
-                    dashboard.setCommonQueryFilters(requestParams.getInputParams());
+                    dashboard.addCommonQueryFilters(requestParams.getInputParams());
                     for (InputParam inputparam : requestParams.getInputParams()) {
                         applyInputParamToPortlets(inputparam, false);
                     }
@@ -457,7 +456,7 @@ public class DashboardController extends SelectorComposer<Window>{
                 
             });
                
-            dashboard.setCommonQueryFilters(persistedGlobalInputParams);
+            dashboard.addCommonQueryFilters(persistedGlobalInputParams);
         }
         
         if (LOG.isDebugEnabled()) {
@@ -976,6 +975,8 @@ public class DashboardController extends SelectorComposer<Window>{
         }
         Sessions.getCurrent().setAttribute(Constants.COMMON_FILTERS, appliedCommonInputParam);
         appliedCommonInputParam.add(inputparam);
+        dashboard.addCommonQueryFilter(inputparam);
+        
         row.setAttribute(Constants.INPUT_PARAM_NAME, inputparam.getName());
         row.setAttribute(Constants.INPUT_PARAM_VALUE, inputDistinctValues);
         
@@ -1111,8 +1112,7 @@ public class DashboardController extends SelectorComposer<Window>{
      *     Constructed row
      * @throws Exception
      */
-    private Row createStringFilterRow(Filter filter)
-            throws HpccConnectionException,RemoteException {
+    private Row createStringFilterRow(Filter filter) throws HpccConnectionException,RemoteException {
         Row row = new Row();
         //if selected any filter values,set Row selected as true
         if(filter.getValues() != null && !filter.getValues().isEmpty()){
@@ -1534,6 +1534,9 @@ public class DashboardController extends SelectorComposer<Window>{
                     InputParam removedInputparam = new InputParam(removedInput);
                     //Need To remove the filter from applied inputparam set
                     appliedCommonInputParam.remove(removedInputparam);
+                    if(dashboard.getCommonQueryFilters() != null){
+                        dashboard.getCommonQueryFilters().remove(removedInputparam);
+                    }
                 }
             
             // refreshing the chart && updating DB

@@ -3,6 +3,7 @@ package org.hpccsystems.dashboard.entity;
 import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -32,7 +33,7 @@ public class Dashboard {
     private String role;
   
     
-    private List<InputParam> commonQueryFilters; 
+    private Set<InputParam> commonQueryFilters; 
     
 
 	public String getDashboardState() {
@@ -323,12 +324,28 @@ public class Dashboard {
         return null;
     }
 
-    public List<InputParam> getCommonQueryFilters() {
+    public Set<InputParam> getCommonQueryFilters() {
         return commonQueryFilters;
     }
 
-    public void setCommonQueryFilters(List<InputParam> commonQueryFilters) {
+    public void setCommonQueryFilters(Set<InputParam> commonQueryFilters) {
         this.commonQueryFilters = commonQueryFilters;
+    }
+
+    public void addCommonQueryFilter(InputParam inputparam) {
+        initiateCommonFilters();
+        commonQueryFilters.add(inputparam);
+    }
+
+    private void initiateCommonFilters() {
+        if(commonQueryFilters == null) {
+            commonQueryFilters = new LinkedHashSet<InputParam>();
+        }
+    }
+
+    public void addCommonQueryFilters(List<InputParam> persistedGlobalInputParams) {
+        initiateCommonFilters();
+        commonQueryFilters.addAll(persistedGlobalInputParams);
     }
 
 }
