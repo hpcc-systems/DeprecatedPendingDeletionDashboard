@@ -134,6 +134,9 @@ public class EditChartController extends SelectorComposer<Component> {
     private Checkbox rotateAxis;
     @Wire
     private Combobox yThresholdCombo;
+    
+    @Wire
+    private Div yThresholdComboDiv;
     @Wire
     private Vlayout yMinMaxThreshold ;
     
@@ -231,6 +234,10 @@ public class EditChartController extends SelectorComposer<Component> {
         //checkboxes enabling
         if(chartData.getDynamicYThresholdEnabled() != null && chartData.getDynamicYThresholdEnabled()){
             yThresholdCheckBox.setChecked(true);
+            if(chartData.getThreshold() != null){
+                yThresholdCombo.setValue(chartData.getThreshold().getColumn());
+               yThresholdCombo.setSelectedIndex(droppedMeasures.indexOf((chartData.getThreshold().getColumn())));
+            }
         }
         
         
@@ -1011,12 +1018,12 @@ public class EditChartController extends SelectorComposer<Component> {
     @Listen("onCheck = #yThresholdCheckBox")
     public void onCheckYThresholdCheckBox(){
         if(yThresholdCheckBox.isChecked()) {
-            yThresholdCombo.setVisible(true);
+            yThresholdComboDiv.setVisible(true);
             yMinMaxThreshold.setVisible(false);
             y2MinMaxThreshold.setVisible(false);
             chartData.setDynamicYThresholdEnabled(true);
         }else{
-            yThresholdCombo.setVisible(false);
+            yThresholdComboDiv.setVisible(false);
             yMinMaxThreshold.setVisible(true);
             y2MinMaxThreshold.setVisible(true);
             chartData.setDynamicYThresholdEnabled(false);

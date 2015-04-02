@@ -47,7 +47,9 @@
 								<listitem>
 								<listcell>
 										<checkbox id="yThresholdCheckBox" label="Use dynamic thresholds" sclass="checkbox"/>
-										<combobox id="yThresholdCombo" readonly="true" hflex="1" sclass="list-combo" visible="false"></combobox>
+										<div id="yThresholdComboDiv" visible="false">
+										<combobox  readonly="true" hflex="1" sclass="list-combo"  width="150px" placeholder="Threshold" ></combobox>
+										</div>
 								</listcell>
 							</listitem>
 							</listbox>
