@@ -48,6 +48,7 @@ import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Checkbox;
+import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Doublebox;
 import org.zkoss.zul.Include;
@@ -60,6 +61,7 @@ import org.zkoss.zul.Tabbox;
 import org.zkoss.zul.Tabpanel;
 import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Vbox;
+import org.zkoss.zul.Vlayout;
 
 /**
  * EditChartController class is used to handle the edit page of the Dashboard
@@ -124,7 +126,18 @@ public class EditChartController extends SelectorComposer<Component> {
     @Wire
     private Checkbox secondAxisHideCheck ;
     @Wire
+    private Checkbox yThresholdCheckBox;
+    
+    @Wire
     private Checkbox rotateAxis;
+    @Wire
+    private Combobox yThresholdCombo;
+    @Wire
+    private Vlayout yMinMaxThreshold ;
+    
+   
+    @Wire
+    private Vlayout y2MinMaxThreshold ;
     @Wire
     private Listitem rotateAxisListItem;
     @Wire
@@ -213,8 +226,15 @@ public class EditChartController extends SelectorComposer<Component> {
             y2AxisThresholdMax.setValue(chartData.getY2ThresholdVaMaxl());
         }
         
+        //checkboxes enabling
+        if(chartData.getDynamicYThresholdEnabled() != null && chartData.getDynamicYThresholdEnabled()){
+            yThresholdCheckBox.setChecked(true);
+        }
+        
+        
         if(chartData.getHideY2Axis() != null && chartData.getHideY2Axis()){
             secondAxisHideCheck.setChecked(true);
+          
         }
         //Setting params for filter include
         filterHolder.setDynamicProperty(Constants.BUSY_COMPONENT, chart);
@@ -966,6 +986,34 @@ public class EditChartController extends SelectorComposer<Component> {
             chartData.setHideY2Axis(false);
         }
     }
+    
+    @Listen("onCheck = #yThresholdCheckBox")
+    public void onCheckYThresholdCheckBox(){
+        if(yThresholdCheckBox.isChecked()) {
+            yThresholdCombo.setVisible(true);
+            yMinMaxThreshold.setVisible(false);
+            y2MinMaxThreshold.setVisible(false);
+            chartData.setDynamicYThresholdEnabled(true);
+        }else{
+            yThresholdCombo.setVisible(false);
+            yMinMaxThreshold.setVisible(true);
+            y2MinMaxThreshold.setVisible(true);
+            chartData.setDynamicYThresholdEnabled(false);
+        }
+    }
+    
+  /*  @Listen("onCheck = #y2ThresholdCheckBox")
+    public void onCheckY2ThresholdCheckBox(){
+        if(y2ThresholdCheckBox.isChecked()) {
+            y2ThresholdCombo.setVisible(true);
+            y2MinMaxThreshold.setVisible(false);
+            chartData.setDynamicY2ThresholdEnabled(true);
+        }else{
+            y2ThresholdCombo.setVisible(false);
+            y2MinMaxThreshold.setVisible(true);
+            chartData.setDynamicY2ThresholdEnabled(false);
+        }
+    }*/
     
     
 }

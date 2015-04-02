@@ -27,6 +27,7 @@ public class XYChartData extends ChartData {
 	private Double y2ThresholdValMin;
 	private Double y2ThresholdValMax;
 	private Boolean hideY2Axis;
+	private Boolean dynamicYThresholdEnabled;
 
 	
 
@@ -224,6 +225,16 @@ public class XYChartData extends ChartData {
     public String getxAxisLabel() {
         return getAttribute().getDisplayName() != null ? getAttribute().getDisplayName() : getAttribute().getColumn();
     }
+    
+    public Boolean getDynamicYThresholdEnabled() {
+        return dynamicYThresholdEnabled;
+    }
+
+    public void setDynamicYThresholdEnabled(Boolean dynamicYThresholdEnabled) {
+        this.dynamicYThresholdEnabled = dynamicYThresholdEnabled;
+    }
+
+
     
     /**
      * @return
