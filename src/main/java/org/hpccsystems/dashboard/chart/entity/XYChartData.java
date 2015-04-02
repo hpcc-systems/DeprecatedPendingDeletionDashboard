@@ -14,6 +14,7 @@ public class XYChartData extends ChartData {
     private Attribute attribute;
     private Attribute groupAttribute;
     private List<Measure> measures;
+    private Measure threshold;    
     private Boolean isGrouped = false;
     private XYGroup group;
     private BigDecimal yAxisMinVal; 
@@ -260,6 +261,15 @@ public class XYChartData extends ChartData {
         labels[0] = label.toString();
         labels[1] = secondaryLabel.toString();
         return labels;
+    }
+
+    @XmlElement
+    public Measure getThreshold() {
+        return threshold;
+    }
+
+    public void setThreshold(Measure threshold) {
+        this.threshold = threshold;
     }
 
   

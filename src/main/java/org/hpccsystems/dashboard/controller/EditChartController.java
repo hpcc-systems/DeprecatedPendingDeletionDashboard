@@ -51,6 +51,7 @@ import org.zkoss.zul.Checkbox;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Doublebox;
 import org.zkoss.zul.Include;
+import org.zkoss.zul.ListModelList;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Listitem;
@@ -141,6 +142,8 @@ public class EditChartController extends SelectorComposer<Component> {
     private Button doneButton;
     private Portlet portlet;
     private ChartDetails chartDetails;
+    
+    private ListModelList<Measure> droppedMeasures = new ListModelList<Measure>();
     
     final Map<String, Object> parameters = new HashMap<String, Object>();
     
@@ -256,7 +259,7 @@ public class EditChartController extends SelectorComposer<Component> {
 	                for (String fileName : chartData.getFiles()) {
 	                    fields = new ArrayList<Field>();
 	                    
-	                    if(!chartData.getIsQuery()){
+	                    if(!chartData.getIsQuery()) {
 	                        fields.addAll(hpccService.getColumns(fileName, chartData.getHpccConnection()));
 	                    } else {
 	                    	querySchema = hpccQueryService.getQuerySchema(fileName, chartData.getHpccConnection(),
@@ -596,6 +599,8 @@ public class EditChartController extends SelectorComposer<Component> {
     }
 
     private void createYListChild(Measure measure) {
+        droppedMeasures.add(measure);
+        
         Listitem yAxisItem = new Listitem();
         final Textbox textBox = new Textbox();
         textBox.setInplace(true);
@@ -699,6 +704,7 @@ public class EditChartController extends SelectorComposer<Component> {
             	secondAxisCheck.setChecked(false);
             }
             yAxisItem.detach();
+            droppedMeasures.remove(measure);
             chartData.getMeasures().remove(measure);
             if(parentComp.getChildren().size() < 1){
                 parentComp.setAttribute(Constants.NONE, null);
@@ -875,57 +881,36 @@ public class EditChartController extends SelectorComposer<Component> {
     
     @Listen("onClick = #minMaxSaveBtn")
     public void onSaveYAxisMinMaxValue(Event event){
-    	if(checkNullEmpty(yAxisMinVal.getValue())){
-    		chartData.setyAxisMinVal(new BigDecimal(yAxisMinVal.getValue()));
-    	}else{
-    	    chartData.setyAxisMinVal(null);
-    	}
-    	if(checkNullEmpty(yAxisMaxVal.getValue())){
-    		chartData.setyAxisMaxVal(new BigDecimal(yAxisMaxVal.getValue()));
-    	}else{
-    	    chartData.setyAxisMaxVal(null);
-    	}
-    	if(checkNullEmpty(y2AxisMinVal.getValue())){
-    	    chartData.setY2AxisMinVal(new BigDecimal(y2AxisMinVal.getValue()));
-    	}else{
-    	    chartData.setY2AxisMinVal(null);
-    	}
-    	if(checkNullEmpty(y2AxisMaxVal.getValue())){
-    	    chartData.setY2AxisMaxVal(new BigDecimal(y2AxisMaxVal.getValue()));
-    	}else{
-    	    chartData.setY2AxisMaxVal(null);
-    	}
-    	if(checkNullEmpty(yAxisThresholdMin.getValue())){
-            chartData.setyThresholdValMin(yAxisThresholdMin.getValue());
-        }else{
-            chartData.setyThresholdValMin(null);
-        }
-    	if(checkNullEmpty(yAxisThresholdMax.getValue())){
-            chartData.setyThresholdValMax(yAxisThresholdMax.getValue());
-        }else{
-            chartData.setyThresholdValMax(null);
-        }
-    	if(checkNullEmpty(y2AxisThresholdMin.getValue())){
-            chartData.setY2ThresholdValMin(y2AxisThresholdMin.getValue());
-        }else{
-            chartData.setY2ThresholdValMin(null);
-        }
-    	if(checkNullEmpty(y2AxisThresholdMax.getValue())){
-            chartData.setY2ThresholdVaMaxl(y2AxisThresholdMax.getValue());
-        }else{
-            chartData.setY2ThresholdVaMaxl(null);
-        }
-    	if (chartData.isDrawable()) {
+        chartData.setyAxisMinVal(getNumber(yAxisMinVal.getValue()));
+        chartData.setyAxisMaxVal(getNumber(yAxisMaxVal.getValue()));
+        chartData.setY2AxisMinVal(getNumber(y2AxisMinVal.getValue()));
+        chartData.setY2AxisMaxVal(getNumber(y2AxisMaxVal.getValue()));
+    	
+        chartData.setyThresholdValMin((Double) checkNullEmpty(yAxisThresholdMin.getValue()));
+        chartData.setyThresholdValMax((Double) checkNullEmpty(yAxisThresholdMax.getValue()));
+        chartData.setY2ThresholdValMin((Double) checkNullEmpty(y2AxisThresholdMin.getValue()));
+        chartData.setY2ThresholdVaMaxl((Double) checkNullEmpty(y2AxisThresholdMax.getValue()));
+        
+        if (chartData.isDrawable()) {
             constructChart();
-        }  	
+        }
+        
     	minMaxPopup.close();
     }
 
-    private boolean checkNullEmpty(Object obj) {
-        if(obj != null && !obj.toString().isEmpty()){
-            return true;
+    private BigDecimal getNumber(Object obj) {
+        return (BigDecimal) checkNullEmpty(obj, true);
+    }
+    
+    private Object checkNullEmpty(Object obj) {
+        return checkNullEmpty(obj, false);
+    }
+    
+    private Object checkNullEmpty(Object obj, boolean isNumber) {
+        if(obj != null && !obj.toString().isEmpty()) {
+            return null;
         }
-        return false;
+        return isNumber ? new BigDecimal(yAxisMaxVal.getValue()) : obj;
     }
 
     public boolean isQueryDataSource() {
