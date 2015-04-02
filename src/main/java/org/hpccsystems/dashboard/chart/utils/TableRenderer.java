@@ -12,7 +12,9 @@ import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.chart.entity.Attribute;
 import org.hpccsystems.dashboard.chart.entity.ChartData;
 import org.hpccsystems.dashboard.chart.entity.Filter;
+import org.hpccsystems.dashboard.chart.entity.InputParam;
 import org.hpccsystems.dashboard.chart.entity.TableData;
+import org.hpccsystems.dashboard.chart.entity.TitleColumn;
 import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.services.HPCCService;
@@ -62,6 +64,11 @@ public class TableRenderer {
         try {
             if(refreshData || tableDataMap == null){
                 tableDataMap = hpccService.fetchTableData(chartData,portlet.getTitleColumns());
+            }
+            
+            if(chartData.getIsQuery()){
+                //To set the inputparam value to title column, if the title column is an inputparam
+                setTitleColValFromInputparam(portlet.getTitleColumns(),chartData.getInputParams());
             }
         } catch (Exception e) {
             LOG.error(Constants.EXCEPTION, e);
@@ -139,6 +146,21 @@ public class TableRenderer {
         return vbox;
     }
 
+    
+    public void setTitleColValFromInputparam(List<TitleColumn> titleColumns,List<InputParam> inputparams) {
+        if(titleColumns !=null ){
+            //get title column value from inputparam
+            titleColumns.forEach(titleColumn ->{
+               InputParam titleParam = new InputParam(titleColumn.getName().trim());
+                  if(inputparams.contains(titleParam)){
+                      InputParam  param = inputparams.get(
+                              inputparams.indexOf(titleParam)) ;
+                      titleColumn.setValue(param.getValue());
+                 }
+            });
+        }  
+    }
+    
     private void populateListCell(final Listbox listBox,
             List<List<Attribute>> columnList, TableData chartData,
             Map<String, List<Attribute>> tableDataMap,Vbox vbox) {

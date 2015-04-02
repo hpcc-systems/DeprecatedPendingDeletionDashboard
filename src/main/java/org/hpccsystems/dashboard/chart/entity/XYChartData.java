@@ -26,8 +26,8 @@ public class XYChartData extends ChartData {
     private Double yThresholdValMax;
 	private Double y2ThresholdValMin;
 	private Double y2ThresholdValMax;
-	private Boolean hideY2Axis;
-	private Boolean dynamicYThresholdEnabled;
+	private boolean hideY2Axis;
+	private boolean dynamicYThresholdEnabled;
 
 	
 
@@ -194,11 +194,11 @@ public class XYChartData extends ChartData {
     }
     
     @XmlElement
-    public Boolean getHideY2Axis() {
+    public boolean getHideY2Axis() {
         return hideY2Axis;
     }
 
-    public void setHideY2Axis(Boolean hideY2Axis) {
+    public void setHideY2Axis(boolean hideY2Axis) {
         this.hideY2Axis = hideY2Axis;
     }
     
@@ -227,11 +227,11 @@ public class XYChartData extends ChartData {
     }
     
     @XmlElement
-    public Boolean getDynamicYThresholdEnabled() {
+    public boolean getDynamicYThresholdEnabled() {
         return dynamicYThresholdEnabled;
     }
 
-    public void setDynamicYThresholdEnabled(Boolean dynamicYThresholdEnabled) {
+    public void setDynamicYThresholdEnabled(boolean dynamicYThresholdEnabled) {
         this.dynamicYThresholdEnabled = dynamicYThresholdEnabled;
     }
 

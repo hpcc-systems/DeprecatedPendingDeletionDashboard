@@ -34,6 +34,7 @@ import org.hpccsystems.dashboard.chart.entity.Filter;
 import org.hpccsystems.dashboard.chart.entity.InputParam;
 import org.hpccsystems.dashboard.chart.entity.Measure;
 import org.hpccsystems.dashboard.chart.entity.TableData;
+import org.hpccsystems.dashboard.chart.entity.TitleColumn;
 import org.hpccsystems.dashboard.chart.entity.XYChartData;
 import org.hpccsystems.dashboard.chart.entity.XYGroup;
 import org.hpccsystems.dashboard.chart.entity.XYModel;
@@ -206,7 +207,7 @@ public class ChartRenderer {
                 list = hpccService.getChartData(chartData,portlet.getTitleColumns());
             }  
             if(chartData.getIsQuery()){
-                setTitleColValFromInputparam(portlet,chartData);
+                setTitleColValFromInputparam(portlet.getTitleColumns(),chartData.getInputParams());
             }
             
             LOG.debug("Title values --->"+ portlet.getTitleColumns());
@@ -372,14 +373,14 @@ public class ChartRenderer {
         portlet.setChartDataJSON(data);
     }
     
-    public void setTitleColValFromInputparam(Portlet portlet,ChartData chartData) {
-        if(portlet.getTitleColumns() !=null && chartData.getInputParams() != null){
+    public void setTitleColValFromInputparam(List<TitleColumn> titleColumns,List<InputParam> inputparams) {
+        if(titleColumns !=null && inputparams != null){
             //get title column value from inputparam
-              portlet.getTitleColumns().forEach(titleColumn ->{
+            titleColumns.forEach(titleColumn ->{
                InputParam titleParam = new InputParam(titleColumn.getName().trim());
-                  if(chartData.getInputParams().contains(titleParam)){
-                      InputParam  param = chartData.getInputParams().get(
-                           chartData.getInputParams().indexOf(titleParam)) ;
+                  if(inputparams.contains(titleParam)){
+                      InputParam  param = inputparams.get(
+                              inputparams.indexOf(titleParam)) ;
                       titleColumn.setValue(param.getValue());
                  }
             });

@@ -898,7 +898,7 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
                 //Threshold
                 if(!isThresholdSet && chartData.getDynamicYThresholdEnabled()) {
                     Measure threshold = chartData.getThreshold();
-                    lstNmElmntLst = fstElmnt.getElementsByTagName(threshold.getColumn() + "_min");                
+                    lstNmElmntLst = fstElmnt.getElementsByTagName(threshold.getColumn() + "_low");                
                     lstNmElmnt = (Element) lstNmElmntLst.item(0);
                     if (lstNmElmnt != null) {
                         if(threshold.isSecondary()) {
@@ -908,7 +908,7 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
                         }
                     }
                     
-                    lstNmElmntLst = fstElmnt.getElementsByTagName(threshold.getColumn() + "_max");                
+                    lstNmElmntLst = fstElmnt.getElementsByTagName(threshold.getColumn() + "_high");                
                     lstNmElmnt = (Element) lstNmElmntLst.item(0);
                     if (lstNmElmnt != null) {
                         if(threshold.isSecondary()) {
@@ -1250,6 +1250,7 @@ return resultDataMap;
                 
     
                 if (tableData.getInputParams() != null) {
+                    
                     Iterator<InputParam> iterator = tableData.getInputParams().iterator();
                     while (iterator.hasNext()) {
                         InputParam param = iterator.next();
@@ -1537,6 +1538,19 @@ return resultDataMap;
                              columnListvalue = tableDataMap.get(data.getColumn());
                              value.setColumn(str);
                              columnListvalue.add(value);
+                         }
+                         
+                         //processing title columns.Taking first row value from the Hpcc response 
+                         //when the title columns are part of output columns
+                         if(count == 0 && titleColumns != null){
+                             for (TitleColumn titleColumn : titleColumns) {
+                                 lstNmElmntLst = fstElmnt.getElementsByTagName(titleColumn.getName());
+                                 lstNmElmnt = (Element) lstNmElmntLst.item(0);
+                               
+                                 if (lstNmElmnt != null) {
+                                     titleColumn.setValue(lstNmElmnt.getTextContent());
+                                 }
+                             }
                          }
                      }
                  }

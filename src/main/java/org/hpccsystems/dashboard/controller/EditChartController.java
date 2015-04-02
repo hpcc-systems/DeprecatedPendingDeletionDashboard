@@ -232,7 +232,7 @@ public class EditChartController extends SelectorComposer<Component> {
         }
         
         //checkboxes enabling
-        if(chartData.getDynamicYThresholdEnabled() != null && chartData.getDynamicYThresholdEnabled()){
+        if(chartData.getDynamicYThresholdEnabled()){
             yThresholdCheckBox.setChecked(true);
             if(chartData.getThreshold() != null){
                 yThresholdCombo.setValue(chartData.getThreshold().getColumn());
@@ -241,7 +241,7 @@ public class EditChartController extends SelectorComposer<Component> {
         }
         
         
-        if(chartData.getHideY2Axis() != null && chartData.getHideY2Axis()){
+        if(chartData.getHideY2Axis()){
             secondAxisHideCheck.setChecked(true);
         }
         if(droppedMeasures != null){

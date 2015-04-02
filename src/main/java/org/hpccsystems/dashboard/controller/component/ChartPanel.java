@@ -164,8 +164,7 @@ public class ChartPanel extends Panel {
             titleTextbox.setVisible(false);
             titlelabel.setVisible(true);
             titlelabel.setValue(titleTextbox.getValue());
-            portlet.setName(titleTextbox.getValue());
-            Events.postEvent("onChangeTitleValues", ChartPanel.this, null);                    
+            portlet.setName(titleTextbox.getValue());                             
            
             //Update Chart Title in DB
             try{
@@ -174,6 +173,8 @@ public class ChartPanel extends Panel {
             }catch(DataAccessException ex){
                 LOG.error(Constants.EXCEPTION, ex);
             }
+            
+            Events.postEvent("onChangeTitleValues", ChartPanel.this, null); 
         }
     };
     
@@ -185,12 +186,18 @@ public class ChartPanel extends Panel {
             if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())){
                 HPCCService hpccService = (HPCCService) SpringUtil.getBean(Constants.HPCC_SERVICE);
             
-                ChartRenderer chartRenderer = (ChartRenderer) SpringUtil.getBean("chartRenderer");
                 try {
-                    //Sets the dynamic title column values with the result retrieved from Hpcc 
-                    hpccService.getChartData((XYChartData) portlet.getChartData(),portlet.getTitleColumns());
-                    
-                    chartRenderer.setTitleColValFromInputparam(portlet,portlet.getChartData());
+                  //Sets the dynamic title column values with the result retrieved from Hpcc 
+                    if(portlet.getChartData() instanceof XYChartData){ 
+                        ChartRenderer chartRenderer = (ChartRenderer) SpringUtil.getBean("chartRenderer");
+                        hpccService.getChartData((XYChartData) portlet.getChartData(),portlet.getTitleColumns());                        
+                        chartRenderer.setTitleColValFromInputparam(portlet.getTitleColumns(),portlet.getChartData().getInputParams());
+                    }else if(portlet.getChartData() instanceof TableData){
+                        hpccService.fetchTableData((TableData) portlet.getChartData(),portlet.getTitleColumns());
+                        TableRenderer tableRenderer = (TableRenderer) SpringUtil.getBean("tableRenderer");
+                        tableRenderer.setTitleColValFromInputparam(portlet.getTitleColumns(),portlet.getChartData().getInputParams());
+                    }
+                   
                 } catch (XPathExpressionException | HpccConnectionException
                         | ParserConfigurationException | SAXException
                         | IOException | ServiceException e) {
@@ -212,8 +219,13 @@ public class ChartPanel extends Panel {
         //Only the input param value will be change
         if(portlet.getName() != null && portlet.getName().contains(TITLE_PATTERN)){
             if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())){
-                ChartRenderer chartRenderer = (ChartRenderer) SpringUtil.getBean("chartRenderer");
-                chartRenderer.setTitleColValFromInputparam(portlet,portlet.getChartData());
+                if(portlet.getChartData() instanceof XYChartData){
+                    ChartRenderer chartRenderer = (ChartRenderer) SpringUtil.getBean("chartRenderer");
+                    chartRenderer.setTitleColValFromInputparam(portlet.getTitleColumns(),portlet.getChartData().getInputParams());
+                }else if(portlet.getChartData() instanceof TableData){
+                    TableRenderer tableRenderer = (TableRenderer) SpringUtil.getBean("tableRenderer");
+                    tableRenderer.setTitleColValFromInputparam(portlet.getTitleColumns(),portlet.getChartData().getInputParams());
+                }
             }  
             if(LOG.isDebugEnabled()){
                 LOG.debug("TitleColumns -->"+portlet.getTitleColumns());
@@ -499,8 +511,8 @@ public class ChartPanel extends Panel {
         
     }
 
-    protected void generateDynamicTitle() {
-        //Generate dynamic label 'ModelID:<$A030>'
+  //Generate dynamic label 'ModelID:<$A030>'
+    protected void generateDynamicTitle() {        
         String chartName = portlet.getName();
         StringBuffer columToReplace = null;
         for(TitleColumn titleColumn :portlet.getTitleColumns()){
@@ -576,10 +588,8 @@ public class ChartPanel extends Panel {
                 //IF RELEVANT
                 // portlet.getChartData().setInputParams(paramsList);
                 if(Constants.RELEVANT_CONFIG == chartService.getCharts().get(portlet.getChartType()).getCategory()){
-                    constructRelevantInputParam(portlet.getChartData());
-                    
-                } else { 
-                 
+                    constructRelevantInputParam(portlet.getChartData());                    
+                } else {                  
                     //Taking first query, as joining not allows for queries
                     QuerySchema querySchema = hpccQueryService
                             .getQuerySchema(portlet.getChartData().getFiles().iterator().next(), portlet.getChartData().getHpccConnection(), portlet
@@ -601,7 +611,6 @@ public class ChartPanel extends Panel {
                                 //Need not to log.This occurs when an inputparam from Hpcc is not found in portlet's
                                 //applied inputparam
                             }
-                                    
                             
                         });
                         
@@ -802,11 +811,7 @@ public class ChartPanel extends Panel {
             	
             	//portlet.setChartDataJSON(" { \"claimId\": \"CLM00042945-C034\", \"claimImage\": \"\\uf0d6\", \"personImage\": \"\\uf007\", \"vehicleImage\": \"\\uf1b9\", \"policyImage\": \"\\uf0f6\" }");
         		portlet.setChartDataJSON(relJSON);
-            }
-            
-            if(portlet.getName() != null && portlet.getName().contains(TITLE_PATTERN)){
-                generateDynamicTitle();
-            }
+            }          
 
             // To construct Table Widget
             if (Constants.CATEGORY_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()) {
@@ -824,6 +829,10 @@ public class ChartPanel extends Panel {
                 }
             }
 
+            if(portlet.getName() != null && portlet.getName().contains(TITLE_PATTERN)){
+                generateDynamicTitle();
+            }
+            
             // Setting button visible, that is hidden when error occurred
             addBtn.setVisible(true);
         } catch (HpccConnectionException e) {
