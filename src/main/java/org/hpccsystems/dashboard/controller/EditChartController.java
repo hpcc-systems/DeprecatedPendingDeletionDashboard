@@ -744,6 +744,9 @@ public class EditChartController extends SelectorComposer<Component> {
             }
             yAxisItem.detach();
             droppedMeasures.remove(measure);
+            if(droppedMeasures.isEmpty()){
+                chartData.setDynamicYThresholdEnabled(false);
+            }
             chartData.getMeasures().remove(measure);
             if(parentComp.getChildren().size() < 1){
                 parentComp.setAttribute(Constants.NONE, null);
@@ -925,8 +928,9 @@ public class EditChartController extends SelectorComposer<Component> {
         chartData.setY2AxisMinVal(getNumber(y2AxisMinVal.getValue()));
         chartData.setY2AxisMaxVal(getNumber(y2AxisMaxVal.getValue()));
     	
-        if(chartData.getDynamicYThresholdEnabled() && yThresholdCombo.getSelectedItem().getValue()!=null  ) {
-                chartData.setThreshold((Measure)yThresholdCombo.getSelectedItem().getValue());
+        if(chartData.getDynamicYThresholdEnabled() && !droppedMeasures.getSelection().isEmpty()
+               && droppedMeasures.getSelection().iterator().next() !=null ) {
+                chartData.setThreshold(droppedMeasures.getSelection().iterator().next());
                 chartData.setyThresholdValMin(null);
                 chartData.setyThresholdValMax(null);
                 chartData.setY2ThresholdValMin(null);

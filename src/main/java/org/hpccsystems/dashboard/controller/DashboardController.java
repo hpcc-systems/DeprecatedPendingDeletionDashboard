@@ -917,6 +917,9 @@ public class DashboardController extends SelectorComposer<Window>{
                     && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()
                     && Constants.CATEGORY_SCORED_SEARCH_TABLE != chartService.getCharts().get(portlet.getChartType()).getCategory()) {
                 
+                if(commonInputParams == null){
+                    commonInputParams =  new LinkedHashMap<String, Map<String,Set<String>>>();
+                }                
                 //As dashboard has commonfilter enabled,setting ''hasCommonFileter' true for the  chart panel
                 //It will tell whether to fetch the fresh hpcc data while selecting the inputparam button.
                 List<Component> chartPanels = portalChildren.get(portlet.getColumn()).getChildren();

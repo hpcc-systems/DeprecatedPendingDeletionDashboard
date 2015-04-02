@@ -1,6 +1,7 @@
 function createXYChart (divId, chartData) {
 	var response = jq.parseJSON(chartData);
 	console.log("response -->"+response.hideY2Axis);
+	console.log("chartData -->"+chartData)
 	var divElement = jq('$'+divId).empty();
 	
 	var showLegend = false;
@@ -59,7 +60,7 @@ function createXYChart (divId, chartData) {
 	var yThresholdMax = null;
 	var y2ThresholdMin = null;
 	var y2ThresholdMax = null;
-	var showY2Axis = false;;
+	var showY2Axis = true;
 	if(response.hideY2Axis && response.hideY2Axis == true){
 		showY2Axis = false;
 	}

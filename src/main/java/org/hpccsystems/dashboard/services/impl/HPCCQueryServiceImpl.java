@@ -902,9 +902,9 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
                     lstNmElmnt = (Element) lstNmElmntLst.item(0);
                     if (lstNmElmnt != null) {
                         if(threshold.isSecondary()) {
-                            chartData.setyThresholdValMin(Double.valueOf(lstNmElmnt.getTextContent()));
-                        } else {
                             chartData.setY2ThresholdValMin(Double.valueOf(lstNmElmnt.getTextContent()));
+                        } else {
+                            chartData.setyThresholdValMin(Double.valueOf(lstNmElmnt.getTextContent()));
                         }
                     }
                     
@@ -912,9 +912,9 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
                     lstNmElmnt = (Element) lstNmElmntLst.item(0);
                     if (lstNmElmnt != null) {
                         if(threshold.isSecondary()) {
-                            chartData.setyThresholdValMax(Double.valueOf(lstNmElmnt.getTextContent()));
-                        } else {
                             chartData.setY2ThresholdVaMaxl(Double.valueOf(lstNmElmnt.getTextContent()));
+                        } else {
+                            chartData.setyThresholdValMax(Double.valueOf(lstNmElmnt.getTextContent()));
                         }
                     }
                     
