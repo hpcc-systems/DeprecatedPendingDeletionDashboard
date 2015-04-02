@@ -390,7 +390,8 @@ public class ChartPanel extends Panel {
         } else if (Constants.SHOW_EDIT_ONLY == buttonState) {
             toolbar.appendChild(addBtn);
         }else if(Constants.SHOW_NO_BUTTONS == buttonState){
-            //Do nothing here
+            titlelabel.setStyle("pointer-events:none");
+            titleTextbox.setReadonly(true);
         }
         toolbar.appendChild(resizeBtn);
         
