@@ -862,6 +862,7 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
         List<Object> valueList = null;
 
         final NodeList nodeList = doc.getElementsByTagName("Row");
+        boolean isThresholdSet = false;
         for (int s = 0; s < nodeList.getLength(); s++) {
             fstNode = nodeList.item(s);
             if (fstNode.getNodeType() == Node.ELEMENT_NODE) {
@@ -880,7 +881,7 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
                         valueList.add("");
                     }
                 dataObj.setxAxisValues(valueList);
-
+                
                 //processing Measures
                 valueList = new ArrayList<Object>();
                 for (Measure measure : chartData.getMeasures()) {
@@ -892,8 +893,34 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
                     } else {
                         valueList.add(new BigDecimal(0));
                     }
-
                 }
+                
+                //Threshold
+                if(!isThresholdSet && chartData.getDynamicYThresholdEnabled()) {
+                    Measure threshold = chartData.getThreshold();
+                    lstNmElmntLst = fstElmnt.getElementsByTagName(threshold.getColumn() + "_min");                
+                    lstNmElmnt = (Element) lstNmElmntLst.item(0);
+                    if (lstNmElmnt != null) {
+                        if(threshold.isSecondary()) {
+                            chartData.setyThresholdValMin(Double.valueOf(lstNmElmnt.getTextContent()));
+                        } else {
+                            chartData.setY2ThresholdValMin(Double.valueOf(lstNmElmnt.getTextContent()));
+                        }
+                    }
+                    
+                    lstNmElmntLst = fstElmnt.getElementsByTagName(threshold.getColumn() + "_max");                
+                    lstNmElmnt = (Element) lstNmElmntLst.item(0);
+                    if (lstNmElmnt != null) {
+                        if(threshold.isSecondary()) {
+                            chartData.setyThresholdValMax(Double.valueOf(lstNmElmnt.getTextContent()));
+                        } else {
+                            chartData.setY2ThresholdVaMaxl(Double.valueOf(lstNmElmnt.getTextContent()));
+                        }
+                    }
+                    
+                    isThresholdSet = true;
+                }
+                
                 //processing title columns.Taking first row value from the Hpcc response 
                 //when the title columns are part of output columns
                 if(s == 0 && titleColumns != null){

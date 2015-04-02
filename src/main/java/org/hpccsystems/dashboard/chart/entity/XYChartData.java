@@ -226,6 +226,7 @@ public class XYChartData extends ChartData {
         return getAttribute().getDisplayName() != null ? getAttribute().getDisplayName() : getAttribute().getColumn();
     }
     
+    @XmlElement
     public Boolean getDynamicYThresholdEnabled() {
         return dynamicYThresholdEnabled;
     }
