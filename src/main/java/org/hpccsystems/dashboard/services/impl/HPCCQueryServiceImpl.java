@@ -1226,13 +1226,13 @@ return resultDataMap;
 }
 
     @Override
-    public Map<String, List<Attribute>> fetchTableData(TableData tableData) throws HpccConnectionException,
+    public Map<String, List<Attribute>> fetchTableData(TableData tableData, List<TitleColumn> titleColumns) throws HpccConnectionException,
             RemoteException {
         Map<String, List<Attribute>> tableDataMap = new LinkedHashMap<String, List<Attribute>>();
 
         try {
             if(tableData.isGenericQuery()){
-                   return fetchGenericTableData(tableDataMap,tableData);
+                   return fetchGenericTableData(tableDataMap,tableData,titleColumns);
              }else{
                 StringBuilder urlBuilder = new StringBuilder();
                 if (tableData.getHpccConnection().getIsSSL()) {
@@ -1304,6 +1304,7 @@ return resultDataMap;
                             fstNode = nodeList.item(count);
                             if (fstNode.getNodeType() == Node.ELEMENT_NODE) {
                                 fstElmnt = (Element) fstNode;
+                                //gets data for table fields 
                                 for (Attribute data : tableData.getAttributes()) {
                                     Attribute value = new Attribute();
                                     
@@ -1363,6 +1364,19 @@ return resultDataMap;
                                     value.setColumn(str);
                                     columnListvalue.add(value);
                                 }
+                                
+                              //processing title columns.Taking first row value from the Hpcc response 
+                                //when the title columns are part of output columns
+                                if(count == 0 && titleColumns != null){
+                                    for (TitleColumn titleColumn : titleColumns) {
+                                        lstNmElmntLst = fstElmnt.getElementsByTagName(titleColumn.getName());
+                                        lstNmElmnt = (Element) lstNmElmntLst.item(0);
+                                      
+                                        if (lstNmElmnt != null) {
+                                            titleColumn.setValue(lstNmElmnt.getTextContent());
+                                        }
+                                    }
+                                }
                             }
                         }
                     }
@@ -1387,7 +1401,7 @@ return resultDataMap;
     }
     
     private Map<String, List<Attribute>> fetchGenericTableData(
-            Map<String, List<Attribute>> tableDataMap, TableData tableData)
+            Map<String, List<Attribute>> tableDataMap, TableData tableData,List<TitleColumn> titleColumns)
             throws XPathExpressionException, IOException,
             ParserConfigurationException, SAXException, HpccConnectionException {
          

@@ -121,7 +121,7 @@ public class ChartPanel extends Panel {
     private static final String INPUT_PARAM_STYLE = "glyphicon glyphicon-tasks btn btn-link img-btn";
     private static final String RESIZE_MAX_STYLE = "glyphicon glyphicon-resize-full btn btn-link img-btn";
     private static final String RESIZE_MIN_STYLE = "glyphicon glyphicon-resize-small btn btn-link img-btn";
-    private static final String GREATER_THAN = "> ";
+    private static final String GREATER_THAN = ">";
     private static final String TITLE_PATTERN = "<$";
     
     final Button addBtn = new Button();
@@ -210,14 +210,16 @@ public class ChartPanel extends Panel {
      */
     public void onChangeInputParamChangeTitle(Event event){
         //Only the input param value will be change
-        if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())){
-            ChartRenderer chartRenderer = (ChartRenderer) SpringUtil.getBean("chartRenderer");
-            chartRenderer.setTitleColValFromInputparam(portlet,portlet.getChartData());
-        }  
-        if(LOG.isDebugEnabled()){
-            LOG.debug("TitleColumns -->"+portlet.getTitleColumns());
+        if(portlet.getName() != null && portlet.getName().contains(TITLE_PATTERN)){
+            if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())){
+                ChartRenderer chartRenderer = (ChartRenderer) SpringUtil.getBean("chartRenderer");
+                chartRenderer.setTitleColValFromInputparam(portlet,portlet.getChartData());
+            }  
+            if(LOG.isDebugEnabled()){
+                LOG.debug("TitleColumns -->"+portlet.getTitleColumns());
+            }
+            generateDynamicTitle();
         }
-        generateDynamicTitle();  
     }
     
     EventListener<Event> enableTitleEdit = (event)->{
@@ -500,20 +502,21 @@ public class ChartPanel extends Panel {
     protected void generateDynamicTitle() {
         //Generate dynamic label 'ModelID:<$A030>'
         String chartName = portlet.getName();
-        StringBuffer titlebuff = new StringBuffer(chartName);
+        StringBuffer columToReplace = null;
         for(TitleColumn titleColumn :portlet.getTitleColumns()){
             if(titleColumn.getValue() != null){
-                titlebuff.deleteCharAt(titlebuff.indexOf(titleColumn.getName())-2);
-                titlebuff.deleteCharAt(titlebuff.indexOf(titleColumn.getName())-1);
-                titlebuff.deleteCharAt(titlebuff.indexOf(titleColumn.getName())+titleColumn.getName().length());
-                titlebuff =  new StringBuffer(titlebuff.toString().replace(titleColumn.getName(), titleColumn.getValue()));
+                columToReplace = new StringBuffer();
+                columToReplace.append("<$").append(titleColumn.getName()).append(">");                
+                if(chartName.contains(columToReplace)){
+                    chartName = chartName.replace(columToReplace, titleColumn.getValue());
+                }
             }
         }
         
         if(LOG.isDebugEnabled()){
-            LOG.debug("chartName -->"+titlebuff);                    
+            LOG.debug("chartName -->"+chartName);                    
         }
-        titlelabel.setValue(titlebuff.toString());
+        titlelabel.setValue(chartName);
     }
 
     /**
@@ -522,22 +525,32 @@ public class ChartPanel extends Panel {
      * dynamic title of the chart as'ModelID: <$A030> Actual:<$2014>'
      */
     private void generateTitleColumns() {
-        String label = portlet.getName();
-        List<String> columnLabels = Arrays.asList(label.split(GREATER_THAN));
-        portlet.setTitleColumns(new ArrayList<TitleColumn>());
-        
-        columnLabels.stream().forEach(colLabel ->{
-            colLabel = colLabel.trim();
-            String titleColumnLabel = colLabel.substring(0, colLabel.indexOf(":"));
-            String titleColumnName = null;
-            if(colLabel.contains(">")){
-                titleColumnName = colLabel.substring(colLabel.indexOf("<$")+2,colLabel.indexOf(">"));
-            }else{
-               titleColumnName = colLabel.substring(colLabel.indexOf("<$")+2);
-            }
-            TitleColumn titleField = new TitleColumn(titleColumnLabel,titleColumnName);
-            portlet.getTitleColumns().add(titleField);
-        });
+        try{
+            String label = portlet.getName();
+            List<String> columnLabels = Arrays.asList(label.split(GREATER_THAN));
+            portlet.setTitleColumns(new ArrayList<TitleColumn>());
+            
+            columnLabels.stream().forEach(colLabel ->{
+                colLabel = colLabel.trim();
+                String titleColumnLabel = null;
+                if(colLabel.contains(":")){
+                    titleColumnLabel = colLabel.substring(0, colLabel.indexOf(":"));
+                }else{
+                    titleColumnLabel = "";
+                }               
+                String titleColumnName = null;
+                if(colLabel.contains(">")){
+                    titleColumnName = colLabel.substring(colLabel.indexOf("<$")+2,colLabel.indexOf(">"));
+                }else{
+                   titleColumnName = colLabel.substring(colLabel.indexOf("<$")+2);
+                }
+                TitleColumn titleField = new TitleColumn(titleColumnLabel,titleColumnName);
+                portlet.getTitleColumns().add(titleField);
+            });
+        }catch(Exception e){
+            //Didn't log as it is not required.The title can be anything,
+            //if it is not having format 'ModelID: <$modelid>'
+        }
         
     }
 
@@ -626,7 +639,7 @@ public class ChartPanel extends Panel {
             
             Map<String, List<Attribute>> inputs = null;
             try {
-                inputs = ((HPCCQueryService)SpringUtil.getBean("hpccQueryService")).fetchTableData((TableData)inputParamData);
+                inputs = ((HPCCQueryService)SpringUtil.getBean("hpccQueryService")).fetchTableData((TableData)inputParamData,portlet.getTitleColumns());
             } catch (RemoteException | HpccConnectionException e) {
                LOG.error(Constants.EXCEPTION,e);
             }

@@ -373,18 +373,16 @@ public class ChartRenderer {
     }
     
     public void setTitleColValFromInputparam(Portlet portlet,ChartData chartData) {
-        if(portlet.getTitleColumns() !=null){
+        if(portlet.getTitleColumns() !=null && chartData.getInputParams() != null){
             //get title column value from inputparam
-            if(chartData.getInputParams() != null){
-                portlet.getTitleColumns().forEach(titleColumn ->{
-                    InputParam titleParam = new InputParam(titleColumn.getName().trim());
-                   if(chartData.getInputParams().contains(titleParam)){
-                       InputParam  param = chartData.getInputParams().get(
-                               chartData.getInputParams().indexOf(titleParam)) ;
-                       titleColumn.setValue(param.getValue());
-                   }
-                });
-            }               
+              portlet.getTitleColumns().forEach(titleColumn ->{
+               InputParam titleParam = new InputParam(titleColumn.getName().trim());
+                  if(chartData.getInputParams().contains(titleParam)){
+                      InputParam  param = chartData.getInputParams().get(
+                           chartData.getInputParams().indexOf(titleParam)) ;
+                      titleColumn.setValue(param.getValue());
+                 }
+            });
         }        
     }
 
@@ -813,7 +811,7 @@ public class ChartRenderer {
 	    Set<String> linkCategories = new HashSet<String>();
 	    
 	    try {
-            Map<String, List<Attribute>> result = hpccService.fetchTableData(tableData);
+            Map<String, List<Attribute>> result = hpccService.fetchTableData(tableData,portlet.getTitleColumns());
             int numOfNodes = result.entrySet().iterator().next().getValue().size();
             
             //Map of Node index to the unique identifier column 

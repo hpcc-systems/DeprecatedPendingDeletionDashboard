@@ -732,12 +732,12 @@ public class HPCCServiceImpl implements HPCCService {
      * @throws RemoteException
      * @throws Exception
      */
-    public Map<String, List<Attribute>> fetchTableData(TableData tableData) throws HpccConnectionException,
+    public Map<String, List<Attribute>> fetchTableData(TableData tableData,List<TitleColumn> titleColumns) throws HpccConnectionException,
             RemoteException {
         //To handle roxie queries
         if(tableData.getIsQuery()) {
             HPCCQueryService hpccQueryService = (HPCCQueryService) SpringUtil.getBean("hpccQueryService");
-            return hpccQueryService.fetchTableData(tableData);
+            return hpccQueryService.fetchTableData(tableData,titleColumns);
         }
         
         Map<String, List<Attribute>> tableDataMap = new LinkedHashMap<String, List<Attribute>>();

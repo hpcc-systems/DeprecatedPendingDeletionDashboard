@@ -97,7 +97,7 @@ public interface HPCCService {
      * @return
      * @throws Exception
      */
-    Map<String, List<Attribute>> fetchTableData(TableData data)
+    Map<String, List<Attribute>> fetchTableData(TableData data,List<TitleColumn> titleColumns)
             throws HpccConnectionException, RemoteException;
     
     /**

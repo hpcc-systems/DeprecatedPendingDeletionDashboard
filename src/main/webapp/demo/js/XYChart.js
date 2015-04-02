@@ -1,5 +1,6 @@
 function createXYChart (divId, chartData) {
 	var response = jq.parseJSON(chartData);
+	console.log("response -->"+response.hideY2Axis);
 	var divElement = jq('$'+divId).empty();
 	
 	var showLegend = false;
@@ -58,6 +59,10 @@ function createXYChart (divId, chartData) {
 	var yThresholdMax = null;
 	var y2ThresholdMin = null;
 	var y2ThresholdMax = null;
+	var showY2Axis = false;;
+	if(response.hideY2Axis && response.hideY2Axis == true){
+		showY2Axis = true;
+	}
 	if(response.timeseries.isEnabled) {
 		xAxisType = 'timeseries';
 		timeFormat = response.timeseries.format;
@@ -143,7 +148,7 @@ function createXYChart (divId, chartData) {
 		            label: {
 		                text: response.secondaryYAxisLabel		                
 		            },
-		            show: !response.hideY2Axis		            
+		            show: showY2Axis		            
 		        },		       
 		       rotated: rotateAxis
 			},

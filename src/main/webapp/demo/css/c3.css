@@ -209,7 +209,7 @@
            stroke: green;
        }
 
-.c3-ygrid-line.gridymax line {
+.c3-ygrid-line.gridmax line {
            stroke: red;
        }
 /*-- CSS for Y axis Threshold End--*/

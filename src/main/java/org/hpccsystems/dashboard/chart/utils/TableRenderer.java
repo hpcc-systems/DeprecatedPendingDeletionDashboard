@@ -61,7 +61,7 @@ public class TableRenderer {
         Map<String, List<Attribute>> tableDataMap = chartData.getHpccTableData();
         try {
             if(refreshData || tableDataMap == null){
-                tableDataMap = hpccService.fetchTableData(chartData);
+                tableDataMap = hpccService.fetchTableData(chartData,portlet.getTitleColumns());
             }
         } catch (Exception e) {
             LOG.error(Constants.EXCEPTION, e);

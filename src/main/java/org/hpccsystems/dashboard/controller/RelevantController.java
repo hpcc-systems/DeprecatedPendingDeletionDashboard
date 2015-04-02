@@ -72,7 +72,7 @@ public class RelevantController extends SelectorComposer<Component>{
 	      ((TableData)inputParamData).setAttributes(attributes);
 	      
 	      ListModelList<String> inputParam = new ListModelList<String>();
-	      Map<String, List<Attribute>> inputs= hpccQueryService.fetchTableData((TableData)inputParamData);
+	      Map<String, List<Attribute>> inputs= hpccQueryService.fetchTableData((TableData)inputParamData,portlet.getTitleColumns());
 	      LOG.debug("Input parameters -->"+ inputs);
 	      
 	      if(inputs.get(fields.iterator().next().getColumnName()) != null){

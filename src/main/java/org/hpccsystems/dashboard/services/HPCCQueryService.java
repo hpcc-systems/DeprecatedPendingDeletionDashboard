@@ -37,7 +37,7 @@ public interface HPCCQueryService {
 
     Set<String> getInputParameters(final String queryName, final HpccConnection hpccConnection,boolean isGenericQuery,String inputParamQuery) throws Exception;
 
-    Map<String, List<Attribute>> fetchTableData(TableData data) throws HpccConnectionException, RemoteException;
+    Map<String, List<Attribute>> fetchTableData(TableData data, List<TitleColumn> titleColumns) throws HpccConnectionException, RemoteException;
     
 	Map<String, Set<String>> getInputParamDistinctValues(String queryName,
 			Set<String> inputParams, HpccConnection hpccConnection,
