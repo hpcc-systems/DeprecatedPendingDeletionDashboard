@@ -170,60 +170,60 @@ function createXYChart (divId, chartData) {
 	var chart = c3.generate(c3JSON);
 	
 	if(yThresholdMin && !yThresholdMax && !y2ThresholdMin && !y2ThresholdMax){
-		chart.ygrids.add([{value: yThresholdMin, text: yThresholdMin+' - '+response.primaryYAxisLabel,position: 'start',class: 'gridy'}]);
+		chart.ygrids.add([{value: yThresholdMin, text: yThresholdMin+' - '+response.primaryYAxisLabel,position: 'start',class: 'gridmin'}]);
    
 	}else if(yThresholdMin && yThresholdMax && !y2ThresholdMin && !y2ThresholdMax){
     	
-		chart.ygrids.add([{value: yThresholdMin, text: yThresholdMin+' - '+response.primaryYAxisLabel,position: 'start',class: 'gridy'},
-		                  {value: yThresholdMax, text: yThresholdMax+' - '+response.primaryYAxisLabel,position: 'start',class: 'gridy'}]);
+		chart.ygrids.add([{value: yThresholdMin, text: yThresholdMin+' - '+response.primaryYAxisLabel,position: 'start',class: 'gridmin'},
+		                  {value: yThresholdMax, text: yThresholdMax+' - '+response.primaryYAxisLabel,position: 'start',class: 'gridmax'}]);
     
 	}else if(yThresholdMin && !yThresholdMax && y2ThresholdMin && !y2ThresholdMax){
 	
-		chart.ygrids.add([{value: yThresholdMin, text: yThresholdMin+' - '+response.primaryYAxisLabel,position: 'start',class: 'gridy'},
-	                  {value: y2ThresholdMin, text: y2ThresholdMin+' - '+response.secondaryYAxisLabel,axis: 'y2',position: 'end',class: 'gridy2'}]);
+		chart.ygrids.add([{value: yThresholdMin, text: yThresholdMin+' - '+response.primaryYAxisLabel,position: 'start',class: 'gridmin'},
+	                  {value: y2ThresholdMin, text: y2ThresholdMin+' - '+response.secondaryYAxisLabel,axis: 'y2',position: 'end',class: 'gridmin'}]);
 
 	}else if(yThresholdMin && !yThresholdMax && !y2ThresholdMin && y2ThresholdMax){
-		chart.ygrids.add([{value: yThresholdMin, text: yThresholdMin+' - '+response.primaryYAxisLabel,position: 'start',class: 'gridy'},
-		                  {value: y2ThresholdMax, text: y2ThresholdMax+' - '+response.secondaryYAxisLabel,axis: 'y2',position: 'end',class: 'gridy2'}]);
+		chart.ygrids.add([{value: yThresholdMin, text: yThresholdMin+' - '+response.primaryYAxisLabel,position: 'start',class: 'gridmin'},
+		                  {value: y2ThresholdMax, text: y2ThresholdMax+' - '+response.secondaryYAxisLabel,axis: 'y2',position: 'end',class: 'gridmax'}]);
 		
 	}else if(yThresholdMin && yThresholdMax && y2ThresholdMin && !y2ThresholdMax){
-		chart.ygrids.add([{value: yThresholdMin, text: yThresholdMin+' - '+response.primaryYAxisLabel,position: 'start',class: 'gridy'},
-		                  {value: yThresholdMax, text: yThresholdMax+' - '+response.primaryYAxisLabel,position: 'start',class: 'gridy'},
-		                  {value: y2ThresholdMin, text: y2ThresholdMin+' - '+response.secondaryYAxisLabel,axis: 'y2',position: 'end',class: 'gridy2'}]);
+		chart.ygrids.add([{value: yThresholdMin, text: yThresholdMin+' - '+response.primaryYAxisLabel,position: 'start',class: 'gridmin'},
+		                  {value: yThresholdMax, text: yThresholdMax+' - '+response.primaryYAxisLabel,position: 'start',class: 'gridmax'},
+		                  {value: y2ThresholdMin, text: y2ThresholdMin+' - '+response.secondaryYAxisLabel,axis: 'y2',position: 'end',class: 'gridmin'}]);
 
 	}else if(yThresholdMin && !yThresholdMax && y2ThresholdMin && y2ThresholdMax){		
-		chart.ygrids.add([{value: yThresholdMin, text: yThresholdMin+' - '+response.primaryYAxisLabel,position: 'start',class: 'gridy'},
-		                  {value: y2ThresholdMin, text: y2ThresholdMin+' - '+response.secondaryYAxisLabel,axis: 'y2',position: 'end',class: 'gridy2'},
-		                  {value: y2ThresholdMax, text: y2ThresholdMax+' - '+response.secondaryYAxisLabel,axis: 'y2',position: 'end',class: 'gridy2'}]); 
+		chart.ygrids.add([{value: yThresholdMin, text: yThresholdMin+' - '+response.primaryYAxisLabel,position: 'start',class: 'gridmin'},
+		                  {value: y2ThresholdMin, text: y2ThresholdMin+' - '+response.secondaryYAxisLabel,axis: 'y2',position: 'end',class: 'gridmin'},
+		                  {value: y2ThresholdMax, text: y2ThresholdMax+' - '+response.secondaryYAxisLabel,axis: 'y2',position: 'end',class: 'gridmax'}]); 
 		
 	}else if(yThresholdMin && yThresholdMax && y2ThresholdMin && y2ThresholdMax){		
-		chart.ygrids.add([{value: yThresholdMin, text: yThresholdMin+' - '+response.primaryYAxisLabel,position: 'start',class: 'gridy'},
-		                  {value: yThresholdMax, text: yThresholdMax+' - '+response.primaryYAxisLabel,position: 'start',class: 'gridy'},
-		                  {value: y2ThresholdMin, text: y2ThresholdMin+' - '+response.secondaryYAxisLabel,axis: 'y2',position: 'end',class: 'gridy2'},
-		                  {value: y2ThresholdMax, text: y2ThresholdMax+' - '+response.secondaryYAxisLabel,axis: 'y2',position: 'end',class: 'gridy2'}]); 
+		chart.ygrids.add([{value: yThresholdMin, text: yThresholdMin+' - '+response.primaryYAxisLabel,position: 'start',class: 'gridmin'},
+		                  {value: yThresholdMax, text: yThresholdMax+' - '+response.primaryYAxisLabel,position: 'start',class: 'gridmax'},
+		                  {value: y2ThresholdMin, text: y2ThresholdMin+' - '+response.secondaryYAxisLabel,axis: 'y2',position: 'end',class: 'gridmin'},
+		                  {value: y2ThresholdMax, text: y2ThresholdMax+' - '+response.secondaryYAxisLabel,axis: 'y2',position: 'end',class: 'gridmax'}]); 
 
 	}else if(!yThresholdMin && yThresholdMax && !y2ThresholdMin && !y2ThresholdMax){		
-		chart.ygrids.add([{value: yThresholdMax, text: yThresholdMax+' - '+response.primaryYAxisLabel,position: 'start',class: 'gridy'}]); 	
+		chart.ygrids.add([{value: yThresholdMax, text: yThresholdMax+' - '+response.primaryYAxisLabel,position: 'start',class: 'gridmax'}]); 	
 		
 	}else if(!yThresholdMin && yThresholdMax && y2ThresholdMin && !y2ThresholdMax){		
-		chart.ygrids.add([{value: yThresholdMax, text: yThresholdMax+' - '+response.primaryYAxisLabel,position: 'start',class: 'gridy'},
-		                  {value: y2ThresholdMin, text: y2ThresholdMin+' - '+response.secondaryYAxisLabel,axis: 'y2',position: 'end',class: 'gridy2'}]); 
+		chart.ygrids.add([{value: yThresholdMax, text: yThresholdMax+' - '+response.primaryYAxisLabel,position: 'start',class: 'gridmax'},
+		                  {value: y2ThresholdMin, text: y2ThresholdMin+' - '+response.secondaryYAxisLabel,axis: 'y2',position: 'end',class: 'gridmin'}]); 
 		
 	}else if(!yThresholdMin && yThresholdMax && !y2ThresholdMin && y2ThresholdMax){		
-		chart.ygrids.add([{value: yThresholdMax, text: yThresholdMax+' - '+response.primaryYAxisLabel,position: 'start',class: 'gridy'},
-		                  {value: y2ThresholdMax, text: y2ThresholdMax+' - '+response.secondaryYAxisLabel,axis: 'y2',position: 'end',class: 'gridy2'}]); 
+		chart.ygrids.add([{value: yThresholdMax, text: yThresholdMax+' - '+response.primaryYAxisLabel,position: 'start',class: 'gridmax'},
+		                  {value: y2ThresholdMax, text: y2ThresholdMax+' - '+response.secondaryYAxisLabel,axis: 'y2',position: 'end',class: 'gridmax'}]); 
 		
 	}else if(!yThresholdMin && yThresholdMax && y2ThresholdMin && y2ThresholdMax){		
-		chart.ygrids.add([{value: yThresholdMax, text: yThresholdMax+' - '+response.primaryYAxisLabel,position: 'start',class: 'gridy'},
-		                  {value: y2ThresholdMin, text: y2ThresholdMin+' - '+response.secondaryYAxisLabel,axis: 'y2',position: 'end',class: 'gridy2'},
-		                  {value: y2ThresholdMax, text: y2ThresholdMax+' - '+response.secondaryYAxisLabel,axis: 'y2',position: 'end',class: 'gridy2'}]); 
+		chart.ygrids.add([{value: yThresholdMax, text: yThresholdMax+' - '+response.primaryYAxisLabel,position: 'start',class: 'gridmax'},
+		                  {value: y2ThresholdMin, text: y2ThresholdMin+' - '+response.secondaryYAxisLabel,axis: 'y2',position: 'end',class: 'gridmin'},
+		                  {value: y2ThresholdMax, text: y2ThresholdMax+' - '+response.secondaryYAxisLabel,axis: 'y2',position: 'end',class: 'gridmax'}]); 
 		
 	}else if(!yThresholdMin && !yThresholdMax && y2ThresholdMin && !y2ThresholdMax){		
-		chart.ygrids.add([{value: y2ThresholdMin, text: y2ThresholdMin+' - '+response.secondaryYAxisLabel,axis: 'y2',position: 'end',class: 'gridy2'}]);
+		chart.ygrids.add([{value: y2ThresholdMin, text: y2ThresholdMin+' - '+response.secondaryYAxisLabel,axis: 'y2',position: 'end',class: 'gridmin'}]);
 		
 	}else if(!yThresholdMin && !yThresholdMax && y2ThresholdMin && y2ThresholdMax){		
-		chart.ygrids.add([{value: y2ThresholdMin, text: y2ThresholdMin+' - '+response.secondaryYAxisLabel,axis: 'y2',position: 'end',class: 'gridy2'},
-		                  {value: y2ThresholdMax, text: y2ThresholdMax+' - '+response.secondaryYAxisLabel,axis: 'y2',position: 'end',class: 'gridy2'}]); 
+		chart.ygrids.add([{value: y2ThresholdMin, text: y2ThresholdMin+' - '+response.secondaryYAxisLabel,axis: 'y2',position: 'end',class: 'gridmin'},
+		                  {value: y2ThresholdMax, text: y2ThresholdMax+' - '+response.secondaryYAxisLabel,axis: 'y2',position: 'end',class: 'gridmax'}]); 
 	}
 
 }
