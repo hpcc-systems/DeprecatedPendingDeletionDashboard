@@ -40,6 +40,7 @@ import org.hpccsystems.dashboard.chart.entity.HpccConnection;
 import org.hpccsystems.dashboard.chart.entity.Join;
 import org.hpccsystems.dashboard.chart.entity.Measure;
 import org.hpccsystems.dashboard.chart.entity.TableData;
+import org.hpccsystems.dashboard.chart.entity.TitleColumn;
 import org.hpccsystems.dashboard.chart.entity.XYChartData;
 import org.hpccsystems.dashboard.chart.entity.XYModel;
 import org.hpccsystems.dashboard.chart.tree.entity.Level;
@@ -198,11 +199,11 @@ public class HPCCServiceImpl implements HPCCService {
      *             , ServiceException
      * 
      */
-    public List<XYModel> getChartData(XYChartData chartData) throws HpccConnectionException,
+    public List<XYModel> getChartData(XYChartData chartData,List<TitleColumn> titleColumns) throws HpccConnectionException,
             ParserConfigurationException, SAXException, IOException, ServiceException, XPathExpressionException {
         //To handle roxie queries
         if(chartData.getIsQuery()) {
-            return hpccQueryService.getChartData(chartData);
+            return hpccQueryService.getChartData(chartData,titleColumns);
         }
         
         final List<XYModel> dataList = new ArrayList<XYModel>();

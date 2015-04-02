@@ -16,6 +16,7 @@ import org.hpccsystems.dashboard.chart.entity.Field;
 import org.hpccsystems.dashboard.chart.entity.HpccConnection;
 import org.hpccsystems.dashboard.chart.entity.ScoredSearchData;
 import org.hpccsystems.dashboard.chart.entity.TableData;
+import org.hpccsystems.dashboard.chart.entity.TitleColumn;
 import org.hpccsystems.dashboard.chart.entity.XYChartData;
 import org.hpccsystems.dashboard.chart.entity.XYModel;
 import org.hpccsystems.dashboard.chart.tree.entity.Level;
@@ -32,7 +33,7 @@ public interface HPCCQueryService {
 	
 	QuerySchema getQuerySchema(String queryName, HpccConnection hpccConnection,boolean isGenericQuery,String inputParamQuery) throws Exception;
 
-    List<XYModel> getChartData(XYChartData data) throws HpccConnectionException, NumberFormatException, XPathExpressionException;
+    List<XYModel> getChartData(XYChartData data,List<TitleColumn> titleColumns) throws HpccConnectionException, NumberFormatException, XPathExpressionException;
 
     Set<String> getInputParameters(final String queryName, final HpccConnection hpccConnection,boolean isGenericQuery,String inputParamQuery) throws Exception;
 

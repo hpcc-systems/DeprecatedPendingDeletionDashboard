@@ -48,6 +48,7 @@ import org.hpccsystems.dashboard.chart.entity.InputParam;
 import org.hpccsystems.dashboard.chart.entity.Measure;
 import org.hpccsystems.dashboard.chart.entity.ScoredSearchData;
 import org.hpccsystems.dashboard.chart.entity.TableData;
+import org.hpccsystems.dashboard.chart.entity.TitleColumn;
 import org.hpccsystems.dashboard.chart.entity.XYChartData;
 import org.hpccsystems.dashboard.chart.entity.XYModel;
 import org.hpccsystems.dashboard.chart.tree.entity.Level;
@@ -66,6 +67,7 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+
 import com.mysql.jdbc.StringUtils;
 
 public class HPCCQueryServiceImpl implements HPCCQueryService {
@@ -372,12 +374,14 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
     }
 
     @Override
-    public List<XYModel> getChartData(XYChartData chartData) throws HpccConnectionException, NumberFormatException, XPathExpressionException {
+    public List<XYModel> getChartData(XYChartData chartData,
+            List<TitleColumn> titleColumns) throws HpccConnectionException,
+            NumberFormatException, XPathExpressionException {
         List<XYModel> dataList = null;
         
        try {
            if(chartData.isGenericQuery()){
-               return getGenericQueryData(chartData);
+               return getGenericQueryData(chartData,titleColumns);
            }else{
                StringBuilder urlBuilder = new StringBuilder();
                if (chartData.getHpccConnection().getIsSSL()) {
@@ -403,7 +407,7 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
                             Map<String,Map<String,List<Object>>> groupedData =  getGroupedChartData(urlBuilder,chartData);
                             return aggregateGroupedData(groupedData,chartData.getMeasures().get(0).getAggregateFunction());
                }else{
-                   dataList = getNonGenericQueryData(urlBuilder,chartData);
+                   dataList = getNonGenericQueryData(urlBuilder,chartData,titleColumns);
                    LOG.debug("dataList -->"+dataList);
                    return doAggregation(dataList, chartData);
                }               
@@ -435,7 +439,7 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
      * @throws ParserConfigurationException 
      * @throws XPathExpressionException 
      */
-    private List<XYModel> getGenericQueryData(XYChartData chartData)
+    private List<XYModel> getGenericQueryData(XYChartData chartData,List<TitleColumn> titleColumns)
             throws HpccConnectionException, IOException, 
             ParserConfigurationException, SAXException, XPathExpressionException {
         
@@ -505,7 +509,7 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
          final InputStream respone = urlConnection.getInputStream();
          
          if (respone != null) {
-            dataList = parseHpccData(respone,chartData);            
+            dataList = parseHpccData(respone,chartData,titleColumns);            
          } else {
              throw new HpccConnectionException(Constants.UNABLE_TO_FETCH_DATA);
          }
@@ -842,7 +846,7 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
      * @throws SAXException 
      */
     private List<XYModel> parseHpccData(InputStream respone,
-            XYChartData chartData) throws ParserConfigurationException,
+            XYChartData chartData,List<TitleColumn> titleColumns) throws ParserConfigurationException,
             SAXException, IOException {
         
         final List<XYModel> dataList = new ArrayList<XYModel>();
@@ -865,6 +869,7 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
 
                 fstElmnt = (Element) fstNode;
                 valueList = new ArrayList<Object>();
+                //processing Attributes
                 Attribute xColumnName = chartData.getAttribute();
                     lstNmElmntLst = fstElmnt.getElementsByTagName(xColumnName.getColumn());
                     lstNmElmnt = (Element) lstNmElmntLst.item(0);
@@ -876,6 +881,7 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
                     }
                 dataObj.setxAxisValues(valueList);
 
+                //processing Measures
                 valueList = new ArrayList<Object>();
                 for (Measure measure : chartData.getMeasures()) {
                     lstNmElmntLst = fstElmnt.getElementsByTagName(measure.getColumn());
@@ -888,11 +894,23 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
                     }
 
                 }
-
+                //processing title columns.Taking first row value from the Hpcc response 
+                //when the title columns are part of output columns
+                if(s == 0 && titleColumns != null){
+                    for (TitleColumn titleColumn : titleColumns) {
+                        lstNmElmntLst = fstElmnt.getElementsByTagName(titleColumn.getName());
+                        lstNmElmnt = (Element) lstNmElmntLst.item(0);
+                      
+                        if (lstNmElmnt != null) {
+                            titleColumn.setValue(lstNmElmnt.getTextContent());
+                        }
+                    }
+                }
                 dataObj.setyAxisValues(valueList);
                 dataList.add(dataObj);
             }
         }
+        LOG.debug("dataList ->" + dataList);
         return dataList;
     }
     /**
@@ -905,8 +923,10 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
      * @throws SAXException
      * @throws HpccConnectionException
      */
-    private List<XYModel> getNonGenericQueryData(StringBuilder urlBuilder,XYChartData chartData) throws IOException,
-            ParserConfigurationException, SAXException, HpccConnectionException {
+    private List<XYModel> getNonGenericQueryData(StringBuilder urlBuilder,
+            XYChartData chartData, List<TitleColumn> titleColumns)
+            throws IOException, ParserConfigurationException, SAXException,
+            HpccConnectionException {
         
         List<XYModel> dataList = null;
       //list holds selected input parameter name
@@ -945,7 +965,7 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
         final InputStream respone = urlConnection.getInputStream();
         
         if (respone != null) {
-            dataList = parseHpccData(respone,chartData);            
+            dataList = parseHpccData(respone,chartData,titleColumns);            
         } else {
             throw new HpccConnectionException(Constants.UNABLE_TO_FETCH_DATA);
         }

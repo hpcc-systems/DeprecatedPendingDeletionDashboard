@@ -2,8 +2,10 @@ package org.hpccsystems.dashboard.controller.component;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
+import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -17,6 +19,9 @@ import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.JAXBException;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.rpc.ServiceException;
+import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.lang.StringEscapeUtils;
 import org.apache.commons.logging.Log;
@@ -30,6 +35,7 @@ import org.hpccsystems.dashboard.chart.entity.RelevantData;
 import org.hpccsystems.dashboard.chart.entity.ScoredSearchData;
 import org.hpccsystems.dashboard.chart.entity.TableData;
 import org.hpccsystems.dashboard.chart.entity.TextData;
+import org.hpccsystems.dashboard.chart.entity.TitleColumn;
 import org.hpccsystems.dashboard.chart.entity.XYChartData;
 import org.hpccsystems.dashboard.chart.gauge.GaugeChartData;
 import org.hpccsystems.dashboard.chart.tree.entity.TreeData;
@@ -51,6 +57,7 @@ import org.hpccsystems.dashboard.services.HPCCService;
 import org.hpccsystems.dashboard.services.WidgetService;
 import org.hpccsystems.dashboard.util.UiGenerator;
 import org.springframework.dao.DataAccessException;
+import org.xml.sax.SAXException;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Components;
@@ -93,7 +100,6 @@ import org.zkoss.zul.Vbox;
 import org.zkoss.zul.Window;
 
 import com.google.gson.Gson;
-import com.mysql.jdbc.StringUtils;
 
 
 /**
@@ -114,6 +120,8 @@ public class ChartPanel extends Panel {
     private static final String INPUT_PARAM_STYLE = "glyphicon glyphicon-tasks btn btn-link img-btn";
     private static final String RESIZE_MAX_STYLE = "glyphicon glyphicon-resize-full btn btn-link img-btn";
     private static final String RESIZE_MIN_STYLE = "glyphicon glyphicon-resize-small btn btn-link img-btn";
+    private static final String GREATER_THAN = "> ";
+    private static final String TITLE_PATTERN = "<$";
     
     final Button addBtn = new Button();
     final Button resetBtn = new Button();
@@ -121,6 +129,7 @@ public class ChartPanel extends Panel {
     final Button resizeBtn = new Button();
     final Div holderDiv = new Div();
     final Div chartDiv = new Div();
+    final Label titlelabel = new Label();
     final Textbox titleTextbox = new Textbox();
     final Box imageContainer = new Box();
     final Caption caption = new Caption();
@@ -149,9 +158,14 @@ public class ChartPanel extends Panel {
     EventListener<Event> titleChangeLisnr = new EventListener<Event>() {
         public void onEvent(final Event event)  {
             if(LOG.isDebugEnabled()){
-                LOG.debug("Title is being changed");
+                LOG.debug("Title is changed");
             }
+            titleTextbox.setVisible(false);
+            titlelabel.setVisible(true);
+            titlelabel.setValue(titleTextbox.getValue());
             portlet.setName(titleTextbox.getValue());
+            Events.postEvent("onApplyTitleValues", ChartPanel.this, null);                    
+           
             //Update Chart Title in DB
             try{
                 WidgetService widgetService =(WidgetService) SpringUtil.getBean("widgetService");
@@ -159,6 +173,59 @@ public class ChartPanel extends Panel {
             }catch(DataAccessException ex){
                 LOG.error(Constants.EXCEPTION, ex);
             }
+        }
+    };
+    
+    public void onApplyTitleValues(Event event)
+    {
+        if(portlet.getName().contains(TITLE_PATTERN)){
+            generateTitleColumns();
+            //Redraw chart to get dynamic title
+            if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())){
+                HPCCService hpccService = (HPCCService) SpringUtil.getBean(Constants.HPCC_SERVICE);
+            
+                ChartRenderer chartRenderer = (ChartRenderer) SpringUtil.getBean("chartRenderer");
+                try {
+                    //Sets the dynamic title column values with the result retrieved from Hpcc 
+                    hpccService.getChartData((XYChartData) portlet.getChartData(),portlet.getTitleColumns());
+                    
+                    chartRenderer.setTitleColValFromInputparam(portlet);
+                } catch (XPathExpressionException | HpccConnectionException
+                        | ParserConfigurationException | SAXException
+                        | IOException | ServiceException e) {
+                    LOG.error(Constants.EXCEPTION, e);
+                }
+            }  
+            if(LOG.isDebugEnabled()){
+                LOG.debug("TitleColumns -->"+portlet.getTitleColumns());
+            }
+            setChartDynamicTitle();               
+        }  
+    }
+    
+    /**
+     * Changes the dynamic chart title with the latest input param values
+     * @param event
+     */
+    public void onChangeInputParamChangeTitle(Event event){
+        //Only the input param value will be change
+        if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())){
+            ChartRenderer chartRenderer = (ChartRenderer) SpringUtil.getBean("chartRenderer");
+            chartRenderer.setTitleColValFromInputparam(portlet);
+        }  
+        if(LOG.isDebugEnabled()){
+            LOG.debug("TitleColumns -->"+portlet.getTitleColumns());
+        }
+        setChartDynamicTitle();  
+    }
+    
+    EventListener<Event> enableTitleEdit = (event)->{
+        titleTextbox.setVisible(true);
+        titlelabel.setVisible(false);
+        if(portlet.getName() != null){
+            titleTextbox.setValue(portlet.getName());            
+        } else {
+            titleTextbox.setValue(Labels.getLabel("chartTitle"));
         }
     };
 
@@ -271,16 +338,25 @@ public class ChartPanel extends Panel {
         hbox.setWidth("100%");
         hbox.setHflex("1");
 
-        titleTextbox.setInplace(true);
+        titlelabel.setVflex("1");
+        titlelabel.setStyle("border: none;    color: black;");
+        if(portlet.getName() != null){
+            if(portlet.getName().contains(TITLE_PATTERN)){
+                generateTitleColumns();
+            }
+            titlelabel.setValue(portlet.getName()); 
+                       
+        } else {
+            titlelabel.setValue(Labels.getLabel("chartTitle"));
+        }
+        titleTextbox.setVisible(false);
         titleTextbox.setVflex("1");
         titleTextbox.setStyle("border: none;    color: black;");
-        if(portlet.getName() != null){
-            titleTextbox.setValue(portlet.getName());            
-        } else {
-            titleTextbox.setValue(Labels.getLabel("chartTitle"));
-        }
-        titleTextbox.setMaxlength(30);
-        titleTextbox.addEventListener(Events.ON_CHANGE, titleChangeLisnr);
+       
+        titleTextbox.setMaxlength(60);
+        titlelabel.addEventListener(Events.ON_CLICK, enableTitleEdit);
+        titleTextbox.addEventListener(Events.ON_BLUR, titleChangeLisnr);
+        titleTextbox.addEventListener(Events.ON_OK, titleChangeLisnr);
 
         toolbar = new Toolbar();
         toolbar.setAlign("end");
@@ -318,6 +394,7 @@ public class ChartPanel extends Panel {
         }
         toolbar.appendChild(resizeBtn);
         
+        hbox.appendChild(titlelabel);
         hbox.appendChild(titleTextbox);
         hbox.appendChild(toolbar);
 
@@ -406,6 +483,50 @@ public class ChartPanel extends Panel {
         
     }
 
+    protected void setChartDynamicTitle() {
+        //Generate dynamic label 'ModelID:<$A030>'
+        String chartName = portlet.getName();
+        String titleValue = null;
+        for(TitleColumn titleColumn :portlet.getTitleColumns()){
+            if(titleColumn.getValue() != null){
+                titleValue = titleColumn.getValue();
+                chartName = chartName.replace(titleColumn.getName(), titleColumn.getValue());
+            }
+        }
+        chartName =  chartName.replace(chartName.substring(chartName.indexOf(titleValue)-2, chartName.indexOf(titleValue)), "");
+        chartName = chartName.replace(chartName.substring(chartName.indexOf(titleValue)+titleValue.length(), 
+                chartName.indexOf(titleValue)+titleValue.length()+1), "");
+        if(LOG.isDebugEnabled()){
+            LOG.debug("chartName -->"+chartName);                    
+        }
+        titlelabel.setValue(chartName);
+    }
+
+    /**
+     * Parses the portlet label 'ModelID: <$ModelID> Actual:<$Cur_Period>'
+     * and creates ChartNameField object.Later these field will be used to generate
+     * dynamic title of the chart as'ModelID: <$A030> Actual:<$2014>'
+     */
+    private void generateTitleColumns() {
+        String label = portlet.getName();
+        List<String> columnLabels = Arrays.asList(label.split(GREATER_THAN));
+        portlet.setTitleColumns(new ArrayList<TitleColumn>());
+        
+        columnLabels.stream().forEach(colLabel ->{
+            colLabel = colLabel.trim();
+            String titleColumnLabel = colLabel.substring(0, colLabel.indexOf(":"));
+            String titleColumnName = null;
+            if(colLabel.contains(">")){
+                titleColumnName = colLabel.substring(colLabel.indexOf("<$")+2,colLabel.indexOf(">"));
+            }else{
+               titleColumnName = colLabel.substring(colLabel.indexOf("<$")+2);
+            }
+            TitleColumn titleField = new TitleColumn(titleColumnLabel,titleColumnName);
+            portlet.getTitleColumns().add(titleField);
+        });
+        
+    }
+
     private void setHeight() {
         Toolkit tk = Toolkit.getDefaultToolkit();
         Dimension d = tk.getScreenSize();
@@ -446,7 +567,7 @@ public class ChartPanel extends Panel {
                              InputParam appliedInput = portlet.getChartData() .getInputParams() .stream()
                                             .filter(input -> input.getName().equals(
                                                     entry.getKey())).findAny().get();
-                             if (appliedInput != null && !StringUtils.isNullOrEmpty(appliedInput.getValue())) {
+                             if (appliedInput != null && !com.mysql.jdbc.StringUtils.isNullOrEmpty(appliedInput.getValue())) {
                                  listitem.setInputValue(appliedInput.getValue());
                              }
                             }catch(NoSuchElementException e){
@@ -458,6 +579,7 @@ public class ChartPanel extends Panel {
                         });
                         
                     }
+                    Events.postEvent("onChangeInputParamChangeTitle", ChartPanel.this, null);
                 }
             } catch (Exception e) {
                 //Exception is not thrown as it is not necessary
@@ -653,6 +775,10 @@ public class ChartPanel extends Panel {
             	
             	//portlet.setChartDataJSON(" { \"claimId\": \"CLM00042945-C034\", \"claimImage\": \"\\uf0d6\", \"personImage\": \"\\uf007\", \"vehicleImage\": \"\\uf1b9\", \"policyImage\": \"\\uf0f6\" }");
         		portlet.setChartDataJSON(relJSON);
+            }
+            
+            if(portlet.getName().contains(TITLE_PATTERN)){
+                setChartDynamicTitle();
             }
 
             // To construct Table Widget

@@ -870,6 +870,8 @@ public class DashboardController extends SelectorComposer<Window>{
         //Updating widget with latest filter details into DB
        widgetService.updateWidget(portlet);
         
+       Events.postEvent("onChangeInputParamChangeTitle",panel, null);
+       
         if(Constants.CATEGORY_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()){    
             //Refreshing table with updated filter values
             panel.drawTableWidget(true);

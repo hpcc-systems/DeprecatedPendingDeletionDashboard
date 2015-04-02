@@ -1,6 +1,9 @@
 package org.hpccsystems.dashboard.entity;
 
+import java.util.List;
+
 import org.hpccsystems.dashboard.chart.entity.ChartData;
+import org.hpccsystems.dashboard.chart.entity.TitleColumn;
 
 public class Portlet {
 
@@ -15,6 +18,15 @@ public class Portlet {
 
     private ChartData chartData;
     private boolean isSinglePortlet;
+    private List<TitleColumn> titleColumns;
+
+    public List<TitleColumn> getTitleColumns() {
+        return titleColumns;
+    }
+
+    public void setTitleColumns(List<TitleColumn> nameFields) {
+        this.titleColumns = nameFields;
+    }
 
     public boolean getIsSinglePortlet() {
 		return isSinglePortlet;

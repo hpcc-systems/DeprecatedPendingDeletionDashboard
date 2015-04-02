@@ -200,10 +200,16 @@ public class ChartRenderer {
         try    {
             List<XYModel> list = null;
             if(chartData.isGrouped()) {
-                list = refactorResult(hpccService.getChartData(chartData), chartData);
+                list = refactorResult(hpccService.getChartData(chartData,portlet.getTitleColumns()), chartData);
             }else {
-                list = hpccService.getChartData(chartData);
+                list = hpccService.getChartData(chartData,portlet.getTitleColumns());
+            }  
+            if(chartData.getIsQuery()){
+                setTitleColValFromInputparam(portlet);
             }
+            
+            LOG.debug("Title values --->"+ portlet.getTitleColumns());
+            
             iterator = list.iterator();    
         }catch(ParserConfigurationException | SAXException
                 | IOException | ServiceException | HpccConnectionException e)    {
@@ -365,6 +371,22 @@ public class ChartRenderer {
         portlet.setChartDataJSON(data);
     }
     
+    public void setTitleColValFromInputparam(Portlet portlet) {
+        if(portlet.getTitleColumns() !=null){
+            //get title column value from inputparam
+            if(portlet.getChartData().getInputParams() != null){
+                portlet.getTitleColumns().forEach(titleColumn ->{
+                    InputParam titleParam = new InputParam(titleColumn.getName().trim());
+                   if(portlet.getChartData().getInputParams().contains(titleParam)){
+                       InputParam  param = portlet.getChartData().getInputParams().get(
+                               portlet.getChartData().getInputParams().indexOf(titleParam)) ;
+                       titleColumn.setValue(param.getValue());
+                   }
+                });
+            }               
+        }        
+    }
+
     private List<XYModel> refactorResult(List<XYModel> input,
             XYChartData chartData) throws HpccConnectionException,
             ServiceException, ParserConfigurationException, SAXException,
@@ -728,7 +750,7 @@ public class ChartRenderer {
 	        xyChartData.getMeasures().add(chartData.getTotal());
 	    }
 	    try {
-            List<XYModel> list = hpccService.getChartData(xyChartData);
+            List<XYModel> list = hpccService.getChartData(xyChartData,portlet.getTitleColumns());
             
             GaugeElement element;
             List<GaugeElement> elements = new ArrayList<GaugeElement>();
