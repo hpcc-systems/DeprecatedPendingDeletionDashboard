@@ -1,3 +1,12 @@
+.radio, .checkbox {
+	margin-top: 0px;
+  	margin-bottom: 0px;
+}
+
+.list-combo > input {
+	  background: white;
+}
+
 .grayscale-image {  
    -webkit-filter: grayscale(0.9); /* Webkit */  
    filter: gray; /* IE6-9 */  

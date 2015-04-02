@@ -44,54 +44,33 @@
 								</listcell>
 							</listitem>
 							</listbox>
-							<listbox>
+							<listbox nonselectableTags="*">
 							<listhead>
 								<listheader label="${labels.primaryAxis}">
 								</listheader> 
 							</listhead>
 							<listitem>
 								<listcell>
-									<hbox hflex="1">
-										<label
-											value="${labels.yAxisStart}" />
-										<doublebox id="yAxisMinVal"
-											zclass="form-control" hflex="1">
-										</doublebox>
-									</hbox>
-								</listcell>
-							</listitem>
-
-							<listitem>
-								<listcell>
-									<hbox hflex="1">
-										<label
-											value="${labels.yAxisEnd}" />
-										<doublebox id="yAxisMaxVal"
-											zclass="form-control" hflex="1">
-										</doublebox>
-									</hbox>
+									<vlayout hflex="1">
+										<label value="Axis Scale" style="font-weight: 600;"/>
+										<hlayout>
+											<doublebox id="yAxisMinVal" placeholder="${labels.yAxisStart}" zclass="form-control" hflex="1" />
+											<doublebox id="yAxisMaxVal" placeholder="${labels.yAxisEnd}" zclass="form-control" hflex="1" />
+										</hlayout>
+									</vlayout>
 								</listcell>
 							</listitem>
 							<listitem>
 								<listcell>
-									<hbox hflex="1">
-										<label
-											value="${labels.yAxisThresholdMin}" />
-										<doublebox
-											id="yAxisThresholdMin" zclass="form-control" hflex="1">
-										</doublebox>
-									</hbox>
-								</listcell>
-							</listitem>
-							<listitem>
-								<listcell>
-									<hbox hflex="1">
-										<label
-											value="${labels.yAxisThresholdMax}" />
-										<doublebox
-											id="yAxisThresholdMax" zclass="form-control" hflex="1">
-										</doublebox>
-									</hbox>
+									<vlayout hflex="1">
+										<label value="Threshold Lines" style="font-weight: 600;"/>
+										<checkbox id="" label="Use dynamic thresholds" sclass="checkbox"/>
+										<combobox readonly="true" hflex="1" sclass="list-combo"></combobox>
+										<hlayout>
+											<doublebox id="yAxisThresholdMin" zclass="form-control" hflex="1" placeholder="Minimum"/>
+											<doublebox id="yAxisThresholdMax" zclass="form-control" hflex="1" placeholder="Maximum"/>
+										</hlayout>
+									</vlayout>
 								</listcell>
 							</listitem>
 							
