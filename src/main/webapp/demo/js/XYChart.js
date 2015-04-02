@@ -61,7 +61,7 @@ function createXYChart (divId, chartData) {
 	var y2ThresholdMax = null;
 	var showY2Axis = false;;
 	if(response.hideY2Axis && response.hideY2Axis == true){
-		showY2Axis = true;
+		showY2Axis = false;
 	}
 	if(response.timeseries.isEnabled) {
 		xAxisType = 'timeseries';
