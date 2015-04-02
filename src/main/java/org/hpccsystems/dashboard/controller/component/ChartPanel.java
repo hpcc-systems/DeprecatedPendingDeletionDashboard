@@ -77,6 +77,7 @@ import org.zkoss.zul.Button;
 import org.zkoss.zul.Caption;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Hbox;
+import org.zkoss.zul.Hlayout;
 import org.zkoss.zul.Html;
 import org.zkoss.zul.Image;
 import org.zkoss.zul.Label;
@@ -221,6 +222,7 @@ public class ChartPanel extends Panel {
     
     EventListener<Event> enableTitleEdit = (event)->{
         titleTextbox.setVisible(true);
+        titleTextbox.focus();
         titlelabel.setVisible(false);
         if(portlet.getName() != null){
             titleTextbox.setValue(portlet.getName());            
@@ -339,7 +341,7 @@ public class ChartPanel extends Panel {
         hbox.setHflex("1");
 
         titlelabel.setVflex("1");
-        titlelabel.setStyle("border: none;    color: black;");
+        titlelabel.setSclass("title-label");
         if(portlet.getName() != null){
             if(portlet.getName().contains(TITLE_PATTERN)){
                 generateTitleColumns();
@@ -350,8 +352,9 @@ public class ChartPanel extends Panel {
             titlelabel.setValue(Labels.getLabel("chartTitle"));
         }
         titleTextbox.setVisible(false);
+        titleTextbox.setHflex("1");
         titleTextbox.setVflex("1");
-        titleTextbox.setStyle("border: none;    color: black;");
+        titleTextbox.setSclass("title-textbox");
        
         titleTextbox.setMaxlength(60);
         titlelabel.addEventListener(Events.ON_CLICK, enableTitleEdit);
@@ -395,8 +398,12 @@ public class ChartPanel extends Panel {
         }
         toolbar.appendChild(resizeBtn);
         
-        hbox.appendChild(titlelabel);
-        hbox.appendChild(titleTextbox);
+        Hlayout hlayout = new Hlayout();
+        hlayout.appendChild(titlelabel);
+        hlayout.appendChild(titleTextbox);
+        hlayout.setHflex("1");
+        
+        hbox.appendChild(hlayout);
         hbox.appendChild(toolbar);
 
         div.appendChild(hbox);
