@@ -156,6 +156,8 @@ public class TableRenderer {
                       InputParam  param = inputparams.get(
                               inputparams.indexOf(titleParam)) ;
                       titleColumn.setValue(param.getValue());
+                 }else{
+                     titleColumn.setValue(null);
                  }
             });
         }  
