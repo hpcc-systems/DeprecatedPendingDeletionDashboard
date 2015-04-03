@@ -235,6 +235,7 @@ public class EditChartController extends SelectorComposer<Component> {
         if(chartData.getDynamicYThresholdEnabled()){
             yThresholdCheckBox.setChecked(true);
             if(chartData.getThreshold() != null){
+                yThresholdComboDiv.setVisible(true);
                 yThresholdCombo.setValue(chartData.getThreshold().getColumn());
                yThresholdCombo.setSelectedIndex(droppedMeasures.indexOf((chartData.getThreshold().getColumn())));
             }

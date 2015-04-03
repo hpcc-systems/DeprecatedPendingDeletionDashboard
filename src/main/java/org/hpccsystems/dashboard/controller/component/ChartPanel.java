@@ -138,6 +138,7 @@ public class ChartPanel extends Panel {
     Listbox inputListbox = null;
     Portlet portlet;
     Toolbar toolbar;
+    private int buttonState;
     
     //Delete panel listener
     EventListener<Event> deleteListener = new EventListener<Event>() {
@@ -341,7 +342,8 @@ public class ChartPanel extends Panel {
         this.setBorder("normal");
         this.setWidth("99%");
         this.setStyle("margin-bottom:5px");
-
+        
+        this.buttonState = buttonState;
         
         // Creating title bar for the panel
         caption.setWidth("100%");
@@ -507,6 +509,10 @@ public class ChartPanel extends Panel {
             if(portlet.getName() != null && portlet.getName().contains(TITLE_PATTERN)){
                 generateDynamicTitle();
             }
+        });
+        
+        this.addEventListener("onDrawingQueryChart", event ->{
+            onDrawingQueryChart(buttonState);
         });
         
     }
