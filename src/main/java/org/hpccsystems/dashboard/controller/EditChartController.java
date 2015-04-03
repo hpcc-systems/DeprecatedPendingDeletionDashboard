@@ -375,7 +375,6 @@ public class EditChartController extends SelectorComposer<Component> {
 
             List<String> columnList = new ArrayList<String>();
             
-            boolean isScendaryMeasurePresent = false;
             for (Measure measure : chartData.getMeasures()) {
                 boolean yColumnExist = false;
                 for (Map.Entry<String, List<Field>> entry : chartData.getFields().entrySet()) {
@@ -392,13 +391,12 @@ public class EditChartController extends SelectorComposer<Component> {
                         yAxisListbox.getParent().setAttribute(Constants.NONE, true);
                     }
                     createYListChild(measure);
-                    isScendaryMeasurePresent = !isScendaryMeasurePresent ? measure.isSecondary():true;
                 } else {
                     columnList.add(measure.getColumn());
                 }
             }
             
-            if(isScendaryMeasurePresent) {
+            if(chartData.getIsScondaryAxisEnabled()) {
                 y2AxisListbox.setVisible(true);
                 secondAxisCheck.setChecked(true);
                 Events.postEvent(Events.ON_CHECK, secondAxisCheck, null);
@@ -975,11 +973,16 @@ public class EditChartController extends SelectorComposer<Component> {
     @Listen("onCheck = #secondAxisCheck")
     public void onCheckSecondaryAxis() {
         if(secondAxisCheck.isChecked()) {
+            chartData.setIsScondaryAxisEnabled(true);
             y2MinMax.setVisible(true);
             y2MinMax.setVisible(true);
             y2AxisListbox.setVisible(true);
             measureContainer.invalidate();
+            
         } else {
+            chartData.setIsScondaryAxisEnabled(false);
+            chartData.setHideY2Axis(false);
+            secondAxisHideCheck.setChecked(false);
             if(!y2AxisListbox.getChildren().isEmpty()) {
                 for (Component component : y2AxisListbox.getChildren()) {
                     if(component instanceof Listitem) {
@@ -1032,8 +1035,7 @@ public class EditChartController extends SelectorComposer<Component> {
             y2MinMaxThreshold.setVisible(true);
             chartData.setDynamicYThresholdEnabled(false);
         }
-    }
-
+    }    
     
 }
 

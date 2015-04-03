@@ -1,6 +1,7 @@
 function createXYChart (divId, chartData) {
 	var response = jq.parseJSON(chartData);
 	console.log("response -->"+response.hideY2Axis);
+	console.log("response -->"+response.enabledY2Axis);
 	console.log("chartData -->"+chartData)
 	var divElement = jq('$'+divId).empty();
 	
@@ -8,10 +9,7 @@ function createXYChart (divId, chartData) {
 	if(Object.keys(response.chartTypes).length > 1) {
 		showLegend = true;
 	} 
-	var showSecondAxis = false;
-	if(response.secondaryYAxisLabel.length){
-		showSecondAxis = true;
-	}
+	
 	var rotateAxis = false;
 	if(response.rotateAxis){
 		rotateAxis = true;
@@ -60,10 +58,15 @@ function createXYChart (divId, chartData) {
 	var yThresholdMax = null;
 	var y2ThresholdMin = null;
 	var y2ThresholdMax = null;
-	var showY2Axis = true;
-	if(response.hideY2Axis && response.hideY2Axis == true){
-		showY2Axis = false;
+	var showY2Axis = false;
+	
+	//Hides secondary axis, if secondary axis is enabled but didn't drop any secondary column
+	//Shows the secondary axis if secondary axis is enabled && didn't hide the axis
+	if(response.enabledY2Axis && !response.hideY2Axis && response.secondaryYAxisLabel.length){
+		showY2Axis = true;
 	}
+	
+	
 	if(response.timeseries.isEnabled) {
 		xAxisType = 'timeseries';
 		timeFormat = response.timeseries.format;

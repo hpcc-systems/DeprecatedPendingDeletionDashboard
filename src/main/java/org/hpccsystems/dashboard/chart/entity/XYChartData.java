@@ -28,10 +28,9 @@ public class XYChartData extends ChartData {
 	private Double y2ThresholdValMax;
 	private boolean hideY2Axis;
 	private boolean dynamicYThresholdEnabled;
+	private boolean isScondaryAxisEnabled;
 
-	
-
-	public XYChartData() {
+    public XYChartData() {
     }
     
     public XYChartData(ChartData chartData) {
@@ -200,6 +199,15 @@ public class XYChartData extends ChartData {
 
     public void setHideY2Axis(boolean hideY2Axis) {
         this.hideY2Axis = hideY2Axis;
+    }
+    
+    @XmlElement
+    public boolean getIsScondaryAxisEnabled() {
+        return isScondaryAxisEnabled;
+    }
+
+    public void setIsScondaryAxisEnabled(boolean enableScondaryAxis) {
+        this.isScondaryAxisEnabled = enableScondaryAxis;
     }
     
     public boolean hasAttribute(Attribute attribute) {
