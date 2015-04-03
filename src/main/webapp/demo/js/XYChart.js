@@ -1,7 +1,5 @@
 function createXYChart (divId, chartData) {
 	var response = jq.parseJSON(chartData);
-	console.log("response -->"+response.hideY2Axis);
-	console.log("response -->"+response.enabledY2Axis);
 	console.log("chartData -->"+chartData)
 	var divElement = jq('$'+divId).empty();
 	
