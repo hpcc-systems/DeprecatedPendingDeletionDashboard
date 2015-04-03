@@ -37,6 +37,7 @@ import org.hpccsystems.dashboard.chart.entity.InputParam;
 import org.hpccsystems.dashboard.chart.entity.Interactivity;
 import org.hpccsystems.dashboard.chart.entity.RelevantData;
 import org.hpccsystems.dashboard.chart.entity.TableData;
+import org.hpccsystems.dashboard.chart.entity.TitleColumn;
 import org.hpccsystems.dashboard.chart.entity.XYChartData;
 import org.hpccsystems.dashboard.chart.gauge.GaugeChartData;
 import org.hpccsystems.dashboard.chart.tree.entity.TreeData;
@@ -1661,6 +1662,13 @@ public class DashboardController extends SelectorComposer<Window>{
         
         portletsToRefresh.forEach(portlet ->{
             portlet.getChartData().getInputParams().remove(removedInputparam);
+            //resetting the title column value to null while removing a inputparam
+            if(portlet.getTitleColumns() != null){
+                TitleColumn titleCol = new TitleColumn("",  removedInputparam.getName());
+                if(portlet.getTitleColumns().contains(titleCol)){
+                    portlet.getTitleColumns().get(portlet.getTitleColumns().indexOf(titleCol)).setValue(null);
+                }
+            }
         });
         return portletsToRefresh;
     
@@ -1978,6 +1986,13 @@ public class DashboardController extends SelectorComposer<Window>{
                     dashboard.getCommonQueryFilters().remove(inputparam);
                     if(portlet.getChartData().getInputParams().contains(inputparam)){
                         portlet.getChartData().getInputParams().remove(inputparam);
+                        //resetting the title colum value while removing a inputparam
+                        if(portlet.getTitleColumns() != null){
+                            TitleColumn titleCol = new TitleColumn("",  inputparam.getName());
+                            if(portlet.getTitleColumns().contains(titleCol)){
+                                portlet.getTitleColumns().get(portlet.getTitleColumns().indexOf(titleCol)).setValue(null);
+                            }
+                        }
                     }
                 });
                 try {
@@ -2006,6 +2021,7 @@ public class DashboardController extends SelectorComposer<Window>{
                         if (portlet.getChartData().getFilters().isEmpty()) {
                             portlet.getChartData().setIsFiltered(false);
                         }
+                        
                     }
                 });
               

@@ -138,7 +138,6 @@ public class ChartPanel extends Panel {
     Listbox inputListbox = null;
     Portlet portlet;
     Toolbar toolbar;
-    private int buttonState;
     
     //Delete panel listener
     EventListener<Event> deleteListener = new EventListener<Event>() {
@@ -343,8 +342,6 @@ public class ChartPanel extends Panel {
         this.setWidth("99%");
         this.setStyle("margin-bottom:5px");
         
-        this.buttonState = buttonState;
-        
         // Creating title bar for the panel
         caption.setWidth("100%");
 
@@ -375,7 +372,6 @@ public class ChartPanel extends Panel {
         titleTextbox.setMaxlength(60);
         titlelabel.addEventListener(Events.ON_CLICK, enableTitleEdit);
         titleTextbox.addEventListener(Events.ON_BLUR, titleChangeLisnr);
-        titleTextbox.addEventListener(Events.ON_OK, titleChangeLisnr);
 
         toolbar = new Toolbar();
         toolbar.setAlign("end");
