@@ -896,7 +896,7 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
                 }
                 
                 //Threshold
-                if(!isThresholdSet && chartData.getDynamicYThresholdEnabled()) {
+                if(!isThresholdSet && chartData.getDynamicYThresholdEnabled() && chartData.getThreshold() != null) {
                     Measure threshold = chartData.getThreshold();
                     lstNmElmntLst = fstElmnt.getElementsByTagName(threshold.getColumn() + "_low");                
                     lstNmElmnt = (Element) lstNmElmntLst.item(0);
