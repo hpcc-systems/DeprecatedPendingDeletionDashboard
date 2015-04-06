@@ -202,7 +202,7 @@ public class EditTableController extends SelectorComposer<Component> {
         public void onEvent(Event arg0) throws Exception {
             try {
                 Map<String, List<Attribute>> tableDataMap = null;
-                tableDataMap = hpccService.fetchTableData(tableData);
+                tableDataMap = hpccService.fetchTableData(tableData,portlet.getTitleColumns());
                 tableData.setHpccTableData(tableDataMap);
                 
                 tableHolder.getChildren().clear();

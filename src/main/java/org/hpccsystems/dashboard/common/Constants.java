@@ -260,6 +260,7 @@ public class Constants {
 	public static final String FETCH_INPUT_PARAM = "fetch_input_parameters";
     public static final String ON_SAVE_INTERACTIVITY = "onSaveInteractivity";
     public static final String ON_SELECT_INTERACTIVITY_FILTER = "onSelectInteractivityFilter";
+    public static final String ON_GENERATE_DYNAMIC_TITLE = "onGenerateDynamicTitle";
     
     
     public static final String INPUT_PARAM_NAME = "inputParamName";
@@ -267,6 +268,7 @@ public class Constants {
     public static final String SELECTED_RADIO_BTN = "selectedRadioBtn";
     public static final String INPUT_PARAM_NAMES = "inputParamNames";
     public static final String INPUT_PARAM_QUERY = "inputParamQuery";
+  
    
 	
 }

@@ -18,8 +18,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
-import java.util.stream.Collectors;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpSession;
 import javax.xml.bind.JAXBException;
@@ -37,7 +37,7 @@ import org.hpccsystems.dashboard.chart.entity.InputParam;
 import org.hpccsystems.dashboard.chart.entity.Interactivity;
 import org.hpccsystems.dashboard.chart.entity.RelevantData;
 import org.hpccsystems.dashboard.chart.entity.TableData;
-import org.hpccsystems.dashboard.chart.entity.TextData;
+import org.hpccsystems.dashboard.chart.entity.TitleColumn;
 import org.hpccsystems.dashboard.chart.entity.XYChartData;
 import org.hpccsystems.dashboard.chart.gauge.GaugeChartData;
 import org.hpccsystems.dashboard.chart.tree.entity.TreeData;
@@ -323,7 +323,7 @@ public class DashboardController extends SelectorComposer<Window>{
                 RequestParams requestParams = (RequestParams) Sessions.getCurrent().getAttribute(Constants.REQUEST_PRAMS);
                 if(requestParams.hasInputParams()) {
                     dashboard.setHasCommonFilter(true);
-                    dashboard.setCommonQueryFilters(requestParams.getInputParams());
+                    dashboard.addCommonQueryFilters(requestParams.getInputParams());
                     for (InputParam inputparam : requestParams.getInputParams()) {
                         applyInputParamToPortlets(inputparam, false);
                     }
@@ -457,7 +457,7 @@ public class DashboardController extends SelectorComposer<Window>{
                 
             });
                
-            dashboard.setCommonQueryFilters(persistedGlobalInputParams);
+            dashboard.addCommonQueryFilters(persistedGlobalInputParams);
         }
         
         if (LOG.isDebugEnabled()) {
@@ -870,6 +870,8 @@ public class DashboardController extends SelectorComposer<Window>{
         //Updating widget with latest filter details into DB
        widgetService.updateWidget(portlet);
         
+       Events.postEvent("onChangeInputParamChangeTitle",panel, null);
+       
         if(Constants.CATEGORY_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()){    
             //Refreshing table with updated filter values
             panel.drawTableWidget(true);
@@ -915,6 +917,9 @@ public class DashboardController extends SelectorComposer<Window>{
                     && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()
                     && Constants.CATEGORY_SCORED_SEARCH_TABLE != chartService.getCharts().get(portlet.getChartType()).getCategory()) {
                 
+                if(commonInputParams == null){
+                    commonInputParams =  new LinkedHashMap<String, Map<String,Set<String>>>();
+                }                
                 //As dashboard has commonfilter enabled,setting ''hasCommonFileter' true for the  chart panel
                 //It will tell whether to fetch the fresh hpcc data while selecting the inputparam button.
                 List<Component> chartPanels = portalChildren.get(portlet.getColumn()).getChildren();
@@ -971,6 +976,8 @@ public class DashboardController extends SelectorComposer<Window>{
         }
         Sessions.getCurrent().setAttribute(Constants.COMMON_FILTERS, appliedCommonInputParam);
         appliedCommonInputParam.add(inputparam);
+        dashboard.addCommonQueryFilter(inputparam);
+        
         row.setAttribute(Constants.INPUT_PARAM_NAME, inputparam.getName());
         row.setAttribute(Constants.INPUT_PARAM_VALUE, inputDistinctValues);
         
@@ -1106,8 +1113,7 @@ public class DashboardController extends SelectorComposer<Window>{
      *     Constructed row
      * @throws Exception
      */
-    private Row createStringFilterRow(Filter filter)
-            throws HpccConnectionException,RemoteException {
+    private Row createStringFilterRow(Filter filter) throws HpccConnectionException,RemoteException {
         Row row = new Row();
         //if selected any filter values,set Row selected as true
         if(filter.getValues() != null && !filter.getValues().isEmpty()){
@@ -1529,6 +1535,9 @@ public class DashboardController extends SelectorComposer<Window>{
                     InputParam removedInputparam = new InputParam(removedInput);
                     //Need To remove the filter from applied inputparam set
                     appliedCommonInputParam.remove(removedInputparam);
+                    if(dashboard.getCommonQueryFilters() != null){
+                        dashboard.getCommonQueryFilters().remove(removedInputparam);
+                    }
                 }
             
             // refreshing the chart && updating DB
@@ -1653,6 +1662,13 @@ public class DashboardController extends SelectorComposer<Window>{
         
         portletsToRefresh.forEach(portlet ->{
             portlet.getChartData().getInputParams().remove(removedInputparam);
+            //resetting the title column value to null while removing a inputparam
+            if(portlet.getTitleColumns() != null){
+                TitleColumn titleCol = new TitleColumn("",  removedInputparam.getName());
+                if(portlet.getTitleColumns().contains(titleCol)){
+                    portlet.getTitleColumns().get(portlet.getTitleColumns().indexOf(titleCol)).setValue(null);
+                }
+            }
         });
         return portletsToRefresh;
     
@@ -1970,6 +1986,13 @@ public class DashboardController extends SelectorComposer<Window>{
                     dashboard.getCommonQueryFilters().remove(inputparam);
                     if(portlet.getChartData().getInputParams().contains(inputparam)){
                         portlet.getChartData().getInputParams().remove(inputparam);
+                        //resetting the title colum value while removing a inputparam
+                        if(portlet.getTitleColumns() != null){
+                            TitleColumn titleCol = new TitleColumn("",  inputparam.getName());
+                            if(portlet.getTitleColumns().contains(titleCol)){
+                                portlet.getTitleColumns().get(portlet.getTitleColumns().indexOf(titleCol)).setValue(null);
+                            }
+                        }
                     }
                 });
                 try {
@@ -1998,6 +2021,7 @@ public class DashboardController extends SelectorComposer<Window>{
                         if (portlet.getChartData().getFilters().isEmpty()) {
                             portlet.getChartData().setIsFiltered(false);
                         }
+                        
                     }
                 });
               

@@ -1,3 +1,30 @@
+.title-textbox {
+  border: none !important;
+  border-radius: 0px !important;
+  color: rgb(246, 246, 246) !important;
+  margin-top: 4px !important;
+  font-family: monospace !important;
+  font-size: 15px !important;
+  padding-top: 3px !important;
+  background-color: rgb(107, 107, 107) !important;	
+}
+
+.title-label {
+	color: black;
+	font-weight: 600;
+  	margin-top: 4px;
+  	height: 31px;
+}
+
+.radio, .checkbox {
+	margin-top: 0px;
+  	margin-bottom: 0px;
+}
+
+.list-combo > input {
+	  background: white;
+}
+
 .grayscale-image {  
    -webkit-filter: grayscale(0.9); /* Webkit */  
    filter: gray; /* IE6-9 */  

@@ -205,11 +205,11 @@
 
 /*-- CSS for Y axis Threshold  Start--*/
 
-.c3-ygrid-line.gridy line {
-           stroke: #7B68EE;
+.c3-ygrid-line.gridmin line {
+           stroke: green;
        }
 
-.c3-ygrid-line.gridy2 line {
-           stroke: #FF69B4;
+.c3-ygrid-line.gridmax line {
+           stroke: red;
        }
 /*-- CSS for Y axis Threshold End--*/

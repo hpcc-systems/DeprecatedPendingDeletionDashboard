@@ -29,10 +29,12 @@ import org.hpccsystems.dashboard.chart.cluster.ClusterLink;
 import org.hpccsystems.dashboard.chart.cluster.ClusterNode;
 import org.hpccsystems.dashboard.chart.cluster.Relation;
 import org.hpccsystems.dashboard.chart.entity.Attribute;
+import org.hpccsystems.dashboard.chart.entity.ChartData;
 import org.hpccsystems.dashboard.chart.entity.Filter;
 import org.hpccsystems.dashboard.chart.entity.InputParam;
 import org.hpccsystems.dashboard.chart.entity.Measure;
 import org.hpccsystems.dashboard.chart.entity.TableData;
+import org.hpccsystems.dashboard.chart.entity.TitleColumn;
 import org.hpccsystems.dashboard.chart.entity.XYChartData;
 import org.hpccsystems.dashboard.chart.entity.XYGroup;
 import org.hpccsystems.dashboard.chart.entity.XYModel;
@@ -89,6 +91,7 @@ public class ChartRenderer {
 	private static final String Y_THRESHOLD_MAX= "yThresholdMax";
     private static final String Y2_THRESHOLD_MAX = "y2ThresholdMax";
     private static final String HIDE_Y2_AXIS = "hideY2Axis";
+    private static final String ENABLED_Y2_AXIS = "enabledY2Axis";
     
     private HPCCService hpccService;
     private ChartService chartService;
@@ -200,10 +203,16 @@ public class ChartRenderer {
         try    {
             List<XYModel> list = null;
             if(chartData.isGrouped()) {
-                list = refactorResult(hpccService.getChartData(chartData), chartData);
+                list = refactorResult(hpccService.getChartData(chartData,portlet.getTitleColumns()), chartData);
             }else {
-                list = hpccService.getChartData(chartData);
+                list = hpccService.getChartData(chartData,portlet.getTitleColumns());
+            }  
+            if(chartData.getIsQuery()){
+                setTitleColValFromInputparam(portlet.getTitleColumns(),chartData.getInputParams());
             }
+            
+            LOG.debug("Title values --->"+ portlet.getTitleColumns());
+            
             iterator = list.iterator();    
         }catch(ParserConfigurationException | SAXException
                 | IOException | ServiceException | HpccConnectionException e)    {
@@ -356,6 +365,7 @@ public class ChartRenderer {
         header.addProperty(Y2_THRESHOLD_MIN, chartData.getY2ThresholdValMin());
         header.addProperty(Y2_THRESHOLD_MAX, chartData.getY2ThresholdVaMaxl());
         header.addProperty(HIDE_Y2_AXIS, chartData.getHideY2Axis());
+        header.addProperty(ENABLED_Y2_AXIS, chartData.getIsScondaryAxisEnabled());
 
         String data = header.toString();
         if (LOG.isDebugEnabled()) {
@@ -365,6 +375,20 @@ public class ChartRenderer {
         portlet.setChartDataJSON(data);
     }
     
+    public void setTitleColValFromInputparam(List<TitleColumn> titleColumns,List<InputParam> inputparams) {
+        if(titleColumns !=null && inputparams != null){
+            //get title column value from inputparam
+            titleColumns.forEach(titleColumn ->{
+               InputParam titleParam = new InputParam(titleColumn.getName().trim());
+                  if(inputparams.contains(titleParam)){
+                      InputParam  param = inputparams.get(
+                              inputparams.indexOf(titleParam)) ;
+                      titleColumn.setValue(param.getValue());
+                 }
+            });
+        }        
+    }
+
     private List<XYModel> refactorResult(List<XYModel> input,
             XYChartData chartData) throws HpccConnectionException,
             ServiceException, ParserConfigurationException, SAXException,
@@ -728,7 +752,7 @@ public class ChartRenderer {
 	        xyChartData.getMeasures().add(chartData.getTotal());
 	    }
 	    try {
-            List<XYModel> list = hpccService.getChartData(xyChartData);
+            List<XYModel> list = hpccService.getChartData(xyChartData,portlet.getTitleColumns());
             
             GaugeElement element;
             List<GaugeElement> elements = new ArrayList<GaugeElement>();
@@ -790,7 +814,7 @@ public class ChartRenderer {
 	    Set<String> linkCategories = new HashSet<String>();
 	    
 	    try {
-            Map<String, List<Attribute>> result = hpccService.fetchTableData(tableData);
+            Map<String, List<Attribute>> result = hpccService.fetchTableData(tableData,portlet.getTitleColumns());
             int numOfNodes = result.entrySet().iterator().next().getValue().size();
             
             //Map of Node index to the unique identifier column 

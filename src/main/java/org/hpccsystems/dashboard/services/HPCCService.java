@@ -16,6 +16,7 @@ import org.hpccsystems.dashboard.chart.entity.ChartData;
 import org.hpccsystems.dashboard.chart.entity.Field;
 import org.hpccsystems.dashboard.chart.entity.HpccConnection;
 import org.hpccsystems.dashboard.chart.entity.TableData;
+import org.hpccsystems.dashboard.chart.entity.TitleColumn;
 import org.hpccsystems.dashboard.chart.entity.XYChartData;
 import org.hpccsystems.dashboard.chart.entity.XYModel;
 import org.hpccsystems.dashboard.chart.tree.entity.Level;
@@ -46,13 +47,14 @@ public interface HPCCService {
     
      /**
       * getChartData() is used the retrieve the ChartData details and render the D3 charts.
+     * @param titleColumns 
      * @param chartParamsMap
      * @return List<BarChart>
      * @throws XPathExpressionException TODO
      * @throws Exception 
      * 
      */
-    List<XYModel> getChartData(XYChartData data)
+    List<XYModel> getChartData(XYChartData data, List<TitleColumn> titleColumns)
             throws HpccConnectionException, ParserConfigurationException,
             SAXException, IOException, ServiceException, XPathExpressionException;
     
@@ -95,7 +97,7 @@ public interface HPCCService {
      * @return
      * @throws Exception
      */
-    Map<String, List<Attribute>> fetchTableData(TableData data)
+    Map<String, List<Attribute>> fetchTableData(TableData data,List<TitleColumn> titleColumns)
             throws HpccConnectionException, RemoteException;
     
     /**

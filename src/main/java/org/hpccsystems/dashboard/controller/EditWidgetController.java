@@ -341,6 +341,10 @@ public class EditWidgetController extends SelectorComposer<Component> {
         portlet.setChartData(chartData);
         try {
             Div div = chartPanel.removeStaticImage();
+            
+            //Send event to change the chart title if the title is dynamic
+            //'ModelID:<$ModelID>Actual:<$Cur_Period>'
+            Events.postEvent(Constants.ON_GENERATE_DYNAMIC_TITLE, chartPanel, null);
 
             //For Table Widget
             if(Constants.CATEGORY_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()) {

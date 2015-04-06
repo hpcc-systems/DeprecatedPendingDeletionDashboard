@@ -14,6 +14,7 @@ public class XYChartData extends ChartData {
     private Attribute attribute;
     private Attribute groupAttribute;
     private List<Measure> measures;
+    private Measure threshold;    
     private Boolean isGrouped = false;
     private XYGroup group;
     private BigDecimal yAxisMinVal; 
@@ -25,11 +26,11 @@ public class XYChartData extends ChartData {
     private Double yThresholdValMax;
 	private Double y2ThresholdValMin;
 	private Double y2ThresholdValMax;
-	private Boolean hideY2Axis;
+	private boolean hideY2Axis;
+	private boolean dynamicYThresholdEnabled;
+	private boolean isScondaryAxisEnabled;
 
-	
-
-	public XYChartData() {
+    public XYChartData() {
     }
     
     public XYChartData(ChartData chartData) {
@@ -192,12 +193,21 @@ public class XYChartData extends ChartData {
     }
     
     @XmlElement
-    public Boolean getHideY2Axis() {
+    public boolean getHideY2Axis() {
         return hideY2Axis;
     }
 
-    public void setHideY2Axis(Boolean hideY2Axis) {
+    public void setHideY2Axis(boolean hideY2Axis) {
         this.hideY2Axis = hideY2Axis;
+    }
+    
+    @XmlElement
+    public boolean getIsScondaryAxisEnabled() {
+        return isScondaryAxisEnabled;
+    }
+
+    public void setIsScondaryAxisEnabled(boolean enableScondaryAxis) {
+        this.isScondaryAxisEnabled = enableScondaryAxis;
     }
     
     public boolean hasAttribute(Attribute attribute) {
@@ -223,6 +233,17 @@ public class XYChartData extends ChartData {
     public String getxAxisLabel() {
         return getAttribute().getDisplayName() != null ? getAttribute().getDisplayName() : getAttribute().getColumn();
     }
+    
+    @XmlElement
+    public boolean getDynamicYThresholdEnabled() {
+        return dynamicYThresholdEnabled;
+    }
+
+    public void setDynamicYThresholdEnabled(boolean dynamicYThresholdEnabled) {
+        this.dynamicYThresholdEnabled = dynamicYThresholdEnabled;
+    }
+
+
     
     /**
      * @return
@@ -260,6 +281,15 @@ public class XYChartData extends ChartData {
         labels[0] = label.toString();
         labels[1] = secondaryLabel.toString();
         return labels;
+    }
+
+    @XmlElement
+    public Measure getThreshold() {
+        return threshold;
+    }
+
+    public void setThreshold(Measure threshold) {
+        this.threshold = threshold;
     }
 
   
