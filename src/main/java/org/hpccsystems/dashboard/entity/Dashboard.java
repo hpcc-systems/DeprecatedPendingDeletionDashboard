@@ -305,7 +305,6 @@ public class Dashboard {
 
     public String getFileType() {
         ChartService chartService = (ChartService) SpringUtil.getBean("chartService");
-        if(this.getHasCommonFilter()){
             for(Portlet portlet : this.getPortletList()){
                 if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())
                         && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()
@@ -319,7 +318,6 @@ public class Dashboard {
                     }
                 }
             }
-        }
         return null;
     }
 

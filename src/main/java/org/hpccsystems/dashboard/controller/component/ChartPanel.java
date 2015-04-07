@@ -459,7 +459,7 @@ public class ChartPanel extends Panel {
                 if ((Constants.CATEGORY_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory())
                         ||(Constants.CATEGORY_TEXT_EDITOR == chartService.getCharts().get(portlet.getChartType()).getCategory())
                         ||(Constants.CATEGORY_SCORED_SEARCH_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory())) {
-                	holderDiv.setHeight(String.valueOf(UiGenerator.getScreenSize().height-250)+"px");
+                	holderDiv.setHeight(String.valueOf(UiGenerator.getScreenSize().height-240)+"px");
                 } else {
                 	holderDiv.setVflex("1");	
                 }
@@ -572,7 +572,7 @@ public class ChartPanel extends Panel {
         Toolkit tk = Toolkit.getDefaultToolkit();
         Dimension d = tk.getScreenSize();
         StringBuilder sb = new StringBuilder();
-        sb.append(d.height-260);
+        sb.append(d.height-240);
         sb.append("px");
         holderDiv.setHeight(sb.toString());
     }
