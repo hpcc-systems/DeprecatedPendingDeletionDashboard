@@ -1,7 +1,5 @@
 package org.hpccsystems.dashboard.controller.component; 
 
-import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.io.IOException;
 import java.rmi.RemoteException;
 import java.util.ArrayList;
@@ -55,7 +53,6 @@ import org.hpccsystems.dashboard.services.GroupService;
 import org.hpccsystems.dashboard.services.HPCCQueryService;
 import org.hpccsystems.dashboard.services.HPCCService;
 import org.hpccsystems.dashboard.services.WidgetService;
-import org.hpccsystems.dashboard.util.UiGenerator;
 import org.springframework.dao.DataAccessException;
 import org.xml.sax.SAXException;
 import org.zkoss.util.resource.Labels;
@@ -369,7 +366,7 @@ public class ChartPanel extends Panel {
         titleTextbox.setVflex("1");
         titleTextbox.setSclass("title-textbox");
        
-        titleTextbox.setMaxlength(60);
+        titleTextbox.setMaxlength(200);
         titlelabel.addEventListener(Events.ON_CLICK, enableTitleEdit);
         titleTextbox.addEventListener(Events.ON_BLUR, titleChangeLisnr);
 
@@ -459,7 +456,11 @@ public class ChartPanel extends Panel {
                 if ((Constants.CATEGORY_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory())
                         ||(Constants.CATEGORY_TEXT_EDITOR == chartService.getCharts().get(portlet.getChartType()).getCategory())
                         ||(Constants.CATEGORY_SCORED_SEARCH_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory())) {
-                	holderDiv.setHeight(String.valueOf(UiGenerator.getScreenSize().height-240)+"px");
+                    
+                    int screenHeight = Integer.parseInt(Sessions.getCurrent()
+                            .getAttribute(Constants.SCREEN_HEIGHT).toString());
+                    Sessions.getCurrent().getAttribute(Constants.SCREEN_HEIGHT);
+                	holderDiv.setHeight(String.valueOf(screenHeight-240)+"px");
                 } else {
                 	holderDiv.setVflex("1");	
                 }
@@ -569,10 +570,12 @@ public class ChartPanel extends Panel {
     }
 
     private void setHeight() {
-        Toolkit tk = Toolkit.getDefaultToolkit();
-        Dimension d = tk.getScreenSize();
-        StringBuilder sb = new StringBuilder();
-        sb.append(d.height-240);
+        int screenHeight = Integer.parseInt(Sessions.getCurrent()
+                .getAttribute(Constants.SCREEN_HEIGHT).toString());
+        Sessions.getCurrent().getAttribute(Constants.SCREEN_HEIGHT);
+        
+        StringBuilder sb = new StringBuilder();       
+        sb.append(screenHeight-240);
         sb.append("px");
         holderDiv.setHeight(sb.toString());
     }

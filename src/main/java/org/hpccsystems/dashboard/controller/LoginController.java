@@ -33,10 +33,13 @@ import org.hpccsystems.dashboard.services.UserCredential;
 import org.zkoss.util.Locales;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.web.Attributes;
+import org.zkoss.zhtml.Div;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Session;
 import org.zkoss.zk.ui.Sessions;
+import org.zkoss.zk.ui.event.Event;
+import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
@@ -78,6 +81,8 @@ public class LoginController extends SelectorComposer<Component> {
     Label message;
     @Wire
     Listbox apps;
+    @Wire
+    Div mydiv; 
     
     @Wire
     Button login;
@@ -129,6 +134,16 @@ public class LoginController extends SelectorComposer<Component> {
             Clients.showNotification(Labels.getLabel("unableToRetrieveApplications"), false);
             LOG.error(Constants.EXCEPTION, ex);
         }
+        
+        this.getSelf().addEventListener(Constants.ON_LOAD_PAGE, new EventListener<Event>() {
+
+            @Override
+            public void onEvent(Event event) throws Exception {
+                LOG.debug("Screen Height-->"+event.getData());
+                Sessions.getCurrent().setAttribute(Constants.SCREEN_HEIGHT, event.getData());
+            }
+            
+        });
     }
 
 
@@ -167,7 +182,7 @@ public class LoginController extends SelectorComposer<Component> {
     }
 
     @Listen("onClick=#login")
-    public void doLogin() throws IOException {
+    public void doLogin() throws IOException {       
         Boolean isLoginSuccessful = false;
         User user = null;
         if (LOG.isDebugEnabled()) {
