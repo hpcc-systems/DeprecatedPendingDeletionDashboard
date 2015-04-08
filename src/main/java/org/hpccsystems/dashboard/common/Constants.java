@@ -13,6 +13,7 @@ public class Constants {
     public static final String ACTIVE_DASHBOARD_ID = "activeDashboardId";
     public static final String ACTIVE_DASHBOARD_NAME = "activeDashboard";
     public static final String ACTIVE_DASHBOARD_ROLE = "activeDashboardRole";
+    public static final String SCREEN_HEIGHT = "screenHeight";
     
     public static final String PORTLET = "portlet";
     public static final String LEVEL = "level";
@@ -261,6 +262,7 @@ public class Constants {
     public static final String ON_SAVE_INTERACTIVITY = "onSaveInteractivity";
     public static final String ON_SELECT_INTERACTIVITY_FILTER = "onSelectInteractivityFilter";
     public static final String ON_GENERATE_DYNAMIC_TITLE = "onGenerateDynamicTitle";
+    public static final String ON_LOAD_PAGE = "onLoadPage";
     
     
     public static final String INPUT_PARAM_NAME = "inputParamName";

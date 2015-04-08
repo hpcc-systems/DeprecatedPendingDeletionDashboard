@@ -895,8 +895,11 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
                     }
                 }
                 
+                dataObj.setyAxisValues(valueList);
+                dataList.add(dataObj);
+                
                 //Threshold
-                if(!isThresholdSet && chartData.getDynamicYThresholdEnabled() && chartData.getThreshold() != null) {
+                if(s == 0 && !isThresholdSet && chartData.getDynamicYThresholdEnabled() && chartData.getThreshold() != null) {
                     Measure threshold = chartData.getThreshold();
                     lstNmElmntLst = fstElmnt.getElementsByTagName(threshold.getColumn() + "_low");                
                     lstNmElmnt = (Element) lstNmElmntLst.item(0);
@@ -933,8 +936,7 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
                         }
                     }
                 }
-                dataObj.setyAxisValues(valueList);
-                dataList.add(dataObj);
+               
             }
         }
         LOG.debug("dataList ->" + dataList);

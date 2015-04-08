@@ -248,8 +248,4 @@ public class UiGenerator {
         }
     }
     
-    public static Dimension getScreenSize(){
-    	Toolkit tk = Toolkit.getDefaultToolkit();
-        return tk.getScreenSize();
-    }
 }

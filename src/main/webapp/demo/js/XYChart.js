@@ -1,6 +1,5 @@
 function createXYChart (divId, chartData) {
 	var response = jq.parseJSON(chartData);
-	console.log("chartData -->"+chartData)
 	var divElement = jq('$'+divId).empty();
 	
 	var showLegend = false;

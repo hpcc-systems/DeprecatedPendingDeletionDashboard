@@ -7,10 +7,14 @@
     <!-- styles -->
     <link href="demo/css/bootstrap/css/bootstrap.min.css" rel="stylesheet" />
     <link rel="stylesheet" href="demo/css/login.css" />
-	
+	<script type="text/javascript">
+		function screeRes() {
+		zAu.send(new zk.Event(zk.Widget.$("$loginDiv"),'onLoadPage', screen.height, {toServer:true}));
+		}
+	</script>
   </head>
 
-  <body> 	
+  <body onLoad="screeRes();"> 	
 	<zscript>
     org.apache.commons.logging.LogFactory.getLog("Login page").error( 
 			"Arg : " + Executions.getCurrent().getArg() +
@@ -18,7 +22,7 @@
 			" Attributes : " + Executions.getCurrent().getAttributes() + 
 			" User Principal: " +  Executions.getCurrent().getUserPrincipal() );
     </zscript>
-     <zul:div apply="org.hpccsystems.dashboard.controller.LoginController"> 
+     <zul:div apply="org.hpccsystems.dashboard.controller.LoginController" id="loginDiv"> 
 	<div class="navbar navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
