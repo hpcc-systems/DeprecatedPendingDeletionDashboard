@@ -1,0 +1,13 @@
+{
+  "name": "dagre",
+  "_cacheHeaders": {
+    "ETag": "\"b62dde66ad8ebeec9f7dfe35b9c17ef580f33978\"",
+    "Content-Length": "338163",
+    "Content-Type": "text/plain; charset=utf-8"
+  },
+  "_release": "e-tag:b62dde66a",
+  "main": "index.js",
+  "_source": "https://raw.githubusercontent.com/cpettitt/dagre/v0.7.1/dist/dagre.js",
+  "_target": "*",
+  "_originalSource": "https://raw.githubusercontent.com/cpettitt/dagre/v0.7.1/dist/dagre.js"
+}

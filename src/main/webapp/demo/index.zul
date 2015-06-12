@@ -16,9 +16,8 @@
 
 <!-- Adding Dependencies of Relavant chart -->
 <?script src="https://code.jquery.com/jquery-1.11.1.min.js" ?>
-<?script src="http://handsontable.com/dist/handsontable.full.js" ?>
-<?script src="js/relevant/widgets/lib/requirejs/require.js"?>
-<?script src="js/relevant/widgets/config.js"?>
+<?script src="js/relevant/visualization/bower_components/requirejs/require.js"?> 
+<?script src="js/relevant/visualization/src/config.js"?>
 
 <zk >
 	<script type="text/javascript">
