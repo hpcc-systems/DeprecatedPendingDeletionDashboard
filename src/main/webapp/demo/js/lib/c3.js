@@ -6106,7 +6106,6 @@
         };
         return axis;
     }
-
+   
     window.c3 = c3;
-
 })(window);
