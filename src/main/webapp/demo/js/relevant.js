@@ -11,12 +11,14 @@ function createRelevantChart(divId, reqData) {
 	
         var table = null;
         var doRandom = null;
-        var cholderDiv = null;
+        var chartHolderDiv = null;
         var divElement = null;
         var width = null;
         var height = null;
         var transitionDuration = 250;
         var tables = [];
+        var frame = null;
+        var main = null;
         
         requirejs.config({
 			baseUrl: "js/relevant/visualization/a"
@@ -30,10 +32,30 @@ function createRelevantChart(divId, reqData) {
         	console.log("Loading relevant widgets...");
         	
         	divElement = jq('$'+divId).empty();
+        	
+        	divElement.append(jq("<header>" +
+					"<nav>" +
+						"<a style=\"float:left;\" class=\"back\"> <i class=\"fa fa-arrow-left\"></i></a>"+	
+						"<div style=\"height:37px;border-left:1px solid #000;display:inline;float:left;\"> &nbsp;</div>"+
+						"<select style=\"float:left;\" id=\"selectbox\" class=\"chartOptions\">"+
+						"<option value=\"\">-layout-</option>"+
+						"<option value=\"Randomize\">Randomize</option>"+
+						"<option value=\"Circle\">Circle</option>"+
+						"<option value=\"ForceDirected\">Force Directed</option>"+
+						"<option value=\"Animated\">Force Directed(Animated)</option>"+
+						"<option value=\"Hierarchy\">Hierarchy</option>"+
+						"<option value=\"Show/Hide\">Show/Hide</option>"+
+						"<option value=\"Fit\">Zoom:Fit</option>"+
+						"<option value=\"Expand\">Zoom:Width</option>"+
+						"<option value=\"ZoomSelected\">Zoom:Selection</option>"+
+						"<option value=\"Zoom\">Zoom:100%</option>"+
+						"</select>"+						
+				 	"</nav>" +
+				 "</header>"));
+        	
         	divElement.append(jq("<div id='chartHolder' class='about' />" ));
-        	divElement.append(jq("<div id='table' class='about tableDiv'/>" ));
-        	cholderDiv = d3.select(divElement.get(0)).select("#chartHolder").attr('id');
-        	console.log("container to attach chart: "+cholderDiv);
+        	chartHolderDiv = d3.select(divElement.get(0)).select("#chartHolder").attr('id');
+        	console.log("container to attach chart: "+chartHolderDiv);
         	
         	// size of the diagram
             width = divElement.width();
@@ -83,7 +105,7 @@ function createRelevantChart(divId, reqData) {
                 populateTableV(selectionTable, selection);
             };
             
-            /*var claimsChart = new Column()
+            var claimsChart = new Column()
 		            .columns(["Date", "Amount"])
 		            .selectionMode(true)
 		            .xAxisType("timeseries")
@@ -95,18 +117,19 @@ function createRelevantChart(divId, reqData) {
                 .selection(selection)
                 .render();
             graph.graph_selection(selection);
-        }*/
+        }
 
         
         main = new Grid()
-	        //.setContent(0, 0, claimsChart, "", 1, 4)
+	        .setContent(0, 0, claimsChart, "", 1, 4)
 	        .setContent(1, 0, graph, "", 6, 4)
 	        .setContent(0, 4, selectionTable, "Selection", 7, 1)
 	        .setContent(7, 0, vertexTable, "", 2, 5) ;
         
         frame = new Surface()
 	        .widget(main)
-	        .target(cholderDiv);
+	        .target(chartHolderDiv)
+	        .render();
         
             var url= "";
             if(chartData.hpccConnection.isHttps == true){
@@ -409,25 +432,6 @@ function createRelevantChart(divId, reqData) {
 				}
 			});
 			
-			divElement.append(jq("<header>" +
-					"<nav>" +
-						"<a style=\"float:left;\" class=\"back\"> <i class=\"fa fa-arrow-left\"></i></a>"+	
-						"<div style=\"height:37px;border-left:1px solid #000;display:inline;float:left;\"> &nbsp;</div>"+
-						"<select style=\"float:left;\" id=\"selectbox\" class=\"chartOptions\">"+
-						"<option value=\"\">-layout-</option>"+
-						"<option value=\"Randomize\">Randomize</option>"+
-						"<option value=\"Circle\">Circle</option>"+
-						"<option value=\"ForceDirected\">Force Directed</option>"+
-						"<option value=\"Animated\">Force Directed(Animated)</option>"+
-						"<option value=\"Hierarchy\">Hierarchy</option>"+
-						"<option value=\"Show/Hide\">Show/Hide</option>"+
-						"<option value=\"Fit\">Zoom:Fit</option>"+
-						"<option value=\"Expand\">Zoom:Width</option>"+
-						"<option value=\"ZoomSelected\">Zoom:Selection</option>"+
-						"<option value=\"Zoom\">Zoom:100%</option>"+
-						"</select>"+						
-				 	"</nav>" +
-				 "</header>"));
 			
         });
         
