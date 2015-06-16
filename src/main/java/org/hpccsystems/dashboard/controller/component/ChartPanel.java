@@ -285,8 +285,7 @@ public class ChartPanel extends Panel {
                     }
                 }
             }else{
-                Map<String,String> inputs = new HashMap<String, String>();
-                
+                Map<String,String> inputs = new HashMap<String, String>();               
                 
                for ( Component comp : inputListbox.getChildren()) {
                     if(comp instanceof InputListitem) {
@@ -668,7 +667,8 @@ public class ChartPanel extends Panel {
         
             InputListitem listitem = new InputListitem("report_no", new HashSet<String>(inputParam), String.valueOf(portlet.getId() + "_board_"));
             inputListbox.appendChild(listitem);
-    }; 
+            listitem.setInputValue(((RelevantData)chartData).getClaimId());            
+      }; 
     
     /**
      * Removes the inputparameters which are already existing in the input param popup
