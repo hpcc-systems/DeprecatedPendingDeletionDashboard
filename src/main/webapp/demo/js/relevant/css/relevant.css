@@ -26,24 +26,6 @@
             width: 800px;
         }
             
-       /* .graph_Vertex .common_Icon .common_Shape .common_FAChar .common_Text{
-            fill: white;
-        }
-        .graph_Vertex.expanding .common_Icon .common_Shape {
-            fill: #b41f3a;
-            stroke: none;
-        }
-        .graph_Vertex.expanding .common_Icon .common_Shape .common_FAChar .common_Text{
-            fill: white;
-        }
-        .graph_Vertex.expanded .common_Icon .common_Shape {
-            fill: #1f77b4;
-            stroke: none;
-        }
-        .graph_Vertex.expanded .common_Icon .common_Shape .common_FAChar .common_Text{
-            fill: white;
-        } */
-           
         ul {
 		  list-style: none;
 		}
@@ -153,7 +135,8 @@
 		  box-shadow: inset 0 1px rgba(255, 255, 255, 0.2), 0 1px rgba(0, 0, 0, 0.2);
 		}
 		
-		/* .graph .graphVertex .vertex.selected .shape {
-    		stroke: red;
-		} */
+		.layout_Surface > h3 {
+		    font-size: initial;
+		}
+		
 		

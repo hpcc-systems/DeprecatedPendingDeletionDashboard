@@ -1,7 +1,8 @@
 /**
  * Code for displaying data for the Relavant graph 
  */
-var graph; 
+var main;
+
 function createRelevantChart(divId, reqData) {
 	var chartData = jq.parseJSON(reqData);
 	console.log(chartData);	
@@ -18,8 +19,7 @@ function createRelevantChart(divId, reqData) {
         var transitionDuration = 250;
         var tables = [];
         var frame = null;
-        var main = null;
-        
+       
         requirejs.config({
 			baseUrl: "js/relevant/visualization/a"
 		});
@@ -67,7 +67,7 @@ function createRelevantChart(divId, reqData) {
             var edgeMap = {};
             var claimMap = {};
             
-            graph = new Graph()
+            var graph = new Graph()
 	            .layout("ForceDirected")
 	            .hierarchyRankDirection("TB")
 	            .hierarchyNodeSeparation(20)
@@ -90,9 +90,9 @@ function createRelevantChart(divId, reqData) {
                 this.graph_selection(graph.selection());
             };
             
-            var selectionTable = new Table();
+           var selectionTable = new Table();
 
-            var vertexTable = new Table();
+           var vertexTable = new Table();
             
             vertexTable.click = function (row, col) {
                 var selection = this.selection().map(function (item) {
@@ -105,7 +105,7 @@ function createRelevantChart(divId, reqData) {
                 populateTableV(selectionTable, selection);
             };
             
-            var claimsChart = new Column()
+       var claimsChart = new Column()
 		            .columns(["Date", "Amount"])
 		            .selectionMode(true)
 		            .xAxisType("timeseries")
@@ -194,15 +194,14 @@ function createRelevantChart(divId, reqData) {
                             element.classed("expanding", false);
                             element.classed("expanded", true);
                         }
-                        console.log("response.claim_list -->",response.claim_list);
-                        response.claim_list.forEach(function (item, i) {                        	
+                        response.claim_list.forEach(function (item, i) {   
+                        	console.log(item.accident_time);
                             var claim = getVertex("c_" + item.report_no, "\uf0d6", item.report_no, item);
                             claimMap[item.report_no] = {
                                     date: item.accident_time,
                                     amount: item.claim_amount,
                                     claim: claim
                                 };
-                            
                             var annotations = [];
                             if (item.road_accident && item.road_accident !== "0") {
                                 annotations.push({
@@ -231,11 +230,9 @@ function createRelevantChart(divId, reqData) {
                             }
                             claim.annotationIcons(annotations);
                         });
-                        console.log("response.claim_list-->",response.claim_list);
                         response.claim_list.forEach(function (item, i) {
                         	getVertex("c_" + item.report_no, chartData.claimImage, item.report_no, item);
                         });
-                        console.log("response.policy_list -->", response.policy_list);
                         response.policy_list.forEach(function (item, i) {
                             getVertex("pol_" + item.car_mark, chartData.policyImage, item.car_mark, item);
                         });
@@ -271,17 +268,18 @@ function createRelevantChart(divId, reqData) {
                         
                         var claimsData = [];
                         for (var key in claimMap) {
-                            claimsData.push([claimMap[key].date, claimMap[key].amount, claimMap[key].claim]);
+                        	claimsData.push([claimMap[key].date, claimMap[key].amount, claimMap[key].claim]);
                         }
+                        console.log("claimsData-->",claimsData);
                         claimsChart
                             .data(claimsData)
-                            .render() ;
+                            .render();
                         
                         populateTableH(vertexTable, vertices);
                     });
                 }
             }
-
+            
             function populateTableV(table, selection) {
                 var columns = ["Property"];
                 var propIdx = {};
@@ -438,8 +436,8 @@ function createRelevantChart(divId, reqData) {
 }
 
 function resizeGraph() {
-	if(graph){
-		graph.resize();
+	if(main){
+		main.resize().render();
 	}
 }
 	
