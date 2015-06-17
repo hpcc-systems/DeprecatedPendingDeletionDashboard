@@ -438,20 +438,21 @@ public class DashboardController extends SelectorComposer<Window>{
                         && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()
                         && Constants.CATEGORY_SCORED_SEARCH_TABLE != chartService.getCharts().get(portlet.getChartType()).getCategory()) {
                     
-                    List<InputParam>  portletInputs = new ArrayList<InputParam>();   
-                    portlet.getChartData().getInputParams().stream().forEach(inputparam -> {
-                        if(inputparam.getIsCommonInput()
-                                && persistedGlobalInputParams.contains(inputparam)){
-                            portletInputs.add(persistedGlobalInputParams
-                                    .get(persistedGlobalInputParams.indexOf(inputparam)));
-                        }else{
-                            portletInputs.add(inputparam);
-                            if (inputparam.getIsCommonInput()) {
-                                persistedGlobalInputParams.add(inputparam);
+                    List<InputParam>  portletInputs = new ArrayList<InputParam>();
+                    if(portlet.getChartData().getInputParams() != null && !portlet.getChartData().getInputParams().isEmpty()){
+                        portlet.getChartData().getInputParams().stream().forEach(inputparam -> {
+                            if(inputparam.getIsCommonInput()
+                                    && persistedGlobalInputParams.contains(inputparam)){
+                                portletInputs.add(persistedGlobalInputParams
+                                        .get(persistedGlobalInputParams.indexOf(inputparam)));
+                            }else{
+                                portletInputs.add(inputparam);
+                                if (inputparam.getIsCommonInput()) {
+                                    persistedGlobalInputParams.add(inputparam);
+                                }
                             }
-                        }
-                    });
-                    
+                        });
+                    }                    
                     portlet.getChartData().setInputParams(portletInputs);
                 }
                 
