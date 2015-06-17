@@ -18,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -1068,9 +1069,13 @@ public class DashboardController extends SelectorComposer<Window>{
             //Checks this portlet query has inputparam with selected inputparam name
             try{
                 for(String file : chartData.getFiles()){
-                    Component tab = commonFilterTabbox.getFirstChild().getChildren().stream().filter(component ->
-                     (component.getAttribute(Constants.INPUT_PARAM_QUERY).equals(file))).findFirst().get();
-                   if(((Set<String>)tab.getAttribute(Constants.INPUT_PARAM_NAMES)).contains(inputparam.getName())){
+                    Optional<Component> option = commonFilterTabbox.getFirstChild().getChildren().stream().filter(component ->
+                    (component.getAttribute(Constants.INPUT_PARAM_QUERY).equals(file))).findFirst();
+                    Component tab = null;
+                    if(option.isPresent()){
+                        tab = option.get();
+                    }
+                   if(tab != null && ((Set<String>)tab.getAttribute(Constants.INPUT_PARAM_NAMES)).contains(inputparam.getName())){
                        hasSelectedInputparam = true;
                    }
                }
@@ -2150,6 +2155,7 @@ public class DashboardController extends SelectorComposer<Window>{
                 List<String> files = new ArrayList<String>();
                 files.addAll(deletedPortlet.getChartData().getFiles());
                 //Removing files to be retained
+              
                 for (String deletedFile : deletedPortlet.getChartData().getFiles()) {
                     for (Portlet portlet : dashboard.getPortletList()) {
                         if(portlet.getWidgetState().equals(Constants.STATE_LIVE_CHART) 
@@ -2160,7 +2166,7 @@ public class DashboardController extends SelectorComposer<Window>{
                         }
                     }
                 }
-                
+                LOG.debug("files after removing-->"+files);
                 //Removing Displayed columns
                 List<Component> componentsToDetach = null;
                
@@ -2242,11 +2248,16 @@ public class DashboardController extends SelectorComposer<Window>{
             Component otherCompWithSameInputparam = null;
             for (InputParam inputparam : appliedCommonInputParam) {
                 try{
-                   final String appliedInput = deletedQueriesInputParams.stream().filter(input ->inputparam.getName().equals(input)).findFirst().get();
+                    Optional<String> optionInput = deletedQueriesInputParams.stream().filter(input ->inputparam.getName().equals(input)).findFirst();
+                    final String appliedInput = optionInput.isPresent() ? optionInput.get():null;
                     if(appliedInput != null){
                         //Check any other query has the same input param
-                        otherCompWithSameInputparam =  commonFilterTabbox.getFirstChild().getChildren().stream().filter(component ->
-                        (((Set<String>)component.getAttribute(Constants.INPUT_PARAM_NAMES)).contains(appliedInput))).findFirst().get();
+                        Optional<Component> option =  commonFilterTabbox.getFirstChild().getChildren().stream().filter(component ->
+                        (((Set<String>)component.getAttribute(Constants.INPUT_PARAM_NAMES)).contains(appliedInput))).findFirst();
+                        if(option.isPresent()){
+                            otherCompWithSameInputparam = option.get();
+                        }
+                       
                         if(otherCompWithSameInputparam == null){
                             inputparamToRemove.add(inputparam);
                         }else{
@@ -2266,8 +2277,11 @@ public class DashboardController extends SelectorComposer<Window>{
             List<Component> rowsToDelete = new ArrayList<Component>();
             Component row = null;
             for (InputParam inputparam  : inputparamToRemove) {
-                row = filterRows.getChildren().stream().filter(component ->
-                (component.getAttribute(Constants.INPUT_PARAM_NAME).equals(inputparam.getName()))).findFirst().get();
+                Optional<Component> option = filterRows.getChildren().stream().filter(component ->
+                (component.getAttribute(Constants.INPUT_PARAM_NAME).equals(inputparam.getName()))).findFirst();
+                if(option.isPresent()){
+                    row = option.get();
+                }                
                 if(row != null){
                     rowsToDelete.add(row);
                 }
@@ -2293,7 +2307,7 @@ public class DashboardController extends SelectorComposer<Window>{
                 filtersToRemove.add(filter);
             }
         }}
-        
+        LOG.debug("filtersToRemove -->"+filtersToRemove);
         Row row;
         Filter rowFilter;
         List<Row> rowsToDelete = new ArrayList<Row>();
@@ -2306,6 +2320,7 @@ public class DashboardController extends SelectorComposer<Window>{
                 }
             }
         }
+        LOG.debug("rowsToDelete -->"+rowsToDelete);
         for (Row row2 : rowsToDelete) {
             row2.detach();
         }
