@@ -215,7 +215,7 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
     private QuerySchema getGenericQuerySchema(String queryName, HpccConnection hpccConnection,String inputParamQuery) throws HpccConnectionException {
         QuerySchema querySchema = new QuerySchema();
         Set<Field> fields = new LinkedHashSet<Field>();
-        Map<String,Set<String>> inputParams = new TreeMap<String, Set<String>>();
+        Map<String,Set<String>> inputParams = new LinkedHashMap<String, Set<String>>();
         querySchema.setFields(fields);
         querySchema.setInputParams(inputParams);
         
@@ -308,7 +308,7 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
     }
     
     private Set<String> extractValues(XPath xPath, Node row){
-        Set<String> values = new HashSet<String>();
+        Set<String> values = new LinkedHashSet<String>();
         try {
             NodeList valueNodes =  (NodeList) xPath.evaluate("field_value/Row/value", row, XPathConstants.NODESET);     
             for (int i = 0; i < valueNodes.getLength(); i++) {
@@ -1081,7 +1081,7 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
             HpccConnection hpccConnection, boolean isGenericQuery,
             String inputParamQuery) throws Exception {
         
-        Set<String> params = new HashSet<String>();
+        Set<String> params = new LinkedHashSet<String>();
         try {
             if(isGenericQuery){
                 
@@ -1676,7 +1676,7 @@ return resultDataMap;
             String queryName, Set<String> inputParams,
             HpccConnection hpccConnection,boolean isGenericQuery, String inputParamQuery) throws Exception {
             
-            Map<String,Set<String>> inputParamValues = new TreeMap<String, Set<String>>();    
+            Map<String,Set<String>> inputParamValues = new LinkedHashMap<String, Set<String>>();    
                 
         try {
                 if(isGenericQuery){

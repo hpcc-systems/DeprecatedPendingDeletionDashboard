@@ -7,8 +7,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.TreeMap;
-
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.chart.entity.ChartData;
@@ -90,7 +88,7 @@ public class InputParametersController extends SelectorComposer<Panel>{
      * @throws Exception
      */
     private void constructInputParameters() throws Exception {
-    	TreeMap<String,Set<String>> paramValues = null;
+    	Map<String,Set<String>> paramValues = null;
       	 Set<String> inputParameter =  null;
       	 
 		if (chartData.getInputParams() == null) {
@@ -98,7 +96,7 @@ public class InputParametersController extends SelectorComposer<Panel>{
 				chartData.getHpccConnection(), chartData.isGenericQuery(),
 				chartData.getInputParamQuery());
 				inputParameter = querySchema.getInputParams().keySet();
-				paramValues = (TreeMap<String, Set<String>>) querySchema.getInputParams();
+				paramValues = querySchema.getInputParams();
 			
 				
 			 InputParam inputParam = null;
@@ -124,7 +122,7 @@ public class InputParametersController extends SelectorComposer<Panel>{
                     chartData.getHpccConnection(), chartData.isGenericQuery(),
                     chartData.getInputParamQuery());
              inputParameter = querySchema.getInputParams().keySet();
-             paramValues = (TreeMap<String, Set<String>>) querySchema.getInputParams();
+             paramValues = querySchema.getInputParams();
             
             
             InputParam tempInput = null;
