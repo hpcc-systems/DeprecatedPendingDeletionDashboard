@@ -2,6 +2,7 @@ package org.hpccsystems.dashboard.services.impl;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.net.URI;
@@ -214,7 +215,7 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
     private QuerySchema getGenericQuerySchema(String queryName, HpccConnection hpccConnection,String inputParamQuery) throws HpccConnectionException {
         QuerySchema querySchema = new QuerySchema();
         Set<Field> fields = new LinkedHashSet<Field>();
-        Map<String,Set<String>> inputParams = new TreeMap<String, Set<String>>();
+        Map<String,Set<String>> inputParams = new LinkedHashMap<String, Set<String>>();
         querySchema.setFields(fields);
         querySchema.setInputParams(inputParams);
         
@@ -307,7 +308,7 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
     }
     
     private Set<String> extractValues(XPath xPath, Node row){
-        Set<String> values = new HashSet<String>();
+        Set<String> values = new LinkedHashSet<String>();
         try {
             NodeList valueNodes =  (NodeList) xPath.evaluate("field_value/Row/value", row, XPathConstants.NODESET);     
             for (int i = 0; i < valueNodes.getLength(); i++) {
@@ -442,73 +443,27 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
     private List<XYModel> getGenericQueryData(XYChartData chartData,List<TitleColumn> titleColumns)
             throws HpccConnectionException, IOException, 
             ParserConfigurationException, SAXException, XPathExpressionException {
-        
+       
        String requestName = getGenericQueryRequestName(chartData);
-       StringBuilder requestbuilder = new StringBuilder(requestName);
-       requestbuilder.append(ROW_NO);
-           
-        StringBuilder urlBuilder = new StringBuilder();
-         List<XYModel> dataList = null;
-        if (chartData.getHpccConnection().getIsSSL()) {
-            urlBuilder.append(Constants.HTTPS);
-        } else {
-            urlBuilder.append(Constants.HTTP);
-        }
-        urlBuilder.append(chartData.getHpccConnection().getHostIp())
-                .append(":")
-                .append(chartData.getHpccConnection().getWsEclPort())
-                .append("/WsEcl/submit/query/")
-                .append(chartData.getHpccConnection().getClusterType())
-                .append("/")
-                .append(chartData.getFiles().iterator().next())
-                .append("/xml?");        
+       String urlStr = null;
+       List<XYModel> dataList;
+       
+       if(requestName != null){
+           urlStr = constructQueryURLWithReqName(requestName,chartData);
+       }else{
+           urlStr = constructQueryURLWithoutReqName(chartData);
+       }
         
-         urlBuilder.append(requestbuilder).append(MEASURE_COLUMN).append("=");
-         Iterator<Measure> measureItr = chartData.getMeasures().iterator();
-         while(measureItr.hasNext()){
-             urlBuilder.append(measureItr.next().getColumn());
-             if (measureItr.hasNext()) {
-                 urlBuilder.append(",");
-             }
-         }
-         
-        urlBuilder.append("&").append(requestbuilder).append(ATTRIBUTE_COLUMN).append("=")
-                .append(chartData.getAttribute().getColumn());
-        
-         if(chartData.isGrouped()){
-             urlBuilder.append("&").append(requestbuilder);
-             urlBuilder.append(GROUPBY_COLUMN).append("=").append(chartData.getGroupAttribute().getColumn());
-         }
-         if (chartData.getInputParams() != null ) {
-             Iterator<InputParam> iterator = chartData.getInputParams().iterator();
-             urlBuilder.append("&");
-             while (iterator.hasNext()) {
-                 InputParam inputParam = iterator.next();
-                 if(!StringUtils.isNullOrEmpty(inputParam.getValue())){
-                     urlBuilder.append(requestbuilder).append(inputParam.getName()).append("=").append(URLEncoder.encode(inputParam.getValue(),Constants.CHAR_CODE));
-                     if (iterator.hasNext()) {
-                         urlBuilder.append("&");
-                     }
-                 }
-             }
-         }
-         
-
-         if(LOG.isDebugEnabled()){
-            LOG.debug("getGenericQueryData() URL -->"+urlBuilder);
-         }        
-        
-         URL url = new URL(urlBuilder.toString());
+         URL url = new URL(urlStr);
          URLConnection urlConnection = url.openConnection();
          String authString = chartData.getHpccConnection().getUsername() + ":"
                  + chartData.getHpccConnection().getPassword();
          String authStringEnc = new String(Base64.encodeBase64(authString.getBytes()));
          urlConnection.setRequestProperty(AUTHORIZATION, BASIC+ authStringEnc);
 
-
-         final InputStream respone = urlConnection.getInputStream();
+         final InputStream respone = urlConnection.getInputStream();        
          
-         if (respone != null) {
+        if (respone != null) {
             dataList = parseHpccData(respone,chartData,titleColumns);            
          } else {
              throw new HpccConnectionException(Constants.UNABLE_TO_FETCH_DATA);
@@ -519,6 +474,123 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
         return dataList;
     }
     
+    private String constructQueryURLWithoutReqName(XYChartData chartData) throws UnsupportedEncodingException {
+            
+         StringBuilder urlBuilder = new StringBuilder();
+         if (chartData.getHpccConnection().getIsSSL()) {
+             urlBuilder.append(Constants.HTTPS);
+         } else {
+             urlBuilder.append(Constants.HTTP);
+         }
+         urlBuilder.append(chartData.getHpccConnection().getHostIp())
+                 .append(":")
+                 .append(chartData.getHpccConnection().getWsEclPort())
+                 .append("/WsEcl/submit/query/")
+                 .append(chartData.getHpccConnection().getClusterType())
+                 .append("/")
+                 .append(chartData.getFiles().iterator().next())
+                 .append("/xml?");        
+         
+          urlBuilder.append(MEASURE_COLUMN).append("=");
+          Iterator<Measure> measureItr = chartData.getMeasures().iterator();
+          while(measureItr.hasNext()){
+              urlBuilder.append(measureItr.next().getColumn());
+              if (measureItr.hasNext()) {
+                  urlBuilder.append(",");
+              }
+          }
+          
+         urlBuilder.append("&").append(ATTRIBUTE_COLUMN).append("=")
+                 .append(chartData.getAttribute().getColumn());
+         
+          if(chartData.isGrouped()){
+              urlBuilder.append("&");
+              urlBuilder.append(GROUPBY_COLUMN).append("=").append(chartData.getGroupAttribute().getColumn());
+          }
+          if (chartData.getInputParams() != null ) {
+              Iterator<InputParam> iterator = chartData.getInputParams().iterator();
+              urlBuilder.append("&");
+              while (iterator.hasNext()) {
+                  InputParam inputParam = iterator.next();
+                  if(!StringUtils.isNullOrEmpty(inputParam.getValue())){
+                    urlBuilder
+                            .append(inputParam.getName())
+                            .append("=")
+                            .append(URLEncoder.encode(inputParam.getValue(),
+                                    Constants.CHAR_CODE));
+                      if (iterator.hasNext()) {
+                          urlBuilder.append("&");
+                      }
+                  }
+              }
+          }          
+
+          if(LOG.isDebugEnabled()){
+             LOG.debug("getGenericQueryData() URL -->"+urlBuilder);
+          }        
+        return urlBuilder.toString();
+    }
+
+    private String constructQueryURLWithReqName(String requestName,XYChartData chartData) throws UnsupportedEncodingException {
+        StringBuilder requestbuilder = new StringBuilder(requestName);
+        requestbuilder.append(ROW_NO);
+            
+         StringBuilder urlBuilder = new StringBuilder();
+         if (chartData.getHpccConnection().getIsSSL()) {
+             urlBuilder.append(Constants.HTTPS);
+         } else {
+             urlBuilder.append(Constants.HTTP);
+         }
+         urlBuilder.append(chartData.getHpccConnection().getHostIp())
+                 .append(":")
+                 .append(chartData.getHpccConnection().getWsEclPort())
+                 .append("/WsEcl/submit/query/")
+                 .append(chartData.getHpccConnection().getClusterType())
+                 .append("/")
+                 .append(chartData.getFiles().iterator().next())
+                 .append("/xml?");        
+         
+          urlBuilder.append(requestbuilder).append(MEASURE_COLUMN).append("=");
+          Iterator<Measure> measureItr = chartData.getMeasures().iterator();
+          while(measureItr.hasNext()){
+              urlBuilder.append(measureItr.next().getColumn());
+              if (measureItr.hasNext()) {
+                  urlBuilder.append(",");
+              }
+          }
+          
+         urlBuilder.append("&").append(requestbuilder).append(ATTRIBUTE_COLUMN).append("=")
+                 .append(chartData.getAttribute().getColumn());
+         
+          if(chartData.isGrouped()){
+              urlBuilder.append("&").append(requestbuilder);
+              urlBuilder.append(GROUPBY_COLUMN).append("=").append(chartData.getGroupAttribute().getColumn());
+          }
+          if (chartData.getInputParams() != null ) {
+              Iterator<InputParam> iterator = chartData.getInputParams().iterator();
+              urlBuilder.append("&");
+              while (iterator.hasNext()) {
+                  InputParam inputParam = iterator.next();
+                  if(!StringUtils.isNullOrEmpty(inputParam.getValue())){
+                    urlBuilder
+                            .append(requestbuilder)
+                            .append(inputParam.getName())
+                            .append("=")
+                            .append(URLEncoder.encode(inputParam.getValue(),
+                                    Constants.CHAR_CODE));
+                      if (iterator.hasNext()) {
+                          urlBuilder.append("&");
+                      }
+                  }
+              }
+          }          
+
+          if(LOG.isDebugEnabled()){
+             LOG.debug("getGenericQueryData() URL -->"+urlBuilder);
+          }        
+        return urlBuilder.toString();
+    }
+
     private String getGenericQueryRequestName(ChartData chartData) throws IOException, XPathExpressionException, ParserConfigurationException, SAXException {
         StringBuilder urlBuilder = new StringBuilder();
        if (chartData.getHpccConnection().getIsSSL()) {
@@ -557,7 +629,7 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
     private String parseGenericQueryRequest(String query, InputStream response)
             throws ParserConfigurationException, SAXException, IOException,
             XPathExpressionException {
-        
+        String reqName = null;
         final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
         final DocumentBuilder db = dbf.newDocumentBuilder();
         final Document doc = db.parse(response);
@@ -567,9 +639,12 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
         NodeList rows = (NodeList) xPath.evaluate("/" + query + "Request", doc, XPathConstants.NODESET);
         
         NodeList list = ((Node)rows.item(0)).getChildNodes();
-        LOG.debug("name ->" +list.item(0).getNodeName()); 
+        if(list.item(0) != null){
+            reqName = list.item(0).getNodeName();
+        }        
+        LOG.debug("Request Row name ->" + reqName); 
         
-        return list.item(0).getNodeName();
+        return reqName;
     }
 
     /**
@@ -1006,7 +1081,7 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
             HpccConnection hpccConnection, boolean isGenericQuery,
             String inputParamQuery) throws Exception {
         
-        Set<String> params = new HashSet<String>();
+        Set<String> params = new LinkedHashSet<String>();
         try {
             if(isGenericQuery){
                 
@@ -1409,8 +1484,7 @@ return resultDataMap;
             ParserConfigurationException, SAXException, HpccConnectionException {
          
          String requestName = getGenericQueryRequestName(tableData);
-         StringBuilder requestbuilder = new StringBuilder(requestName);
-         requestbuilder.append(ROW_NO);
+         StringBuilder requestbuilder = null;
            
          StringBuilder urlBuilder = new StringBuilder();
          if (tableData.getHpccConnection().getIsSSL()) {
@@ -1426,21 +1500,13 @@ return resultDataMap;
          .append("/")
          .append(tableData.getFiles().iterator().next()).append("/xml?");    
          
-
-         if (tableData.getInputParams() != null) {
-             Iterator<InputParam> iterator = tableData.getInputParams().iterator();
-             while (iterator.hasNext()) {
-                 InputParam param = iterator.next();
-                 if(!StringUtils.isNullOrEmpty(param.getValue())){
-                     urlBuilder.append(requestbuilder).append(param.getName()).append("=").append(URLEncoder.encode(param.getValue(),Constants.CHAR_CODE));
-
-                     if (iterator.hasNext()) {
-                         urlBuilder.append("&");
-                     }
-                 }
-             }
+         if(requestName != null){
+             requestbuilder = new StringBuilder(requestName);
+             requestbuilder.append(ROW_NO);
+             urlBuilder.append(addInputparamToURL(requestbuilder,tableData.getInputParams()));
+         }else{
+             urlBuilder.append(addInputparamToURL(tableData.getInputParams()));
          }
-         
 
          URL url = new URL(urlBuilder.toString());
          URLConnection urlConnection = url.openConnection();
@@ -1566,12 +1632,51 @@ return resultDataMap;
          return tableDataMap;
     }
 
+    private Object addInputparamToURL(List<InputParam> inputParams) throws UnsupportedEncodingException {        
+        String urlStr= null;        
+        if (inputParams != null) {
+            StringBuilder urlBuilder = new StringBuilder();
+            Iterator<InputParam> iterator = inputParams.iterator();
+            while (iterator.hasNext()) {
+                InputParam param = iterator.next();
+                if(!StringUtils.isNullOrEmpty(param.getValue())){
+                    urlBuilder.append(param.getName()).append("=").append(URLEncoder.encode(param.getValue(),Constants.CHAR_CODE));
+                    if (iterator.hasNext()) {
+                        urlBuilder.append("&");
+                    }
+                }
+            }
+            urlStr = urlBuilder.toString();
+        }
+        return urlStr;    
+    }
+
+    private String addInputparamToURL(StringBuilder requestbuilder,
+            List<InputParam> inputParams) throws UnsupportedEncodingException {        
+        String urlStr= null;        
+        if (inputParams != null) {
+            StringBuilder urlBuilder = new StringBuilder();
+            Iterator<InputParam> iterator = inputParams.iterator();
+            while (iterator.hasNext()) {
+                InputParam param = iterator.next();
+                if(!StringUtils.isNullOrEmpty(param.getValue())){
+                    urlBuilder.append(requestbuilder).append(param.getName()).append("=").append(URLEncoder.encode(param.getValue(),Constants.CHAR_CODE));
+                    if (iterator.hasNext()) {
+                        urlBuilder.append("&");
+                    }
+                }
+            }
+            urlStr = urlBuilder.toString();
+        }
+        return urlStr;
+    }
+
     @Override
     public Map<String, Set<String>> getInputParamDistinctValues(
             String queryName, Set<String> inputParams,
             HpccConnection hpccConnection,boolean isGenericQuery, String inputParamQuery) throws Exception {
             
-            Map<String,Set<String>> inputParamValues = new TreeMap<String, Set<String>>();    
+            Map<String,Set<String>> inputParamValues = new LinkedHashMap<String, Set<String>>();    
                 
         try {
                 if(isGenericQuery){

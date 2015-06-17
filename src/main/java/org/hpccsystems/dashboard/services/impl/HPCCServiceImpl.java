@@ -18,6 +18,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
@@ -992,8 +993,7 @@ public class HPCCServiceImpl implements HPCCService {
                 fileMeta.setIsDirectory(false);
                 results.add(fileMeta);
             }
-
-            return results;
+            return results.stream().filter(meta -> !meta.getFileName().contains("ins00") && !meta.getFileName().endsWith("_service")).collect(Collectors.toList());
         } catch (RemoteException | ServiceException e) {
             LOG.error(Constants.EXCEPTION, e);
             throw new HpccConnectionException(e.getMessage());
