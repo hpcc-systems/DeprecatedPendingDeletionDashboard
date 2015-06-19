@@ -405,7 +405,7 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
                if( chartData.isGrouped()
                        && chartData.getMeasures().get(0).getAggregateFunction() != null
                        &&!Constants.NONE.equals(chartData.getMeasures().get(0).getAggregateFunction())){
-                            Map<String,Map<String,List<Object>>> groupedData =  getGroupedChartData(urlBuilder,chartData);
+                            Map<String,Map<String,List<Object>>> groupedData =  getGroupedChartData(urlBuilder,chartData,titleColumns);
                             return aggregateGroupedData(groupedData,chartData.getMeasures().get(0).getAggregateFunction());
                }else{
                    dataList = getNonGenericQueryData(urlBuilder,chartData,titleColumns);
@@ -464,7 +464,20 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
          final InputStream respone = urlConnection.getInputStream();        
          
         if (respone != null) {
-            dataList = parseHpccData(respone,chartData,titleColumns);            
+            if(chartData.isGrouped()
+                    && chartData.getMeasures().get(0).getAggregateFunction() != null
+                    &&!Constants.NONE.equals(chartData.getMeasures().get(0).getAggregateFunction())){
+                
+                    final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                    final DocumentBuilder db = dbf.newDocumentBuilder();
+                    final Document doc = db.parse(respone);
+
+                    final NodeList nodeList = doc.getElementsByTagName("Row");
+                    Map<String,Map<String,List<Object>>> groupedRowData  = groupData(nodeList,chartData,titleColumns);                    
+               return aggregateGroupedData(groupedRowData,chartData.getMeasures().get(0).getAggregateFunction());
+            }else{
+                dataList = parseHpccData(respone,chartData,titleColumns);  
+            }
          } else {
              throw new HpccConnectionException(Constants.UNABLE_TO_FETCH_DATA);
          }
@@ -695,10 +708,13 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
      * @throws ParserConfigurationException
      * @throws SAXException
      */
-    private Map<String,Map<String,List<Object>>> getGroupedChartData(StringBuilder urlBuilder, XYChartData chartData) throws HpccConnectionException, IOException,
+    private Map<String, Map<String, List<Object>>> getGroupedChartData(
+            StringBuilder urlBuilder, XYChartData chartData,
+            List<TitleColumn> titleColumns) throws HpccConnectionException,
+            IOException,
             ParserConfigurationException, SAXException {
         
-         Map<String,Map<String,List<Object>>> groupedRowData = new LinkedHashMap<String, Map<String,List<Object>>>();
+         Map<String,Map<String,List<Object>>> groupedRowData = null;
             // Has Input parameter set
             if (chartData.getInputParams() != null ) {
                 Iterator<InputParam> iterator = chartData.getInputParams().iterator();
@@ -724,75 +740,95 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
             }
 
         final InputStream respone = urlConnection.getInputStream();
-        Attribute firstxColumnName = null;
-        Attribute groupedxColumnName = null;
+      
         if (respone != null) {
             final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
             final DocumentBuilder db = dbf.newDocumentBuilder();
             final Document doc = db.parse(respone);
 
-            Node fstNode = null;
-            Element fstElmnt = null, lstNmElmnt = null;
-            NodeList lstNmElmntLst = null;
-            Element secondLstNmElmnt = null;
-            NodeList secondLstNmElmntLst = null;
-
-           
-            Map<String, List<Object>> childMap = null;
-            List<Object> yValues = null;
             final NodeList nodeList = doc.getElementsByTagName("Row");
-            for (int s = 0; s < nodeList.getLength(); s++) {
-                fstNode = nodeList.item(s);
-                if (fstNode.getNodeType() == Node.ELEMENT_NODE) {
-                    fstElmnt = (Element) fstNode;
-                    //getting first x-column value
-                    firstxColumnName = chartData.getAttribute();
-                        lstNmElmntLst = fstElmnt.getElementsByTagName(firstxColumnName.getColumn());
-                        lstNmElmnt = (Element) lstNmElmntLst.item(0);
-                        if (lstNmElmnt != null) {
-                            if(groupedRowData.get(lstNmElmnt.getTextContent()) != null){
-                                 childMap = groupedRowData.get(lstNmElmnt.getTextContent());                                 
-                            }else{
-                                groupedRowData.put(lstNmElmnt.getTextContent(), new TreeMap<String, List<Object>>());
-                                childMap = groupedRowData.get(lstNmElmnt.getTextContent());
-                            }
-                            
-                        } else {
-                            groupedRowData.put("", new TreeMap<String, List<Object>>());
-                            childMap = groupedRowData.get("");
-                        }   
-                        //getting second x-column value
-                        groupedxColumnName = chartData.getGroupAttribute();
-                         secondLstNmElmntLst = fstElmnt.getElementsByTagName(groupedxColumnName.getColumn());
-                         secondLstNmElmnt = (Element) secondLstNmElmntLst.item(0);
-                         if (secondLstNmElmnt != null) {
-                            if( childMap.get(secondLstNmElmnt.getTextContent()) != null){
-                                yValues = childMap.get(secondLstNmElmnt.getTextContent());
-                            }else{
-                                childMap.put(secondLstNmElmnt.getTextContent(),new ArrayList<Object>());
-                                yValues = childMap.get(secondLstNmElmnt.getTextContent());
-                            } 
-                            
-                         } else {
-                             childMap.put("", new ArrayList<Object>());
-                             yValues = childMap.get("");
-                         }
-                       //getting Y-column value
-                         for (Measure measure : chartData.getMeasures()) {
-                             lstNmElmntLst = fstElmnt.getElementsByTagName(measure.getColumn());
-                             lstNmElmnt = (Element) lstNmElmntLst.item(0);
-                             if (lstNmElmnt != null) {
-                                 yValues.add(new BigDecimal(lstNmElmnt.getTextContent()));
-                             } else {
-                                 yValues.add(new BigDecimal(0));
-                             }
-                         }
-                }
-            }
+            groupedRowData  = groupData(nodeList,chartData,titleColumns);
+            
         } else {
             throw new HpccConnectionException(Constants.UNABLE_TO_FETCH_DATA);
         }
+        if(LOG.isDebugEnabled()){
+            LOG.debug("groupedRowData -->"+groupedRowData);
+        }
         return groupedRowData;    
+    }
+
+    private Map<String, Map<String, List<Object>>> groupData(NodeList nodeList,
+            XYChartData chartData, List<TitleColumn> titleColumns) {
+
+        Map<String,Map<String,List<Object>>> groupedRowData = new LinkedHashMap<String, Map<String,List<Object>>>();
+        
+        Attribute firstxColumnName = null;
+        Attribute groupedxColumnName = null;
+        Node fstNode = null;
+        Element fstElmnt = null, lstNmElmnt = null;
+        NodeList lstNmElmntLst = null;
+        Element secondLstNmElmnt = null;
+        NodeList secondLstNmElmntLst = null;
+
+       
+        Map<String, List<Object>> childMap = null;
+        List<Object> yValues = null;
+        for (int s = 0; s < nodeList.getLength(); s++) {
+            fstNode = nodeList.item(s);
+            if (fstNode.getNodeType() == Node.ELEMENT_NODE) {
+                fstElmnt = (Element) fstNode;
+                //getting first x-column value
+                firstxColumnName = chartData.getAttribute();
+                    lstNmElmntLst = fstElmnt.getElementsByTagName(firstxColumnName.getColumn());
+                    lstNmElmnt = (Element) lstNmElmntLst.item(0);
+                    if (lstNmElmnt != null) {
+                        if(groupedRowData.get(lstNmElmnt.getTextContent()) != null){
+                             childMap = groupedRowData.get(lstNmElmnt.getTextContent());                                 
+                        }else{
+                            groupedRowData.put(lstNmElmnt.getTextContent(), new TreeMap<String, List<Object>>());
+                            childMap = groupedRowData.get(lstNmElmnt.getTextContent());
+                        }
+                        
+                    } else {
+                        groupedRowData.put("", new TreeMap<String, List<Object>>());
+                        childMap = groupedRowData.get("");
+                    }   
+                    //getting second x-column value
+                    groupedxColumnName = chartData.getGroupAttribute();
+                     secondLstNmElmntLst = fstElmnt.getElementsByTagName(groupedxColumnName.getColumn());
+                     secondLstNmElmnt = (Element) secondLstNmElmntLst.item(0);
+                     if (secondLstNmElmnt != null) {
+                        if( childMap.get(secondLstNmElmnt.getTextContent()) != null){
+                            yValues = childMap.get(secondLstNmElmnt.getTextContent());
+                        }else{
+                            childMap.put(secondLstNmElmnt.getTextContent(),new ArrayList<Object>());
+                            yValues = childMap.get(secondLstNmElmnt.getTextContent());
+                        } 
+                        
+                     } else {
+                         childMap.put("", new ArrayList<Object>());
+                         yValues = childMap.get("");
+                     }
+                   //getting Y-column value
+                     for (Measure measure : chartData.getMeasures()) {
+                         lstNmElmntLst = fstElmnt.getElementsByTagName(measure.getColumn());
+                         lstNmElmnt = (Element) lstNmElmntLst.item(0);
+                         if (lstNmElmnt != null) {
+                             yValues.add(new BigDecimal(lstNmElmnt.getTextContent()));
+                         } else {
+                             yValues.add(new BigDecimal(0));
+                         }
+                     }
+                     
+                     //processing title columns.Taking first row value from the Hpcc response 
+                     //when the title columns are part of output columns
+                     if(s == 0 && titleColumns != null){
+                         parseTitle(titleColumns,fstElmnt);
+                     }
+            }
+        }
+        return groupedRowData;
     }
 
     private List<XYModel> doAggregation(List<XYModel> source, XYChartData chartData) {
@@ -937,7 +973,7 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
         List<Object> valueList = null;
 
         final NodeList nodeList = doc.getElementsByTagName("Row");
-        boolean isThresholdSet = false;
+        Boolean isThresholdSet = false;
         for (int s = 0; s < nodeList.getLength(); s++) {
             fstNode = nodeList.item(s);
             if (fstNode.getNodeType() == Node.ELEMENT_NODE) {
@@ -972,51 +1008,67 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
                 
                 dataObj.setyAxisValues(valueList);
                 dataList.add(dataObj);
-                
+               
                 //Threshold
                 if(s == 0 && !isThresholdSet && chartData.getDynamicYThresholdEnabled() && chartData.getThreshold() != null) {
-                    Measure threshold = chartData.getThreshold();
-                    lstNmElmntLst = fstElmnt.getElementsByTagName(threshold.getColumn() + "_low");                
-                    lstNmElmnt = (Element) lstNmElmntLst.item(0);
-                    if (lstNmElmnt != null) {
-                        if(threshold.isSecondary()) {
-                            chartData.setY2ThresholdValMin(Double.valueOf(lstNmElmnt.getTextContent()));
-                        } else {
-                            chartData.setyThresholdValMin(Double.valueOf(lstNmElmnt.getTextContent()));
-                        }
-                    }
-                    
-                    lstNmElmntLst = fstElmnt.getElementsByTagName(threshold.getColumn() + "_high");                
-                    lstNmElmnt = (Element) lstNmElmntLst.item(0);
-                    if (lstNmElmnt != null) {
-                        if(threshold.isSecondary()) {
-                            chartData.setY2ThresholdVaMaxl(Double.valueOf(lstNmElmnt.getTextContent()));
-                        } else {
-                            chartData.setyThresholdValMax(Double.valueOf(lstNmElmnt.getTextContent()));
-                        }
-                    }
-                    
-                    isThresholdSet = true;
+                    parseSecondaryAxis(isThresholdSet,chartData,fstElmnt);
                 }
                 
                 //processing title columns.Taking first row value from the Hpcc response 
                 //when the title columns are part of output columns
                 if(s == 0 && titleColumns != null){
-                    for (TitleColumn titleColumn : titleColumns) {
-                        lstNmElmntLst = fstElmnt.getElementsByTagName(titleColumn.getName());
-                        lstNmElmnt = (Element) lstNmElmntLst.item(0);
-                      
-                        if (lstNmElmnt != null) {
-                            titleColumn.setValue(lstNmElmnt.getTextContent());
-                        }
-                    }
+                    parseTitle(titleColumns,fstElmnt);
                 }
                
             }
         }
-        LOG.debug("dataList ->" + dataList);
+        if(LOG.isDebugEnabled()){
+            LOG.debug("dataList ->" + dataList);            
+        }
+        
         return dataList;
     }
+    private void parseTitle(List<TitleColumn> titleColumns, Element fstElmnt) {
+        Element lstNmElmnt = null;
+        NodeList lstNmElmntLst = null;
+        for (TitleColumn titleColumn : titleColumns) {
+            lstNmElmntLst = fstElmnt.getElementsByTagName(titleColumn.getName());
+            lstNmElmnt = (Element) lstNmElmntLst.item(0);
+          
+            if (lstNmElmnt != null) {
+                titleColumn.setValue(lstNmElmnt.getTextContent());
+            }
+        }        
+    }
+
+    private void parseSecondaryAxis(Boolean isThresholdSet,XYChartData chartData, Element fstElmnt) {
+        Element lstNmElmnt = null;
+        NodeList lstNmElmntLst = null;
+        Measure threshold = chartData.getThreshold();
+        lstNmElmntLst = fstElmnt.getElementsByTagName(threshold.getColumn() + "_low");                
+        lstNmElmnt = (Element) lstNmElmntLst.item(0);
+        if (lstNmElmnt != null) {
+            if(threshold.isSecondary()) {
+                chartData.setY2ThresholdValMin(Double.valueOf(lstNmElmnt.getTextContent()));
+            } else {
+                chartData.setyThresholdValMin(Double.valueOf(lstNmElmnt.getTextContent()));
+            }
+        }
+        
+        lstNmElmntLst = fstElmnt.getElementsByTagName(threshold.getColumn() + "_high");                
+        lstNmElmnt = (Element) lstNmElmntLst.item(0);
+        if (lstNmElmnt != null) {
+            if(threshold.isSecondary()) {
+                chartData.setY2ThresholdVaMaxl(Double.valueOf(lstNmElmnt.getTextContent()));
+            } else {
+                chartData.setyThresholdValMax(Double.valueOf(lstNmElmnt.getTextContent()));
+            }
+        }
+        
+        isThresholdSet = true;
+    
+    }
+
     /**
      * Fetches chart data when no input parameter/Only one input parameter is specified
      * @param urlBuilder
