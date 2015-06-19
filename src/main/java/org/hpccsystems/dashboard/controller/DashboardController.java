@@ -320,13 +320,22 @@ public class DashboardController extends SelectorComposer<Window>{
             //Common Query filters
             //Adding Query params from session
             if(userCredential.hasRole(Constants.ROLE_API_VIEW_DASHBOARD)) {
-                commonFiltersPanel.setVisible(false);
+                if(Constants.ROLE_CONSUMER.equals(dashboard.getRole()) ) {
+                    commonFiltersPanel.setVisible(false);
+                  } else {
+                       commonFiltersPanel.setVisible(true);                    
+                  }
+                
                 RequestParams requestParams = (RequestParams) Sessions.getCurrent().getAttribute(Constants.REQUEST_PRAMS);
                 if(requestParams.hasInputParams()) {
                     dashboard.setHasCommonFilter(true);
                     dashboard.addCommonQueryFilters(requestParams.getInputParams());
                     for (InputParam inputparam : requestParams.getInputParams()) {
-                        applyInputParamToPortlets(inputparam, false);
+                        if (Constants.ROLE_CONTRIBUTOR.equals(dashboard.getRole())
+                                || Constants.ROLE_ADMIN.equals(dashboard.getRole())) {
+                            inputparam.setIsCommonInput(true);
+                          }
+                        applyInputParamToPortlets(inputparam, false); 
                     }
                 }
             }
@@ -337,9 +346,7 @@ public class DashboardController extends SelectorComposer<Window>{
                 addWidget.detach();
             }
             for (Portlet portlet : dashboard.getPortletList()) {  
-                if(userCredential.hasRole(Constants.ROLE_API_VIEW_DASHBOARD)){
-                    panel = new ChartPanel(portlet, Constants.SHOW_NO_BUTTONS);
-                } else if(userCredential.hasRole(Constants.CIRCUIT_ROLE_VIEW_EDIT_DASHBOARD) ||
+              if(userCredential.hasRole(Constants.CIRCUIT_ROLE_VIEW_EDIT_DASHBOARD) ||
                         Constants.ROLE_ADMIN.equals(dashboard.getRole()) ) {
                     panel = new ChartPanel(portlet, Constants.SHOW_ALL_BUTTONS);
                 } else if(Constants.ROLE_CONTRIBUTOR.equals(dashboard.getRole())) {
