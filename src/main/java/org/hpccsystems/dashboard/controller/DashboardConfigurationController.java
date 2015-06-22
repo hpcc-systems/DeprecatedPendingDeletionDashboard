@@ -139,7 +139,6 @@ public class DashboardConfigurationController extends SelectorComposer<Component
             this.getSelf().detach();
         } else {
             //Creating new Board
-            boolean siglePortletEnabled = false;
             if(validateDashboardName()) {
                 dashboard = new Dashboard();
                 // Setting ADMIN role as the dashboard is being created
@@ -153,12 +152,16 @@ public class DashboardConfigurationController extends SelectorComposer<Component
                 
                 //Deciding Columns and rows
                 Integer panelCount = null;
-                panelCount = dashboard.getColumnCount();
-                if(dashboard.getColumnCount() == 0){
-               	 panelCount = 1;
+                if( dashboard.getColumnCount() == 1){
+                	panelCount = 2;
+                } else if (dashboard.getColumnCount() == 2){
+                	panelCount = 4;
+                } else if (dashboard.getColumnCount() == 3){
+                	panelCount = 9;
+                } else if(dashboard.getColumnCount() == 0){
+                	panelCount = 1; 
                	 //for single layout,column & row will be one
                	 dashboard.setColumnCount(1);
-               	siglePortletEnabled = true;
                }
                 
                 if(LOG.isDebugEnabled()){
@@ -172,7 +175,7 @@ public class DashboardConfigurationController extends SelectorComposer<Component
                         //generating portlet id
                         portlet.setColumn(i - 1);
                         portlet.setWidgetState(Constants.STATE_EMPTY);
-                        if(panelCount == 1 && siglePortletEnabled){
+                        if(panelCount == 1 ){
                         	portlet.setIsSinglePortlet(true);
                     	}
                         dashboard.getPortletList().add(portlet);

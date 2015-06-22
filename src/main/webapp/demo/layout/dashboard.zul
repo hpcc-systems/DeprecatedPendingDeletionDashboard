@@ -98,7 +98,7 @@
 			</grid>
 		</panelchildren>
 	</panel>
-	<portallayout maximizedMode="whole">
+	<portallayout>
 		<portalchildren visible="false"/>
 		<portalchildren visible="false"/>
 		<portalchildren visible="false"/>
