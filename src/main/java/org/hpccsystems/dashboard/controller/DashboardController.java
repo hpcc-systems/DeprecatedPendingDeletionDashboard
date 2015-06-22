@@ -28,6 +28,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.rpc.ServiceException;
 import javax.xml.xpath.XPathExpressionException;
 
+import org.apache.axis.utils.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.chart.cluster.ClusterData;
@@ -110,6 +111,7 @@ import org.zkoss.zul.Rows;
 import org.zkoss.zul.Tab;
 import org.zkoss.zul.Tabbox;
 import org.zkoss.zul.Tabpanel;
+import org.zkoss.zul.Textbox;
 import org.zkoss.zul.Toolbar;
 import org.zkoss.zul.Window;
 
@@ -712,12 +714,10 @@ public class DashboardController extends SelectorComposer<Window>{
             listbox.addEventListener(Events.ON_SELECT, paramsSelectListener);
             
             for (Entry<String, Set<String>> inputParamsEntry : entry.getValue().entrySet()) {
-                if(!inputParamsEntry.getValue().isEmpty()){
                     listitem = new Listitem(inputParamsEntry.getKey());
                     listitem.setAttribute(Constants.INPUT_PARAM_NAME, inputParamsEntry.getKey());
-                     listitem.setAttribute(Constants.INPUT_PARAM_VALUE, inputParamsEntry.getValue());
+                    listitem.setAttribute(Constants.INPUT_PARAM_VALUE, inputParamsEntry.getValue());
                     listbox.appendChild(listitem);
-                }
             }
             tabpanel.appendChild(listbox);
             commonFilterTabbox.getFirstChild().appendChild(tab);
@@ -1002,11 +1002,7 @@ public class DashboardController extends SelectorComposer<Window>{
         
         row.appendChild(div);
         
-        Anchorlayout anchorlayout = new Anchorlayout();
-        anchorlayout.setHflex("1");
-        
         Hbox hbox = new Hbox();
-        hbox.appendChild(anchorlayout);
         
         // Current implementation assumes, in a dashboard, 
         // there are no two widgets drawn such that their file names are same but belong to different HPCC Systems
@@ -1014,43 +1010,64 @@ public class DashboardController extends SelectorComposer<Window>{
         //Generating Checkboxes
         Anchorchildren anchorchildren;
         Radio radio;
-        for (String value : inputDistinctValues) {
-            anchorchildren = new Anchorchildren();
-            radio = new Radio(value);
-            radio.setZclass("checkbox");
-            radio.setStyle("margin: 0px; padding-right: 5px;");
+        if(!inputDistinctValues.isEmpty()){
             
-            anchorchildren.appendChild(radio);
-            anchorlayout.appendChild(anchorchildren);
-            //To display previously selected filter values
-            if(value.equals(inputparam.getValue())){
-                radio.setChecked(true);
-                row.setAttribute(Constants.ROW_CHECKED, true);
-                row.setAttribute(Constants.SELECTED_RADIO_BTN, radio);
-            }
-            radio.addEventListener(Events.ON_CLICK, new EventListener<Event>() {
-
-                @Override
-                public void onEvent(Event event) throws Exception {
-                    Radio radio = (Radio) event.getTarget();
-                    Row row = (Row) radio.getParent().getParent().getParent().getParent();
-
+            Anchorlayout anchorlayout = new Anchorlayout();
+            anchorlayout.setHflex("1");
+            hbox.appendChild(anchorlayout);
+            
+            for (String value : inputDistinctValues) {
+                anchorchildren = new Anchorchildren();
+                radio = new Radio(value);
+                radio.setZclass("checkbox");
+                radio.setStyle("margin: 0px; padding-right: 5px;");
+                
+                anchorchildren.appendChild(radio);
+                anchorlayout.appendChild(anchorchildren);
+                //To display previously selected filter values
+                if(value.equals(inputparam.getValue())){
+                    radio.setChecked(true);
                     row.setAttribute(Constants.ROW_CHECKED, true);
-                    inputparam.setValue(radio.getLabel());
-                    inputparam.setIsCommonInput(true);
-                    applyInputParamToPortlets(inputparam, true);
-                    
-                   if(row.getAttribute(Constants.SELECTED_RADIO_BTN) != null){
-                      ( (Radio)row.getAttribute(Constants.SELECTED_RADIO_BTN)).setSelected(false);
-                   }
-                   row.setAttribute(Constants.SELECTED_RADIO_BTN, radio);
-                   
-                // Set Common HpccConnection to session, if this is first common filter applied
-                   setCommonHpccConnection();
+                    row.setAttribute(Constants.SELECTED_RADIO_BTN, radio);
                 }
+                radio.addEventListener(Events.ON_CLICK, new EventListener<Event>() {
+    
+                    @Override
+                    public void onEvent(Event event) throws Exception {
+                        Radio radio = (Radio) event.getTarget();
+                        Row row = (Row) radio.getParent().getParent().getParent().getParent();
+    
+                        row.setAttribute(Constants.ROW_CHECKED, true);
+                        inputparam.setValue(radio.getLabel());
+                        inputparam.setIsCommonInput(true);
+                        applyInputParamToPortlets(inputparam, true);
+                        
+                       if(row.getAttribute(Constants.SELECTED_RADIO_BTN) != null){
+                          ( (Radio)row.getAttribute(Constants.SELECTED_RADIO_BTN)).setSelected(false);
+                       }
+                       row.setAttribute(Constants.SELECTED_RADIO_BTN, radio);
+                       
+                    // Set Common HpccConnection to session, if this is first common filter applied
+                       setCommonHpccConnection();
+                    }
+                });
+            }
+        }else{
+            //If input parameter has no value, display textbox
+            Textbox textbox = new Textbox();
+            textbox.setHflex("1");
+            hbox.appendChild(textbox);
+            //Displaying the value which is retrieved from DB/previously selected
+            if(StringUtils.isEmpty(inputparam.getValue())){
+                textbox.setValue(inputparam.getValue());
+            }
+            textbox.addEventListener(Events.ON_BLUR, (event)->{
+                inputparam.setValue(textbox.getValue().trim());
+                inputparam.setIsCommonInput(true);
+                applyInputParamToPortlets(inputparam, true);
+                row.setAttribute(Constants.ROW_CHECKED, true);
             });
-        }
-        
+        }        
         row.appendChild(hbox);
         
         return row;
@@ -1074,21 +1091,17 @@ public class DashboardController extends SelectorComposer<Window>{
                 hasSelectedInputparam = true;
             }
             //Checks this portlet query has inputparam with selected inputparam name
-            try{
-                for(String file : chartData.getFiles()){
-                    Optional<Component> option = commonFilterTabbox.getFirstChild().getChildren().stream().filter(component ->
-                    (component.getAttribute(Constants.INPUT_PARAM_QUERY).equals(file))).findFirst();
-                    Component tab = null;
-                    if(option.isPresent()){
-                        tab = option.get();
-                    }
-                   if(tab != null && ((Set<String>)tab.getAttribute(Constants.INPUT_PARAM_NAMES)).contains(inputparam.getName())){
-                       hasSelectedInputparam = true;
-                   }
-               }
-            }catch(NoSuchElementException e){
-                //Need not to log this exception
-            }
+             for(String file : chartData.getFiles()){
+                 Optional<Component> option = commonFilterTabbox.getFirstChild().getChildren().stream().filter(component ->
+                 (component.getAttribute(Constants.INPUT_PARAM_QUERY).equals(file))).findFirst();
+                  Component tab = null;
+                  if(option.isPresent()){
+                      tab = option.get();
+                  }
+                  if(tab != null && ((Set<String>)tab.getAttribute(Constants.INPUT_PARAM_NAMES)).contains(inputparam.getName())){
+                      hasSelectedInputparam = true;
+                  }
+              }
              
              if(hasSelectedInputparam){
                  if(chartData.getInputParams() == null){
