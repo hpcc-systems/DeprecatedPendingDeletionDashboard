@@ -522,7 +522,7 @@ public class ChartPanel extends Panel {
                 columToReplace = new StringBuffer();
                 columToReplace.append("<$").append(titleColumn.getName()).append(">");                
                 if(chartName.contains(columToReplace)){
-                    chartName = chartName.replace(columToReplace, titleColumn.getValue());
+                    chartName = chartName.replace(columToReplace, titleColumn.getValue().toUpperCase());
                 }
             }
         }
