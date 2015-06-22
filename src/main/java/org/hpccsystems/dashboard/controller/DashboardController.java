@@ -1058,7 +1058,7 @@ public class DashboardController extends SelectorComposer<Window>{
             textbox.setHflex("1");
             hbox.appendChild(textbox);
             //Displaying the value which is retrieved from DB/previously selected
-            if(StringUtils.isEmpty(inputparam.getValue())){
+            if(!StringUtils.isEmpty(inputparam.getValue())){
                 textbox.setValue(inputparam.getValue());
             }
             textbox.addEventListener(Events.ON_BLUR, (event)->{
