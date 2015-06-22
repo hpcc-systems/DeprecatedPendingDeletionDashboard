@@ -573,8 +573,13 @@ public class ChartPanel extends Panel {
                 .getAttribute(Constants.SCREEN_HEIGHT).toString());
         Sessions.getCurrent().getAttribute(Constants.SCREEN_HEIGHT);
         
-        StringBuilder sb = new StringBuilder();       
-        sb.append(385);
+        StringBuilder sb = new StringBuilder();
+        if(portlet.getIsSinglePortlet()){
+        	sb.append(screenHeight-240);	
+        } else {
+        	sb.append(385);	
+        }
+        
         sb.append("px");
         holderDiv.setHeight(sb.toString());
     }
