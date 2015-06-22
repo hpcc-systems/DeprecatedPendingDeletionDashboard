@@ -369,7 +369,7 @@ public class EditChartController extends SelectorComposer<Component> {
                 chartData.removeAttribute();
             }
             if (groupColumnExist) {
-                createAttributeListChild(attribute, true);
+                createAttributeListChild(groupAttribute, true);
             } else {
                 chartData.removeGroupAttribute();
             }
