@@ -369,7 +369,7 @@ public class EditChartController extends SelectorComposer<Component> {
                 chartData.removeAttribute();
             }
             if (groupColumnExist) {
-                createAttributeListChild(attribute, true);
+                createAttributeListChild(groupAttribute, true);
             } else {
                 chartData.removeGroupAttribute();
             }
@@ -484,10 +484,6 @@ public class EditChartController extends SelectorComposer<Component> {
         }
         if (chartData.isGrouped() && !chartData.getMeasures().isEmpty()) {
             Clients.showNotification(Labels.getLabel("chartAlreadyGrouped"), Constants.ERROR_NOTIFICATION, yAxisListbox, Constants.POSITION_END_CENTER, 3000, true);
-            return;
-        }
-        if(chartData.isGrouped() && Constants.NONE.equals(measure.getAggregateFunction())){
-            Clients.showNotification(Labels.getLabel("dropAggregatedMeasureAsChartGrouped"), Constants.ERROR_NOTIFICATION, yAxisListbox, Constants.POSITION_END_CENTER, 3000, true);
             return;
         }
         
@@ -805,11 +801,6 @@ public class EditChartController extends SelectorComposer<Component> {
         if (chartData.hasMultipleMeasures() || chartData.isGrouped()) {
             Clients.showNotification(Labels.getLabel("chartAlreadyGrouped"), Constants.ERROR_NOTIFICATION, 
                     groupListbox, Constants.POSITION_END_CENTER, 3000, true);
-            return;
-        }
-        
-        if(!chartData.getMeasures().isEmpty() && !chartData.hasMultipleMeasures() && Constants.NONE.equals(chartData.getMeasures().get(0).getAggregateFunction())){
-            Clients.showNotification(Labels.getLabel("dropAggregatedMeasureToGroupe"), Constants.ERROR_NOTIFICATION, yAxisListbox, Constants.POSITION_END_CENTER, 3000, true);
             return;
         }
         

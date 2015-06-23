@@ -522,7 +522,7 @@ public class ChartPanel extends Panel {
                 columToReplace = new StringBuffer();
                 columToReplace.append("<$").append(titleColumn.getName()).append(">");                
                 if(chartName.contains(columToReplace)){
-                    chartName = chartName.replace(columToReplace, titleColumn.getValue());
+                    chartName = chartName.replace(columToReplace, titleColumn.getValue().toUpperCase());
                 }
             }
         }
@@ -573,8 +573,13 @@ public class ChartPanel extends Panel {
                 .getAttribute(Constants.SCREEN_HEIGHT).toString());
         Sessions.getCurrent().getAttribute(Constants.SCREEN_HEIGHT);
         
-        StringBuilder sb = new StringBuilder();       
-        sb.append(screenHeight-240);
+        StringBuilder sb = new StringBuilder();
+        if(portlet.getIsSinglePortlet()){
+        	sb.append(screenHeight-240);	
+        } else {
+        	sb.append(385);	
+        }
+        
         sb.append("px");
         holderDiv.setHeight(sb.toString());
     }

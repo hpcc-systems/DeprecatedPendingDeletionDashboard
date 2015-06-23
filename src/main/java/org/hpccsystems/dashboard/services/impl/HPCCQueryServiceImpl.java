@@ -402,11 +402,14 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
 
                //Input parameter may not have any value selected
                //or it has single value selected for a single input parameter               
-               if( chartData.isGrouped()
-                       && chartData.getMeasures().get(0).getAggregateFunction() != null
-                       &&!Constants.NONE.equals(chartData.getMeasures().get(0).getAggregateFunction())){
+                if (chartData.isGrouped()) {
                             Map<String,Map<String,List<Object>>> groupedData =  getGroupedChartData(urlBuilder,chartData,titleColumns);
-                            return aggregateGroupedData(groupedData,chartData.getMeasures().get(0).getAggregateFunction());
+                            if(chartData.getMeasures().get(0).getAggregateFunction() != null 
+                                    && !Constants.NONE.equals(chartData.getMeasures().get(0).getAggregateFunction())){
+                                return aggregateGroupedDataToXYModel(groupedData,chartData.getMeasures().get(0).getAggregateFunction());
+                            }else{
+                                return createXYModelFromGroupedData(groupedData);  
+                            }
                }else{
                    dataList = getNonGenericQueryData(urlBuilder,chartData,titleColumns);
                    LOG.debug("dataList -->"+dataList);
@@ -464,21 +467,24 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
          final InputStream respone = urlConnection.getInputStream();        
          
         if (respone != null) {
-            if(chartData.isGrouped()
-                    && chartData.getMeasures().get(0).getAggregateFunction() != null
-                    &&!Constants.NONE.equals(chartData.getMeasures().get(0).getAggregateFunction())){
-                
-                    final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
-                    final DocumentBuilder db = dbf.newDocumentBuilder();
-                    final Document doc = db.parse(respone);
+            if (chartData.isGrouped()) {
+                final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+                final DocumentBuilder db = dbf.newDocumentBuilder();
+                final Document doc = db.parse(respone);
 
-                    final NodeList nodeList = doc.getElementsByTagName("Row");
-                    Map<String,Map<String,List<Object>>> groupedRowData  = groupData(nodeList,chartData,titleColumns);                    
-               return aggregateGroupedData(groupedRowData,chartData.getMeasures().get(0).getAggregateFunction());
-            }else{
-                dataList = parseHpccData(respone,chartData,titleColumns);  
+                final NodeList nodeList = doc.getElementsByTagName("Row");
+                Map<String, Map<String, List<Object>>> groupedRowData = groupData(nodeList, chartData, titleColumns);
+                if (chartData.getMeasures().get(0).getAggregateFunction() != null 
+                        &&!Constants.NONE.equals(chartData.getMeasures().get(0).getAggregateFunction())) {
+                    return aggregateGroupedDataToXYModel(groupedRowData, chartData.getMeasures().get(0).getAggregateFunction());
+                } else {
+                    return createXYModelFromGroupedData(groupedRowData);
+                }
+
+            } else {
+                dataList = parseHpccData(respone, chartData, titleColumns);
             }
-         } else {
+        } else {
              throw new HpccConnectionException(Constants.UNABLE_TO_FETCH_DATA);
          }
          if(LOG.isDebugEnabled()){
@@ -660,13 +666,40 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
         return reqName;
     }
 
+    private List<XYModel> createXYModelFromGroupedData(Map<String, Map<String, List<Object>>> groupedData) {
+        List<XYModel> dataList = new ArrayList<XYModel>();
+        List<Object> xvalueList = null;
+        List<Object> yvalueList = null;
+        Object xValue = null;
+        XYModel xyModel = null;
+        for(Entry<String, Map<String, List<Object>>> entry :groupedData.entrySet()){
+            xValue =  entry.getKey();
+           
+            for(Entry<String, List<Object>> group : entry.getValue().entrySet()){
+                xvalueList = new ArrayList<Object>();
+                xvalueList.add(xValue);
+                xvalueList.add(group.getKey());
+                yvalueList = new ArrayList<Object>();
+                for (Object object : group.getValue()) {
+                    yvalueList.add(object);
+               }
+                xyModel = new XYModel();
+                xyModel.setxAxisValues(xvalueList);
+                xyModel.setyAxisValues(yvalueList);
+                dataList.add(xyModel);
+            }
+             
+        }
+        LOG.debug("Aggregated dataList -->"+dataList);
+       return dataList;
+    }
     /**
      * Aggregates chart data while grouping more attributes/x-columns with aggregate function
      * @param groupedData
      * @param aggregateFn
      * @return List<XYModel>
      */
-    private List<XYModel> aggregateGroupedData(Map<String, Map<String, List<Object>>> groupedData,String aggregateFn) {
+    private List<XYModel> aggregateGroupedDataToXYModel(Map<String, Map<String, List<Object>>> groupedData,String aggregateFn) {
         
          List<XYModel> dataList = new ArrayList<XYModel>();
          List<Object> xvalueList = null;
