@@ -119,7 +119,6 @@ function createXYChart (divId, chartData) {
 				y: {
 					min: yMin,
 					max: yMax,
-		            padding: {top:0, bottom:0},
 					tick: {
 		                format: d3.format(",.2r")
 		            },

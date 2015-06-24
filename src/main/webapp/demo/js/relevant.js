@@ -1,8 +1,9 @@
 /**
  * Code for displaying data for the Relavant graph 
  */
-var main;
-
+var graphData = [];
+var graph;
+var frame;
 function createRelevantChart(divId, reqData) {
 	var chartData = jq.parseJSON(reqData);
 	console.log(chartData);	
@@ -18,7 +19,6 @@ function createRelevantChart(divId, reqData) {
         var height = null;
         var transitionDuration = 250;
         var tables = [];
-        var frame = null;
        
         requirejs.config({
 			baseUrl: "js/relevant/visualization/a"
@@ -27,8 +27,8 @@ function createRelevantChart(divId, reqData) {
 
 	        require([ "src/layout/Surface", "src/layout/Grid", "src/other/Comms",
 					"src/graph/Graph", "src/graph/Edge", "src/graph/Vertex",
-					"src/other/Table", "src/chart/Column" ],
-			function(Surface, Grid, Comms, Graph, Edge, Vertex, Table, Column) {
+					"src/other/Table", "src/chart/Column","src/other/Persist" ],
+			function(Surface, Grid, Comms, Graph, Edge, Vertex, Table, Column, Persist) {
         	console.log("Loading relevant widgets...");
         	
         	divElement = jq('$'+divId).empty();
@@ -67,7 +67,7 @@ function createRelevantChart(divId, reqData) {
             var edgeMap = {};
             var claimMap = {};
             
-            var graph = new Graph()
+           graph = new Graph()
 	            .layout("ForceDirected")
 	            .hierarchyRankDirection("TB")
 	            .hierarchyNodeSeparation(20)
@@ -76,8 +76,27 @@ function createRelevantChart(divId, reqData) {
 	            .highlightOnMouseOverVertex(true) ;
             
             graph.vertex_dblclick = function (d) {
-                d3.event.stopPropagation();
-                callService(d._id, d.element());
+            	 d3.event.stopPropagation();
+            	 //backup the present vertices and edges of graph object, will be used for back button
+            	/* var vertexedgeMap = [];
+            	 var vertex;
+            	 var edge;
+            	 var vertexStr = [];
+            	 var edgeStr = [];
+                 for (var index = 0; index < graph.data().vertices.length; index++) {
+                	 vertex = graph.data().vertices[index];                	
+                	 vertexStr.push(Persist.serialize(vertex));
+                 }
+            	
+                 for (var index = 0; index < graph.data().edges.length; index++) {
+                	 edge = graph.data().edges[index];
+                	 edgeStr.push(Persist.serialize(edge));
+                 }
+                 vertexedgeMap["vertices"] = vertexStr;
+                 vertexedgeMap["edges"] = edgeStr;
+                 graphData.push(vertexedgeMap);
+                 console.log('vertexedgeMap -->',vertexedgeMap);*/
+                callService(d._id, d.element()); 
             };
             
             graph.graph_selection = function (selection) {
@@ -120,14 +139,14 @@ function createRelevantChart(divId, reqData) {
         }
 
         
-        main = new Grid()
+        var main = new Grid()
 	        .setContent(0, 0, claimsChart, "", 1, 4)
 	        .setContent(1, 0, graph, "", 6, 4)
 	        .setContent(0, 4, selectionTable, "Selection", 7, 1)
 	        .setContent(7, 0, vertexTable, "", 2, 5) ;
         
-        frame = new Surface()
-	        .widget(main)
+        frame = new Surface();        
+        frame.widget(main)
 	        .target(chartHolderDiv)
 	        .render();
         
@@ -230,6 +249,7 @@ function createRelevantChart(divId, reqData) {
                             }
                             claim.annotationIcons(annotations);
                         });
+                       
                         response.claim_list.forEach(function (item, i) {
                         	getVertex("c_" + item.report_no, chartData.claimImage, item.report_no, item);
                         });
@@ -262,10 +282,10 @@ function createRelevantChart(divId, reqData) {
                         });
 
                         graph
-                            .data({ vertices: vertices, edges: edges, merge: true })
+                           .data({ vertices: vertices, edges: edges, merge: true })
                             .render()
                             .layout(graph.layout(), transitionDuration);
-                        
+                      
                         var claimsData = [];
                         for (var key in claimMap) {
                         	claimsData.push([claimMap[key].date, claimMap[key].amount, claimMap[key].claim]);
@@ -429,15 +449,42 @@ function createRelevantChart(divId, reqData) {
 						
 				}
 			});
+			divElement.on("click", ".back",function() {
+				
+				/*var backupGraph = graphData.pop();
+				var verticesAry = backupGraph["vertices"];
+				var edgesAry = backupGraph["edges"];
+				var newData = {
+					    vertices: [],
+					    edges: [],
+					    merge : false
+					};	
+				for(var index = 0; index < verticesAry.length; index++){	
+					Persist.create(verticesAry[index], function(vertex) {
+						newData.vertices.push(vertex)
+						});
+				}
+				
+				for(var index = 0; index < edgesAry.length; index++){					
+					Persist.create(edgesAry[index], function(edge) {
+						newData.edges.push(edge)
+						});
+				}
+				
+				graph
+                 .data({ vertices: newData.vertices, edges: newData.edges, merge: false })
+                  .render();*/
+				
+				/* main.setContent(1, 0, graph, "", 6, 4);
+				 main.render();*/
+			});
 			
-			
-        });
-        
+        });        
 }
 
 function resizeGraph() {
-	if(main){
-		main.resize().render();
+	if(frame){
+		frame.resize().render();
 	}
 }
 	
