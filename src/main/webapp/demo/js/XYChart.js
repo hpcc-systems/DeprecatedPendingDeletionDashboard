@@ -39,7 +39,7 @@ function createXYChart (divId, chartData) {
 	var fullWidth = divElement.width();
 	
 	//checking the minimum height for browser and component and set the same as window height. 
-	if(divElement.parent().parent().height()<($(window).height()-150)){fullHeight = divElement.parent().parent().height();}
+	if(divElement.parent().parent().height()<($(window).height()-150)){fullHeight = divElement.parent().parent().height()-30;}
 	else{fullHeight = ($(window).height()-150);}
 	
 	if(divElement.width()>$(window).width()){fullWidth = $(window).width();}
@@ -119,7 +119,6 @@ function createXYChart (divId, chartData) {
 				y: {
 					min: yMin,
 					max: yMax,
-		            padding: {top:0, bottom:0},
 					tick: {
 		                format: d3.format(",.2r")
 		            },
