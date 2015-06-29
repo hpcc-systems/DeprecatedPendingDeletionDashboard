@@ -113,12 +113,13 @@ function createXYChart (divId, chartData) {
 				width:{
 	            ratio: 0.5 // this makes bar width 50% of length between ticks
 			    },
-			    zerobased:false
+			    //zerobased:false //Enabling zero based scale,as a bar which starts at the min value not shown
 			},
 			axis: {
 				y: {
 					min: yMin,
 					max: yMax,
+					padding: {top:0, bottom:0},
 					tick: {
 		                format: d3.format(",.2r")
 		            },
@@ -155,7 +156,7 @@ function createXYChart (divId, chartData) {
 			
 			tooltip: {
 		        format: {
-		           // value: d3.format('f')
+		            value: d3.format('f')
 		        }
 		    },
 			legend: {
