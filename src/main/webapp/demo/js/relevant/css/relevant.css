@@ -37,7 +37,7 @@
 		  /* right: 0; */
 		  z-index: 2;
 		  height: 37px;
-		  line-height: 37px;
+		  line-height: 32px;
 		  color: #ddd;
 		  text-shadow: 0 -1px black;
 		  background: #243942;
@@ -90,6 +90,7 @@
 		  border-right: 1px solid #2f4b56;
 		  border-right: 1px solid rgba(255, 255, 255, 0.05);
 		  cursor: pointer;
+		  line-height: 36px;
 		}
 		header nav a:hover {
 		  background: #2f4b56;
@@ -100,15 +101,7 @@
 		  background-position: 12px 11px;
 		  background-repeat: no-repeat;
 		}
-		/* header nav a.tasks {
-		  background-image: url("../img/tasks.png");
-		}
-		header nav a.messages {
-		  background-image: url("../img/messages.png");
-		}
-		header nav a.settings {
-		  background-image: url("../img/settings.png");
-		} */
+		
 		header nav li.active a, header nav a:active {
 		  padding-right: 16px;
 		  background-color: #1b2b32;
@@ -137,6 +130,30 @@
 		
 		.layout_Surface > h3 {
 		    font-size: initial;
+		}
+		
+		.showHideSelectTableLabel {
+			  color:#000; 
+  			  text-shadow: none; 
+		}
+		input[type="checkbox"].showHideSelectTable{
+			margin:0;
+		}
+		
+		.graph_Graph .graphVertex .graph_Vertex.selected .common_Shape .common_Shape{
+ 			 stroke: #f48a00 !important;
+		}
+		
+		.common_TextBox.selected .common_Shape .common_Shape{
+  			fill: #f48a00;  			
+		}
+		
+		.graph_Graph .graphVertex .graph_Vertex.selected .common_TextBox .common_Shape {
+   			 fill: #f48a00;
+		}
+
+		 .graph_Graph .graphVertex .graph_Vertex.selected .common_TextBox .common_Text {
+   		 fill:white;
 		}
 		
 		

@@ -377,7 +377,7 @@ public class SidebarController extends GenericForwardComposer<Component>{
             final Navitem dropped = (Navitem) event.getTarget();
             final List<Component> list = navBar.getChildren();
             swapDashboard(list, dragged, dropped);
-            }
+        }
     };
 
     /**Swaps dashboard
@@ -393,21 +393,28 @@ public class SidebarController extends GenericForwardComposer<Component>{
                 if (currentNavitem.equals(dropped)) {
                     navBar.insertBefore(dragged, dropped);
                     updateDashboardSequence();
+                    addNavitemSelectListener(currentNavitem);
                     return;
                 } else if (currentNavitem.equals(dragged)) {
                     navBar.insertBefore(dropped, dragged);
                     updateDashboardSequence();
+                   addNavitemSelectListener(currentNavitem);
                     return;
-                }
-                if (authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_EDIT_DASHBOARD)) {
-                    currentNavitem.addEventListener(Events.ON_CLICK,apiNavItemSelectLisnr);
-                } else {
-                    currentNavitem.addEventListener(Events.ON_CLICK,navItemSelectLisnr);
-                }
-            }
+                }       
+            }      
         }
     }
         
+    private void addNavitemSelectListener(Navitem currentNavitem) {
+        if (authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_VIEW_EDIT_DASHBOARD)) {
+            currentNavitem.removeEventListener(Events.ON_CLICK, apiNavItemSelectLisnr);
+            currentNavitem.addEventListener(Events.ON_CLICK,apiNavItemSelectLisnr);
+        } else {
+            currentNavitem.removeEventListener(Events.ON_CLICK, navItemSelectLisnr);
+            currentNavitem.addEventListener(Events.ON_CLICK,navItemSelectLisnr);
+        }
+    }
+
     private void updateDashboardSequence() {
         try{
         List<Integer> dashboardList = new ArrayList<Integer>();
