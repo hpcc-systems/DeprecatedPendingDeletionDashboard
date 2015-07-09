@@ -171,7 +171,7 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
 
             urlConnection = url.openConnection();
             urlConnection.setRequestProperty(AUTHORIZATION, BASIC + authStringEnc);
-
+            
             doc = dBuilder.parse(urlConnection.getInputStream());
             doc.getDocumentElement().normalize();
 
@@ -607,6 +607,65 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
           if(LOG.isDebugEnabled()){
              LOG.debug("getGenericQueryData() URL -->"+urlBuilder);
           }        
+        return urlBuilder.toString();
+    }
+    
+    private String constructComplicatedTreeQuery(String requestName,TreeData chartData, List<TreeFilter> treeFilters) throws UnsupportedEncodingException {
+        StringBuilder requestbuilder = new StringBuilder(requestName);
+        requestbuilder.append(ROW_NO);
+        
+        StringBuilder urlBuilder = new StringBuilder();
+        if (chartData.getHpccConnection().getIsSSL()) {
+            urlBuilder.append(Constants.HTTPS);
+        } else {
+            urlBuilder.append(Constants.HTTP);
+        }
+        urlBuilder.append(chartData.getHpccConnection().getHostIp())
+        .append(":")
+        .append(chartData.getHpccConnection().getWsEclPort())
+        .append("/WsEcl/submit/query/")
+        .append(chartData.getHpccConnection().getClusterType())
+        .append("/")
+        .append(chartData.getFiles().iterator().next())
+        .append("/xml?");        
+
+        if (chartData.getInputParams() != null ) {
+            Iterator<InputParam> iterator = chartData.getInputParams().iterator();
+            urlBuilder.append("&");
+            while (iterator.hasNext()) {
+                InputParam inputParam = iterator.next();
+                if(!StringUtils.isNullOrEmpty(inputParam.getValue())){
+                    urlBuilder
+                    .append(requestbuilder)
+                    .append(inputParam.getName())
+                    .append("=")
+                    .append(URLEncoder.encode(inputParam.getValue(),
+                            Constants.CHAR_CODE));
+                    if (iterator.hasNext()) {
+                        urlBuilder.append("&");
+                    }
+                }
+            }
+        }          
+        
+        if (treeFilters != null) {
+
+            Iterator<TreeFilter> filterIterator = treeFilters.iterator();
+            while (filterIterator.hasNext()) {
+                TreeFilter treeFilter = (TreeFilter) filterIterator.next();
+                urlBuilder.append(requestbuilder)
+                        .append(treeFilter.getColumnName())
+                        .append("=")
+                        .append(URLEncoder.encode(treeFilter.getValue(), Constants.CHAR_CODE));
+                if (filterIterator.hasNext()) {
+                    urlBuilder.append("&");
+                }
+            }
+        }
+        
+        if(LOG.isDebugEnabled()){
+            LOG.debug("Tree Data URL -->"+urlBuilder);
+        }        
         return urlBuilder.toString();
     }
 
@@ -1844,74 +1903,94 @@ return resultDataMap;
     }
 
     @Override
-    public List<List<String>> getRootValues(TreeData treeData, Level level,
-            List<TreeFilter> treeFilters) throws HpccConnectionException, RemoteException {
-        
+    public List<List<String>> getRootValues(TreeData treeData, Level level, List<TreeFilter> treeFilters)
+            throws HpccConnectionException, RemoteException {
+
         List<List<String>> valueList = null;
-         String query = level.getElements().get(0).getFileName();
         try {
-            StringBuilder urlBuilder = new StringBuilder();
-            if (treeData.getHpccConnection().getIsSSL()) {
-                urlBuilder.append(Constants.HTTPS);
+            String requestName = getGenericQueryRequestName(treeData);
+
+            String urlStr;
+            if (requestName != null) {
+                urlStr = constructComplicatedTreeQuery(requestName, treeData, treeFilters);
             } else {
-                urlBuilder.append(Constants.HTTP);
-            }
-            urlBuilder.append(treeData.getHpccConnection().getHostIp())
-                    .append(":")
-                    .append(treeData.getHpccConnection().getWsEclPort())
-                    .append("/WsEcl/submit/query/")
-                    .append(treeData.getHpccConnection().getClusterType())
-                    //Since a level can use only one query, taking first LevelElement's query
-                    .append("/").append(query)
-                    .append("/xml?");
-            
-            if(treeFilters != null){               
-            
-                Iterator<TreeFilter> filterIterator = treeFilters.iterator();
-                while (filterIterator.hasNext()) {
-                    TreeFilter treeFilter = (TreeFilter) filterIterator.next();
-                    urlBuilder
-                            .append(treeFilter.getColumnName())
-                            .append("=")
-                            .append(URLEncoder.encode(treeFilter.getValue(),Constants.CHAR_CODE));
-                    if (filterIterator.hasNext()) {
-                        urlBuilder.append("&");
+                String query = level.getElements().get(0).getFileName();
+                StringBuilder urlBuilder = new StringBuilder();
+                if (treeData.getHpccConnection().getIsSSL()) {
+                    urlBuilder.append(Constants.HTTPS);
+                } else {
+                    urlBuilder.append(Constants.HTTP);
+                }
+                urlBuilder.append(treeData.getHpccConnection().getHostIp()).append(":")
+                        .append(treeData.getHpccConnection().getWsEclPort()).append("/WsEcl/submit/query/")
+                        .append(treeData.getHpccConnection().getClusterType())
+                        // Since a level can use only one query, taking first
+                        // LevelElement's query
+                        .append("/").append(query).append("/xml?");
+
+                if (treeData.getInputParams() != null && treeData.getInputParams().size() == 1) {
+
+                    Iterator<InputParam> iterator = treeData.getInputParams().iterator();
+                    while (iterator.hasNext()) {
+                        InputParam param = iterator.next();
+                        if (!StringUtils.isNullOrEmpty(param.getValue())) {
+                            urlBuilder.append(param.getName()).append("=")
+                                    .append(URLEncoder.encode(param.getValue(), Constants.CHAR_CODE));
+
+                            if (iterator.hasNext()) {
+                                urlBuilder.append("&");
+                            }
+                        }
                     }
                 }
+
+                if (treeFilters != null) {
+
+                    Iterator<TreeFilter> filterIterator = treeFilters.iterator();
+                    while (filterIterator.hasNext()) {
+                        TreeFilter treeFilter = (TreeFilter) filterIterator.next();
+                        urlBuilder.append(treeFilter.getColumnName()).append("=")
+                                .append(URLEncoder.encode(treeFilter.getValue(), Constants.CHAR_CODE));
+                        if (filterIterator.hasNext()) {
+                            urlBuilder.append("&");
+                        }
+                    }
+                }
+
+                urlStr = urlBuilder.toString();
+
+                if (LOG.isDebugEnabled()) {
+                    LOG.debug("getRootValues() URL ->" + urlStr);
+                }
             }
-            
-            URL url = new URL(urlBuilder.toString());
-            
-            if (LOG.isDebugEnabled()) {
-                LOG.debug("getRootValues() URL ->" + url);
-            }
-            
+
+            URL url = new URL(urlStr);
+
             URLConnection urlConnection = url.openConnection();
-            String authString = treeData.getHpccConnection().getUsername()
-                    + ":" + treeData.getHpccConnection().getPassword();
+            String authString = treeData.getHpccConnection().getUsername() + ":" + treeData.getHpccConnection().getPassword();
             String authStringEnc = new String(Base64.encodeBase64(authString.getBytes()));
-            urlConnection.setRequestProperty(AUTHORIZATION, BASIC+ authStringEnc);
+            urlConnection.setRequestProperty(AUTHORIZATION, BASIC + authStringEnc);
 
             final InputStream response = urlConnection.getInputStream();
-            
+
             if (response != null) {
-                valueList =  constructChildValueList(response,level);
+                valueList = constructChildValueList(response, level);
             } else {
                 throw new HpccConnectionException(Constants.UNABLE_TO_FETCH_DATA);
             }
-            
+
         } catch (RemoteException e) {
             if (e.getMessage().contains("Unauthorized")) {
                 throw new HpccConnectionException("401 Unauthorized");
             }
             LOG.error(Constants.EXCEPTION, e);
             throw e;
-        } catch (ParserConfigurationException | SAXException | IOException ex) {
+        } catch (ParserConfigurationException | SAXException | IOException | XPathExpressionException ex) {
             LOG.error(Constants.EXCEPTION, ex);
             throw new HpccConnectionException(ex.getMessage());
         }
-        if(LOG.isDebugEnabled()){
-            LOG.debug("valueList --->"+valueList);
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("valueList --->" + valueList);
         }
         return valueList;
     }

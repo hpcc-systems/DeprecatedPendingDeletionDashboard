@@ -117,7 +117,8 @@
 	<vlayout vflex="1" hflex="1">
 		<hbox>
 			<label id="rootLabel" visible="false"></label>
-			<combobox id="rootCombobox" visible="false"></combobox>
+			<textbox id="rootValue" visible="false"></textbox>
+			<button id="createTree" label="Create Tree" visible="false"></button>
 		</hbox>
 		<div vflex="1" hflex="1" id="chart" style="margin-right:2px"></div>
 	</vlayout>
