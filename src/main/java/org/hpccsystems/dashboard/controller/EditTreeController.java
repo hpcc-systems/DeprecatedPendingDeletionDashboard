@@ -50,6 +50,7 @@ import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Comboitem;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Hbox;
+import org.zkoss.zul.Include;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Panel;
@@ -83,6 +84,9 @@ public class EditTreeController extends SelectorComposer<Component>{
     private Label rootLabel;
     @Wire
     private Combobox rootCombobox;
+    
+    @Wire
+    private Include treeFilterHolder;
     
     @Wire
     private Div chart;
@@ -178,6 +182,18 @@ public class EditTreeController extends SelectorComposer<Component>{
             levels.add(level);
             appendLevelItem(level);
         }
+        
+      //Setting params for filter include
+        treeFilterHolder.setDynamicProperty(Constants.BUSY_COMPONENT, chart);
+        treeFilterHolder.setDynamicProperty(Constants.PARENT, this.getSelf());
+        if (treeData.getIsQuery()) {
+            treeFilterHolder.setSrc("layout/input_parameters.zul");
+            Events.sendEvent(Constants.CREATE_PARAM_EVENT, treeFilterHolder, null);
+        } /*else {
+            treeFilterHolder.setSrc("layout/filter.zul");
+        }*/
+        
+        
     }
     
     EventListener<DropEvent> dropListener = new EventListener<DropEvent>() {

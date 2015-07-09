@@ -87,7 +87,8 @@
 	
 	<vlayout vflex="1">
 		<hlayout vflex="1">
-			<panel width="200px" sclass="editPanel" height="500px"	title="Available Columns">
+		<vbox>
+			<panel width="200px" sclass="editPanel" height="325px"	title="Available Columns">
 				<panelchildren>
 					<tabbox id="filesTabbox" vflex="1" mold="accordion">
 						<tabs id="tabs"> </tabs>
@@ -95,7 +96,8 @@
 					</tabbox>
 				</panelchildren>
 			</panel>
-
+			<include id="treeFilterHolder"></include>
+					</vbox>
 			<panel sclass="editPanel" height="500px" title="Tree Levels" border="normal">
 				<panelchildren sclass="borderedChildren">
 					<vbox vflex="1" width="200px" id="levelsContainer">
@@ -106,6 +108,7 @@
 
 
 		</hlayout>
+		
 		<box vflex="0" hflex="1" align="center">
 			<button label="${labels.drawChart}" id="drawTree" zclass="btn btn-success" style="margin-bottom: 3px">
 			</button>

@@ -1,6 +1,6 @@
 <panel id="inputPanel"
 	apply="org.hpccsystems.dashboard.controller.InputParametersController" 
-	height="180px" 
+	height="170px" 
 	title="Input Parameters" 
 	sclass="editPanel">
 	<caption>
