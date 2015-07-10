@@ -508,9 +508,12 @@ public class EditTreeController extends SelectorComposer<Component>{
         public void onEvent(Event event) throws Exception {
         	HttpSession httpSession =  (HttpSession)Executions.getCurrent().getSession().getNativeSession();
         	httpSession.setAttribute(Constants.EDIT_WINDOW_CHART_DIV,treeData);
-        	
-            chartRenderer.constructTreeJSON(treeData, portlet,Constants.EDIT_WINDOW_CHART_DIV);
-            chartRenderer.drawChart(Constants.EDIT_WINDOW_CHART_DIV, portlet);
+        	//Don't draw the chart if Levels not defined
+        	if(treeData.getLevels() != null && !treeData.getLevels().isEmpty() && treeData.getRootValueMap() != null){
+        	    chartRenderer.constructTreeJSON(treeData, portlet,Constants.EDIT_WINDOW_CHART_DIV);
+                chartRenderer.drawChart(Constants.EDIT_WINDOW_CHART_DIV, portlet);
+        	}
+            
             Clients.clearBusy(chart);            
         }
     };

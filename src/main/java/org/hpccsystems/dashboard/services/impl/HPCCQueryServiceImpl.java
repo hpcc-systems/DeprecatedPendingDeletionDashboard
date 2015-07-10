@@ -42,7 +42,6 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.chart.entity.AdvancedFilter;
 import org.hpccsystems.dashboard.chart.entity.Attribute;
-import org.hpccsystems.dashboard.chart.entity.ChartData;
 import org.hpccsystems.dashboard.chart.entity.Field;
 import org.hpccsystems.dashboard.chart.entity.HpccConnection;
 import org.hpccsystems.dashboard.chart.entity.InputParam;
@@ -447,7 +446,7 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
             throws HpccConnectionException, IOException, 
             ParserConfigurationException, SAXException, XPathExpressionException {
        
-       String requestName = getGenericQueryRequestName(chartData);
+       String requestName = getGenericQueryRequestName(chartData.getHpccConnection(),chartData.getFiles().iterator().next());
        String urlStr = null;
        List<XYModel> dataList;
        
@@ -649,8 +648,8 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
         }          
         
         if (treeFilters != null) {
-
             Iterator<TreeFilter> filterIterator = treeFilters.iterator();
+            urlBuilder.append("&");
             while (filterIterator.hasNext()) {
                 TreeFilter treeFilter = (TreeFilter) filterIterator.next();
                 urlBuilder.append(requestbuilder)
@@ -669,20 +668,20 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
         return urlBuilder.toString();
     }
 
-    private String getGenericQueryRequestName(ChartData chartData) throws IOException, XPathExpressionException, ParserConfigurationException, SAXException {
+    private String getGenericQueryRequestName(HpccConnection hpccConnection,String query) throws IOException, XPathExpressionException, ParserConfigurationException, SAXException {
         StringBuilder urlBuilder = new StringBuilder();
-       if (chartData.getHpccConnection().getIsSSL()) {
+       if (hpccConnection.getIsSSL()) {
            urlBuilder.append(Constants.HTTPS);
        } else {
            urlBuilder.append(Constants.HTTP);
        }
-       urlBuilder.append(chartData.getHpccConnection().getHostIp())
+       urlBuilder.append(hpccConnection.getHostIp())
                .append(":")
-               .append(chartData.getHpccConnection().getWsEclPort())
+               .append(hpccConnection.getWsEclPort())
                .append("/WsEcl/example/request/query/")
-               .append(chartData.getHpccConnection().getClusterType())
+               .append(hpccConnection.getClusterType())
                .append("/")
-               .append(chartData.getFiles().iterator().next())
+               .append(query)
                .append("?display");   
        
        if(LOG.isDebugEnabled()){
@@ -691,15 +690,14 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
        
         URL url = new URL(urlBuilder.toString());
         URLConnection urlConnection = url.openConnection();
-        String authString = chartData.getHpccConnection().getUsername() + ":"
-                + chartData.getHpccConnection().getPassword();
+        String authString = hpccConnection.getUsername() + ":" + hpccConnection.getPassword();
         String authStringEnc = new String(Base64.encodeBase64(authString.getBytes()));
         urlConnection.setRequestProperty(AUTHORIZATION, BASIC+ authStringEnc);
 
 
         final InputStream response= urlConnection.getInputStream();
         
-       String requestName = parseGenericQueryRequest(chartData.getFiles().iterator().next(),response);
+       String requestName = parseGenericQueryRequest(query,response);
         LOG.debug("requestName -->"+requestName);
         return requestName;
     }
@@ -1254,19 +1252,33 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
                 String authStringEnc = new String(Base64.encodeBase64(authString.getBytes()));
                 urlConnection.setRequestProperty(AUTHORIZATION, BASIC + authStringEnc);
 
-                DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
-                DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
+               final DocumentBuilderFactory dbFactory = DocumentBuilderFactory.newInstance();
+               final DocumentBuilder dBuilder = dbFactory.newDocumentBuilder();
 
-                Document doc = dBuilder.parse(urlConnection.getInputStream());
+               final Document doc = dBuilder.parse(urlConnection.getInputStream());
                 doc.getDocumentElement().normalize();
 
-                Node row = doc.getElementsByTagName(queryName + "Request").item(0);
-                NodeList nodeList = row.getChildNodes();
-
-                for (int i = 0; i < nodeList.getLength(); i++) {
-                    Node node = nodeList.item(i);
-                    if (node.getNodeType() == Node.ELEMENT_NODE) {  
-                        params.add(node.getNodeName());
+                String requestName = getGenericQueryRequestName(hpccConnection,queryName);
+                
+                XPathFactory xPathFactory = XPathFactory.newInstance();
+                XPath xPath = xPathFactory.newXPath();
+                NodeList rows = (NodeList) xPath.evaluate("/" + queryName + "Request" + "/" + requestName + "/" +"Row", doc, XPathConstants.NODESET);
+                if(rows.item(0) != null){
+                    
+                   NodeList list = ((Node)rows.item(0)).getChildNodes();                    
+                    for(int index=0; index<list.getLength(); index++){
+                        params.add(list.item(index).getNodeName());
+                    }
+                     
+                }else{
+                    Node row = doc.getElementsByTagName(queryName + "Request").item(0);
+                    NodeList nodeList = row.getChildNodes();
+    
+                    for (int i = 0; i < nodeList.getLength(); i++) {
+                        Node node = nodeList.item(i);
+                        if (node.getNodeType() == Node.ELEMENT_NODE) {  
+                            params.add(node.getNodeName());
+                        }
                     }
                 }
                 
@@ -1627,7 +1639,7 @@ return resultDataMap;
             throws XPathExpressionException, IOException,
             ParserConfigurationException, SAXException, HpccConnectionException {
          
-         String requestName = getGenericQueryRequestName(tableData);
+         String requestName = getGenericQueryRequestName(tableData.getHpccConnection(),tableData.getFiles().iterator().next());
          StringBuilder requestbuilder = null;
            
          StringBuilder urlBuilder = new StringBuilder();
@@ -1908,8 +1920,7 @@ return resultDataMap;
 
         List<List<String>> valueList = null;
         try {
-            String requestName = getGenericQueryRequestName(treeData);
-
+            String requestName = getGenericQueryRequestName(treeData.getHpccConnection(),treeData.getFiles().iterator().next());
             String urlStr;
             if (requestName != null) {
                 urlStr = constructComplicatedTreeQuery(requestName, treeData, treeFilters);
