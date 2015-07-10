@@ -1,5 +1,5 @@
 <panel id="chartFilter" 
-	height="180px" 
+	height="170px" 
 	title="${labels.chartFilters}"
 	apply="org.hpccsystems.dashboard.controller.FilterController"
 	sclass="editPanel">

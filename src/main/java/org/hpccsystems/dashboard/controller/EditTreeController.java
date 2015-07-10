@@ -1,8 +1,6 @@
 package org.hpccsystems.dashboard.controller; 
 
-import java.rmi.RemoteException;
 import java.util.ArrayList;
-import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,7 +19,6 @@ import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.controller.component.ImageGridPopup;
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.entity.QuerySchema;
-import org.hpccsystems.dashboard.exception.HpccConnectionException;
 import org.hpccsystems.dashboard.services.AuthenticationService;
 import org.hpccsystems.dashboard.services.HPCCQueryService;
 import org.hpccsystems.dashboard.services.HPCCService;
@@ -35,7 +32,6 @@ import org.zkoss.zk.ui.event.DropEvent;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
-import org.zkoss.zk.ui.event.SelectEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
@@ -46,10 +42,9 @@ import org.zkoss.zul.Anchorchildren;
 import org.zkoss.zul.Anchorlayout;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Caption;
-import org.zkoss.zul.Combobox;
-import org.zkoss.zul.Comboitem;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Hbox;
+import org.zkoss.zul.Include;
 import org.zkoss.zul.Label;
 import org.zkoss.zul.Listitem;
 import org.zkoss.zul.Panel;
@@ -82,7 +77,12 @@ public class EditTreeController extends SelectorComposer<Component>{
     @Wire
     private Label rootLabel;
     @Wire
-    private Combobox rootCombobox;
+    private Textbox rootValue;
+    @Wire
+    private Button createTree;
+    
+    @Wire
+    private Include treeFilterHolder;
     
     @Wire
     private Div chart;
@@ -114,7 +114,6 @@ public class EditTreeController extends SelectorComposer<Component>{
         doneButton = (Button) execution.getAttribute(Constants.EDIT_WINDOW_DONE_BUTTON);
         
         this.getSelf().addEventListener("onDrawChart", drawChartListener);
-        this.getSelf().addEventListener("onPopulateList", populateCombobox);
         
         // API chart config flow without chart
         if (authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_CONFIG_CHART)) {
@@ -178,6 +177,18 @@ public class EditTreeController extends SelectorComposer<Component>{
             levels.add(level);
             appendLevelItem(level);
         }
+        
+      //Setting params for filter include
+        treeFilterHolder.setDynamicProperty(Constants.BUSY_COMPONENT, chart);
+        treeFilterHolder.setDynamicProperty(Constants.PARENT, this.getSelf());
+        if (treeData.getIsQuery()) {
+            treeFilterHolder.setSrc("layout/input_parameters.zul");
+            Events.sendEvent(Constants.CREATE_PARAM_EVENT, treeFilterHolder, null);
+        } /*else {
+            treeFilterHolder.setSrc("layout/filter.zul");
+        }*/
+        
+        
     }
     
     EventListener<DropEvent> dropListener = new EventListener<DropEvent>() {
@@ -413,11 +424,7 @@ public class EditTreeController extends SelectorComposer<Component>{
     @Listen("onClick=#drawTree")
     public void drawTree(Event event) {
         
-        //removing the available root values
-        if(rootCombobox.getChildren() != null)    {    
-        rootCombobox.getChildren().clear();
-        }
-        
+      
         //clearing the edit window
         Clients.evalJavaScript("clearChart('" + Constants.EDIT_WINDOW_CHART_DIV +  "')");
         
@@ -450,20 +457,42 @@ public class EditTreeController extends SelectorComposer<Component>{
         
         treeData.setLevels(levels);
         
-        Clients.showBusy(chart, "Retriving data");
-        Events.echoEvent(new Event("onPopulateList", this.getSelf()));
+        StringBuilder stringBuilder;
+        
+        rootValue.setVisible(true);
+        createTree.setVisible(true);
+        
+        //Creating Label
+        stringBuilder = new StringBuilder();
+        for (LevelElement element : levels.get(0).getElements()) {
+            stringBuilder.append(element.getName());
+        }
+        stringBuilder.append(": ");
+        rootLabel.setValue(stringBuilder.toString());
+        rootLabel.setVisible(true);
+        
+        rootValue.setValue(null);
     }
 
     /**
      * Constructs Tree
      * @param event
      */
-    @Listen("onSelect=#rootCombobox")
-    public void onSelectRoot(SelectEvent<Component, Object> event) {
-        Comboitem selectedItem = (Comboitem) event.getSelectedItems().iterator().next();
+    @Listen("onClick = #createTree")
+    public void onSelectRoot(Event event) {
         
-        @SuppressWarnings("unchecked")
-        Map<String, String> rootValueMap = (Map<String, String>) selectedItem.getAttribute(Constants.VALUE);
+        LinkedHashMap<String, String> rootValueMap = new LinkedHashMap<String, String>();
+        StringBuilder stringBuilder = new StringBuilder();
+        
+        for (LevelElement element : levels.get(0).getElements()) {
+            if(element.getIsColumn()) {
+                String value = rootValue.getText();
+                stringBuilder.append(value);
+                rootValueMap.put(element.getFileName() + "." + element.getName(), value);
+            } else {
+                stringBuilder.append(element.getName());
+            }
+        }
         
         treeData.setRootValueMap(rootValueMap);
         
@@ -479,84 +508,16 @@ public class EditTreeController extends SelectorComposer<Component>{
         public void onEvent(Event event) throws Exception {
         	HttpSession httpSession =  (HttpSession)Executions.getCurrent().getSession().getNativeSession();
         	httpSession.setAttribute(Constants.EDIT_WINDOW_CHART_DIV,treeData);
-        	
-            chartRenderer.constructTreeJSON(treeData, portlet,Constants.EDIT_WINDOW_CHART_DIV);
-            chartRenderer.drawChart(Constants.EDIT_WINDOW_CHART_DIV, portlet);
+        	//Don't draw the chart if Levels not defined
+        	if(treeData.getLevels() != null && !treeData.getLevels().isEmpty() && treeData.getRootValueMap() != null){
+        	    chartRenderer.constructTreeJSON(treeData, portlet,Constants.EDIT_WINDOW_CHART_DIV);
+                chartRenderer.drawChart(Constants.EDIT_WINDOW_CHART_DIV, portlet);
+        	}
+            
             Clients.clearBusy(chart);            
         }
     };
-    
-    
-    EventListener<Event> populateCombobox = new EventListener<Event>() {
-        
-        @Override
-        public void onEvent(Event event)throws Exception {
-        	try {
-            //Removing available values
-            rootCombobox.getChildren().clear();
-            
-            List<List<String>> valueList;
-			
-				valueList = hpccService.getRootValues(treeData, treeData.getLevels().get(0), null);
-			
-            StringBuilder stringBuilder;
-            
-            addlevelElement(valueList);
-            
-            rootCombobox.setVisible(true);
-            
-            //Creating Label
-            stringBuilder = new StringBuilder();
-            for (LevelElement element : levels.get(0).getElements()) {
-                stringBuilder.append(element.getName());
-            }
-            stringBuilder.append(": ");
-            rootLabel.setValue(stringBuilder.toString());
-            rootLabel.setVisible(true);
-            
-            
-            Clients.clearBusy(chart);
-        	} catch (RemoteException | HpccConnectionException e) {
-				 LOG.error(Constants.EXCEPTION, e);
-				Clients.showNotification("Unable to fetch Hpcc root values",
-						"error", EditTreeController.this.getSelf(),
-						"middle_center", 5000, true);
-				 Clients.clearBusy(chart);
-               return;
-			}
-        }
-    };
 
-    /**
-     * Appends level elements to Level
-     * @param valueList
-     */
-    protected void addlevelElement(List<List<String>> valueList) {
-        StringBuilder stringBuilder;
-        Iterator<String> valueIterator;
-        String value;
-        Map<String, String> valueMap;
-        for (List<String> list : valueList) {
-            valueMap = new LinkedHashMap<String, String>();
-            stringBuilder = new StringBuilder();
-            valueIterator = list.iterator();
-            for (LevelElement element : levels.get(0).getElements()) {
-                if(element.getIsColumn()) {
-                    value = valueIterator.next();
-                    stringBuilder.append(value);
-                    valueMap.put(element.getFileName() + "." + element.getName(), value);
-                } else {
-                    stringBuilder.append(element.getName());
-                }
-            }
-            Comboitem comboitem = new Comboitem(stringBuilder.toString());
-            comboitem.setAttribute(Constants.VALUE, valueMap);
-            rootCombobox.appendChild(comboitem);
-            if(treeData.getRootValueMap() != null && treeData.getRootValueMap().equals(valueMap)) {
-                rootCombobox.setSelectedItem(comboitem);
-            }
-        }
-    }
     
 }
 
