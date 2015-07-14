@@ -692,8 +692,7 @@ public class ChartPanel extends Panel {
 
     public void onDrawingQueryChart(final int buttonState) {
         if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState()) && portlet.getChartData().getIsQuery() 
-                && (Constants.CATEGORY_HIERARCHY !=  chartService.getCharts().get(portlet.getChartType())
-                        .getCategory() && Constants.CATEGORY_SCORED_SEARCH_TABLE !=  chartService.getCharts().get(portlet.getChartType())
+                && (Constants.CATEGORY_SCORED_SEARCH_TABLE !=  chartService.getCharts().get(portlet.getChartType())
                                 .getCategory())){
             if(inputParamBtn != null) {
                 inputParamBtn.detach();

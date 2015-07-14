@@ -715,9 +715,9 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
         NodeList rows = (NodeList) xPath.evaluate("/" + query + "Request", doc, XPathConstants.NODESET);
         
         NodeList list = ((Node)rows.item(0)).getChildNodes();
-        if(list.item(0) != null){
+        if(list.item(0).getChildNodes().item(0).getChildNodes().item(0) != null){
             reqName = list.item(0).getNodeName();
-        }        
+        } 
         LOG.debug("Request Row name ->" + reqName); 
         
         return reqName;
@@ -1939,7 +1939,7 @@ return resultDataMap;
                         // LevelElement's query
                         .append("/").append(query).append("/xml?");
 
-                if (treeData.getInputParams() != null && treeData.getInputParams().size() == 1) {
+                if (treeData.getInputParams() != null && !treeData.getInputParams().isEmpty()) {
 
                     Iterator<InputParam> iterator = treeData.getInputParams().iterator();
                     while (iterator.hasNext()) {
