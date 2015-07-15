@@ -355,7 +355,7 @@ public class EditWidgetController extends SelectorComposer<Component> {
                         );
             } else if(Constants.CATEGORY_HIERARCHY == chartService.getCharts().get(portlet.getChartType()).getCategory()) {
                 //For Tree Widgets
-                final String divToDraw = div.getId(); 
+                final String divToDraw = div.getUuid(); 
                 
                 //isEdit Window is set to false as we are constructing the JSON to be drawn in the Widget itself
                 chartRenderer.drawChart(divToDraw, portlet);
