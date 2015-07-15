@@ -5,7 +5,7 @@ function createTreeChart(divId, chartData) {
 	var chartId = reqData.chart_id;
 	var treeData = reqData.chart_data;
 	
-	var divElement = jq('$'+divId).empty();
+	var divElement = jq('#'+divId).empty();
 	divElement.append(jq("<div id='chartHolder'/>" ));		
 	var divToDraw = d3.select(divElement.get(0)).select("div");	
 

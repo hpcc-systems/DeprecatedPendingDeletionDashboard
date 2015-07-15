@@ -135,7 +135,9 @@ public class ChartPanel extends Panel {
     Listbox inputListbox = null;
     Portlet portlet;
     Toolbar toolbar;
+    private String divId;
     
+   
     //Delete panel listener
     EventListener<Event> deleteListener = new EventListener<Event>() {
         public void onEvent(final Event event) {
@@ -994,8 +996,14 @@ public class ChartPanel extends Panel {
      * @throws Exception 
      */
     public String drawD3Graph() {
+     
         if(!portlet.getWidgetState().equals(Constants.STATE_LIVE_CHART)){
             return null;
+        }
+        if(Constants.CATEGORY_HIERARCHY !=  chartService.getCharts().get(portlet.getChartType()).getCategory()){
+            divId =  chartDiv.getId();
+        }else{
+            divId = chartDiv.getUuid();
         }
         String chartJson = null;
         if(Constants.RELEVANT_CONFIG != chartService.getCharts().get(portlet.getChartType()).getCategory()){
@@ -1034,7 +1042,7 @@ public class ChartPanel extends Panel {
                     .append("})")
                 .append(").done(function(){")
                 .append(chartDetails.getConfiguration().getFunctionName())
-                .append("('" + chartDiv.getId() +  "','"+ chartJson +"')")
+                .append("('" + divId +  "','"+ chartJson +"')")
             .append("});");
             
             jsBuilder.append("}");
@@ -1073,7 +1081,7 @@ public class ChartPanel extends Panel {
                     .append("})")
                 .append(").done(function(){")
                 .append(chartDetails.getConfiguration().getFunctionName())
-                .append("('" + chartDiv.getId() +  "','"+ chartJson +"')")
+                .append("('" + divId +  "','"+ chartJson +"')")
                 .append("});");
         }
         
