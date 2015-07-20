@@ -156,7 +156,7 @@ function createXYChart (divId, chartData) {
 			
 			tooltip: {
 		        format: {
-		            value: d3.format('f')
+		            value: d3.format('g')
 		        }
 		    },
 			legend: {
