@@ -180,7 +180,7 @@ function createGaugeChart(divId, reqData) {
 	};
 	
 	
-	var dropDown = container.append('div')
+	/*var dropDown = container.append('div')
 		.attr("class", "power-gauge-select")
 		.append('select');
 	
@@ -197,7 +197,7 @@ function createGaugeChart(divId, reqData) {
 	
 	dropDown.on("change", function() {
 		powerGauge.update(d3.event.target.value);
-	});
+	});*/
 	
 	container.append('div')
 		.attr('id', 'power-gauge' + chartData.portletId)
