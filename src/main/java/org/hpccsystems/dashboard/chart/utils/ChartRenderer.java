@@ -29,7 +29,6 @@ import org.hpccsystems.dashboard.chart.cluster.ClusterLink;
 import org.hpccsystems.dashboard.chart.cluster.ClusterNode;
 import org.hpccsystems.dashboard.chart.cluster.Relation;
 import org.hpccsystems.dashboard.chart.entity.Attribute;
-import org.hpccsystems.dashboard.chart.entity.ChartData;
 import org.hpccsystems.dashboard.chart.entity.Filter;
 import org.hpccsystems.dashboard.chart.entity.InputParam;
 import org.hpccsystems.dashboard.chart.entity.Measure;
@@ -293,9 +292,8 @@ public class ChartRenderer {
                             LOG.debug("Aggregate function -- " + measure.getAggregateFunction());
                         }
                         if(measure.getAggregateFunction() != null) {
-                            row.add(new JsonPrimitive(measure.getColumn() + "_"    + measure.getAggregateFunction()));
-                            yColumnNames.add(new YColumn(measure.getColumn() + "_"+ measure.getAggregateFunction(), 
-                                    measure.isSecondary()));
+                            row.add(new JsonPrimitive(measure.getLabel()));
+                            yColumnNames.add(new YColumn(measure.getLabel(), measure.isSecondary()));
                         } else {
                             row.add(new JsonPrimitive(measure.getColumn()));
                             yColumnNames.add(new YColumn(measure.getColumn(), measure.isSecondary()));
