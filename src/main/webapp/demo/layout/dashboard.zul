@@ -73,7 +73,7 @@
 </style>
 
 <vlayout vflex="1" hflex="1" zclass="dashboard-body" style="overflow:auto; margin-top: 35px; margin-left: 5px;">
-	<panel id="commonFiltersPanel" zclass="filter panel" border="normal" style="margin-bottom: 0px;" visible="false"  collapsible="true">
+	<panel id="commonFiltersPanel" zclass="filter panel" border="normal" style="margin-bottom: 0px;" visible="false"  collapsible="true" open="false">
 		<caption>
 			<div hflex="1">
 				<hbox align="center" pack="stretch" hflex="1">
