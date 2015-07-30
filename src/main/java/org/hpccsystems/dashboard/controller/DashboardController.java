@@ -411,6 +411,11 @@ public class DashboardController extends SelectorComposer<Window>{
         if(!userCredential.hasRole(Constants.ROLE_API_VIEW_DASHBOARD) && dashboard.getHasCommonFilter()) {
             commonFiltersPanel.setVisible(true);
         }
+        
+        //Hide Common filters for Consumers
+        if(Constants.ROLE_CONSUMER.equals(dashboard.getRole())) {
+            commonFiltersPanel.setVisible(false);
+        }
     }
    
 
@@ -2150,7 +2155,9 @@ public class DashboardController extends SelectorComposer<Window>{
         public void onEvent(Event event) throws Exception {
             drawnLiveChartCount--;    
             if(drawnLiveChartCount == 0){
-                constructCommonFilterPanel();
+                if(!Constants.ROLE_CONSUMER.equals(dashboard.getRole())) {
+                    constructCommonFilterPanel();
+                }
             }
         }
         
