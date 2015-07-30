@@ -401,7 +401,7 @@ public class ChartPanel extends Panel {
                 toolbar.appendChild(deleteBtn);
             }
         } else if (Constants.SHOW_EDIT_ONLY == buttonState) {
-            toolbar.appendChild(addBtn);
+            //Nothing right now.. :(
         }else if(Constants.SHOW_NO_BUTTONS == buttonState){
             titlelabel.setStyle("pointer-events:none");
             titleTextbox.setReadonly(true);
@@ -702,9 +702,10 @@ public class ChartPanel extends Panel {
             }
             
             inputParamBtn = new Button();
-            if(Constants.SHOW_ALL_BUTTONS == buttonState && !toolbar.getChildren().isEmpty()) {
+            boolean showIPButton = Constants.SHOW_ALL_BUTTONS == buttonState || Constants.SHOW_EDIT_ONLY == buttonState;
+            if(showIPButton && !toolbar.getChildren().isEmpty()) {
                 toolbar.insertBefore(inputParamBtn, toolbar.getFirstChild());
-            } else if(Constants.SHOW_ALL_BUTTONS == buttonState){
+            } else if(showIPButton){
                 toolbar.appendChild(inputParamBtn);
             }
             inputParamBtn.setSclass(INPUT_PARAM_STYLE);
