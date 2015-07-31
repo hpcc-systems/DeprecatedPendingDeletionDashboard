@@ -1066,12 +1066,19 @@ public class DashboardController extends SelectorComposer<Window>{
             if(!StringUtils.isEmpty(inputparam.getValue())){
                 textbox.setValue(inputparam.getValue());
             }
-            textbox.addEventListener(Events.ON_BLUR, (event)->{
-                inputparam.setValue(textbox.getValue().trim());
-                inputparam.setIsCommonInput(true);
-                applyInputParamToPortlets(inputparam, true);
-                row.setAttribute(Constants.ROW_CHECKED, true);
-            });
+            
+            EventListener<Event> valueChangeListener = new EventListener<Event>() {
+                @Override
+                public void onEvent(Event event) throws Exception {
+                    inputparam.setValue(textbox.getValue().trim());
+                    inputparam.setIsCommonInput(true);
+                    applyInputParamToPortlets(inputparam, true);
+                    row.setAttribute(Constants.ROW_CHECKED, true);
+                }
+            };
+            
+            textbox.addEventListener(Events.ON_BLUR, valueChangeListener);
+            textbox.addEventListener(Events.ON_OK, valueChangeListener);
         }        
         row.appendChild(hbox);
         
@@ -2491,7 +2498,7 @@ public class DashboardController extends SelectorComposer<Window>{
                            component2.appendChild(newInclude);
                            Clients.evalJavaScript("showPopUp()");
                        }                       
-                       dashboardService.deleteDashboard(dashboard.getDashboardId(),authenticationService.getUserCredential().getUserId());
+                       dashboardService.deleteDashboard(dashboard.getDashboardId(),authenticationService.getUserCredential());
                        dashboardService.updateSidebarDetails(dashboardIdList);
                  }
 

@@ -11,6 +11,7 @@ import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.dao.DashboardDao;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.services.DashboardService;
+import org.hpccsystems.dashboard.services.UserCredential;
 import org.springframework.context.annotation.Scope;
 import org.springframework.context.annotation.ScopedProxyMode;
 import org.springframework.dao.DataAccessException;
@@ -89,9 +90,9 @@ public class DashboardServiceImpl implements DashboardService {
      * service to delete a dashboard
      *
      */
-    public int deleteDashboard(Integer dashboardId, String userId) throws DataAccessException{
+    public int deleteDashboard(Integer dashboardId, UserCredential user) throws DataAccessException{
         try {
-            return dashboardDao.deleteDashboard(dashboardId,userId);
+            return dashboardDao.deleteDashboard(dashboardId,user);
         } catch (DataAccessException e) {
             LOG.error(Constants.EXCEPTION, e);
             throw e;

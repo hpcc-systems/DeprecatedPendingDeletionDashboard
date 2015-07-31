@@ -3,7 +3,6 @@ package org.hpccsystems.dashboard.chart.utils;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.Iterator;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -31,7 +30,6 @@ import org.zkoss.zul.Listcell;
 import org.zkoss.zul.Listhead;
 import org.zkoss.zul.Listheader;
 import org.zkoss.zul.Listitem;
-import org.zkoss.zul.Space;
 import org.zkoss.zul.Span;
 import org.zkoss.zul.Vbox;
 
@@ -81,8 +79,8 @@ public class TableRenderer {
         listBox.setHflex("1");
         listBox.setVflex("1");
         
-        listBox.setAutopaging(true);
-
+        listBox.setPageSize(10);
+        
         Listhead listhead = new Listhead();
 
         Listheader listheader = null;

@@ -4,6 +4,7 @@ import java.sql.SQLException;
 import java.util.List;
 
 import org.hpccsystems.dashboard.entity.Dashboard;
+import org.hpccsystems.dashboard.services.UserCredential;
 import org.springframework.dao.DataAccessException;
 
 
@@ -43,7 +44,7 @@ public interface DashboardDao {
      * @param dashboardId
      * @param deleteStatus
      */
-    int deleteDashboard(Integer dashboardId, String userId) throws DataAccessException;
+    int deleteDashboard(Integer dashboardId, UserCredential user) throws DataAccessException;
 
     /**
      * Dao call to update dashboard details into DB

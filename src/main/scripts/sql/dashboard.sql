@@ -107,7 +107,7 @@ VALUES('Table Widget',
 INSERT INTO chart_details(name,description,configuration,created_by,category,isplugin) 
 VALUES('Tree Layout',
 'Displays data visually in Tree structure',
-'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xyConfiguration><dependentCssURL>css/d3.css</dependentCssURL><dependentJsURL>js/lib/d3.v3.min.js</dependentJsURL><functionName>createTreeChart</functionName><imageURL>chart/tree.png</imageURL><jsURL>js/treelayout.js</jsURL><minLevels>2</minLevels><maxLevels>0</maxLevels></xyConfiguration>',
+'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xyConfiguration><dependentCssURL>css/d3.css</dependentCssURL><dependentJsURL>js/lib/d3.v3.min.js</dependentJsURL><functionName>createTreeChart</functionName><imageURL>chart/tree.png</imageURL><jsURL>js/simpletree.js</jsURL><minLevels>2</minLevels><maxLevels>0</maxLevels></xyConfiguration>',
 '2',3,false);
 
 INSERT INTO chart_details(name,description,configuration,created_by,category,isplugin) 
