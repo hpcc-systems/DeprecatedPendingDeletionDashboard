@@ -13,6 +13,7 @@ public class Queries {
     public static final String DELETE_DASHBOARD_WIDGETS = "delete from widget_details where dashboard_id=?";
     public static final String DELETE_WIDGETS = "delete from widget_details where widget_id=?";
     public static final String DELETE_DASHBOARD = "delete from dashboard_details where dashboard_id=? and user_id =? ";    
+    public static final String DELETE_DASHBOARD_ADMIN = "delete from dashboard_details where dashboard_id=?";    
     public static final String INSERT_WIDGET_DETAILS = "insert into widget_details(dashboard_id,widget_name,widget_state,chart_type,column_identifier,widget_sequence,chart_data,single_widget) values(?,?,?,?,?,?,?,?)";
     public static final String GET_USER_DETAILS = "select id,password,active_flag,first_name,last_name from user_details where id=?"; 
     public static final String INSERT_USER = "INSERT INTO user_details(id,first_name,last_name,password) VALUES (?, ?,?,?)";

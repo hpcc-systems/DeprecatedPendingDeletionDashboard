@@ -2498,7 +2498,7 @@ public class DashboardController extends SelectorComposer<Window>{
                            component2.appendChild(newInclude);
                            Clients.evalJavaScript("showPopUp()");
                        }                       
-                       dashboardService.deleteDashboard(dashboard.getDashboardId(),authenticationService.getUserCredential().getUserId());
+                       dashboardService.deleteDashboard(dashboard.getDashboardId(),authenticationService.getUserCredential());
                        dashboardService.updateSidebarDetails(dashboardIdList);
                  }
 

@@ -19,6 +19,7 @@ import org.hpccsystems.dashboard.common.Queries;
 import org.hpccsystems.dashboard.dao.DashboardDao;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.rowmapper.DashboardRowMapper;
+import org.hpccsystems.dashboard.services.UserCredential;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.dao.DataAccessException;
 import org.springframework.jdbc.core.BatchPreparedStatementSetter;
@@ -110,7 +111,7 @@ public class DashboardDaoImpl implements DashboardDao {
         
     }
 
-    public int deleteDashboard(final Integer dashboardId, final String userId)
+    public int deleteDashboard(final Integer dashboardId, final UserCredential user)
             throws DataAccessException {
         int rowsdeleted = 0;
         rowsdeleted = getJdbcTemplate().update(
@@ -118,17 +119,22 @@ public class DashboardDaoImpl implements DashboardDao {
 
         rowsdeleted = getJdbcTemplate().update(Queries.DELETE_ACL_PUBLIC,
                 new Object[] { dashboardId });
-        // TODO : need to disable this userId null check, when circuit passes
-        // the user details
-        if (userId != null) {
-            rowsdeleted = getJdbcTemplate().update(Queries.DELETE_DASHBOARD,
-                    new Object[] { dashboardId, userId });
-        } else {
+        
+        // TODO : need to disable this userId null check, when circuit passes the user details
+        if(user == null) {
             rowsdeleted = getJdbcTemplate().update(
                     Queries.API_DELETE_DASHBOARD, new Object[] { dashboardId
-
+                            
                     });
+        } else if(user.isSuperUser()){
+            rowsdeleted = getJdbcTemplate().update(Queries.DELETE_DASHBOARD_ADMIN,
+                    new Object[] { dashboardId});
+        } else {
+            String userId = user.getUserId();
+            rowsdeleted = getJdbcTemplate().update(Queries.DELETE_DASHBOARD,
+                    new Object[] { dashboardId, userId });
         }
+        
         return rowsdeleted;
     }
 

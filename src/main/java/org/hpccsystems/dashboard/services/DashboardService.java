@@ -41,7 +41,7 @@ public interface DashboardService {
      * @param dashboardId
      * @param deleteStatus
      */
-    int deleteDashboard(Integer dashboardId,String userId)throws DataAccessException;    
+    int deleteDashboard(Integer dashboardId,UserCredential user)throws DataAccessException;    
     
     /**
      * updateSidebarDetails() is responsible for update the sidebar details into dashboard_details table.
