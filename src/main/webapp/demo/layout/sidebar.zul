@@ -3,16 +3,23 @@
 	id="sidebarContainer"
 	zclass="sidebar-container">
 <style>
+.sidebar-container {
+	overflow-y: auto;
+    overflow-x: hidden;
+    border-bottom: 36px solid;
+}
+
 .addbtn-container{
 	position: absolute;
 	text-align:center; 
 	bottom:0px; 
 	width:100%
+	z-index: 1000;
 }
 </style>
 <navbar orient="vertical" id="navBar" zclass="sidebar">
 </navbar>
-<div sclass="addbtn-container">
+<div sclass="addbtn-container" hflex="1">
 	<script type="text/javascript"> 
 	function showPopUp() {
 		zk.afterMount(function(){
