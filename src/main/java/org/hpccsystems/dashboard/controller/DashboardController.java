@@ -9,6 +9,8 @@ import java.sql.Timestamp;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Iterator;
@@ -479,7 +481,20 @@ public class DashboardController extends SelectorComposer<Window>{
         if (LOG.isDebugEnabled()) {
             LOG.debug("Persisted Common input params -> "  + persistedGlobalInputParams);
         }
-       
+        
+        //Re creating order
+        List<String> order = dashboardService.getFilterOrder(dashboard.getDashboardId());
+        if(order != null) {
+            Collections.sort(persistedGlobalInputParams, new Comparator<InputParam>() {
+
+                @Override
+                public int compare(InputParam o1, InputParam o2) {
+                    return Integer.compare(order.indexOf(o1.getName()), order.indexOf(o2.getName()));
+                }
+                
+            });
+        }
+        
         // Generating applied filter rows, with values
       
         // Getting all columns.This holds the fields for newly added charts, to avoid reconstructing listbox 
@@ -791,9 +806,19 @@ public class DashboardController extends SelectorComposer<Window>{
                 }
                 
             }
+            
+            StringBuilder sb = new StringBuilder();
+            Iterator<Filter> iterator = appliedCommonFilters.iterator();
+            while (iterator.hasNext()) {
+                sb.append(iterator.next().getColumn());
+                if(iterator.hasNext()) {
+                    sb.append(",");
+                }
+            }
+            dashboardService.saveFilterOrder(dashboard.getDashboardId(), sb.toString());
         }
+
     }; 
-    
     
     
     EventListener<SelectEvent<Component, Object>> paramsSelectListener = new EventListener<SelectEvent<Component,Object>>() {
@@ -846,6 +871,16 @@ public class DashboardController extends SelectorComposer<Window>{
                 }
                 
             }
+            
+            StringBuilder sb = new StringBuilder();
+            Iterator<InputParam> iterator = appliedCommonInputParam.iterator();
+            while (iterator.hasNext()) {
+                sb.append(iterator.next().getName());
+                if(iterator.hasNext()) {
+                    sb.append(",");
+                }
+            }
+            dashboardService.saveFilterOrder(dashboard.getDashboardId(), sb.toString());
         }
     }; 
     
@@ -986,7 +1021,7 @@ public class DashboardController extends SelectorComposer<Window>{
             row.setAttribute(Constants.ROW_CHECKED, false);
         }
         if(appliedCommonInputParam== null ){
-            appliedCommonInputParam = new HashSet<InputParam>();
+            appliedCommonInputParam = new LinkedHashSet<InputParam>();
         }
         Sessions.getCurrent().setAttribute(Constants.COMMON_FILTERS, appliedCommonInputParam);
         appliedCommonInputParam.add(inputparam);
@@ -1160,7 +1195,7 @@ public class DashboardController extends SelectorComposer<Window>{
             row.setAttribute(Constants.ROW_CHECKED, false);
         }
         if(appliedCommonFilters== null ){
-            appliedCommonFilters = new HashSet<Filter>();
+            appliedCommonFilters = new LinkedHashSet<Filter>();
         }
         Sessions.getCurrent().setAttribute(Constants.COMMON_FILTERS, appliedCommonFilters);
         appliedCommonFilters.add(filter);
@@ -1313,7 +1348,7 @@ public class DashboardController extends SelectorComposer<Window>{
             row.setAttribute(Constants.ROW_CHECKED, false);
         }
         if(appliedCommonFilters == null ){
-            appliedCommonFilters = new HashSet<Filter>();
+            appliedCommonFilters = new LinkedHashSet<Filter>();
         }
         Sessions.getCurrent().setAttribute(Constants.COMMON_FILTERS, appliedCommonFilters);
         appliedCommonFilters.add(filter);

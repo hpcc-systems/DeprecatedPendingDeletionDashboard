@@ -366,4 +366,16 @@ public class DashboardDaoImpl implements DashboardDao {
                 new Object[] { userId, applicationId }, String.class);
     }
 
+    @Override
+    public void saveFilterOrder(Integer dashboardId, String order) {
+        LOG.debug("Updating oder " + order + " Dashboard id - " + dashboardId);
+        
+        getJdbcTemplate().update("UPDATE dashboard_details SET filter_order = ? WHERE dashboard_id = ?", new Object[] {order , dashboardId});
+    }
+
+    @Override
+    public String getFilterOrder(Integer dashboardId) {
+        return getJdbcTemplate().queryForObject("SELECT filter_order from dashboard_details WHERE dashboard_id = ?", String.class, new Object[]{dashboardId});
+    }
+
 }

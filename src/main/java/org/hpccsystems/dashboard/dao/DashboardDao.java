@@ -87,4 +87,8 @@ public interface DashboardDao {
      * @return List<String>
      */
     List<String> getDashboardName(String userId, String applicationId);
+
+    void saveFilterOrder(Integer dashboardId, String order);
+
+    String getFilterOrder(Integer dashboardId);
 }
