@@ -135,29 +135,32 @@ function update(source) {
 
 // Toggle children on click.
 function click(d) {
-		
-	var memberfilter = new Array();
-	memberfilter[0] = "name";
-	memberfilter[1] = "level";
-	memberfilter[2] = "filters";
-	memberfilter[3] = "imageSrc";
-	console.log(JSON.stringify(d,memberfilter));
-    
-	jq.getJSON("../heirarchical_chartdata.do?chart_id=" + chartId + "&node=" + JSON.stringify(d,memberfilter), function(addTheseJSON) {
-	    var newnodes = tree.nodes(addTheseJSON.children).reverse();
-	    d.children = newnodes[0];
-	    update(d);
-	});
-	
 	
   if (d.children) {
     d._children = d.children;
     d.children = null;
+    update(d);
   } else {
-    d.children = d._children;
-    d._children = null;
+	if(d._children == null || d._children.length == 0) {
+		var memberfilter = new Array();
+		memberfilter[0] = "name";
+		memberfilter[1] = "level";
+		memberfilter[2] = "filters";
+		memberfilter[3] = "imageSrc";
+		console.log(JSON.stringify(d,memberfilter));
+	    
+		jq.getJSON("../heirarchical_chartdata.do?chart_id=" + chartId + "&node=" + JSON.stringify(d,memberfilter), function(addTheseJSON) {
+		    var newnodes = tree.nodes(addTheseJSON.children).reverse();
+		    d.children = newnodes[0];
+		    d._children = null;
+		    update(d);
+		});
+	} else {
+		d.children = d._children;
+	    d._children = null;
+	    update(d);
+	}
   }
-  update(d);
 }
 
 }
