@@ -28,6 +28,7 @@ public class Dashboard {
     private Timestamp lastupdatedDate;
     private Integer sequence;
     private boolean hasCommonFilter = false;
+    private boolean showLocalFilter;
     private Integer visibility;
     private String role;
   
@@ -343,6 +344,14 @@ public class Dashboard {
     public void addCommonQueryFilters(List<InputParam> persistedGlobalInputParams) {
         initiateCommonFilters();
         commonQueryFilters.addAll(persistedGlobalInputParams);
+    }
+
+    public boolean showLocalFilter() {
+        return showLocalFilter;
+    }
+
+    public void setShowLocalFilter(boolean showLocalFilter) {
+        this.showLocalFilter = showLocalFilter;
     }
 
 }

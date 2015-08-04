@@ -1,10 +1,12 @@
 package org.hpccsystems.dashboard.services.impl; 
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.common.Constants;
@@ -139,6 +141,17 @@ public class DashboardServiceImpl implements DashboardService {
     @Override
     public List<String> getDashboardName(String userId, String applicationId) {
         return dashboardDao.getDashboardName(userId, applicationId);
+    }
+
+    @Override
+    public void saveFilterOrder(Integer dashboardId, String order) {
+        dashboardDao.saveFilterOrder(dashboardId, order);
+    }
+
+    @Override
+    public List<String> getFilterOrder(Integer dashboardId) {
+        String order = dashboardDao.getFilterOrder(dashboardId);
+        return order != null ? Arrays.asList(StringUtils.split(order, ",")) : null;
     }
 
 }

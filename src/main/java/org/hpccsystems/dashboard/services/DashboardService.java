@@ -88,5 +88,9 @@ public interface DashboardService {
      * @return List<String>
      */
     List<String> getDashboardName(String userId, String applicationId);
+
+    void saveFilterOrder(Integer dashboardId, String string);
+
+    List<String> getFilterOrder(Integer dashboardId);
     
 }

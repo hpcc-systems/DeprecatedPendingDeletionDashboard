@@ -41,6 +41,8 @@ application_id VARCHAR(50),
 visibility TINYINT,
 last_updated_date TIMESTAMP,
 common_filter TINYINT,
+show_localfilter TINYINT,
+filter_order TEXT,
 PRIMARY KEY(dashboard_id)
 ) ENGINE=InnoDB;
 

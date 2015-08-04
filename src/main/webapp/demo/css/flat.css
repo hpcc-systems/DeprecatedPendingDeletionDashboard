@@ -227,7 +227,7 @@ body{
   position: relative;
 }
 .sidebar > ul > li > a {
-  padding: 10px 0 2px 15px;
+  padding: 5px 0px 5px 2px;
   display: block;
   color: #AAAAAA;
   font-family: 'Signika Negative', "Helvetica Neue", Helvetica, Arial, sans-serif;

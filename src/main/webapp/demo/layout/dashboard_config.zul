@@ -54,6 +54,12 @@
 				</div>
 				<checkbox zclass="checkbox" id="commonFiltersCheckbox"></checkbox>
 			</hbox>
+			<hbox align="center" sclass="options-form">
+				<div zclass="options-div">
+					<label value="Show local filters" zclass="h5"></label>
+				</div>
+				<checkbox zclass="checkbox" id="localFiltersCheckbox"></checkbox>
+			</hbox>
 			
 			<hbox align="center" sclass="options-form">
 				<div zclass="options-div">
