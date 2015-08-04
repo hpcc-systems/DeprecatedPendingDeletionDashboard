@@ -49,6 +49,8 @@ public class DashboardConfigurationController extends SelectorComposer<Component
     @Wire
     Checkbox commonFiltersCheckbox;
     @Wire
+    Checkbox localFiltersCheckbox;
+    @Wire
     Hbox commonFilterHbox;
     @Wire
     private Hlayout layout;
@@ -92,6 +94,10 @@ public class DashboardConfigurationController extends SelectorComposer<Component
                 isCommonFiltersEnabled = true;
             }
             
+            if(dashboard.showLocalFilter()){
+                localFiltersCheckbox.setChecked(true);
+            }
+            
             try {
                 radioList.get(dashboard.getColumnCount() - 1).setSelected(true);
             } catch (ArrayIndexOutOfBoundsException e) {
@@ -110,6 +116,9 @@ public class DashboardConfigurationController extends SelectorComposer<Component
             //Creating a new Dashboard             
             //Setting two column layout as default
             radioList.get(2).setSelected(true);
+            
+            //Defaulting show local filters to true
+            localFiltersCheckbox.setChecked(true);
         }
         
     }
@@ -128,6 +137,7 @@ public class DashboardConfigurationController extends SelectorComposer<Component
             //Changing configuration of existing board            
             dashboard.setName(nameTextbox.getValue());
             dashboard.setHasCommonFilter(commonFiltersCheckbox.isChecked());
+            dashboard.setShowLocalFilter(localFiltersCheckbox.isChecked());
             
             //Removing Common HpccConnection object from session, if Common filters are disabled
             if(!commonFiltersCheckbox.isChecked()) {
@@ -149,6 +159,7 @@ public class DashboardConfigurationController extends SelectorComposer<Component
                 dashboard.setLastupdatedDate(new Timestamp(Calendar.getInstance().getTime().getTime()));
     
                 dashboard.setHasCommonFilter(commonFiltersCheckbox.isChecked());
+                dashboard.setShowLocalFilter(localFiltersCheckbox.isChecked());
                 
                 //Deciding Columns and rows
                 Integer panelCount = null;

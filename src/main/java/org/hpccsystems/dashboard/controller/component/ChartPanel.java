@@ -136,6 +136,8 @@ public class ChartPanel extends Panel {
     Portlet portlet;
     Toolbar toolbar;
     private String divId;
+    private int btnState;
+    private boolean showLocalFilter;
     
    
     //Delete panel listener
@@ -328,7 +330,10 @@ public class ChartPanel extends Panel {
         
 
 
-    public ChartPanel(final Portlet argPortlet, final int buttonState) {
+    public ChartPanel(final Portlet argPortlet, final int buttonState, final boolean showLocalFilters) {
+        this.btnState = buttonState;
+        this.showLocalFilter = showLocalFilters;
+        
         this.setZclass("panel");
         this.imageContainer.setVflex("1");
         this.imageContainer.setHflex("1");
@@ -383,8 +388,10 @@ public class ChartPanel extends Panel {
         resizeBtn.setSclass(RESIZE_MAX_STYLE);
         resizeBtn.setTooltiptext("Maximize window");
         
-        //Shows Input parameters for Quieries(Roxie/Thor)
-        onDrawingQueryChart(buttonState);
+        if(showLocalFilters) {
+            //Shows Input parameters for Quieries(Roxie/Thor)
+            onDrawingQueryChart(buttonState);
+        }
         
         if(Constants.SHOW_ALL_BUTTONS == buttonState) {
         	if(Constants.STATE_EMPTY.equals(portlet.getWidgetState())){
@@ -695,6 +702,12 @@ public class ChartPanel extends Panel {
     
 
     public void onDrawingQueryChart(final int buttonState) {
+        boolean showIPButton = Constants.SHOW_ALL_BUTTONS == buttonState || Constants.SHOW_EDIT_ONLY == buttonState;
+        
+        if(!showIPButton || !showLocalFilter) {
+            return;
+        }
+        
         if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState()) && portlet.getChartData().getIsQuery() 
                 && (Constants.CATEGORY_SCORED_SEARCH_TABLE !=  chartService.getCharts().get(portlet.getChartType())
                                 .getCategory())){
@@ -704,7 +717,6 @@ public class ChartPanel extends Panel {
             }
             
             inputParamBtn = new Button();
-            boolean showIPButton = Constants.SHOW_ALL_BUTTONS == buttonState || Constants.SHOW_EDIT_ONLY == buttonState;
             if(showIPButton && !toolbar.getChildren().isEmpty()) {
                 toolbar.insertBefore(inputParamBtn, toolbar.getFirstChild());
             } else if(showIPButton){
@@ -1279,6 +1291,22 @@ public class ChartPanel extends Panel {
                 window = (Window) component;
                 Events.sendEvent(new Event("onPanelReset", window, portlet));
             }
+        }
+    }
+
+    public void showLocalFilter() {
+        showLocalFilter = true;
+        if(inputParamBtn != null){
+            inputParamBtn.setVisible(true);
+        } else {
+            onDrawingQueryChart(this.btnState);
+        }
+    }
+
+    public void hideLocalFilter() {
+        showLocalFilter = false;
+        if(inputParamBtn != null){
+            inputParamBtn.setVisible(false);
         }
     }
 } 

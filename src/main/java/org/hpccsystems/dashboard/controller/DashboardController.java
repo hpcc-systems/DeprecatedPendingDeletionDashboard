@@ -352,11 +352,11 @@ public class DashboardController extends SelectorComposer<Window>{
             for (Portlet portlet : dashboard.getPortletList()) {  
               if(userCredential.hasRole(Constants.CIRCUIT_ROLE_VIEW_EDIT_DASHBOARD) ||
                         Constants.ROLE_ADMIN.equals(dashboard.getRole()) ) {
-                    panel = new ChartPanel(portlet, Constants.SHOW_ALL_BUTTONS);
+                    panel = new ChartPanel(portlet, Constants.SHOW_ALL_BUTTONS, dashboard.showLocalFilter());
                 } else if(Constants.ROLE_CONTRIBUTOR.equals(dashboard.getRole())) {
-                     panel = new ChartPanel(portlet, Constants.SHOW_EDIT_ONLY);
+                     panel = new ChartPanel(portlet, Constants.SHOW_EDIT_ONLY, dashboard.showLocalFilter());
                 } else {
-                    panel = new ChartPanel(portlet, Constants.SHOW_NO_BUTTONS);                    
+                    panel = new ChartPanel(portlet, Constants.SHOW_NO_BUTTONS, dashboard.showLocalFilter());                    
                 }
                                 
                 portalChildren.get(portlet.getColumn()).appendChild(panel);
@@ -1775,7 +1775,7 @@ public class DashboardController extends SelectorComposer<Window>{
             portlet.setColumn(column);
             
             //Assuming ChartPanel is configurable, as 'Add Widget' is enabled
-            chartPanel = new ChartPanel(portlet,Constants.SHOW_ALL_BUTTONS);
+            chartPanel = new ChartPanel(portlet,Constants.SHOW_ALL_BUTTONS, dashboard.showLocalFilter());
             portalChildren.get(portlet.getColumn()).appendChild(chartPanel);
             chartPanel.focus();
             
@@ -1894,6 +1894,20 @@ public class DashboardController extends SelectorComposer<Window>{
                         portalChildren.get(dashboard.getColumnCount() -1).appendChild(component);
                     }
                 }
+            }
+            
+            //Updating Local filters toggle
+            for (Portalchildren component : portalChildren) {
+                component.getChildren()
+                    .stream()
+                    .filter(comp -> comp instanceof ChartPanel)
+                    .forEach(cp -> {
+                        if(dashboard.showLocalFilter()) {
+                            ((ChartPanel)cp).showLocalFilter();
+                        } else {
+                            ((ChartPanel)cp).hideLocalFilter();
+                        }
+                    });
             }
             
             //To update Dashboard Name
