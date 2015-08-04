@@ -368,8 +368,6 @@ public class ChartPanel extends Panel {
         titleTextbox.setSclass("title-textbox");
        
         titleTextbox.setMaxlength(200);
-        titlelabel.addEventListener(Events.ON_CLICK, enableTitleEdit);
-        titleTextbox.addEventListener(Events.ON_BLUR, titleChangeLisnr);
 
         toolbar = new Toolbar();
         toolbar.setAlign("end");
@@ -390,6 +388,10 @@ public class ChartPanel extends Panel {
         
         if(Constants.SHOW_ALL_BUTTONS == buttonState) {
         	if(Constants.STATE_EMPTY.equals(portlet.getWidgetState())){
+        	    //Adding title change listeners only for ADMINS
+        	    titlelabel.addEventListener(Events.ON_CLICK, enableTitleEdit);
+        	    titleTextbox.addEventListener(Events.ON_BLUR, titleChangeLisnr);
+        	    
         	    addBtn.setTooltiptext("Add Chart");
             }else{
                 addBtn.setTooltiptext("Configure Chart");
