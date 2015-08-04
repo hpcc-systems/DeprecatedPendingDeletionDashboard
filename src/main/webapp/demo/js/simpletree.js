@@ -166,7 +166,7 @@ var reqData = jq.parseJSON(chartData);
             }
             dragStarted = true;
             nodes = tree.nodes(d);
-            d3.event.sourceEvent.stopPropagation();
+            //d3.event.sourceEvent.stopPropagation();
             // it's important that we suppress the mouseover event on the node being dragged. Otherwise it will absorb the mouseover event and the underlying node will not detect it d3.select(this).attr('pointer-events', 'none');
         })
         .on("dragend", function(d) {
@@ -320,7 +320,7 @@ var reqData = jq.parseJSON(chartData);
     // Toggle children on click.
 
     function click(d) {
-        if (d3.event.defaultPrevented) return; // click suppressed
+        //if (d3.event.defaultPrevented) return; // click suppressed
         toggleChildren(d);
     }
 
