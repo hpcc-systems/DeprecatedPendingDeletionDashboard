@@ -506,7 +506,7 @@ public class DashboardController extends SelectorComposer<Window>{
             commonInputParams =  new LinkedHashMap<String, Map<String,Set<String>>>();
         }
         for(InputParam globalInput : persistedGlobalInputParams){
-                Set<String> distinctValues = new HashSet<>();
+                Set<String> distinctValues = new LinkedHashSet<>();
                 for(Portlet portlet : dashboard.getPortletList()){
                     if (portlet.getWidgetState().equals( Constants.STATE_LIVE_CHART)
                             && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()
