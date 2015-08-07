@@ -49,6 +49,8 @@ public class DashboardConfigurationController extends SelectorComposer<Component
     @Wire
     Checkbox commonFiltersCheckbox;
     @Wire
+    Checkbox lockCfCheckbox;
+    @Wire
     Checkbox localFiltersCheckbox;
     @Wire
     Hbox commonFilterHbox;
@@ -91,6 +93,7 @@ public class DashboardConfigurationController extends SelectorComposer<Component
             
             if(dashboard.getHasCommonFilter()){
                 commonFiltersCheckbox.setChecked(true);
+                lockCfCheckbox.setChecked(dashboard.isLockCommonFilter());
                 isCommonFiltersEnabled = true;
             }
             
@@ -137,6 +140,7 @@ public class DashboardConfigurationController extends SelectorComposer<Component
             //Changing configuration of existing board            
             dashboard.setName(nameTextbox.getValue());
             dashboard.setHasCommonFilter(commonFiltersCheckbox.isChecked());
+            dashboard.setLockCommonFilter(lockCfCheckbox.isChecked());
             dashboard.setShowLocalFilter(localFiltersCheckbox.isChecked());
             
             //Removing Common HpccConnection object from session, if Common filters are disabled
@@ -159,6 +163,7 @@ public class DashboardConfigurationController extends SelectorComposer<Component
                 dashboard.setLastupdatedDate(new Timestamp(Calendar.getInstance().getTime().getTime()));
     
                 dashboard.setHasCommonFilter(commonFiltersCheckbox.isChecked());
+                dashboard.setLockCommonFilter(lockCfCheckbox.isChecked());
                 dashboard.setShowLocalFilter(localFiltersCheckbox.isChecked());
                 
                 //Deciding Columns and rows

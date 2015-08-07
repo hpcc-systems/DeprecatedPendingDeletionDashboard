@@ -19,6 +19,7 @@ public class DashboardRowMapper implements RowMapper<Dashboard> {
         dashboard.setVisibility(rs.getInt("visibility"));
         dashboard.setHasCommonFilter(rs.getBoolean("common_filter"));
         dashboard.setShowLocalFilter(rs.getBoolean("show_localfilter"));
+        dashboard.setLockCommonFilter(rs.getBoolean("lock_commonfilter"));
         dashboard.setLastupdatedDate(rs.getTimestamp("last_updated_date"));
         return dashboard;
     }

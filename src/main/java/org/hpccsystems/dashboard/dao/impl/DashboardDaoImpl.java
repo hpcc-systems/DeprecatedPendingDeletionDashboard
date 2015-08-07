@@ -168,8 +168,8 @@ public class DashboardDaoImpl implements DashboardDao {
                         dashboard.getVisibility(),
                         dashboard.getHasCommonFilter(),
                         dashboard.showLocalFilter(),
+                        dashboard.isLockCommonFilter(),
                         dashboard.getDashboardId()
-
                 });
     }
 
@@ -339,6 +339,7 @@ public class DashboardDaoImpl implements DashboardDao {
             dashboard.setLastupdatedDate(rs.getTimestamp("last_updated_date"));
             dashboard.setHasCommonFilter(rs.getBoolean("common_filter"));
             dashboard.setShowLocalFilter(rs.getBoolean("show_localfilter"));
+            dashboard.setLockCommonFilter(rs.getBoolean("lock_commonfilter"));
             
             // Only when joining with acl_public table,to get 'role'
             dashboard.setRole(rs.getString("role"));

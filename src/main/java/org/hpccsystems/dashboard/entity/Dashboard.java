@@ -29,6 +29,7 @@ public class Dashboard {
     private Integer sequence;
     private boolean hasCommonFilter = false;
     private boolean showLocalFilter;
+    private boolean lockCommonFilter;
     private Integer visibility;
     private String role;
   
@@ -352,6 +353,14 @@ public class Dashboard {
 
     public void setShowLocalFilter(boolean showLocalFilter) {
         this.showLocalFilter = showLocalFilter;
+    }
+
+    public boolean isLockCommonFilter() {
+        return lockCommonFilter;
+    }
+
+    public void setLockCommonFilter(boolean lockCommonFilter) {
+        this.lockCommonFilter = lockCommonFilter;
     }
 
 }
