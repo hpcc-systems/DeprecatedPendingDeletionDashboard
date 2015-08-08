@@ -176,6 +176,8 @@ public class DashboardController extends SelectorComposer<Window>{
     Set<Filter> appliedCommonFilters;
     Set<InputParam> appliedCommonInputParam;
     
+    private List<Button> filterButtons = new ArrayList<Button>();
+    
     Map<String, Set<Field>> commonFields;
     private int drawnLiveChartCount;
     private Map<String, Map<String,Set<String>>>  commonInputParams;
@@ -506,7 +508,7 @@ public class DashboardController extends SelectorComposer<Window>{
             commonInputParams =  new LinkedHashMap<String, Map<String,Set<String>>>();
         }
         for(InputParam globalInput : persistedGlobalInputParams){
-                Set<String> distinctValues = new HashSet<>();
+                Set<String> distinctValues = new LinkedHashSet<>();
                 for(Portlet portlet : dashboard.getPortletList()){
                     if (portlet.getWidgetState().equals( Constants.STATE_LIVE_CHART)
                             && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()
@@ -1040,6 +1042,11 @@ public class DashboardController extends SelectorComposer<Window>{
         button.addEventListener(Events.ON_CLICK, removeGlobalFilter);
         div.appendChild(button);
         
+        filterButtons.add(button);
+        if(dashboard.isLockCommonFilter()) {
+            button.setVisible(false);
+        }
+        
         row.appendChild(div);
         
         Hbox hbox = new Hbox();
@@ -1212,6 +1219,11 @@ public class DashboardController extends SelectorComposer<Window>{
         button.addEventListener(Events.ON_CLICK, removeGlobalFilter);
         div.appendChild(button);
         
+        filterButtons.add(button);
+        if(dashboard.isLockCommonFilter()) {
+            button.setVisible(false);
+        }
+        
         Anchorlayout anchorlayout = new Anchorlayout();
         anchorlayout.setHflex("1");
         
@@ -1364,6 +1376,11 @@ public class DashboardController extends SelectorComposer<Window>{
         button.setStyle("float: right;");
         button.addEventListener(Events.ON_CLICK, removeGlobalFilter);
         div.appendChild(button);
+        
+        filterButtons.add(button);
+        if(dashboard.isLockCommonFilter()) {
+            button.setVisible(false);
+        }
         
         
         // Current implementation assumes, in a dashboard, 
@@ -1622,6 +1639,9 @@ public class DashboardController extends SelectorComposer<Window>{
             
             //Removing the Filter row in UI
             removedRow.detach();
+            
+            //Removing buttons from filter list
+            filterButtons.remove(event.getTarget());
         }
     };
 
@@ -2001,6 +2021,12 @@ public class DashboardController extends SelectorComposer<Window>{
                 Clients.showNotification(Labels.getLabel("unableToUpdateWidget"),
                         Clients.NOTIFICATION_TYPE_ERROR, DashboardController.this.getSelf(), Constants.POSITION_CENTER, 3000, true);
             }
+            
+            if(dashboard.isLockCommonFilter()) {
+                filterButtons.forEach(btn -> btn.setVisible(false));
+            } else {
+                filterButtons.forEach(btn -> btn.setVisible(true));
+            }
         }        
     };
 
@@ -2022,6 +2048,7 @@ public class DashboardController extends SelectorComposer<Window>{
             filterRows.getChildren().clear();
             dashboard.setHasCommonFilter(false);
             
+            filterButtons.clear();
         } catch (Exception e) {
             LOG.debug(" Exception while removing global filters", e);
         }

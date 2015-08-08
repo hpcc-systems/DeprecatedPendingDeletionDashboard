@@ -9,7 +9,6 @@ public class Queries {
     private Queries() {
     }
     
-    public static final String INSERT_DASHBOARD = "INSERT INTO dashboard_details(dashboard_name,user_id,application_Id,last_updated_date,column_count,sequence,source_id,visibility,common_filter) VALUES(?,?,?,?,?,?,?,?,?)";
     public static final String DELETE_DASHBOARD_WIDGETS = "delete from widget_details where dashboard_id=?";
     public static final String DELETE_WIDGETS = "delete from widget_details where widget_id=?";
     public static final String DELETE_DASHBOARD = "delete from dashboard_details where dashboard_id=? and user_id =? ";    
@@ -24,7 +23,7 @@ public class Queries {
     public static final String RETRIEVE_DASHBOARD_DETAILS = "select * from dashboard_details where application_id = ";
     public static final String DASHBOARD_IN_CLAUSE = " and dashboard_id in ";
     public static final String UPDATE_SIDEBAR_DETAILS = "update dashboard_details set sequence=? where dashboard_id=?";
-    public static final String UPDATE_DASHBOARD =  "update dashboard_details set dashboard_name=?,column_count=?,source_id=?,last_updated_date=?,visibility=?,common_filter=?,show_localfilter=? where dashboard_id=?";
+    public static final String UPDATE_DASHBOARD =  "update dashboard_details set dashboard_name=?,column_count=?,source_id=?,last_updated_date=?,visibility=?,common_filter=?,show_localfilter=?,lock_commonfilter=? where dashboard_id=?";
     public static final String UPDATE_WIDGET_SEQUENCE = "update widget_details set column_identifier=?,widget_sequence=? where widget_id=? and dashboard_id=?";
     public static final String ADD_CHART_DATA = "update widget_details set widget_state=?, chart_type=?  where widget_id=?";
     public static final String CLEAR_CHART_DATA = "update widget_details set widget_name=?, widget_state=?,chart_type=?,chart_data=?  where widget_id=?";
@@ -38,7 +37,7 @@ public class Queries {
     public static final String SELECT_GROUP="select * from acl_public where dashboard_id = ?";
     public static final String DELETE_GROUP="delete from acl_public where dashboard_id=? and group_code in(?)";
     public static final String GET_PRIVATE_DASHBOARDS = "SELECT * FROM dashboard_details WHERE user_id=? AND application_id=? order by sequence";
-    public static final String GET_ROLE_BASED_DASHBOARDS = "SELECT a.role,d.dashboard_id,d.application_id,d.dashboard_name,d.column_count,d.source_id,d.visibility,d.last_updated_date,d.common_filter,d.show_localfilter FROM acl_public AS a JOIN dashboard_details AS d ON a.dashboard_id = d.dashboard_id AND a.group_code in ";
+    public static final String GET_ROLE_BASED_DASHBOARDS = "SELECT a.role,d.dashboard_id,d.application_id,d.dashboard_name,d.column_count,d.source_id,d.visibility,d.last_updated_date,d.common_filter,d.show_localfilter,d.lock_commonfilter FROM acl_public AS a JOIN dashboard_details AS d ON a.dashboard_id = d.dashboard_id AND a.group_code in ";
     public static final String GET_ALL_DASHBOARD = "SELECT * FROM dashboard_details where application_id=? order by sequence";
     public static final String GET_DASHBOARD = "SELECT * FROM dashboard_details WHERE dashboard_id=?";
     public static final String DELETE_ACL_PUBLIC = "delete from acl_public where dashboard_id=?";

@@ -60,17 +60,6 @@ var reqData = jq.parseJSON(chartData);
         return d.children && d.children.length > 0 ? d.children : null;
     });
 
-
-    // sort the tree according to the node names
-
-    function sortTree() {
-        tree.sort(function(a, b) {
-            return b.name.toLowerCase() < a.name.toLowerCase() ? 1 : -1;
-        });
-    }
-    // Sort the tree initially incase the JSON isn't in a sorted order.
-    sortTree();
-
     // TODO: Pan function, can be better implemented.
 
     function pan(domNode, direction) {
@@ -371,12 +360,18 @@ var reqData = jq.parseJSON(chartData);
             })
             .on('click', click);
 
-        nodeEnter.append("circle")
+        nodeEnter.append("image")
+	    	.attr("xlink:href", function(d) {
+	        	if(!d.imageSrc)
+	        		return d._children ? './chart/icons/circle_c.png' : './chart/icons/circle.png';
+	    		
+	        	return d._children ? './chart/icons/' + d.imageSrc + '_c.png' : './chart/icons/' + d.imageSrc + '.png';
+	    	})
             .attr('class', 'nodeCircle')
-            .attr("r", 0)
-            .style("fill", function(d) {
-                return d._children ? "lightsteelblue" : "#fff";
-            });
+	        .attr("x", -8)
+	        .attr("y", -8)
+	        .attr("width", 16)
+	        .attr("height", 16);
 
         nodeEnter.append("text")
             .attr("x", function(d) {
@@ -418,12 +413,15 @@ var reqData = jq.parseJSON(chartData);
                 return d.name;
             });
 
-        // Change the circle fill depending on whether it has children and is collapsed
-        node.select("circle.nodeCircle")
-            .attr("r", 4.5)
-            .style("fill", function(d) {
-                return d._children ? "lightsteelblue" : "#fff";
-            });
+        // Change the image depending on whether it has children and is collapsed
+        node.select("image.nodeCircle")
+	        .attr("xlink:href", function(d) {
+	        	if(!d.imageSrc) {
+	        		return d._children ? './chart/icons/circle_c.png' : './chart/icons/circle.png';
+	        	}
+	    		
+	        	return d._children ? './chart/icons/' + d.imageSrc + '_c.png' : './chart/icons/' + d.imageSrc + '.png';
+	    	});
 
         // Transition nodes to their new position.
         var nodeUpdate = node.transition()
