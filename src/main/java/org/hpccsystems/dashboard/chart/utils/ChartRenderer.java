@@ -542,6 +542,10 @@ public class ChartRenderer {
             jsBuilder.append("],'callback': oneMethod});");
         } else {
             jsBuilder.append("jq.when(");
+            
+            /*
+             * Uncomment for plugins to work
+             * 
             if(chartDetails.getConfiguration().getDependentJsURL() != null 
                     && !chartDetails.getConfiguration().getDependentJsURL().isEmpty()) {
                 for (String path : chartDetails.getConfiguration().getDependentJsURL()) {
@@ -549,7 +553,7 @@ public class ChartRenderer {
                         .append(path)
                         .append("'),");
                 }
-            }
+            } */
             
             jsBuilder.append("jq.getScript('")
                 .append(chartDetails.getConfiguration().getJsURL())

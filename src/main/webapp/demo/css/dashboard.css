@@ -16,14 +16,8 @@
   	height: 31px;
 }
 
-.radio, .checkbox > input {
-	margin-top: 0;
-    margin-right: 2px;
-}
-
-.radio, .checkbox {
-	margin-top: 0px;
-  	margin-bottom: 0px;
+input[type="radio"], input[type="checkbox"] {
+    margin: 0px 5px 0 0;
 }
 
 .list-combo > input {
