@@ -543,6 +543,18 @@ public class ChartRenderer {
         } else {
             jsBuilder.append("jq.when(");
             
+            /*
+             * Uncomment for plugins to work
+             * 
+            if(chartDetails.getConfiguration().getDependentJsURL() != null 
+                    && !chartDetails.getConfiguration().getDependentJsURL().isEmpty()) {
+                for (String path : chartDetails.getConfiguration().getDependentJsURL()) {
+                    jsBuilder.append("jq.getScript('")
+                        .append(path)
+                        .append("'),");
+                }
+            } */
+            
             jsBuilder.append("jq.getScript('")
                 .append(chartDetails.getConfiguration().getJsURL())
                 .append("'),");
