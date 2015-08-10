@@ -9,6 +9,10 @@
 <?style src="css/jquery-ui.css"?>
 <?script src="js/common.js"?>
 
+<?script src="js/lib/d3.v3.min.js"?>
+<?script src="js/lib/c3.js"?>
+<?script src="js/lib/datamaps.usa.min.js"?>
+<?script src="js/lib/topojson.v1.min.js"?>
 <?script src="http://www.google.com/jsapi"?>
 
 <?style src="css/dashboard.css"?>
