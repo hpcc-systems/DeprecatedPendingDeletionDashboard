@@ -53,6 +53,7 @@
 					<label value="${labels.commonFilters}" zclass="h5"></label>
 				</div>
 				<checkbox zclass="checkbox" label="Enable" id="commonFiltersCheckbox"></checkbox>
+				<space></space>
 				<checkbox zclass="checkbox" label="Prevent deletion" id="lockCfCheckbox"></checkbox>
 			</hbox>
 			<hbox align="center" sclass="options-form">

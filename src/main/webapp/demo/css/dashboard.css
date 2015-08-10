@@ -16,7 +16,7 @@
   	height: 31px;
 }
 
-.radio, .checkbox > input {
+.radio > input {
 	margin-top: 0;
     margin-right: 2px;
 }
