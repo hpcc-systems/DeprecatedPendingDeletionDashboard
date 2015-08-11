@@ -9,6 +9,11 @@
   background-color: rgb(107, 107, 107) !important;	
 }
 
+.header-logo {
+	margin-top: 5px;
+    margin-left: 10px;
+}
+
 .title-label {
 	color: black;
 	font-weight: 600;

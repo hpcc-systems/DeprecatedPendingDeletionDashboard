@@ -242,6 +242,22 @@ public class DashboardController extends SelectorComposer<Window>{
         } 
         
     };
+    
+    EventListener<Event> sidebarResizeListener = event -> {
+        LOG.debug("Sidebar resized..!");
+        for (Portalchildren component : portalChildren) {
+            component.getChildren()
+                .stream()
+                .filter(comp -> comp instanceof ChartPanel)
+                .forEach(cp -> {
+                    ChartPanel panel = (ChartPanel) cp;
+                    if(panel.getPortlet().isLive()) {
+                        panel.redrawLiveChart();
+                    }
+                });
+        }
+    };
+    
     @Override
     public void doAfterCompose(Window comp) throws Exception {
         super.doAfterCompose(comp);
@@ -420,6 +436,8 @@ public class DashboardController extends SelectorComposer<Window>{
         if(Constants.ROLE_CONSUMER.equals(dashboard.getRole())) {
             commonFiltersPanel.setVisible(false);
         }
+        
+        comp.addEventListener("onSidebarResize", sidebarResizeListener);
     }
    
 

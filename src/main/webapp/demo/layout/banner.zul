@@ -1,7 +1,7 @@
 <div hflex="1" vflex="1"> 
-	<hbox hflex="1" vflex="1" align="center">
-		<vbox align="center" width="200px">
-			<image src="/demo/images/logo_white.png" width="180px"/>
+	<hbox hflex="1" vflex="1">
+		<vbox width="200px">
+			<image class="header-logo" src="/demo/images/logo_white.png" width="180px"/>
 		</vbox>
 		
 		<hbox 

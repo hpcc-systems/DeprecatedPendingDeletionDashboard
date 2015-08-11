@@ -582,7 +582,6 @@ public class ChartPanel extends Panel {
     private void setHeight() {
         int screenHeight = Integer.parseInt(Sessions.getCurrent()
                 .getAttribute(Constants.SCREEN_HEIGHT).toString());
-        Sessions.getCurrent().getAttribute(Constants.SCREEN_HEIGHT);
         
         StringBuilder sb = new StringBuilder();
         if(portlet.getIsSinglePortlet()){
@@ -840,20 +839,7 @@ public class ChartPanel extends Panel {
             }          
 
             // To construct Table Widget
-            if (Constants.CATEGORY_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()) {
-                drawTableWidget(true);
-            } else if (Constants.CATEGORY_TEXT_EDITOR == chartService.getCharts().get(portlet.getChartType()).getCategory()) {
-                onCreateDocumentWidget();
-            } else if(Constants.CATEGORY_SCORED_SEARCH_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()){
-                drawScoredSearchTable();
-            }else {
-                String chartScript = drawD3Graph();
-                if (chartScript != null) {
-                    Clients.evalJavaScript(chartScript);
-                } else {
-                    throw new WrongValueException("JSON to create chart is null");
-                }
-            }
+            redrawLiveChart();
 
             if(portlet.getName() != null && portlet.getName().contains(TITLE_PATTERN)){
                 generateDynamicTitle();
@@ -885,6 +871,23 @@ public class ChartPanel extends Panel {
                     window = (Window) component;
                     Events.sendEvent(new Event("onPanelDrawn", window));
                 }
+            }
+        }
+    }
+
+    public void redrawLiveChart() {
+        if (Constants.CATEGORY_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()) {
+            drawTableWidget(true);
+        } else if (Constants.CATEGORY_TEXT_EDITOR == chartService.getCharts().get(portlet.getChartType()).getCategory()) {
+            onCreateDocumentWidget();
+        } else if(Constants.CATEGORY_SCORED_SEARCH_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()){
+            drawScoredSearchTable();
+        }else {
+            String chartScript = drawD3Graph();
+            if (chartScript != null) {
+                Clients.evalJavaScript(chartScript);
+            } else {
+                throw new WrongValueException("JSON to create chart is null");
             }
         }
     }
@@ -1078,6 +1081,9 @@ public class ChartPanel extends Panel {
             jsBuilder.append("],'callback': oneMethod});");
         } else {
             jsBuilder.append("jq.when(");
+            
+            /*
+             * 
             if(chartDetails.getConfiguration().getDependentJsURL() != null 
                     && !chartDetails.getConfiguration().getDependentJsURL().isEmpty()) {
                 for (String path : chartDetails.getConfiguration().getDependentJsURL()) {
@@ -1086,6 +1092,7 @@ public class ChartPanel extends Panel {
                         .append("'),");
                 }
             }
+             */
             
             jsBuilder.append("jq.getScript('")
                 .append(chartDetails.getConfiguration().getJsURL())
