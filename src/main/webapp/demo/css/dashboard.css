@@ -9,6 +9,11 @@
   background-color: rgb(107, 107, 107) !important;	
 }
 
+.header-logo {
+	margin-top: 5px;
+    margin-left: 10px;
+}
+
 .title-label {
 	color: black;
 	font-weight: 600;
@@ -224,4 +229,21 @@ background: #91C3E0;
 
 .z-panelchildren header nav .chartOptions,.z-panelchildren header nav .filterTableOptions{
 	margin:7px 5px 0 5px;
+}
+
+.z-north-collapsed, .z-south-collapsed, .z-west-collapsed, .z-center-collapsed, .z-east-collapsed {
+    background: none repeat scroll 0 0 #333;
+    border: 1px solid #333;
+}    
+
+.z-borderlayout{
+	background-color:#333;
+}
+
+.z-east-splitter, .z-west-splitter, .z-north-splitter, .z-south-splitter {
+    background: #333;
+}    
+
+.z-east-splitter-button, .z-west-splitter-button, .z-north-splitter-button, .z-south-splitter-button,.z-borderlayout-icon {
+    color: #fff;    
 }

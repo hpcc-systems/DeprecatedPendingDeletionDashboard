@@ -9,7 +9,7 @@
 		<north height="70px" style="background-color: #292929;" border="none" zclass="banner" >		
 			<include src="/demo/layout/banner.zul" />
 		</north>
-		<west width="205px" border="none" minsize="300">
+		<west width="205px" border="none" splittable="true" minsize="300" collapsible="true" id="sidebarContainer">
 			<include src="/demo/layout/sidebar.zul"/>
 		</west>
 		<center id="mainContent" border="none" self="@insert(content)" >

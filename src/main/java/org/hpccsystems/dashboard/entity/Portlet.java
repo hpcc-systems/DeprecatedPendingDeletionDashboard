@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.hpccsystems.dashboard.chart.entity.ChartData;
 import org.hpccsystems.dashboard.chart.entity.TitleColumn;
+import org.hpccsystems.dashboard.common.Constants;
 
 public class Portlet {
 
@@ -113,6 +114,10 @@ public class Portlet {
                 .append(", isSinglePortlet=").append(isSinglePortlet)
                 .append("]");
         return buffer.toString();
+    }
+
+    public boolean isLive() {
+        return Constants.STATE_LIVE_CHART.equals(widgetState);
     }
 
 }
