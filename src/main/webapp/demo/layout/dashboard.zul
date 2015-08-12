@@ -88,7 +88,8 @@
 								<tabpanels>	</tabpanels>
 							</tabbox>
 						</popup>
-						<button sclass="glyphicon glyphicon-plus btn btn-link img-btn" popup="filterColumnPopup, position=start_before"></button>
+						<button style="    visibility: hidden;"></button>
+						<button id="addFilterBtn" sclass="glyphicon glyphicon-plus btn btn-link img-btn" popup="filterColumnPopup, position=start_before"></button>
 					</toolbar>
 				</hbox>
 			</div>

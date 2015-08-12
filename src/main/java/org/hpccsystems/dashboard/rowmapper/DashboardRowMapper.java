@@ -20,6 +20,8 @@ public class DashboardRowMapper implements RowMapper<Dashboard> {
         dashboard.setHasCommonFilter(rs.getBoolean("common_filter"));
         dashboard.setShowLocalFilter(rs.getBoolean("show_localfilter"));
         dashboard.setLockCommonFilter(rs.getBoolean("lock_commonfilter"));
+        dashboard.setLockaddCommonFilter(rs.getBoolean("lock_add_commonfilter"));
+        dashboard.setLockChartTitle(rs.getBoolean("lock_charttitle"));
         dashboard.setLastupdatedDate(rs.getTimestamp("last_updated_date"));
         return dashboard;
     }

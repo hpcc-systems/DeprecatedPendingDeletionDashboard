@@ -170,6 +170,9 @@ public class DashboardController extends SelectorComposer<Window>{
     private Button addWidget;
     
     @Wire
+    private Button addFilterBtn;
+    
+    @Wire
     private Button configureDashboard;
     
     Integer panelCount = 0;
@@ -376,7 +379,11 @@ public class DashboardController extends SelectorComposer<Window>{
                 } else {
                     panel = new ChartPanel(portlet, Constants.SHOW_NO_BUTTONS, dashboard.showLocalFilter());                    
                 }
-                                
+                
+                if(dashboard.lockChartTitle()) {
+                    panel.disableTitleEditing();
+                }
+              
                 portalChildren.get(portlet.getColumn()).appendChild(panel);
                 
                 //Constructing chart data only when live chart is drawn
@@ -435,6 +442,10 @@ public class DashboardController extends SelectorComposer<Window>{
         //Hide Common filters for Consumers
         if(Constants.ROLE_CONSUMER.equals(dashboard.getRole())) {
             commonFiltersPanel.setVisible(false);
+        }
+        
+        if(dashboard.isLockaddCommonFilter()) {
+            addFilterBtn.setVisible(false);
         }
         
         comp.addEventListener("onSidebarResize", sidebarResizeListener);
@@ -1627,26 +1638,30 @@ public class DashboardController extends SelectorComposer<Window>{
             Row removedRow = (Row) event.getTarget().getParent().getParent();
             Boolean rowChecked = (Boolean)removedRow.getAttribute(Constants.ROW_CHECKED);
             
+            Iterator<Portlet> iterator = null;
+            if(Constants.LOGICAL_FILE.equals(dashboard.getFileType())) {
+                iterator = removeFilter(removedRow).iterator();
+                
+                Filter removedFilter = (Filter)removedRow.getAttribute(Constants.FILTER);
+                //Need To remove the filter from applied filter set
+                appliedCommonFilters.remove(removedFilter);
+            } else if(Constants.QUERY.equals(dashboard.getFileType())) {
+                iterator = removeInputparam(removedRow).iterator();
+                
+                String removedInput =  removedRow.getAttribute(Constants.INPUT_PARAM_NAME).toString();
+                InputParam removedInputparam = new InputParam(removedInput);
+                
+                LOG.debug("Available filters - " + appliedCommonInputParam + " Filter to remove - " + removedInputparam);
+                
+                //Need To remove the filter from applied inputparam set
+                appliedCommonInputParam.remove(removedInputparam);
+                if(dashboard.getCommonQueryFilters() != null){
+                    dashboard.getCommonQueryFilters().remove(removedInputparam);
+                }
+            }
+            
             //refresh the portlets, if the removed row/filter has any checked values
             if(rowChecked){
-                Iterator<Portlet> iterator =null;
-                if(Constants.LOGICAL_FILE.equals(dashboard.getFileType())){
-                    iterator = removeFilter(removedRow).iterator();
-                    
-                    Filter removedFilter = (Filter)removedRow.getAttribute(Constants.FILTER);
-                    //Need To remove the filter from applied filter set
-                    appliedCommonFilters.remove(removedFilter);
-                }else if(Constants.QUERY.equals(dashboard.getFileType())){
-                    iterator = removeInputparam(removedRow).iterator();
-                    
-                    String removedInput =  removedRow.getAttribute(Constants.INPUT_PARAM_NAME).toString();
-                    InputParam removedInputparam = new InputParam(removedInput);
-                    //Need To remove the filter from applied inputparam set
-                    appliedCommonInputParam.remove(removedInputparam);
-                    if(dashboard.getCommonQueryFilters() != null){
-                        dashboard.getCommonQueryFilters().remove(removedInputparam);
-                    }
-                }
             
             // refreshing the chart && updating DB
             while (iterator.hasNext()) {
@@ -1816,7 +1831,7 @@ public class DashboardController extends SelectorComposer<Window>{
             chartPanel = new ChartPanel(portlet,Constants.SHOW_ALL_BUTTONS, dashboard.showLocalFilter());
             portalChildren.get(portlet.getColumn()).appendChild(chartPanel);
             chartPanel.focus();
-            
+                        
             reorderPortletPanels();
             
             widgetService.addWidget(dashboardId, portlet, dashboard.getPortletList().indexOf(portlet));
@@ -2044,6 +2059,27 @@ public class DashboardController extends SelectorComposer<Window>{
                 filterButtons.forEach(btn -> btn.setVisible(false));
             } else {
                 filterButtons.forEach(btn -> btn.setVisible(true));
+            }
+            
+            if(dashboard.getHasCommonFilter() && !dashboard.isLockaddCommonFilter()) {
+                addFilterBtn.setVisible(true);
+            } else if(dashboard.getHasCommonFilter() && dashboard.isLockaddCommonFilter()) {
+                addFilterBtn.setVisible(false);
+            }
+            
+            //Making chart title editable
+            for (Portalchildren component : portalChildren) {
+                component.getChildren()
+                    .stream()
+                    .filter(comp -> comp instanceof ChartPanel)
+                    .forEach(cp -> {
+                        ChartPanel panel = (ChartPanel) cp;
+                        if(dashboard.lockChartTitle()) {
+                            panel.disableTitleEditing();
+                        } else {
+                            panel.enableTitleEditing();
+                        }
+                    });
             }
         }        
     };

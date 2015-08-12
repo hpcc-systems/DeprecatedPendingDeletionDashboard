@@ -51,7 +51,13 @@ public class DashboardConfigurationController extends SelectorComposer<Component
     @Wire
     Checkbox lockCfCheckbox;
     @Wire
+    Checkbox lockaddCfCheckbox;
+    @Wire
     Checkbox localFiltersCheckbox;
+    
+    @Wire
+    Checkbox lockTitleCheckbox;
+    
     @Wire
     Hbox commonFilterHbox;
     @Wire
@@ -94,11 +100,16 @@ public class DashboardConfigurationController extends SelectorComposer<Component
             if(dashboard.getHasCommonFilter()){
                 commonFiltersCheckbox.setChecked(true);
                 lockCfCheckbox.setChecked(dashboard.isLockCommonFilter());
+                lockaddCfCheckbox.setChecked(dashboard.isLockaddCommonFilter());
                 isCommonFiltersEnabled = true;
             }
             
             if(dashboard.showLocalFilter()){
                 localFiltersCheckbox.setChecked(true);
+            }
+            
+            if(dashboard.lockChartTitle()){
+                lockTitleCheckbox.setChecked(true);
             }
             
             try {
@@ -141,7 +152,9 @@ public class DashboardConfigurationController extends SelectorComposer<Component
             dashboard.setName(nameTextbox.getValue());
             dashboard.setHasCommonFilter(commonFiltersCheckbox.isChecked());
             dashboard.setLockCommonFilter(lockCfCheckbox.isChecked());
+            dashboard.setLockaddCommonFilter(lockaddCfCheckbox.isChecked());
             dashboard.setShowLocalFilter(localFiltersCheckbox.isChecked());
+            dashboard.setLockChartTitle(lockTitleCheckbox.isChecked());
             
             //Removing Common HpccConnection object from session, if Common filters are disabled
             if(!commonFiltersCheckbox.isChecked()) {
@@ -164,7 +177,9 @@ public class DashboardConfigurationController extends SelectorComposer<Component
     
                 dashboard.setHasCommonFilter(commonFiltersCheckbox.isChecked());
                 dashboard.setLockCommonFilter(lockCfCheckbox.isChecked());
+                dashboard.setLockaddCommonFilter(lockaddCfCheckbox.isChecked());
                 dashboard.setShowLocalFilter(localFiltersCheckbox.isChecked());
+                dashboard.setLockChartTitle(lockTitleCheckbox.isChecked());
                 
                 //Deciding Columns and rows
                 Integer panelCount = null;

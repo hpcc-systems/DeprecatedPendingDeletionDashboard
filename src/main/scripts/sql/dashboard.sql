@@ -43,6 +43,8 @@ last_updated_date TIMESTAMP,
 common_filter TINYINT,
 show_localfilter TINYINT,
 lock_commonfilter TINYINT,
+lock_add_commonfilter TINYINT,
+lock_charttitle TINYINT,
 filter_order TEXT,
 PRIMARY KEY(dashboard_id)
 ) ENGINE=InnoDB;

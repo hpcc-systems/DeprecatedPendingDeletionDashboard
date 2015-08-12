@@ -102,6 +102,7 @@ public class DashboardDaoImpl implements DashboardDao {
         parameters.put("visibility", dashboard.getVisibility());
         parameters.put("common_filter", dashboard.getHasCommonFilter());
         parameters.put("show_localfilter", dashboard.showLocalFilter());
+        parameters.put("lock_charttitle", dashboard.lockChartTitle());
         
         Number newId = new SimpleJdbcInsert(jdbcTemplate.getDataSource())
                         .withTableName("dashboard_details")
@@ -169,6 +170,8 @@ public class DashboardDaoImpl implements DashboardDao {
                         dashboard.getHasCommonFilter(),
                         dashboard.showLocalFilter(),
                         dashboard.isLockCommonFilter(),
+                        dashboard.isLockaddCommonFilter(),
+                        dashboard.lockChartTitle(),
                         dashboard.getDashboardId()
                 });
     }
@@ -339,6 +342,8 @@ public class DashboardDaoImpl implements DashboardDao {
             dashboard.setLastupdatedDate(rs.getTimestamp("last_updated_date"));
             dashboard.setHasCommonFilter(rs.getBoolean("common_filter"));
             dashboard.setShowLocalFilter(rs.getBoolean("show_localfilter"));
+            dashboard.setLockaddCommonFilter(rs.getBoolean("lock_add_commonfilter"));
+            dashboard.setLockChartTitle(rs.getBoolean("lock_charttitle"));
             dashboard.setLockCommonFilter(rs.getBoolean("lock_commonfilter"));
             
             // Only when joining with acl_public table,to get 'role'

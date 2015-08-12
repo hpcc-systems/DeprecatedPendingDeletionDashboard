@@ -30,6 +30,8 @@ public class Dashboard {
     private boolean hasCommonFilter = false;
     private boolean showLocalFilter;
     private boolean lockCommonFilter;
+    private boolean lockaddCommonFilter;
+    private boolean lockChartTitle;
     private Integer visibility;
     private String role;
   
@@ -361,6 +363,22 @@ public class Dashboard {
 
     public void setLockCommonFilter(boolean lockCommonFilter) {
         this.lockCommonFilter = lockCommonFilter;
+    }
+
+    public boolean isLockaddCommonFilter() {
+        return lockaddCommonFilter;
+    }
+
+    public void setLockaddCommonFilter(boolean lockaddCommonFilter) {
+        this.lockaddCommonFilter = lockaddCommonFilter;
+    }
+
+    public boolean lockChartTitle() {
+        return lockChartTitle;
+    }
+
+    public void setLockChartTitle(boolean lockChartTitle) {
+        this.lockChartTitle = lockChartTitle;
     }
 
 }
