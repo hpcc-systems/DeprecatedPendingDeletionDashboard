@@ -36,6 +36,11 @@
 		.options-div {
 			width: 150px
 		}
+		
+		input[type="radio"]:focus {
+			outline: none;
+    		box-shadow: none;
+		}
 </style>
 	
 	<vbox spacing="0px" hflex="1">		
@@ -45,22 +50,32 @@
 			<textbox id="nameTextbox"  zclass="form-control"></textbox>
 		</hlayout>
 	
-		<hlayout zclass="form-group">
+		<vlayout spacing="10px" zclass="form-group">
 			<label zclass="label" value="${labels.dashboardOptions}"></label>
 			
 			<hbox id ="commonFilterHbox" align="center" sclass="options-form" visible="false">
 				<div zclass="options-div">
 					<label value="${labels.commonFilters}" zclass="h5"></label>
 				</div>
-				<checkbox zclass="checkbox" label="Enable" id="commonFiltersCheckbox"></checkbox>
+				<checkbox label="Enable" id="commonFiltersCheckbox"></checkbox>
 				<space></space>
-				<checkbox zclass="checkbox" label="Prevent deletion" id="lockCfCheckbox"></checkbox>
+				<checkbox label="Prevent deletion" id="lockCfCheckbox"></checkbox>
+				<space></space>
+				<checkbox label="Prevent Addition" id="lockaddCfCheckbox"></checkbox>
 			</hbox>
+			
 			<hbox align="center" sclass="options-form">
 				<div zclass="options-div">
-					<label value="Show local filters" zclass="h5"></label>
+					<label value="Chart Titles" zclass="h5"></label>
 				</div>
-				<checkbox zclass="checkbox" id="localFiltersCheckbox"></checkbox>
+				<checkbox id="lockTitleCheckbox" label="Disable title modification"></checkbox>
+			</hbox>
+			
+			<hbox align="center" sclass="options-form">
+				<div zclass="options-div">
+					<label value="Widget level filters" zclass="h5"></label>
+				</div>
+				<checkbox id="localFiltersCheckbox" label="Show filter popup"></checkbox>
 			</hbox>
 			
 			<hbox align="center" sclass="options-form">
@@ -68,11 +83,12 @@
 					<label value="Dashboard Visiblity" zclass="h5"></label>
 				</div>
 				<radiogroup id="visiblityRadiogroup">
-					<radio  zclass="radio-inline" value="0" label="Private" selected="true"></radio>
-					<radio  zclass="radio-inline" value="1" label="Public"></radio>
+					<radio  value="0" label="Private" selected="true"></radio>
+					<space></space>
+					<radio  value="1" label="Public"></radio>
 				</radiogroup>
 			</hbox>
-		</hlayout>
+		</vlayout>
 		
 		<hlayout id="layout" zclass="form-group">
 			<label zclass="label" value="${labels.dashboardLayout}"></label>

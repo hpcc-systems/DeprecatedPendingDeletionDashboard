@@ -388,6 +388,8 @@ public class ChartPanel extends Panel {
         resizeBtn.setSclass(RESIZE_MAX_STYLE);
         resizeBtn.setTooltiptext("Maximize window");
         
+        titleTextbox.addEventListener(Events.ON_BLUR, titleChangeLisnr);
+        
         if(showLocalFilters) {
             //Shows Input parameters for Quieries(Roxie/Thor)
             onDrawingQueryChart(buttonState);
@@ -396,9 +398,6 @@ public class ChartPanel extends Panel {
         if(Constants.SHOW_ALL_BUTTONS == buttonState) {
         	if(Constants.STATE_EMPTY.equals(portlet.getWidgetState())){
         	    //Adding title change listeners only for ADMINS
-        	    titlelabel.addEventListener(Events.ON_CLICK, enableTitleEdit);
-        	    titleTextbox.addEventListener(Events.ON_BLUR, titleChangeLisnr);
-        	    
         	    addBtn.setTooltiptext("Add Chart");
             }else{
                 addBtn.setTooltiptext("Configure Chart");
@@ -521,7 +520,8 @@ public class ChartPanel extends Panel {
         this.addEventListener("onDrawingQueryChart", event ->{
             onDrawingQueryChart(buttonState);
         });
-        
+     
+        enableTitleEditing();
     }
 
   //Generate dynamic label 'ModelID:<$A030>'
@@ -1315,5 +1315,13 @@ public class ChartPanel extends Panel {
         if(inputParamBtn != null){
             inputParamBtn.setVisible(false);
         }
+    }
+    
+    public void enableTitleEditing() {
+        titlelabel.addEventListener(Events.ON_CLICK, enableTitleEdit);
+    }
+    
+    public void disableTitleEditing() {
+        titlelabel.removeEventListener(Events.ON_CLICK, enableTitleEdit);
     }
 } 
