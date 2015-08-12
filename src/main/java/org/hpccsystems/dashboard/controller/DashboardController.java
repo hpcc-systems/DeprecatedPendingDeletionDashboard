@@ -1627,26 +1627,30 @@ public class DashboardController extends SelectorComposer<Window>{
             Row removedRow = (Row) event.getTarget().getParent().getParent();
             Boolean rowChecked = (Boolean)removedRow.getAttribute(Constants.ROW_CHECKED);
             
+            Iterator<Portlet> iterator = null;
+            if(Constants.LOGICAL_FILE.equals(dashboard.getFileType())) {
+                iterator = removeFilter(removedRow).iterator();
+                
+                Filter removedFilter = (Filter)removedRow.getAttribute(Constants.FILTER);
+                //Need To remove the filter from applied filter set
+                appliedCommonFilters.remove(removedFilter);
+            } else if(Constants.QUERY.equals(dashboard.getFileType())) {
+                iterator = removeInputparam(removedRow).iterator();
+                
+                String removedInput =  removedRow.getAttribute(Constants.INPUT_PARAM_NAME).toString();
+                InputParam removedInputparam = new InputParam(removedInput);
+                
+                LOG.debug("Available filters - " + appliedCommonInputParam + " Filter to remove - " + removedInputparam);
+                
+                //Need To remove the filter from applied inputparam set
+                appliedCommonInputParam.remove(removedInputparam);
+                if(dashboard.getCommonQueryFilters() != null){
+                    dashboard.getCommonQueryFilters().remove(removedInputparam);
+                }
+            }
+            
             //refresh the portlets, if the removed row/filter has any checked values
             if(rowChecked){
-                Iterator<Portlet> iterator =null;
-                if(Constants.LOGICAL_FILE.equals(dashboard.getFileType())){
-                    iterator = removeFilter(removedRow).iterator();
-                    
-                    Filter removedFilter = (Filter)removedRow.getAttribute(Constants.FILTER);
-                    //Need To remove the filter from applied filter set
-                    appliedCommonFilters.remove(removedFilter);
-                }else if(Constants.QUERY.equals(dashboard.getFileType())){
-                    iterator = removeInputparam(removedRow).iterator();
-                    
-                    String removedInput =  removedRow.getAttribute(Constants.INPUT_PARAM_NAME).toString();
-                    InputParam removedInputparam = new InputParam(removedInput);
-                    //Need To remove the filter from applied inputparam set
-                    appliedCommonInputParam.remove(removedInputparam);
-                    if(dashboard.getCommonQueryFilters() != null){
-                        dashboard.getCommonQueryFilters().remove(removedInputparam);
-                    }
-                }
             
             // refreshing the chart && updating DB
             while (iterator.hasNext()) {
