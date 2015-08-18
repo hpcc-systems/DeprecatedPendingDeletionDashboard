@@ -162,11 +162,12 @@ public class DashboardServiceImpl implements DashboardService {
     public void addOrUpdateCommonInput(Integer dashboardId, String userId,
             List<InputParam> commonInputs) throws JAXBException {
         
-        try {            
+        try {     
+            String commonInputText = null;
             if (commonInputs != null) {
-                String commonInputText = XMLConverter.makeCommonInputXML(commonInputs);
-                dashboardDao.addOrUpdateCommonInput(dashboardId, commonInputText,userId);
+                commonInputText = XMLConverter.makeCommonInputXML(commonInputs);
             }
+            dashboardDao.addOrUpdateCommonInput(dashboardId, commonInputText,userId);
         } catch (DataAccessException ex) {
             LOG.error(Constants.EXCEPTION, ex);
             throw ex;

@@ -485,6 +485,7 @@ public class XMLConverter {
         InputParams inputParams = new InputParams();
         JAXBContext jaxbContext;
         try {
+            
             jaxbContext = JAXBContext.newInstance(InputParams.class);
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
             inputParams = (InputParams) jaxbUnmarshaller.unmarshal(new StringReader(xml));

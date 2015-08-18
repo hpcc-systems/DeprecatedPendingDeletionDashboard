@@ -7,6 +7,7 @@ import java.util.stream.Collectors;
 import javax.xml.bind.JAXBException;
 import javax.xml.stream.XMLStreamException;
 
+import org.apache.axis.utils.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.chart.cluster.ClusterData;
@@ -70,7 +71,12 @@ public class WidgetServiceImpl implements WidgetService {
     @Override
     public List<InputParam> getInputParams(Integer dashboardId, String userId) {
         try {
-            return XMLConverter.makeCommonInputObject(widgetDao.getinputParams(dashboardId, userId));
+            String xml = widgetDao.getinputParams(dashboardId, userId);
+            if(!StringUtils.isEmpty(xml)){
+            return XMLConverter.makeCommonInputObject(xml);
+            }else{
+                return null;
+            }
         } catch (JAXBException | EncryptDecryptException | XMLStreamException e) {
             LOG.error(e);
             return null;
@@ -122,7 +128,7 @@ public class WidgetServiceImpl implements WidgetService {
                                 XMLConverter.makeXYChartDataObject(portlet.getChartDataXML()));
                     }
                 
-                    if(!isUserIdnull) {
+                    if(!isUserIdnull && inputParams != null) {
                         portlet.applyInputParams(inputParams);
                     }
                 }

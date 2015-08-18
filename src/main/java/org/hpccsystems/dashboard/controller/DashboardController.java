@@ -1254,12 +1254,10 @@ public class DashboardController extends SelectorComposer<Window>{
                 .collect(Collectors.toList());
         
         //For query widget need to update dashboard_filters table with common input params
-        if(!appliedCommonInputParam.isEmpty()){
             dashboardService
                 .addOrUpdateCommonInput(dashboard.getDashboardId(),
                             authenticationService.getUserCredential()
                                     .getUserId(), CommonInputParamWithValue);
-        }
     }
 
 
