@@ -329,7 +329,7 @@ public class DashboardController extends SelectorComposer<Window>{
             }        
 
             try {
-                dashboard.setPortletList((ArrayList<Portlet>) widgetService.retriveWidgetDetails(dashboardId));
+                dashboard.setPortletList((ArrayList<Portlet>) widgetService.retriveWidgetDetails(dashboardId, userCredential.getUserId()));
             } catch(DataAccessException ex) {
                 Clients.showNotification(
                         Labels.getLabel("unableToRetrieveWidget"),
@@ -480,51 +480,62 @@ public class DashboardController extends SelectorComposer<Window>{
         if(dashboard.getCommonQueryFilters() != null) {
             persistedGlobalInputParams.addAll(dashboard.getCommonQueryFilters());
         } else {
-            dashboard.getPortletList().forEach( portlet -> {
+            List<InputParam> persistedParams = widgetService.getInputParams(dashboardId, userCredential.getUserId());
+            
+            if(persistedParams != null && !persistedParams.isEmpty()) {
+                persistedGlobalInputParams.addAll(persistedParams);
+                dashboard.addCommonQueryFilters(persistedParams);
+            } else {
+                //Assuming it is being created from legacy system
                 
-                if (portlet.getWidgetState().equals( Constants.STATE_LIVE_CHART)
-                        && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()
-                        && Constants.CATEGORY_SCORED_SEARCH_TABLE != chartService.getCharts().get(portlet.getChartType()).getCategory()) {
+                dashboard.getPortletList().forEach( portlet -> {
                     
-                    List<InputParam>  portletInputs = new ArrayList<InputParam>();
-                    if(portlet.getChartData().getInputParams() != null && !portlet.getChartData().getInputParams().isEmpty()){
-                        portlet.getChartData().getInputParams().stream().forEach(inputparam -> {
-                            if(inputparam.getIsCommonInput()
-                                    && persistedGlobalInputParams.contains(inputparam)){
-                                portletInputs.add(persistedGlobalInputParams
-                                        .get(persistedGlobalInputParams.indexOf(inputparam)));
-                            }else{
-                                portletInputs.add(inputparam);
-                                if (inputparam.getIsCommonInput()) {
-                                    persistedGlobalInputParams.add(inputparam);
+                    if (portlet.getWidgetState().equals( Constants.STATE_LIVE_CHART)
+                            && Constants.CATEGORY_TEXT_EDITOR != chartService.getCharts().get(portlet.getChartType()).getCategory()
+                            && Constants.CATEGORY_SCORED_SEARCH_TABLE != chartService.getCharts().get(portlet.getChartType()).getCategory()) {
+                        
+                        List<InputParam>  portletInputs = new ArrayList<InputParam>();
+                        if(portlet.getChartData().getInputParams() != null && !portlet.getChartData().getInputParams().isEmpty()){
+                            portlet.getChartData().getInputParams().stream().forEach(inputparam -> {
+                                if(inputparam.getIsCommonInput()
+                                        && persistedGlobalInputParams.contains(inputparam)){
+                                    portletInputs.add(persistedGlobalInputParams
+                                            .get(persistedGlobalInputParams.indexOf(inputparam)));
+                                }else{
+                                    portletInputs.add(inputparam);
+                                    if (inputparam.getIsCommonInput()) {
+                                        persistedGlobalInputParams.add(inputparam);
+                                    }
                                 }
-                            }
-                        });
-                    }                    
-                    portlet.getChartData().setInputParams(portletInputs);
+                            });
+                        }                    
+                        portlet.getChartData().setInputParams(portletInputs);
+                    }
+                    
+                });
+                
+                dashboard.addCommonQueryFilters(persistedGlobalInputParams);
+                
+                List<String> order = dashboardService.getFilterOrder(dashboard.getDashboardId());
+                if(order != null) {
+                    Collections.sort(persistedGlobalInputParams, new Comparator<InputParam>() {
+                        
+                        @Override
+                        public int compare(InputParam o1, InputParam o2) {
+                            return Integer.compare(order.indexOf(o1.getName()), order.indexOf(o2.getName()));
+                        }
+                        
+                    });
                 }
                 
-            });
-               
-            dashboard.addCommonQueryFilters(persistedGlobalInputParams);
+            }
+            
         }
         
         if (LOG.isDebugEnabled()) {
             LOG.debug("Persisted Common input params -> "  + persistedGlobalInputParams);
         }
         
-        //Re creating order
-        List<String> order = dashboardService.getFilterOrder(dashboard.getDashboardId());
-        if(order != null) {
-            Collections.sort(persistedGlobalInputParams, new Comparator<InputParam>() {
-
-                @Override
-                public int compare(InputParam o1, InputParam o2) {
-                    return Integer.compare(order.indexOf(o1.getName()), order.indexOf(o2.getName()));
-                }
-                
-            });
-        }
         
         // Generating applied filter rows, with values
       

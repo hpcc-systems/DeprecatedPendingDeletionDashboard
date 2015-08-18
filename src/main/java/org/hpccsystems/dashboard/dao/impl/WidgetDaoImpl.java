@@ -236,6 +236,24 @@ public class WidgetDaoImpl implements WidgetDao{
     
     @Override
     public String getinputParams(Integer dashboardId, String userId) {
-        return null;
+        try {
+            return getJdbcTemplate().queryForObject("SELECT filter_data FROM dashboard_filters WHERE dashboard_id = ? AND user_id = ?", 
+                    String.class, 
+                    new Object[]{dashboardId, userId});
+        } catch (Exception e) {
+            //Assuming no rows were returned, getting owner's filters
+            StringBuilder sql = new StringBuilder("SELECT filter_data FROM dashboard_filters ")
+                    .append("JOIN dashboard_details ON dashboard_details.dashboard_id = dashboard_filters.dashboard_id ")
+                    .append("AND dashboard_details.user_id = dashboard_filters.user_id ")
+                    .append("WHERE dashboard_filters.dashboard_id = ?");
+            
+            try {
+                return getJdbcTemplate()
+                        .queryForObject(sql.toString(), String.class, new Object[]{dashboardId});
+            } catch (Exception e2) {
+                //Since no rows are found returning empty string
+                return "";
+            }
+        }
     }
 }

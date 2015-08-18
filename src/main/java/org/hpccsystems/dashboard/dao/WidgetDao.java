@@ -86,5 +86,9 @@ public interface WidgetDao {
 
     void addOrUpdateCommonInput(Integer dashboardId, String commonInputText,String userId);
     
+    /**
+     * Returns user's filter when available. 
+     * If no filters are available for the user, Dashboard creators filters are returned
+     */
     String getinputParams(Integer dashboardId, String userId);
 }

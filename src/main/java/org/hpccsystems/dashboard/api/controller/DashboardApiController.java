@@ -256,7 +256,7 @@ public class DashboardApiController {
 				chartConfiguration = new GsonBuilder().create().fromJson(
 						circuitFields, ApiChartConfiguration.class);
 				List<Portlet> portletList = widgetService
-						.retriveWidgetDetails(Integer.valueOf(dashboardId));
+						.retriveWidgetDetails(Integer.valueOf(dashboardId), null);
 				Map<Integer, ChartDetails> chartdetailsMap = chartService
 						.getCharts();
 				if (portletList != null && !portletList.isEmpty()) {

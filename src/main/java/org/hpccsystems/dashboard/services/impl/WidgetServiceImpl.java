@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.stream.XMLStreamException;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -58,7 +59,7 @@ public class WidgetServiceImpl implements WidgetService {
     public void addWidgetDetails(Integer dashboardId,List<Portlet> portlets) throws DataAccessException{
         try
         {
-        widgetDao.addWidgetDetails(dashboardId,portlets);
+            widgetDao.addWidgetDetails(dashboardId,portlets);
         }catch(DataAccessException ex) {
             LOG.error(Constants.EXCEPTION, ex);
             throw ex;
@@ -66,7 +67,27 @@ public class WidgetServiceImpl implements WidgetService {
         
     }
     
-    public List<Portlet> retriveWidgetDetails(Integer dashboardId) throws DataAccessException {
+    @Override
+    public List<InputParam> getInputParams(Integer dashboardId, String userId) {
+        try {
+            return XMLConverter.makeCommonInputObject(widgetDao.getinputParams(dashboardId, userId));
+        } catch (JAXBException | EncryptDecryptException | XMLStreamException e) {
+            LOG.error(e);
+            return null;
+        }
+    }
+    
+    
+    
+    @Override
+    public List<Portlet> retriveWidgetDetails(Integer dashboardId, String userId) throws DataAccessException {
+        boolean isUserIdnull = userId == null;
+        
+        List<InputParam> inputParams = null;
+        if(!isUserIdnull) {
+            inputParams = getInputParams(dashboardId, userId);
+        }
+        
         try {
             //Making Objects from XML
             List<Portlet> portlets = widgetDao.retriveWidgetDetails(dashboardId);
@@ -99,6 +120,10 @@ public class WidgetServiceImpl implements WidgetService {
                     else {
                         portlet.setChartData(
                                 XMLConverter.makeXYChartDataObject(portlet.getChartDataXML()));
+                    }
+                
+                    if(!isUserIdnull) {
+                        portlet.applyInputParams(inputParams);
                     }
                 }
             }

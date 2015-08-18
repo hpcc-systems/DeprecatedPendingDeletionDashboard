@@ -36,6 +36,7 @@ import org.hpccsystems.dashboard.services.ChartService;
 import org.hpccsystems.dashboard.services.DashboardService;
 import org.hpccsystems.dashboard.services.HPCCQueryService;
 import org.hpccsystems.dashboard.services.HPCCService;
+import org.hpccsystems.dashboard.services.UserCredential;
 import org.hpccsystems.dashboard.services.WidgetService;
 import org.springframework.dao.DataAccessException;
 import org.zkoss.util.resource.Labels;
@@ -109,6 +110,9 @@ public class EditWidgetController extends SelectorComposer<Component> {
     
     Dashboard dashboard;
     private Integer dashboardId;
+    
+    UserCredential userCredential;
+    
     @Override
     public void doAfterCompose(Component comp) throws Exception {
         if(LOG.isDebugEnabled()) {
@@ -119,7 +123,8 @@ public class EditWidgetController extends SelectorComposer<Component> {
         
         Execution execution = Executions.getCurrent();
         
-        if(authenticationService.getUserCredential().hasRole(Constants.CIRCUIT_ROLE_CONFIG_CHART)) {
+        userCredential = authenticationService.getUserCredential();
+        if(userCredential.hasRole(Constants.CIRCUIT_ROLE_CONFIG_CHART)) {
             if(execution.getParameter(Constants.CIRCUIT_DASHBOARD_ID) != null){
                 List<String> dashboardIdList = null;
                 dashboardIdList = new ArrayList<String>();
@@ -131,7 +136,7 @@ public class EditWidgetController extends SelectorComposer<Component> {
                         dashboardIdList,
                         null).get(0);
                 dashboardId = dashboard.getDashboardId();
-                portlet = widgetService.retriveWidgetDetails(dashboard.getDashboardId())
+                portlet = widgetService.retriveWidgetDetails(dashboard.getDashboardId(), userCredential.getUserId())
                         .get(0); //Assuming one Widget exists for the provided dashboard
                  
             } else {
@@ -233,7 +238,7 @@ public class EditWidgetController extends SelectorComposer<Component> {
                         sourceId)
                             .get(0); // Assuming one Dashboard exists for a provided source_id 
         LOG.debug("API view Role - dashboard -->"+dashboard);
-        portlet = widgetService.retriveWidgetDetails(dashboard.getDashboardId())
+        portlet = widgetService.retriveWidgetDetails(dashboard.getDashboardId(), userCredential.getUserId())
                 .get(0); //Assuming one Widget exists for the provided dashboard
         LOG.debug("API view Role - portlet -->"+portlet);
         LOG.debug("chartType passed -->"+chartType);
@@ -275,7 +280,7 @@ public class EditWidgetController extends SelectorComposer<Component> {
             // Provided source id is already saved
             dashboard = dashboards.get(0);
             
-            portlet = widgetService.retriveWidgetDetails(dashboard.getDashboardId())
+            portlet = widgetService.retriveWidgetDetails(dashboard.getDashboardId(), userCredential.getUserId())
                     .get(0); //Assuming one Widget exists for the provided dashboard
         } else {
             dashboard = new Dashboard();

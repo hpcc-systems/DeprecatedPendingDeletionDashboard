@@ -484,7 +484,6 @@ public class XMLConverter {
         return sw.toString();
     }
 
-    @SuppressWarnings("unchecked")
     public static List<InputParam> makeCommonInputObject(String xml) throws JAXBException, EncryptDecryptException, XMLStreamException {
         JAXBContext jaxbContext;
         List<InputParam> commonInputs = null;
