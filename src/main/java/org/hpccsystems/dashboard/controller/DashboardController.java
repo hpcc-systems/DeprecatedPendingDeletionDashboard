@@ -916,7 +916,7 @@ public class DashboardController extends SelectorComposer<Window>{
             }
             
             try {
-                updateDashboardInputparam(dashboard);
+                updateDashboardInputparam();
             } catch (JAXBException e) {
                 LOG.error("Error Updating Charts", e);
                 Clients.showNotification("Unable to update charts",
@@ -1231,7 +1231,7 @@ public class DashboardController extends SelectorComposer<Window>{
         }
         
         try {
-            updateDashboardInputparam(dashboard);
+            updateDashboardInputparam();
         } catch (JAXBException e) {
             LOG.error("Error Updating Charts", e);
             Clients.showNotification("Unable to update charts",
@@ -1246,21 +1246,20 @@ public class DashboardController extends SelectorComposer<Window>{
      * @param passedDashboard
      * @throws JAXBException
      */
-    private void updateDashboardInputparam(Dashboard passedDashboard) throws JAXBException {
+    private void updateDashboardInputparam() throws JAXBException {
        
-        Set<InputParam> CommonInputParamWithValue = getInputparamWithValue(appliedCommonInputParam);
+        List<InputParam> CommonInputParamWithValue = appliedCommonInputParam
+                .stream()
+                .filter(commonInputparam -> commonInputparam.getValue() != null)
+                .collect(Collectors.toList());
+        
         //For query widget need to update dashboard_filters table with common input params
         if(!appliedCommonInputParam.isEmpty()){
             dashboardService
-                    .addOrUpdateCommonInput(passedDashboard.getDashboardId(),
+                .addOrUpdateCommonInput(dashboard.getDashboardId(),
                             authenticationService.getUserCredential()
                                     .getUserId(), CommonInputParamWithValue);
         }
-    }
-
-
-    private Set<InputParam> getInputparamWithValue(Set<InputParam> appliedCommonInputParam2) {        
-        return appliedCommonInputParam.stream().filter(commonInputparam -> commonInputparam.getValue() != null).collect(Collectors.toSet());
     }
 
 
@@ -1722,7 +1721,7 @@ public class DashboardController extends SelectorComposer<Window>{
             }
            //TODO: need to check updating dashboard_filters table is required 
             try {
-                updateDashboardInputparam(dashboard);
+                updateDashboardInputparam();
             } catch (JAXBException e) {
                 LOG.error("Error Updating Charts", e);
                 Clients.showNotification("Unable to update charts",
@@ -2233,7 +2232,7 @@ public class DashboardController extends SelectorComposer<Window>{
         });
         
         try {
-            updateDashboardInputparam(dashboard);
+            updateDashboardInputparam();
         } catch (JAXBException e) {
             LOG.error("Error Updating Charts", e);
             Clients.showNotification("Unable to update charts",

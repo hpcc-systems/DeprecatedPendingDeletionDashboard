@@ -101,6 +101,6 @@ public interface DashboardService {
      *  Adds the common inputparam data into dashboard_filters table,if the inputparam exists already in the table,updates the value     
      */
     void addOrUpdateCommonInput(Integer dashboardId, String userId,
-            Set<InputParam> commonInputs) throws JAXBException;
+            List<InputParam> commonInputs) throws JAXBException;
     
 }

@@ -5,7 +5,6 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Set;
 
 import javax.xml.bind.JAXBException;
 
@@ -161,7 +160,7 @@ public class DashboardServiceImpl implements DashboardService {
 
     @Override
     public void addOrUpdateCommonInput(Integer dashboardId, String userId,
-            Set<InputParam> commonInputs) throws JAXBException {
+            List<InputParam> commonInputs) throws JAXBException {
         
         try {            
             if (commonInputs != null) {
