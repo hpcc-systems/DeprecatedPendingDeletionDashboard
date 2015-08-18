@@ -91,4 +91,4 @@ public interface WidgetService {
      * @throws EncryptDecryptException 
      */
     int updateHpccPassword(List<Dashboard> dashboards, HpccConnection hpccConnection, String password) throws EncryptDecryptException;
-}
+} 

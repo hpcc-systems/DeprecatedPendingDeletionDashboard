@@ -1,10 +1,14 @@
 package org.hpccsystems.dashboard.entity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.hpccsystems.dashboard.chart.entity.ChartData;
+import org.hpccsystems.dashboard.chart.entity.InputParam;
 import org.hpccsystems.dashboard.chart.entity.TitleColumn;
 import org.hpccsystems.dashboard.common.Constants;
+import org.hpccsystems.dashboard.services.ChartService;
+import org.zkoss.zkplus.spring.SpringUtil;
 
 public class Portlet implements Cloneable{
 
@@ -127,4 +131,27 @@ public class Portlet implements Cloneable{
         return clonedObj;
     }
 
+    
+    public boolean isGloballyFilterable() {
+        ChartService chartService = (ChartService) SpringUtil.getBean("chartService");
+        int category = chartService.getCharts().get(chartType).getCategory();
+        
+        return Constants.STATE_LIVE_CHART.equals(widgetState)
+                && Constants.CATEGORY_TEXT_EDITOR != category
+                && Constants.CATEGORY_SCORED_SEARCH_TABLE != category;
+    }
+
+    public void applyInputParams(List<InputParam> inputParams) {
+        if(chartData.getInputParams() != null && !chartData.getInputParams().isEmpty()){
+            //Removing existing matched params
+            inputParams.forEach(param -> chartData.getInputParams().remove(param));
+            
+            chartData.getInputParams().addAll(inputParams);
+        } else {
+            List<InputParam> params = new ArrayList<InputParam>();
+            params.addAll(inputParams);
+            chartData.setInputParams(inputParams);
+        }
+        
+    }
 }

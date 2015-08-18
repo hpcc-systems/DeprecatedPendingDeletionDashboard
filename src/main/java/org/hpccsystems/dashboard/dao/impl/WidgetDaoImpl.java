@@ -233,4 +233,9 @@ public class WidgetDaoImpl implements WidgetDao{
                 commonInputText
         });
     }
+    
+    @Override
+    public String getinputParams(Integer dashboardId, String userId) {
+        return null;
+    }
 }

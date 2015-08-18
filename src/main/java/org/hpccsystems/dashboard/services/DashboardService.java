@@ -1,6 +1,7 @@
 package org.hpccsystems.dashboard.services;
 import java.util.List;
 
+import org.hpccsystems.dashboard.chart.entity.InputParam;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.springframework.dao.DataAccessException;
 

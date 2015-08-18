@@ -85,4 +85,6 @@ public interface WidgetDao {
 
 
     void addOrUpdateCommonInput(Integer dashboardId, String commonInputText,String userId);
+    
+    String getinputParams(Integer dashboardId, String userId);
 }

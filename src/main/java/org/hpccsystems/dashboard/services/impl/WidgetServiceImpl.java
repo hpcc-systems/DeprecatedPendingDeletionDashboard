@@ -293,4 +293,4 @@ public class WidgetServiceImpl implements WidgetService {
         widgetDao.updateHpccPassword(dashboardIds, hpccConnection.getHostIp(), hpccConnection.getUsername(), encryptor.encrypt(password));
     }
 
-}
+} 
