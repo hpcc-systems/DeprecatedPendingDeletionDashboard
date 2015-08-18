@@ -11,7 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -138,6 +138,7 @@ public class ChartPanel extends Panel {
     private String divId;
     private int btnState;
     private boolean showLocalFilter;
+    private Integer dashboardId;
     
    
     //Delete panel listener
@@ -254,6 +255,7 @@ public class ChartPanel extends Panel {
             final Map<String, Object> parameters = new HashMap<String, Object>();
             parameters.put(Constants.PARENT, ChartPanel.this);
             parameters.put(Constants.PORTLET, portlet);
+            parameters.put(Constants.DASHBOARD_ID, dashboardId);
 
             final Window window = (Window) Executions.createComponents(
                     "/demo/add_widget.zul", holderDiv, parameters);
@@ -316,9 +318,10 @@ public class ChartPanel extends Panel {
             Events.sendEvent("onCreateLiveChart", ChartPanel.this, parameters);
             
             WidgetService widgetService = (WidgetService)SpringUtil.getBean("widgetService");
+            AuthenticationService authenticationService = (AuthenticationService) SpringUtil.getBean(Constants.AUTHENTICATION_SERVICE);
             try {
-                widgetService.updateWidget(portlet);
-            } catch (DataAccessException |JAXBException |EncryptDecryptException e) {
+                widgetService.updateWidget(portlet,dashboardId,authenticationService.getUserCredential().getUserId());
+            } catch (DataAccessException |JAXBException |EncryptDecryptException | CloneNotSupportedException e) {
                 LOG.error(e);
                 Clients.showNotification("Error occurred while persisting current changes","error", ChartPanel.this,"middle_center",3000, false);
             }
@@ -330,7 +333,8 @@ public class ChartPanel extends Panel {
         
 
 
-    public ChartPanel(final Portlet argPortlet, final int buttonState, final boolean showLocalFilters) {
+    public ChartPanel(final Portlet argPortlet, final int buttonState, 
+            final boolean showLocalFilters,Integer dashboardId) {
         this.btnState = buttonState;
         this.showLocalFilter = showLocalFilters;
         
@@ -345,6 +349,7 @@ public class ChartPanel extends Panel {
         this.setWidth("99%");
         this.setStyle("margin-bottom:5px");
         
+        this.dashboardId = dashboardId;
         // Creating title bar for the panel
         caption.setWidth("100%");
 
@@ -618,18 +623,20 @@ public class ChartPanel extends Panel {
                         paramValues.entrySet().forEach(entry ->{
                             InputListitem listitem = new InputListitem(
                                     entry.getKey(), entry.getValue(), String.valueOf(portlet.getId() + "_board_"));
+                            
                             inputListbox.appendChild(listitem);
-                            try{
-                             InputParam appliedInput = portlet.getChartData() .getInputParams() .stream()
-                                            .filter(input -> input.getName().equals(
-                                                    entry.getKey())).findAny().get();
-                             if (appliedInput != null && !com.mysql.jdbc.StringUtils.isNullOrEmpty(appliedInput.getValue())) {
-                                 listitem.setInputValue(appliedInput.getValue());
-                             }
-                            }catch(NoSuchElementException e){
-                                //Need not to log.This occurs when an inputparam from Hpcc is not found in portlet's
-                                //applied inputparam
+                            InputParam appliedInput = null;
+                            Optional<InputParam> appliedInputOption = portlet.getChartData() .getInputParams() .stream()
+                                           .filter(input -> input.getName().equals(
+                                                   entry.getKey())).findAny();
+                            if(appliedInputOption.isPresent()){
+                                appliedInput = appliedInputOption.get();
                             }
+                             
+                            if (appliedInput != null && !com.mysql.jdbc.StringUtils.isNullOrEmpty(appliedInput.getValue())) {
+                                listitem.setInputValue(appliedInput.getValue());
+                            }
+                            
                             
                         });
                         

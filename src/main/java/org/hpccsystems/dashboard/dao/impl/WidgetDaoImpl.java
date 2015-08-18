@@ -222,4 +222,14 @@ public class WidgetDaoImpl implements WidgetDao{
         
         return namedParameterJdbcTemplate.update(builder.toString(), parameters);
     }
+    @Override
+    public void addOrUpdateCommonInput(Integer dashboardId, String commonInputText,
+            String userId) {
+        String INSERT_UPDATE_COMMON_INPUT= "INSERT INTO dashboard_filters(dashboard_id,user_id,filter_data) values (?,?,?)  ON DUPLICATE KEY UPDATE filter_data=?";
+        getJdbcTemplate().update(INSERT_UPDATE_COMMON_INPUT,new Object[] {
+                dashboardId,                    
+                userId,
+                commonInputText                
+        });
+    }
 }

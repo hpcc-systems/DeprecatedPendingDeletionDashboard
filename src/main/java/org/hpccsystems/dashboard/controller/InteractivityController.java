@@ -13,6 +13,7 @@ import org.hpccsystems.dashboard.chart.entity.TableData;
 import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.Portlet;
+import org.hpccsystems.dashboard.services.AuthenticationService;
 import org.hpccsystems.dashboard.services.ChartService;
 import org.hpccsystems.dashboard.services.HPCCQueryService;
 import org.hpccsystems.dashboard.services.WidgetService;
@@ -63,6 +64,8 @@ public class InteractivityController extends SelectorComposer<Component> {
     private HPCCQueryService hpccQueryService;
     @WireVariable
     private WidgetService widgetService;
+    @WireVariable
+    private AuthenticationService authenticationService;
     
     private  Dashboard dashboard;
     private Window parent;
@@ -232,7 +235,7 @@ public class InteractivityController extends SelectorComposer<Component> {
         //Update tabledata with interactivity details into DB 
         ((ListModelList<Object>)interactivityListbox.getModel()).getInnerList().forEach(portlet ->{
             try {
-                widgetService.updateWidget((Portlet)portlet);
+                widgetService.updateWidget((Portlet)portlet,dashboard.getDashboardId(),authenticationService.getUserCredential().getUserId());
             } catch (Exception e) {
                LOG.error(Constants.EXCEPTION,e);
                Clients.showNotification(

@@ -410,7 +410,7 @@ public class EditWidgetController extends SelectorComposer<Component> {
             //update Live chart data into DB
             portlet.setChartData(chartData);
             
-            widgetService.updateWidget(portlet);
+            widgetService.updateWidget(portlet,dashboard.getDashboardId(), authenticationService.getUserCredential().getUserId());
 
         }catch(DataAccessException | HpccConnectionException e){
             Clients.showNotification(Labels.getLabel("unableToUpdateDBData"), "error", this.getSelf(), "middle_center", 3000, true);
@@ -486,7 +486,7 @@ public class EditWidgetController extends SelectorComposer<Component> {
         portlet.setChartData(chartData);
         
         try {
-            widgetService.updateWidget(portlet);
+            widgetService.updateWidget(portlet,dashboard.getDashboardId(), authenticationService.getUserCredential().getUserId());
         } catch (Exception e) {
             // TODO Show notification
         }
@@ -517,13 +517,17 @@ public class EditWidgetController extends SelectorComposer<Component> {
                     dashboardService.addDashboardDetails(dashboard, Constants.CIRCUIT_APPLICATION_ID, dashboard
                                         .getSourceId(),    authenticationService.getUserCredential().getUserId());
                 portlet.setChartData(chartData);
-                widgetService.addWidget(dashboard.getDashboardId(),    portlet, 0);
+                widgetService.addWidget(dashboard.getDashboardId(),portlet, 0,authenticationService.getUserCredential().getUserId());
             } else {
                 dashboardService.updateDashboard(dashboard);
                 portlet.setChartData(chartData);
-                widgetService.updateWidget(portlet);
+                widgetService.updateWidget(portlet,dashboard.getDashboardId(), authenticationService.getUserCredential().getUserId());
             }
-        } catch (DataAccessException e) {
+        }catch (CloneNotSupportedException e) {
+            Clients.showNotification(Labels.getLabel("errorOnSavingChanges"));
+            LOG.error(Constants.EXCEPTION, e);
+            return;
+        }catch (DataAccessException e) {
             Clients.showNotification(Labels.getLabel("errorOnSavingChanges"));
             LOG.error(Constants.EXCEPTION, e);
             return;

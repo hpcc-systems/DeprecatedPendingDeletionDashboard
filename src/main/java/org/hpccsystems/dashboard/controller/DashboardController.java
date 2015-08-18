@@ -237,7 +237,7 @@ public class DashboardController extends SelectorComposer<Window>{
         
         releventPortlet.setChartDataJSON(relJSON);
         //To update Relevant data with the selected claim id
-        widgetService.updateWidget(releventPortlet);
+        widgetService.updateWidget(releventPortlet,dashboard.getDashboardId(),authenticationService.getUserCredential().getUserId());
         
         String chartScript = selectedRelevantPanel.drawD3Graph();
         if (chartScript != null) {
@@ -373,11 +373,11 @@ public class DashboardController extends SelectorComposer<Window>{
             for (Portlet portlet : dashboard.getPortletList()) {  
               if(userCredential.hasRole(Constants.CIRCUIT_ROLE_VIEW_EDIT_DASHBOARD) ||
                         Constants.ROLE_ADMIN.equals(dashboard.getRole()) ) {
-                    panel = new ChartPanel(portlet, Constants.SHOW_ALL_BUTTONS, dashboard.showLocalFilter());
+                    panel = new ChartPanel(portlet, Constants.SHOW_ALL_BUTTONS, dashboard.showLocalFilter(),dashboard.getDashboardId());
                 } else if(Constants.ROLE_CONTRIBUTOR.equals(dashboard.getRole())) {
-                     panel = new ChartPanel(portlet, Constants.SHOW_EDIT_ONLY, dashboard.showLocalFilter());
+                     panel = new ChartPanel(portlet, Constants.SHOW_EDIT_ONLY, dashboard.showLocalFilter(),dashboard.getDashboardId());
                 } else {
-                    panel = new ChartPanel(portlet, Constants.SHOW_NO_BUTTONS, dashboard.showLocalFilter());                    
+                    panel = new ChartPanel(portlet, Constants.SHOW_NO_BUTTONS, dashboard.showLocalFilter(),dashboard.getDashboardId());                    
                 }
                 
                 if(dashboard.lockChartTitle()) {
@@ -927,12 +927,13 @@ public class DashboardController extends SelectorComposer<Window>{
      * @throws ServiceException 
      * @throws EncryptDecryptException 
      * @throws XPathExpressionException 
+     * @throws CloneNotSupportedException 
      * @throws Exception
      */
     public void updateWidgets(Portlet portlet) throws JAXBException
             ,DataAccessException, ServiceException,
              ParserConfigurationException, SAXException, IOException,
-             HpccConnectionException, EncryptDecryptException, XPathExpressionException {
+             HpccConnectionException, EncryptDecryptException, XPathExpressionException, CloneNotSupportedException {
 
         if(LOG.isDebugEnabled()){
             LOG.debug("Updating charts in portlet - " + portlet);
@@ -948,7 +949,7 @@ public class DashboardController extends SelectorComposer<Window>{
         }
         
         //Updating widget with latest filter details into DB
-       widgetService.updateWidget(portlet);
+       widgetService.updateWidget(portlet,dashboard.getDashboardId(),authenticationService.getUserCredential().getUserId());
         
        Events.postEvent("onChangeInputParamChangeTitle",panel, null);
        
@@ -1828,13 +1829,13 @@ public class DashboardController extends SelectorComposer<Window>{
             portlet.setColumn(column);
             
             //Assuming ChartPanel is configurable, as 'Add Widget' is enabled
-            chartPanel = new ChartPanel(portlet,Constants.SHOW_ALL_BUTTONS, dashboard.showLocalFilter());
+            chartPanel = new ChartPanel(portlet,Constants.SHOW_ALL_BUTTONS, dashboard.showLocalFilter(),dashboard.getDashboardId());
             portalChildren.get(portlet.getColumn()).appendChild(chartPanel);
             chartPanel.focus();
                         
             reorderPortletPanels();
             
-            widgetService.addWidget(dashboardId, portlet, dashboard.getPortletList().indexOf(portlet));
+            widgetService.addWidget(dashboardId, portlet, dashboard.getPortletList().indexOf(portlet),authenticationService.getUserCredential().getUserId());
             
             //Updating new widget sequence to DB
             widgetService.updateWidgetSequence(dashboard);
@@ -2362,7 +2363,7 @@ public class DashboardController extends SelectorComposer<Window>{
             deletedPortlet.setWidgetState(Constants.STATE_EMPTY);
             
             //Clears all chart data from DB
-            widgetService.updateWidget(deletedPortlet);
+            widgetService.updateWidget(deletedPortlet,dashboard.getDashboardId(),authenticationService.getUserCredential().getUserId());
             
         }
     };

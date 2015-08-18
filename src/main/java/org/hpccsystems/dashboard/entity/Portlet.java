@@ -6,7 +6,7 @@ import org.hpccsystems.dashboard.chart.entity.ChartData;
 import org.hpccsystems.dashboard.chart.entity.TitleColumn;
 import org.hpccsystems.dashboard.common.Constants;
 
-public class Portlet {
+public class Portlet implements Cloneable{
 
     private String name;
     private Integer id;
@@ -118,6 +118,13 @@ public class Portlet {
 
     public boolean isLive() {
         return Constants.STATE_LIVE_CHART.equals(widgetState);
+    }
+
+    @Override
+    public Portlet clone() throws CloneNotSupportedException {
+        Portlet clonedObj = (Portlet) super.clone();
+        clonedObj.setChartData(this.getChartData().clone());
+        return clonedObj;
     }
 
 }

@@ -37,9 +37,11 @@ public interface WidgetService {
      *     portlet Id
      * @throws DataAccessException
      * @throws EncryptDecryptException 
+     * @throws CloneNotSupportedException 
      * @throws Exception 
      */
-    void addWidget(Integer dashboardId, Portlet portlet, Integer sequence)throws JAXBException, DataAccessException, EncryptDecryptException;
+    void addWidget(Integer dashboardId, Portlet portlet, Integer sequence,String userId)throws JAXBException,
+    DataAccessException, EncryptDecryptException, CloneNotSupportedException;
     
     /**
      * @param dashboardId
@@ -67,9 +69,11 @@ public interface WidgetService {
      * 
      * @param portlet
      * @throws EncryptDecryptException 
+     * @throws CloneNotSupportedException 
      * @throws Exception
      */
-    void updateWidget(Portlet portlet)throws DataAccessException ,JAXBException, EncryptDecryptException;
+    void updateWidget(Portlet portlet,Integer dashboardId,String userId)
+            throws DataAccessException ,JAXBException, EncryptDecryptException, CloneNotSupportedException;
 
     /**
      * Service to update chart title

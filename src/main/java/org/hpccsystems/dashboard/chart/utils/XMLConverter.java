@@ -2,6 +2,7 @@ package org.hpccsystems.dashboard.chart.utils;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.List;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -12,6 +13,7 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.chart.cluster.ClusterData;
 import org.hpccsystems.dashboard.chart.entity.ChartData;
+import org.hpccsystems.dashboard.chart.entity.InputParam;
 import org.hpccsystems.dashboard.chart.entity.RelevantData;
 import org.hpccsystems.dashboard.chart.entity.ScoredSearchData;
 import org.hpccsystems.dashboard.chart.entity.TableData;
@@ -458,4 +460,34 @@ public class XMLConverter {
         return chartData;
     }
 
+    public static String makeCommonInputXML(List<InputParam> commonInputParams) throws JAXBException {
+        java.io.StringWriter sw = new StringWriter();
+        JAXBContext jaxbContext;
+        try {
+            jaxbContext = JAXBContext.newInstance(List.class,InputParam.class);
+            Marshaller marshaller = jaxbContext.createMarshaller();
+            marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
+            marshaller.marshal(commonInputParams, sw);
+        } catch (JAXBException e) {
+            LOG.error(Constants.EXCEPTION,e);
+            throw e;
+        }
+        return sw.toString();
+    }
+
+    @SuppressWarnings("unchecked")
+    public static List<InputParam> makeCommonInputObject(String xml) throws JAXBException, EncryptDecryptException {
+        List<InputParam> commonInputParams = null;
+        JAXBContext jaxbContext;
+        try {
+            jaxbContext = JAXBContext.newInstance(List.class,InputParam.class);
+            Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
+            commonInputParams = (List<InputParam>) jaxbUnmarshaller.unmarshal(new StringReader(xml));
+            
+        } catch (JAXBException e) {
+            LOG.error(Constants.EXCEPTION,e);
+            throw e;
+        }    
+        return commonInputParams;
+    }
 }

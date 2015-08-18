@@ -2,6 +2,7 @@ package org.hpccsystems.dashboard.services.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBException;
 
@@ -10,6 +11,7 @@ import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.chart.cluster.ClusterData;
 import org.hpccsystems.dashboard.chart.entity.ChartData;
 import org.hpccsystems.dashboard.chart.entity.HpccConnection;
+import org.hpccsystems.dashboard.chart.entity.InputParam;
 import org.hpccsystems.dashboard.chart.entity.RelevantData;
 import org.hpccsystems.dashboard.chart.entity.ScoredSearchData;
 import org.hpccsystems.dashboard.chart.entity.TableData;
@@ -136,46 +138,51 @@ public class WidgetServiceImpl implements WidgetService {
     }
 
     @Override
-    public void updateWidget(Portlet portlet) throws DataAccessException,
-            JAXBException, EncryptDecryptException {
+    public void updateWidget(Portlet portlet,Integer dashboardId,String userId) throws DataAccessException,
+            JAXBException, EncryptDecryptException, CloneNotSupportedException {
         
+        List<InputParam> commonInputParams = null;
+        Portlet clonedPortlet = portlet.clone();
+        
+        if(clonedPortlet.getChartData().getIsQuery()){
+            commonInputParams =  getAndRemoveCommonInputs(clonedPortlet);
+        }
         try {
             // Converting Java Objects to XML
             if(portlet.getWidgetState().equals(Constants.STATE_LIVE_CHART)) {
                 if(Constants.CATEGORY_TABLE== chartService.getCharts().get(portlet.getChartType()).getCategory()) {
-                    portlet.setChartDataXML(
+                    clonedPortlet.setChartDataXML(
                             XMLConverter.makeTableDataXML(
-                                    (TableData) portlet.getChartData())
+                                    (TableData) clonedPortlet.getChartData())
                             );                
                 } else if(Constants.CATEGORY_HIERARCHY == chartService.getCharts().get(portlet.getChartType()).getCategory()) {
-                    portlet.setChartDataXML(
+                    clonedPortlet.setChartDataXML(
                             XMLConverter.makeTreeDataXML(
-                                    (TreeData) portlet.getChartData())
+                                    (TreeData) clonedPortlet.getChartData())
                             );
                 } else if(Constants.CATEGORY_TEXT_EDITOR == chartService.getCharts().get(portlet.getChartType()).getCategory()){
-                    portlet.setChartDataXML(
-                                    ((TextData) portlet.getChartData()).getHtmlText());
+                    clonedPortlet.setChartDataXML(
+                                    ((TextData) clonedPortlet.getChartData()).getHtmlText());
                 } else if(Constants.CATEGORY_GAUGE == chartService.getCharts().get(portlet.getChartType()).getCategory()) {
-                    portlet.setChartDataXML(
+                    clonedPortlet.setChartDataXML(
                             XMLConverter.makeGaugeChartDataXML(
-                                    (GaugeChartData) portlet.getChartData())  );
+                                    (GaugeChartData) clonedPortlet.getChartData())  );
                 }else if(Constants.CATEGORY_CLUSTER == chartService.getCharts().get(portlet.getChartType()).getCategory()){
-                	 portlet.setChartDataXML(
+                    clonedPortlet.setChartDataXML(
                              XMLConverter.makeClusterChartDataXML(
-                                     (ClusterData) portlet.getChartData()));
+                                     (ClusterData) clonedPortlet.getChartData()));
                 } else if(Constants.CATEGORY_SCORED_SEARCH_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()){
-                	portlet.setChartDataXML(
-                			XMLConverter.makeScoredSearchDataXML((ScoredSearchData) portlet.getChartData()));
+                    clonedPortlet.setChartDataXML(
+                			XMLConverter.makeScoredSearchDataXML((ScoredSearchData) clonedPortlet.getChartData()));
                 } else if(Constants.RELEVANT_CONFIG == chartService.getCharts().get(portlet.getChartType()).getCategory()){
-                	portlet.setChartDataXML(
-                			XMLConverter.makeRelevantChartDataXML((RelevantData) portlet.getChartData()));
+                    clonedPortlet.setChartDataXML(
+                			XMLConverter.makeRelevantChartDataXML((RelevantData) clonedPortlet.getChartData()));
                 }
                 else {
                     //For Pie/Line/Bar charts
-                    portlet.setChartDataXML(
+                    clonedPortlet.setChartDataXML(
                             XMLConverter.makeXYChartDataXML(
-                                    (XYChartData) portlet.getChartData())
-                            );
+                                    (XYChartData) clonedPortlet.getChartData()) );
                 }
             }
         } catch (DataAccessException e) {
@@ -187,7 +194,12 @@ public class WidgetServiceImpl implements WidgetService {
         }
         
         try    {
-            widgetDao.updateWidget(portlet);
+            widgetDao.updateWidget(clonedPortlet);
+            if(commonInputParams != null){
+                String commonInputText = XMLConverter.makeCommonInputXML(commonInputParams);
+                widgetDao.addOrUpdateCommonInput(dashboardId,commonInputText,userId);
+            }
+            
         } catch(DataAccessException ex) {
             LOG.error(Constants.EXCEPTION, ex);
             throw ex;
@@ -206,27 +218,32 @@ public class WidgetServiceImpl implements WidgetService {
     }
 
     @Override
-    public void addWidget(Integer dashboardId, Portlet portlet,
-            Integer sequence) throws JAXBException, DataAccessException, EncryptDecryptException {
+    public void addWidget(Integer dashboardId, Portlet portlet,Integer sequence,String userId) 
+            throws JAXBException, DataAccessException, EncryptDecryptException, CloneNotSupportedException {
+        List<InputParam> commonInputParams = null;
         try {
+            Portlet clonedPortlet = portlet.clone();
+            
+            if(clonedPortlet.getChartData().getIsQuery()){
+                commonInputParams =  getAndRemoveCommonInputs(clonedPortlet);
+            }
             // Converting Java Objects to XML
             if (portlet.getWidgetState().equals(Constants.STATE_LIVE_CHART)) {
                 if (Constants.CATEGORY_TABLE== chartService.getCharts().get(portlet.getChartType()).getCategory()) {
-                    portlet.setChartDataXML(XMLConverter
-                            .makeTableDataXML((TableData) portlet.getChartData()));
+                    clonedPortlet.setChartDataXML(XMLConverter
+                            .makeTableDataXML((TableData) clonedPortlet.getChartData()));
                 } else if (Constants.CATEGORY_HIERARCHY == chartService.getCharts().get(portlet.getChartType()).getCategory()) {
-                    portlet.setChartDataXML(XMLConverter
-                            .makeTreeDataXML((TreeData) portlet.getChartData()));
+                    clonedPortlet.setChartDataXML(XMLConverter
+                            .makeTreeDataXML((TreeData) clonedPortlet.getChartData()));
                 }else if(Constants.CATEGORY_TEXT_EDITOR == chartService.getCharts().get(portlet.getChartType()).getCategory()){
-                	portlet.setChartDataXML(((TextData) portlet.getChartData()).getHtmlText());
+                    clonedPortlet.setChartDataXML(((TextData) clonedPortlet.getChartData()).getHtmlText());
                 } else if(Constants.CATEGORY_SCORED_SEARCH_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()){
-                	portlet.setChartDataXML(
-                			XMLConverter.makeScoredSearchDataXML((ScoredSearchData) portlet.getChartData()));
+                    clonedPortlet.setChartDataXML(
+                			XMLConverter.makeScoredSearchDataXML((ScoredSearchData) clonedPortlet.getChartData()));
                 }else {
                     // For Pie/Line/Bar charts
-                    portlet.setChartDataXML(XMLConverter
-                            .makeXYChartDataXML((XYChartData) portlet
-                                    .getChartData()));
+                    clonedPortlet.setChartDataXML(XMLConverter
+                            .makeXYChartDataXML((XYChartData) clonedPortlet.getChartData()));
                 }
             }
         } catch(JAXBException ex){
@@ -234,10 +251,28 @@ public class WidgetServiceImpl implements WidgetService {
         }
         try {
              widgetDao.addWidget(dashboardId, portlet, sequence);
+             if(commonInputParams != null){
+                 String commonInputText = XMLConverter.makeCommonInputXML(commonInputParams);
+                 widgetDao.addOrUpdateCommonInput(dashboardId,commonInputText,userId);
+             }
+            
         } catch (DataAccessException ex) {
             LOG.error(Constants.EXCEPTION,ex);
             throw ex;
         }
+    }
+
+    private List<InputParam> getAndRemoveCommonInputs(Portlet clonedPortlet) {
+        List<InputParam> commonInputparams = new ArrayList<InputParam>();
+        commonInputparams = clonedPortlet.getChartData().getInputParams()
+                .stream().filter(input -> input.getIsCommonInput())
+                .collect(Collectors.toList());
+        if(commonInputparams.isEmpty()){
+            return null;
+        }else{
+            clonedPortlet.getChartData().getInputParams().removeAll(commonInputparams);
+            return commonInputparams;
+        }       
     }
 
     @Override
