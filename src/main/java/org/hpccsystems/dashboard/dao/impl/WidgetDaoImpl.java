@@ -229,7 +229,8 @@ public class WidgetDaoImpl implements WidgetDao{
         getJdbcTemplate().update(INSERT_UPDATE_COMMON_INPUT,new Object[] {
                 dashboardId,                    
                 userId,
-                commonInputText                
+                commonInputText ,
+                commonInputText
         });
     }
 }

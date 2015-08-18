@@ -2,12 +2,17 @@ package org.hpccsystems.dashboard.chart.utils;
 
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 import javax.xml.bind.Unmarshaller;
+import javax.xml.stream.XMLInputFactory;
+import javax.xml.stream.XMLStreamException;
+import javax.xml.stream.XMLStreamReader;
+import javax.xml.transform.stream.StreamSource;
 
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
@@ -464,10 +469,14 @@ public class XMLConverter {
         java.io.StringWriter sw = new StringWriter();
         JAXBContext jaxbContext;
         try {
-            jaxbContext = JAXBContext.newInstance(List.class,InputParam.class);
+            jaxbContext = JAXBContext.newInstance(InputParam.class);
             Marshaller marshaller = jaxbContext.createMarshaller();
             marshaller.setProperty(Marshaller.JAXB_ENCODING, "UTF-8");
-            marshaller.marshal(commonInputParams, sw);
+            marshaller.setProperty(Marshaller.JAXB_FRAGMENT, true);
+            
+           for(InputParam input  : commonInputParams){
+                marshaller.marshal(input, sw);
+           }
         } catch (JAXBException e) {
             LOG.error(Constants.EXCEPTION,e);
             throw e;
@@ -476,18 +485,29 @@ public class XMLConverter {
     }
 
     @SuppressWarnings("unchecked")
-    public static List<InputParam> makeCommonInputObject(String xml) throws JAXBException, EncryptDecryptException {
-        List<InputParam> commonInputParams = null;
+    public static List<InputParam> makeCommonInputObject(String xml) throws JAXBException, EncryptDecryptException, XMLStreamException {
         JAXBContext jaxbContext;
+        List<InputParam> commonInputs = null;
         try {
-            jaxbContext = JAXBContext.newInstance(List.class,InputParam.class);
+            jaxbContext = JAXBContext.newInstance(InputParam.class);
             Unmarshaller jaxbUnmarshaller = jaxbContext.createUnmarshaller();
-            commonInputParams = (List<InputParam>) jaxbUnmarshaller.unmarshal(new StringReader(xml));
+            XMLInputFactory xif = XMLInputFactory.newFactory();
+            XMLStreamReader xsr = xif.createXMLStreamReader(new StreamSource(xml));
+            
+            commonInputs = new ArrayList<InputParam>();
+            while(xsr.getEventType() != XMLStreamReader.END_DOCUMENT) {
+                LOG.debug("xsr.getLocalName() -->{}"+xsr.getLocalName());
+                if(xsr.isStartElement() && "InputParam".equals(xsr.getLocalName())) {
+                    InputParam input = (InputParam) jaxbUnmarshaller.unmarshal(xsr);
+                    commonInputs.add(input);
+                }
+                xsr.next();
+            }
             
         } catch (JAXBException e) {
             LOG.error(Constants.EXCEPTION,e);
             throw e;
         }    
-        return commonInputParams;
+        return commonInputs;
     }
 }

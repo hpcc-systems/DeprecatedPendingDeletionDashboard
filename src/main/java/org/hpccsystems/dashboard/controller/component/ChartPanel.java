@@ -271,6 +271,7 @@ public class ChartPanel extends Panel {
             final Map<String, Object> parameters = new HashMap<String, Object>();
             parameters.put(Constants.PARENT, ChartPanel.this);
             parameters.put(Constants.PORTLET, portlet);
+            parameters.put(Constants.DASHBOARD_ID, dashboardId);
             
             final Window window = (Window) Executions.createComponents(
                     "/demo/layout/edit_portlet.zul", holderDiv, parameters);
