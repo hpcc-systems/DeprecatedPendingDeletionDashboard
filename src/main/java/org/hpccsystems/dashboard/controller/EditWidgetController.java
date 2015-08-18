@@ -109,7 +109,7 @@ public class EditWidgetController extends SelectorComposer<Component> {
     ChartPanel chartPanel;
     
     Dashboard dashboard;
-    private Integer dashboardId;
+    
     
     UserCredential userCredential;
     
@@ -135,7 +135,6 @@ public class EditWidgetController extends SelectorComposer<Component> {
                         authenticationService.getUserCredential().getUserId(), 
                         dashboardIdList,
                         null).get(0);
-                dashboardId = dashboard.getDashboardId();
                 portlet = widgetService.retriveWidgetDetails(dashboard.getDashboardId(), userCredential.getUserId())
                         .get(0); //Assuming one Widget exists for the provided dashboard
                  
@@ -171,7 +170,6 @@ public class EditWidgetController extends SelectorComposer<Component> {
             portlet = (Portlet) Executions.getCurrent().getArg().get(Constants.PORTLET);
             chartPanel = (ChartPanel) Executions.getCurrent().getArg().get(Constants.PARENT);
             holderInclude.setDynamicProperty(Constants.PARENT, editPortletWindow);
-            dashboardId = (Integer) Executions.getCurrent().getArg().get(Constants.DASHBOARD_ID);
             initChartData();
             if (Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())) {
                 chartData = portlet.getChartData();
@@ -415,7 +413,7 @@ public class EditWidgetController extends SelectorComposer<Component> {
             //update Live chart data into DB
             portlet.setChartData(chartData);
             
-            widgetService.updateWidget(portlet,dashboardId, authenticationService.getUserCredential().getUserId());
+            widgetService.updateWidget(portlet);
 
         }catch(DataAccessException | HpccConnectionException e){
             Clients.showNotification(Labels.getLabel("unableToUpdateDBData"), "error", this.getSelf(), "middle_center", 3000, true);
@@ -491,7 +489,7 @@ public class EditWidgetController extends SelectorComposer<Component> {
         portlet.setChartData(chartData);
         
         try {
-            widgetService.updateWidget(portlet,dashboardId, authenticationService.getUserCredential().getUserId());
+            widgetService.updateWidget(portlet);
         } catch (Exception e) {
             // TODO Show notification
         }
@@ -522,11 +520,11 @@ public class EditWidgetController extends SelectorComposer<Component> {
                     dashboardService.addDashboardDetails(dashboard, Constants.CIRCUIT_APPLICATION_ID, dashboard
                                         .getSourceId(),    authenticationService.getUserCredential().getUserId());
                 portlet.setChartData(chartData);
-                widgetService.addWidget(dashboardId,portlet, 0,authenticationService.getUserCredential().getUserId());
+                widgetService.addWidget(portlet, 0);
             } else {
                 dashboardService.updateDashboard(dashboard);
                 portlet.setChartData(chartData);
-                widgetService.updateWidget(portlet,dashboardId, authenticationService.getUserCredential().getUserId());
+                widgetService.updateWidget(portlet);
             }
         }catch (CloneNotSupportedException e) {
             Clients.showNotification(Labels.getLabel("errorOnSavingChanges"));

@@ -41,8 +41,8 @@ public interface WidgetService {
      * @throws CloneNotSupportedException 
      * @throws Exception 
      */
-    void addWidget(Integer dashboardId, Portlet portlet, Integer sequence,String userId)throws JAXBException,
-    DataAccessException, EncryptDecryptException, CloneNotSupportedException;
+    void addWidget(Portlet portlet, Integer sequence)throws JAXBException,
+    DataAccessException, EncryptDecryptException;
     
     /**
      * @param dashboardId
@@ -73,8 +73,8 @@ public interface WidgetService {
      * @throws CloneNotSupportedException 
      * @throws Exception
      */
-    void updateWidget(Portlet portlet,Integer dashboardId,String userId)
-            throws DataAccessException ,JAXBException, EncryptDecryptException, CloneNotSupportedException;
+    void updateWidget(Portlet portlet) throws DataAccessException ,JAXBException,
+    EncryptDecryptException, CloneNotSupportedException;
 
     /**
      * Service to update chart title
@@ -92,6 +92,7 @@ public interface WidgetService {
      * @throws EncryptDecryptException 
      */
     int updateHpccPassword(List<Dashboard> dashboards, HpccConnection hpccConnection, String password) throws EncryptDecryptException;
+    
     
     
     /**

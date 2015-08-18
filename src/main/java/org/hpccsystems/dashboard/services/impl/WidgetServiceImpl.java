@@ -163,15 +163,14 @@ public class WidgetServiceImpl implements WidgetService {
     }
 
     @Override
-    public void updateWidget(Portlet portlet,Integer dashboardId,String userId) throws DataAccessException,
+    public void updateWidget(Portlet portlet) throws DataAccessException,
             JAXBException, EncryptDecryptException, CloneNotSupportedException {
         
-        List<InputParam> commonInputParams = null;
         Portlet clonedPortlet = portlet.clone();
-        
-        if(clonedPortlet.getChartData().getIsQuery()){
-            commonInputParams =  getAndRemoveCommonInputs(clonedPortlet);
+        if(clonedPortlet.getChartData().getInputParams() != null){
+            clonedPortlet.getChartData().getInputParams().removeAll(getCommonInputs(portlet)) ; 
         }
+       
         try {
             // Converting Java Objects to XML
             if(portlet.getWidgetState().equals(Constants.STATE_LIVE_CHART)) {
@@ -216,20 +215,7 @@ public class WidgetServiceImpl implements WidgetService {
         }catch(JAXBException ex){
             LOG.error("JAXBException while updating widget"+ex);
             throw ex;
-        }
-        
-        try    {
-            widgetDao.updateWidget(clonedPortlet);
-            if(commonInputParams != null){
-                String commonInputText = XMLConverter.makeCommonInputXML(commonInputParams);
-                widgetDao.addOrUpdateCommonInput(dashboardId,commonInputText,userId);
-            }
-            
-        } catch(DataAccessException ex) {
-            LOG.error(Constants.EXCEPTION, ex);
-            throw ex;
-        }
-        
+        }        
     }
 
     @Override
@@ -243,61 +229,31 @@ public class WidgetServiceImpl implements WidgetService {
     }
 
     @Override
-    public void addWidget(Integer dashboardId, Portlet portlet,Integer sequence,String userId) 
-            throws JAXBException, DataAccessException, EncryptDecryptException, CloneNotSupportedException {
-        List<InputParam> commonInputParams = null;
+    public void addWidget(Portlet portlet,Integer sequence) 
+            throws JAXBException, DataAccessException, EncryptDecryptException {
         try {
-            Portlet clonedPortlet = portlet.clone();
-            
-            if(clonedPortlet.getChartData().getIsQuery()){
-                commonInputParams =  getAndRemoveCommonInputs(clonedPortlet);
-            }
             // Converting Java Objects to XML
             if (portlet.getWidgetState().equals(Constants.STATE_LIVE_CHART)) {
                 if (Constants.CATEGORY_TABLE== chartService.getCharts().get(portlet.getChartType()).getCategory()) {
-                    clonedPortlet.setChartDataXML(XMLConverter
-                            .makeTableDataXML((TableData) clonedPortlet.getChartData()));
+                    portlet.setChartDataXML(XMLConverter
+                            .makeTableDataXML((TableData) portlet.getChartData()));
                 } else if (Constants.CATEGORY_HIERARCHY == chartService.getCharts().get(portlet.getChartType()).getCategory()) {
-                    clonedPortlet.setChartDataXML(XMLConverter
-                            .makeTreeDataXML((TreeData) clonedPortlet.getChartData()));
+                    portlet.setChartDataXML(XMLConverter
+                            .makeTreeDataXML((TreeData) portlet.getChartData()));
                 }else if(Constants.CATEGORY_TEXT_EDITOR == chartService.getCharts().get(portlet.getChartType()).getCategory()){
-                    clonedPortlet.setChartDataXML(((TextData) clonedPortlet.getChartData()).getHtmlText());
+                    portlet.setChartDataXML(((TextData) portlet.getChartData()).getHtmlText());
                 } else if(Constants.CATEGORY_SCORED_SEARCH_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()){
-                    clonedPortlet.setChartDataXML(
-                			XMLConverter.makeScoredSearchDataXML((ScoredSearchData) clonedPortlet.getChartData()));
+                    portlet.setChartDataXML(
+                			XMLConverter.makeScoredSearchDataXML((ScoredSearchData) portlet.getChartData()));
                 }else {
                     // For Pie/Line/Bar charts
-                    clonedPortlet.setChartDataXML(XMLConverter
-                            .makeXYChartDataXML((XYChartData) clonedPortlet.getChartData()));
+                    portlet.setChartDataXML(XMLConverter
+                            .makeXYChartDataXML((XYChartData) portlet.getChartData()));
                 }
             }
         } catch(JAXBException ex){
             throw ex;
         }
-        try {
-             widgetDao.addWidget(dashboardId, portlet, sequence);
-             if(commonInputParams != null){
-                 String commonInputText = XMLConverter.makeCommonInputXML(commonInputParams);
-                 widgetDao.addOrUpdateCommonInput(dashboardId,commonInputText,userId);
-             }
-            
-        } catch (DataAccessException ex) {
-            LOG.error(Constants.EXCEPTION,ex);
-            throw ex;
-        }
-    }
-
-    private List<InputParam> getAndRemoveCommonInputs(Portlet clonedPortlet) {
-        List<InputParam> commonInputparams = new ArrayList<InputParam>();
-        commonInputparams = clonedPortlet.getChartData().getInputParams()
-                .stream().filter(input -> input.getIsCommonInput())
-                .collect(Collectors.toList());
-        if(commonInputparams.isEmpty()){
-            return null;
-        }else{
-            clonedPortlet.getChartData().getInputParams().removeAll(commonInputparams);
-            return commonInputparams;
-        }       
     }
 
     @Override
@@ -316,6 +272,20 @@ public class WidgetServiceImpl implements WidgetService {
         //TODO: Consider maximum IN clause limit for mysql, default is 1048576
         return 
         widgetDao.updateHpccPassword(dashboardIds, hpccConnection.getHostIp(), hpccConnection.getUsername(), encryptor.encrypt(password));
+    }
+    
+    private List<InputParam> getCommonInputs(Portlet portlet) {
+        List<InputParam> commonInputparams = new ArrayList<InputParam>();
+        commonInputparams = portlet.getChartData().getInputParams()
+                .stream().filter(input -> input.getIsCommonInput())
+                .collect(Collectors.toList());
+        LOG.debug("commonInputparams --->"+commonInputparams);
+        if(commonInputparams.isEmpty()){
+            return null;
+        }else{
+            portlet.getChartData().getInputParams().removeAll(commonInputparams);
+            return commonInputparams;
+        }       
     }
 
 } 

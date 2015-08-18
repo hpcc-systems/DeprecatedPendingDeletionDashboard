@@ -235,7 +235,7 @@ public class InteractivityController extends SelectorComposer<Component> {
         //Update tabledata with interactivity details into DB 
         ((ListModelList<Object>)interactivityListbox.getModel()).getInnerList().forEach(portlet ->{
             try {
-                widgetService.updateWidget((Portlet)portlet,dashboard.getDashboardId(),authenticationService.getUserCredential().getUserId());
+                widgetService.updateWidget((Portlet)portlet);
             } catch (Exception e) {
                LOG.error(Constants.EXCEPTION,e);
                Clients.showNotification(

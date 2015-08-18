@@ -1,5 +1,8 @@
 package org.hpccsystems.dashboard.services;
 import java.util.List;
+import java.util.Set;
+
+import javax.xml.bind.JAXBException;
 
 import org.hpccsystems.dashboard.chart.entity.InputParam;
 import org.hpccsystems.dashboard.entity.Dashboard;
@@ -93,5 +96,11 @@ public interface DashboardService {
     void saveFilterOrder(Integer dashboardId, String string);
 
     List<String> getFilterOrder(Integer dashboardId);
+
+    /**
+     *  Adds the common inputparam data into dashboard_filters table,if the inputparam exists already in the table,updates the value     
+     */
+    void addOrUpdateCommonInput(Integer dashboardId, String userId,
+            Set<InputParam> commonInputs) throws JAXBException;
     
 }

@@ -138,7 +138,6 @@ public class ChartPanel extends Panel {
     private String divId;
     private int btnState;
     private boolean showLocalFilter;
-    private Integer dashboardId;
     
    
     //Delete panel listener
@@ -255,7 +254,6 @@ public class ChartPanel extends Panel {
             final Map<String, Object> parameters = new HashMap<String, Object>();
             parameters.put(Constants.PARENT, ChartPanel.this);
             parameters.put(Constants.PORTLET, portlet);
-            parameters.put(Constants.DASHBOARD_ID, dashboardId);
 
             final Window window = (Window) Executions.createComponents(
                     "/demo/add_widget.zul", holderDiv, parameters);
@@ -271,7 +269,6 @@ public class ChartPanel extends Panel {
             final Map<String, Object> parameters = new HashMap<String, Object>();
             parameters.put(Constants.PARENT, ChartPanel.this);
             parameters.put(Constants.PORTLET, portlet);
-            parameters.put(Constants.DASHBOARD_ID, dashboardId);
             
             final Window window = (Window) Executions.createComponents(
                     "/demo/layout/edit_portlet.zul", holderDiv, parameters);
@@ -319,9 +316,8 @@ public class ChartPanel extends Panel {
             Events.sendEvent("onCreateLiveChart", ChartPanel.this, parameters);
             
             WidgetService widgetService = (WidgetService)SpringUtil.getBean("widgetService");
-            AuthenticationService authenticationService = (AuthenticationService) SpringUtil.getBean(Constants.AUTHENTICATION_SERVICE);
             try {
-                widgetService.updateWidget(portlet,dashboardId,authenticationService.getUserCredential().getUserId());
+                widgetService.updateWidget(portlet);
             } catch (DataAccessException |JAXBException |EncryptDecryptException | CloneNotSupportedException e) {
                 LOG.error(e);
                 Clients.showNotification("Error occurred while persisting current changes","error", ChartPanel.this,"middle_center",3000, false);
@@ -350,7 +346,6 @@ public class ChartPanel extends Panel {
         this.setWidth("99%");
         this.setStyle("margin-bottom:5px");
         
-        this.dashboardId = dashboardId;
         // Creating title bar for the panel
         caption.setWidth("100%");
 

@@ -4,6 +4,7 @@ import java.io.StringReader;
 import java.io.StringWriter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
@@ -465,7 +466,7 @@ public class XMLConverter {
         return chartData;
     }
 
-    public static String makeCommonInputXML(List<InputParam> commonInputParams) throws JAXBException {
+    public static String makeCommonInputXML(Set<InputParam> commonInputParams) throws JAXBException {
         java.io.StringWriter sw = new StringWriter();
         JAXBContext jaxbContext;
         try {

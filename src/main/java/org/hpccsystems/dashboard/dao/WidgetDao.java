@@ -83,8 +83,6 @@ public interface WidgetDao {
      */
     int updateHpccPassword(List<Integer> dashboardIds, String hostIp, String username, String password);
 
-
-    void addOrUpdateCommonInput(Integer dashboardId, String commonInputText,String userId);
     
     /**
      * Returns user's filter when available. 

@@ -237,7 +237,8 @@ public class DashboardController extends SelectorComposer<Window>{
         
         releventPortlet.setChartDataJSON(relJSON);
         //To update Relevant data with the selected claim id
-        widgetService.updateWidget(releventPortlet,dashboard.getDashboardId(),authenticationService.getUserCredential().getUserId());
+        widgetService.updateWidget(releventPortlet);
+        //TODO: check do the dashboard_filters table need to be updated
         
         String chartScript = selectedRelevantPanel.drawD3Graph();
         if (chartScript != null) {
@@ -914,6 +915,14 @@ public class DashboardController extends SelectorComposer<Window>{
                 
             }
             
+            try {
+                updateDashboardInputparam(dashboard);
+            } catch (JAXBException e) {
+                LOG.error("Error Updating Charts", e);
+                Clients.showNotification("Unable to update charts",
+                        Clients.NOTIFICATION_TYPE_ERROR, DashboardController.this.getSelf(),Constants.POSITION_CENTER, 3000, true);
+            }
+            
             StringBuilder sb = new StringBuilder();
             Iterator<InputParam> iterator = appliedCommonInputParam.iterator();
             while (iterator.hasNext()) {
@@ -960,7 +969,10 @@ public class DashboardController extends SelectorComposer<Window>{
         }
         
         //Updating widget with latest filter details into DB
-       widgetService.updateWidget(portlet,dashboard.getDashboardId(),authenticationService.getUserCredential().getUserId());
+        //For logical file widget need to widget_details table
+        if(!portlet.getChartData().getIsQuery()){
+            widgetService.updateWidget(portlet);
+        }
         
        Events.postEvent("onChangeInputParamChangeTitle",panel, null);
        
@@ -1171,7 +1183,7 @@ public class DashboardController extends SelectorComposer<Window>{
     
     @SuppressWarnings("unchecked")
     protected void applyInputParamToPortlets(InputParam inputparam, boolean redrawCharts) {
-
+        
         for (Portlet portlet : dashboard.getPortletList()) {
 
             if (!Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())
@@ -1215,12 +1227,40 @@ public class DashboardController extends SelectorComposer<Window>{
                         Clients.showNotification("Unable to update charts", Clients.NOTIFICATION_TYPE_ERROR, this.getSelf(), Constants.POSITION_CENTER, 5000, true);
                      }
                  }
-             }
-            
-           
+             }           
+        }
+        
+        try {
+            updateDashboardInputparam(dashboard);
+        } catch (JAXBException e) {
+            LOG.error("Error Updating Charts", e);
+            Clients.showNotification("Unable to update charts",
+                    Clients.NOTIFICATION_TYPE_ERROR, this.getSelf(),Constants.POSITION_CENTER, 3000, true);
         }
     
         
+    }
+
+
+    /**Updates dashboard_filters table with common inputparam details
+     * @param passedDashboard
+     * @throws JAXBException
+     */
+    private void updateDashboardInputparam(Dashboard passedDashboard) throws JAXBException {
+       
+        Set<InputParam> CommonInputParamWithValue = getInputparamWithValue(appliedCommonInputParam);
+        //For query widget need to update dashboard_filters table with common input params
+        if(!appliedCommonInputParam.isEmpty()){
+            dashboardService
+                    .addOrUpdateCommonInput(passedDashboard.getDashboardId(),
+                            authenticationService.getUserCredential()
+                                    .getUserId(), CommonInputParamWithValue);
+        }
+    }
+
+
+    private Set<InputParam> getInputparamWithValue(Set<InputParam> appliedCommonInputParam2) {        
+        return appliedCommonInputParam.stream().filter(commonInputparam -> commonInputparam.getValue() != null).collect(Collectors.toSet());
     }
 
 
@@ -1673,15 +1713,21 @@ public class DashboardController extends SelectorComposer<Window>{
             }
             
             //refresh the portlets, if the removed row/filter has any checked values
-            if(rowChecked){
-            
+            if(rowChecked){            
             // refreshing the chart && updating DB
-            while (iterator.hasNext()) {
-                Portlet portlet = iterator.next();
-                updateWidgets(portlet);
+                while (iterator.hasNext()) {
+                    Portlet portlet = iterator.next();
+                    updateWidgets(portlet);
                 }
             }
-            
+           //TODO: need to check updating dashboard_filters table is required 
+            try {
+                updateDashboardInputparam(dashboard);
+            } catch (JAXBException e) {
+                LOG.error("Error Updating Charts", e);
+                Clients.showNotification("Unable to update charts",
+                        Clients.NOTIFICATION_TYPE_ERROR, DashboardController.this.getSelf(),Constants.POSITION_CENTER, 3000, true);
+            }
             //Removing the Filter row in UI
             removedRow.detach();
             
@@ -1846,7 +1892,7 @@ public class DashboardController extends SelectorComposer<Window>{
                         
             reorderPortletPanels();
             
-            widgetService.addWidget(dashboardId, portlet, dashboard.getPortletList().indexOf(portlet),authenticationService.getUserCredential().getUserId());
+            widgetService.addWidget(portlet, dashboard.getPortletList().indexOf(portlet));
             
             //Updating new widget sequence to DB
             widgetService.updateWidgetSequence(dashboard);
@@ -2186,6 +2232,13 @@ public class DashboardController extends SelectorComposer<Window>{
             }
         });
         
+        try {
+            updateDashboardInputparam(dashboard);
+        } catch (JAXBException e) {
+            LOG.error("Error Updating Charts", e);
+            Clients.showNotification("Unable to update charts",
+                    Clients.NOTIFICATION_TYPE_ERROR, DashboardController.this.getSelf(),Constants.POSITION_CENTER, 3000, true);
+        }               
     }
 
 
@@ -2374,7 +2427,7 @@ public class DashboardController extends SelectorComposer<Window>{
             deletedPortlet.setWidgetState(Constants.STATE_EMPTY);
             
             //Clears all chart data from DB
-            widgetService.updateWidget(deletedPortlet,dashboard.getDashboardId(),authenticationService.getUserCredential().getUserId());
+            widgetService.updateWidget(deletedPortlet);
             
         }
     };

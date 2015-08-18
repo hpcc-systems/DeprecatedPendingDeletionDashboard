@@ -11,7 +11,6 @@ import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.controller.component.ChartPanel;
 import org.hpccsystems.dashboard.entity.ChartDetails;
 import org.hpccsystems.dashboard.entity.Portlet;
-import org.hpccsystems.dashboard.services.AuthenticationService;
 import org.hpccsystems.dashboard.services.ChartService;
 import org.hpccsystems.dashboard.services.WidgetService;
 import org.zkoss.zk.ui.Component;
@@ -48,13 +47,10 @@ public class ChartWidgetController extends GenericForwardComposer<Component> {
     Window addChartWindow;
     
     private Portlet portlet; 
-    private Integer dashboardId;
     
     @Override
     public void doAfterCompose(final Component comp) throws Exception {
         super.doAfterCompose(comp);
-        
-        dashboardId =(Integer) Executions.getCurrent().getAttribute(Constants.DASHBOARD_ID);
         
         ChartService chartService = (ChartService)SpringUtil.getBean(Constants.CHART_SERVICE);
         Map<Integer, ChartDetails> charts = chartService.getCharts();
@@ -125,8 +121,7 @@ public class ChartWidgetController extends GenericForwardComposer<Component> {
             //Add new widget into DB with chart type and 'Grayed' state
             try{
                 WidgetService widgetService =(WidgetService) SpringUtil.getBean(Constants.WIDGET_SERVICE);
-                AuthenticationService authenticationService = (AuthenticationService) SpringUtil.getBean(Constants.AUTHENTICATION_SERVICE);
-                widgetService.updateWidget(portlet,dashboardId,authenticationService.getUserCredential().getUserId());
+                widgetService.updateWidget(portlet);
             }catch(Exception ex){
                 LOG.error(Constants.EXCEPTION, ex);
             }
