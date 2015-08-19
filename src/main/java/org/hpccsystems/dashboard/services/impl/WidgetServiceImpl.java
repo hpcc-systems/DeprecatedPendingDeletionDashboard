@@ -224,7 +224,13 @@ public class WidgetServiceImpl implements WidgetService {
         }catch(JAXBException ex){
             LOG.error("JAXBException while updating widget"+ex);
             throw ex;
-        }        
+        }     
+        try{
+            widgetDao.updateWidget(clonedPortlet);            
+        } catch(DataAccessException ex) {
+            LOG.error(Constants.EXCEPTION, ex);
+            throw ex;
+        }
     }
 
     @Override
