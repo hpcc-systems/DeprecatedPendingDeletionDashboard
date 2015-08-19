@@ -173,8 +173,11 @@ public class WidgetServiceImpl implements WidgetService {
             JAXBException, EncryptDecryptException, CloneNotSupportedException {
         
         Portlet clonedPortlet = portlet.clone();
-        if(clonedPortlet.getChartData().getInputParams() != null){
-            clonedPortlet.getChartData().getInputParams().removeAll(getCommonInputs(portlet)) ; 
+        if(portlet.getChartData().getInputParams() != null){
+            List<InputParam> commonInputs = getCommonInputs(portlet);
+            if(commonInputs != null){
+                clonedPortlet.getChartData().getInputParams().removeAll(commonInputs) ;
+            }
         }
        
         try {
@@ -286,12 +289,7 @@ public class WidgetServiceImpl implements WidgetService {
                 .stream().filter(input -> input.getIsCommonInput())
                 .collect(Collectors.toList());
         LOG.debug("commonInputparams --->"+commonInputparams);
-        if(commonInputparams.isEmpty()){
-            return null;
-        }else{
-            portlet.getChartData().getInputParams().removeAll(commonInputparams);
-            return commonInputparams;
-        }       
+        return commonInputparams;
     }
 
 } 
