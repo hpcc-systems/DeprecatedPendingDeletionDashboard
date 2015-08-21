@@ -106,6 +106,8 @@ public class WidgetDaoImpl implements WidgetDao{
     
     @Override
     public void updateWidgetSequence(final Integer dashboardId,final List<Portlet> portlets) throws DataAccessException {
+        LOG.debug("Portlets - " + portlets);
+        
         String sql = Queries.UPDATE_WIDGET_SEQUENCE;
         getJdbcTemplate().batchUpdate(sql, new BatchPreparedStatementSetter() {
             public void setValues(PreparedStatement statement, int i)throws SQLException {

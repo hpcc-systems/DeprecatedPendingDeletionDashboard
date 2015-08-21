@@ -127,7 +127,11 @@ public class Portlet implements Cloneable{
     @Override
     public Portlet clone() throws CloneNotSupportedException {
         Portlet clonedObj = (Portlet) super.clone();
-        clonedObj.setChartData(this.getChartData().clone());
+        
+        if(this.getChartData() != null) {
+            clonedObj.setChartData(this.getChartData().clone());
+        }
+        
         return clonedObj;
     }
 

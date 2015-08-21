@@ -41,7 +41,7 @@ public interface WidgetService {
      * @throws CloneNotSupportedException 
      * @throws Exception 
      */
-    void addWidget(Portlet portlet, Integer sequence)throws JAXBException,
+    void addWidget(Integer dashboardId, Portlet portlet, Integer sequence)throws JAXBException,
     DataAccessException, EncryptDecryptException;
     
     /**

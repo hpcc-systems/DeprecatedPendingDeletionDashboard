@@ -173,7 +173,7 @@ public class WidgetServiceImpl implements WidgetService {
             JAXBException, EncryptDecryptException, CloneNotSupportedException {
         
         Portlet clonedPortlet = portlet.clone();
-        if(portlet.getChartData().getInputParams() != null){
+        if(portlet.getChartData() != null && portlet.getChartData().getInputParams() != null){
             List<InputParam> commonInputs = getCommonInputs(portlet);
             if(commonInputs != null){
                 clonedPortlet.getChartData().getInputParams().removeAll(commonInputs) ;
@@ -244,7 +244,7 @@ public class WidgetServiceImpl implements WidgetService {
     }
 
     @Override
-    public void addWidget(Portlet portlet,Integer sequence) 
+    public void addWidget(Integer dashboardId, Portlet portlet,Integer sequence) 
             throws JAXBException, DataAccessException, EncryptDecryptException {
         try {
             // Converting Java Objects to XML
@@ -269,6 +269,13 @@ public class WidgetServiceImpl implements WidgetService {
         } catch(JAXBException ex){
             throw ex;
         }
+        
+       try {
+            widgetDao.addWidget(dashboardId, portlet, sequence);
+       } catch (DataAccessException ex) {
+           LOG.error(Constants.EXCEPTION,ex);
+           throw ex;
+       }
     }
 
     @Override

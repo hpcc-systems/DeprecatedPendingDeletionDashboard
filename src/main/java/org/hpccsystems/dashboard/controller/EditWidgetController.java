@@ -520,7 +520,7 @@ public class EditWidgetController extends SelectorComposer<Component> {
                     dashboardService.addDashboardDetails(dashboard, Constants.CIRCUIT_APPLICATION_ID, dashboard
                                         .getSourceId(),    authenticationService.getUserCredential().getUserId());
                 portlet.setChartData(chartData);
-                widgetService.addWidget(portlet, 0);
+                widgetService.addWidget(dashboard.getDashboardId(), portlet, 0);
             } else {
                 dashboardService.updateDashboard(dashboard);
                 portlet.setChartData(chartData);
