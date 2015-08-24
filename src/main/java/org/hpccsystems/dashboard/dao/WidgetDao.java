@@ -1,7 +1,8 @@
 package org.hpccsystems.dashboard.dao;
 
 import java.sql.SQLException;
-import java.util.List; 
+import java.util.List;
+
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.springframework.dao.DataAccessException;
 
@@ -81,4 +82,11 @@ public interface WidgetDao {
      *     Number of rows affected
      */
     int updateHpccPassword(List<Integer> dashboardIds, String hostIp, String username, String password);
+
+    
+    /**
+     * Returns user's filter when available. 
+     * If no filters are available for the user, Dashboard creators filters are returned
+     */
+    String getinputParams(Integer dashboardId, String userId);
 }

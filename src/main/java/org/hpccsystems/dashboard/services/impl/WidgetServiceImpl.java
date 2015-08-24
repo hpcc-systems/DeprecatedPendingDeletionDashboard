@@ -2,14 +2,18 @@ package org.hpccsystems.dashboard.services.impl;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.xml.bind.JAXBException;
+import javax.xml.stream.XMLStreamException;
 
+import org.apache.axis.utils.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.chart.cluster.ClusterData;
 import org.hpccsystems.dashboard.chart.entity.ChartData;
 import org.hpccsystems.dashboard.chart.entity.HpccConnection;
+import org.hpccsystems.dashboard.chart.entity.InputParam;
 import org.hpccsystems.dashboard.chart.entity.RelevantData;
 import org.hpccsystems.dashboard.chart.entity.ScoredSearchData;
 import org.hpccsystems.dashboard.chart.entity.TableData;
@@ -56,7 +60,7 @@ public class WidgetServiceImpl implements WidgetService {
     public void addWidgetDetails(Integer dashboardId,List<Portlet> portlets) throws DataAccessException{
         try
         {
-        widgetDao.addWidgetDetails(dashboardId,portlets);
+            widgetDao.addWidgetDetails(dashboardId,portlets);
         }catch(DataAccessException ex) {
             LOG.error(Constants.EXCEPTION, ex);
             throw ex;
@@ -64,7 +68,32 @@ public class WidgetServiceImpl implements WidgetService {
         
     }
     
-    public List<Portlet> retriveWidgetDetails(Integer dashboardId) throws DataAccessException {
+    @Override
+    public List<InputParam> getInputParams(Integer dashboardId, String userId) {
+        try {
+            String xml = widgetDao.getinputParams(dashboardId, userId);
+            if(!StringUtils.isEmpty(xml)){
+            return XMLConverter.makeCommonInputObject(xml);
+            }else{
+                return null;
+            }
+        } catch (JAXBException | EncryptDecryptException | XMLStreamException e) {
+            LOG.error(e);
+            return null;
+        }
+    }
+    
+    
+    
+    @Override
+    public List<Portlet> retriveWidgetDetails(Integer dashboardId, String userId) throws DataAccessException {
+        boolean isUserIdnull = userId == null;
+        
+        List<InputParam> inputParams = null;
+        if(!isUserIdnull) {
+            inputParams = getInputParams(dashboardId, userId);
+        }
+        
         try {
             //Making Objects from XML
             List<Portlet> portlets = widgetDao.retriveWidgetDetails(dashboardId);
@@ -97,6 +126,10 @@ public class WidgetServiceImpl implements WidgetService {
                     else {
                         portlet.setChartData(
                                 XMLConverter.makeXYChartDataObject(portlet.getChartDataXML()));
+                    }
+                
+                    if(!isUserIdnull && inputParams != null) {
+                        portlet.applyInputParams(inputParams);
                     }
                 }
             }
@@ -137,45 +170,52 @@ public class WidgetServiceImpl implements WidgetService {
 
     @Override
     public void updateWidget(Portlet portlet) throws DataAccessException,
-            JAXBException, EncryptDecryptException {
+            JAXBException, EncryptDecryptException, CloneNotSupportedException {
         
+        Portlet clonedPortlet = portlet.clone();
+        if(portlet.getChartData() != null && portlet.getChartData().getInputParams() != null){
+            List<InputParam> commonInputs = getCommonInputs(portlet);
+            if(commonInputs != null){
+                clonedPortlet.getChartData().getInputParams().removeAll(commonInputs) ;
+            }
+        }
+       
         try {
             // Converting Java Objects to XML
             if(portlet.getWidgetState().equals(Constants.STATE_LIVE_CHART)) {
                 if(Constants.CATEGORY_TABLE== chartService.getCharts().get(portlet.getChartType()).getCategory()) {
-                    portlet.setChartDataXML(
+                    clonedPortlet.setChartDataXML(
                             XMLConverter.makeTableDataXML(
-                                    (TableData) portlet.getChartData())
+                                    (TableData) clonedPortlet.getChartData())
                             );                
                 } else if(Constants.CATEGORY_HIERARCHY == chartService.getCharts().get(portlet.getChartType()).getCategory()) {
-                    portlet.setChartDataXML(
+                    clonedPortlet.setChartDataXML(
                             XMLConverter.makeTreeDataXML(
-                                    (TreeData) portlet.getChartData())
+                                    (TreeData) clonedPortlet.getChartData())
                             );
                 } else if(Constants.CATEGORY_TEXT_EDITOR == chartService.getCharts().get(portlet.getChartType()).getCategory()){
-                    portlet.setChartDataXML(
-                                    ((TextData) portlet.getChartData()).getHtmlText());
+                    clonedPortlet.setChartDataXML(
+                                    ((TextData) clonedPortlet.getChartData()).getHtmlText());
                 } else if(Constants.CATEGORY_GAUGE == chartService.getCharts().get(portlet.getChartType()).getCategory()) {
-                    portlet.setChartDataXML(
+                    clonedPortlet.setChartDataXML(
                             XMLConverter.makeGaugeChartDataXML(
-                                    (GaugeChartData) portlet.getChartData())  );
+                                    (GaugeChartData) clonedPortlet.getChartData())  );
                 }else if(Constants.CATEGORY_CLUSTER == chartService.getCharts().get(portlet.getChartType()).getCategory()){
-                	 portlet.setChartDataXML(
+                    clonedPortlet.setChartDataXML(
                              XMLConverter.makeClusterChartDataXML(
-                                     (ClusterData) portlet.getChartData()));
+                                     (ClusterData) clonedPortlet.getChartData()));
                 } else if(Constants.CATEGORY_SCORED_SEARCH_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()){
-                	portlet.setChartDataXML(
-                			XMLConverter.makeScoredSearchDataXML((ScoredSearchData) portlet.getChartData()));
+                    clonedPortlet.setChartDataXML(
+                			XMLConverter.makeScoredSearchDataXML((ScoredSearchData) clonedPortlet.getChartData()));
                 } else if(Constants.RELEVANT_CONFIG == chartService.getCharts().get(portlet.getChartType()).getCategory()){
-                	portlet.setChartDataXML(
-                			XMLConverter.makeRelevantChartDataXML((RelevantData) portlet.getChartData()));
+                    clonedPortlet.setChartDataXML(
+                			XMLConverter.makeRelevantChartDataXML((RelevantData) clonedPortlet.getChartData()));
                 }
                 else {
                     //For Pie/Line/Bar charts
-                    portlet.setChartDataXML(
+                    clonedPortlet.setChartDataXML(
                             XMLConverter.makeXYChartDataXML(
-                                    (XYChartData) portlet.getChartData())
-                            );
+                                    (XYChartData) clonedPortlet.getChartData()) );
                 }
             }
         } catch (DataAccessException e) {
@@ -184,15 +224,13 @@ public class WidgetServiceImpl implements WidgetService {
         }catch(JAXBException ex){
             LOG.error("JAXBException while updating widget"+ex);
             throw ex;
-        }
-        
-        try    {
-            widgetDao.updateWidget(portlet);
+        }     
+        try{
+            widgetDao.updateWidget(clonedPortlet);            
         } catch(DataAccessException ex) {
             LOG.error(Constants.EXCEPTION, ex);
             throw ex;
         }
-        
     }
 
     @Override
@@ -206,8 +244,8 @@ public class WidgetServiceImpl implements WidgetService {
     }
 
     @Override
-    public void addWidget(Integer dashboardId, Portlet portlet,
-            Integer sequence) throws JAXBException, DataAccessException, EncryptDecryptException {
+    public void addWidget(Integer dashboardId, Portlet portlet,Integer sequence) 
+            throws JAXBException, DataAccessException, EncryptDecryptException {
         try {
             // Converting Java Objects to XML
             if (portlet.getWidgetState().equals(Constants.STATE_LIVE_CHART)) {
@@ -218,26 +256,26 @@ public class WidgetServiceImpl implements WidgetService {
                     portlet.setChartDataXML(XMLConverter
                             .makeTreeDataXML((TreeData) portlet.getChartData()));
                 }else if(Constants.CATEGORY_TEXT_EDITOR == chartService.getCharts().get(portlet.getChartType()).getCategory()){
-                	portlet.setChartDataXML(((TextData) portlet.getChartData()).getHtmlText());
+                    portlet.setChartDataXML(((TextData) portlet.getChartData()).getHtmlText());
                 } else if(Constants.CATEGORY_SCORED_SEARCH_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()){
-                	portlet.setChartDataXML(
+                    portlet.setChartDataXML(
                 			XMLConverter.makeScoredSearchDataXML((ScoredSearchData) portlet.getChartData()));
                 }else {
                     // For Pie/Line/Bar charts
                     portlet.setChartDataXML(XMLConverter
-                            .makeXYChartDataXML((XYChartData) portlet
-                                    .getChartData()));
+                            .makeXYChartDataXML((XYChartData) portlet.getChartData()));
                 }
             }
         } catch(JAXBException ex){
             throw ex;
         }
-        try {
-             widgetDao.addWidget(dashboardId, portlet, sequence);
-        } catch (DataAccessException ex) {
-            LOG.error(Constants.EXCEPTION,ex);
-            throw ex;
-        }
+        
+       try {
+            widgetDao.addWidget(dashboardId, portlet, sequence);
+       } catch (DataAccessException ex) {
+           LOG.error(Constants.EXCEPTION,ex);
+           throw ex;
+       }
     }
 
     @Override
@@ -257,5 +295,14 @@ public class WidgetServiceImpl implements WidgetService {
         return 
         widgetDao.updateHpccPassword(dashboardIds, hpccConnection.getHostIp(), hpccConnection.getUsername(), encryptor.encrypt(password));
     }
+    
+    private List<InputParam> getCommonInputs(Portlet portlet) {
+        List<InputParam> commonInputparams = new ArrayList<InputParam>();
+        commonInputparams = portlet.getChartData().getInputParams()
+                .stream().filter(input -> input.getIsCommonInput())
+                .collect(Collectors.toList());
+        LOG.debug("commonInputparams --->"+commonInputparams);
+        return commonInputparams;
+    }
 
-}
+} 

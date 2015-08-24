@@ -4,7 +4,7 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import org.hpccsystems.dashboard.chart.entity.InputParam;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
@@ -13,7 +13,7 @@ import org.apache.commons.lang.StringUtils;
 import org.hpccsystems.dashboard.common.Constants;
 
 @XmlRootElement
-public class ChartData {
+public class ChartData implements Cloneable{
 
     private Map<String, List<Field>> fields;
     private HpccConnection hpccConnection;
@@ -121,5 +121,13 @@ public class ChartData {
     public void setInputParams(List<InputParam> inputParams) {
         this.inputParams = inputParams;
     }
+
+    @Override
+    public ChartData clone() throws CloneNotSupportedException {
+        ChartData clonedObj = (ChartData) super.clone();
+        return clonedObj;
+    }
+    
+    
 
 }

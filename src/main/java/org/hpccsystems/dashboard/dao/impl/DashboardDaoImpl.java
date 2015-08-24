@@ -388,4 +388,18 @@ public class DashboardDaoImpl implements DashboardDao {
         return getJdbcTemplate().queryForObject("SELECT filter_order from dashboard_details WHERE dashboard_id = ?", String.class, new Object[]{dashboardId});
     }
 
+    @Override
+    public void addOrUpdateCommonInput(Integer dashboardId,
+            String commonInputText, String userId) {
+
+        String INSERT_UPDATE_COMMON_INPUT= "INSERT INTO dashboard_filters(dashboard_id,user_id,filter_data) values (?,?,?)  ON DUPLICATE KEY UPDATE filter_data=?";
+        getJdbcTemplate().update(INSERT_UPDATE_COMMON_INPUT,new Object[] {
+                dashboardId,                    
+                userId,
+                commonInputText ,
+                commonInputText
+        });
+            
+    }
+
 }

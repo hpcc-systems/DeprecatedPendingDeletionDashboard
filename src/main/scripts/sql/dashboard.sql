@@ -185,3 +185,9 @@ PRIMARY KEY(group_code,user_id)
 
 INSERT INTO user_groups(group_code, user_id) VALUES ('Demo_Consumer', 'user'),('Demo_Admin', 'admin'),('Demo_Contributor', 'user');
 
+create table dashboard_filters (
+dashboard_id  INT,  
+user_id VARCHAR(100),
+filter_data TEXT,
+PRIMARY KEY(dashboard_id,user_id)
+) ENGINE=InnoDB;

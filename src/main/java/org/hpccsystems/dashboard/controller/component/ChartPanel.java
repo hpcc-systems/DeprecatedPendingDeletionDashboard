@@ -11,7 +11,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
-import java.util.NoSuchElementException;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -318,7 +318,7 @@ public class ChartPanel extends Panel {
             WidgetService widgetService = (WidgetService)SpringUtil.getBean("widgetService");
             try {
                 widgetService.updateWidget(portlet);
-            } catch (DataAccessException |JAXBException |EncryptDecryptException e) {
+            } catch (DataAccessException |JAXBException |EncryptDecryptException | CloneNotSupportedException e) {
                 LOG.error(e);
                 Clients.showNotification("Error occurred while persisting current changes","error", ChartPanel.this,"middle_center",3000, false);
             }
@@ -330,7 +330,8 @@ public class ChartPanel extends Panel {
         
 
 
-    public ChartPanel(final Portlet argPortlet, final int buttonState, final boolean showLocalFilters) {
+    public ChartPanel(final Portlet argPortlet, final int buttonState, 
+            final boolean showLocalFilters,Integer dashboardId) {
         this.btnState = buttonState;
         this.showLocalFilter = showLocalFilters;
         
@@ -618,18 +619,20 @@ public class ChartPanel extends Panel {
                         paramValues.entrySet().forEach(entry ->{
                             InputListitem listitem = new InputListitem(
                                     entry.getKey(), entry.getValue(), String.valueOf(portlet.getId() + "_board_"));
+                            
                             inputListbox.appendChild(listitem);
-                            try{
-                             InputParam appliedInput = portlet.getChartData() .getInputParams() .stream()
-                                            .filter(input -> input.getName().equals(
-                                                    entry.getKey())).findAny().get();
-                             if (appliedInput != null && !com.mysql.jdbc.StringUtils.isNullOrEmpty(appliedInput.getValue())) {
-                                 listitem.setInputValue(appliedInput.getValue());
-                             }
-                            }catch(NoSuchElementException e){
-                                //Need not to log.This occurs when an inputparam from Hpcc is not found in portlet's
-                                //applied inputparam
+                            InputParam appliedInput = null;
+                            Optional<InputParam> appliedInputOption = portlet.getChartData() .getInputParams() .stream()
+                                           .filter(input -> input.getName().equals(
+                                                   entry.getKey())).findAny();
+                            if(appliedInputOption.isPresent()){
+                                appliedInput = appliedInputOption.get();
                             }
+                             
+                            if (appliedInput != null && !com.mysql.jdbc.StringUtils.isNullOrEmpty(appliedInput.getValue())) {
+                                listitem.setInputValue(appliedInput.getValue());
+                            }
+                            
                             
                         });
                         

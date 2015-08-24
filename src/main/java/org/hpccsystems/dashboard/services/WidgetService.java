@@ -6,6 +6,7 @@ import java.util.List;
 import javax.xml.bind.JAXBException;
 
 import org.hpccsystems.dashboard.chart.entity.HpccConnection;
+import org.hpccsystems.dashboard.chart.entity.InputParam;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.exception.EncryptDecryptException;
@@ -26,7 +27,7 @@ public interface WidgetService {
      *     A list of Portlet objects corresponding to the provided Dashboard Id
      * @throws SQLException
      */
-    List<Portlet> retriveWidgetDetails(Integer dashboardId) throws DataAccessException;    
+    List<Portlet> retriveWidgetDetails(Integer dashboardId, String userId) throws DataAccessException;    
     
     
     /**
@@ -37,9 +38,11 @@ public interface WidgetService {
      *     portlet Id
      * @throws DataAccessException
      * @throws EncryptDecryptException 
+     * @throws CloneNotSupportedException 
      * @throws Exception 
      */
-    void addWidget(Integer dashboardId, Portlet portlet, Integer sequence)throws JAXBException, DataAccessException, EncryptDecryptException;
+    void addWidget(Integer dashboardId, Portlet portlet, Integer sequence)throws JAXBException,
+    DataAccessException, EncryptDecryptException;
     
     /**
      * @param dashboardId
@@ -67,9 +70,11 @@ public interface WidgetService {
      * 
      * @param portlet
      * @throws EncryptDecryptException 
+     * @throws CloneNotSupportedException 
      * @throws Exception
      */
-    void updateWidget(Portlet portlet)throws DataAccessException ,JAXBException, EncryptDecryptException;
+    void updateWidget(Portlet portlet) throws DataAccessException ,JAXBException,
+    EncryptDecryptException, CloneNotSupportedException;
 
     /**
      * Service to update chart title
@@ -87,4 +92,12 @@ public interface WidgetService {
      * @throws EncryptDecryptException 
      */
     int updateHpccPassword(List<Dashboard> dashboards, HpccConnection hpccConnection, String password) throws EncryptDecryptException;
-}
+    
+    
+    
+    /**
+     * Returns user's filter when available. 
+     * If no filters are available for the user, Dashboard creators filters are returned
+     */
+    List<InputParam> getInputParams(Integer dashboardId, String userId);
+} 

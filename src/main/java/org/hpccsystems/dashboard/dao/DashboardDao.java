@@ -91,4 +91,7 @@ public interface DashboardDao {
     void saveFilterOrder(Integer dashboardId, String order);
 
     String getFilterOrder(Integer dashboardId);
+
+    void addOrUpdateCommonInput(Integer dashboardId, String commonInputText,
+            String userId);
 }

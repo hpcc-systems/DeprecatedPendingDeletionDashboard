@@ -6,9 +6,13 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+import javax.xml.bind.JAXBException;
+
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
+import org.hpccsystems.dashboard.chart.entity.InputParam;
+import org.hpccsystems.dashboard.chart.utils.XMLConverter;
 import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.dao.DashboardDao;
 import org.hpccsystems.dashboard.entity.Dashboard;
@@ -152,6 +156,24 @@ public class DashboardServiceImpl implements DashboardService {
     public List<String> getFilterOrder(Integer dashboardId) {
         String order = dashboardDao.getFilterOrder(dashboardId);
         return order != null ? Arrays.asList(StringUtils.split(order, ",")) : null;
+    }
+
+    @Override
+    public void addOrUpdateCommonInput(Integer dashboardId, String userId,
+            List<InputParam> commonInputs) throws JAXBException {
+        
+        try {     
+            String commonInputText = null;
+            if (commonInputs != null) {
+                commonInputText = XMLConverter.makeCommonInputXML(commonInputs);
+            }
+            dashboardDao.addOrUpdateCommonInput(dashboardId, commonInputText,userId);
+        } catch (DataAccessException ex) {
+            LOG.error(Constants.EXCEPTION, ex);
+            throw ex;
+        }
+    
+        
     }
 
 }
