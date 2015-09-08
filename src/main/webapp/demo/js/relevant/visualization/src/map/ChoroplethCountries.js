@@ -15,29 +15,30 @@
         this.projection(this.worldProjection());
     }
     ChoroplethCountries.prototype = Object.create(Choropleth.prototype);
+    ChoroplethCountries.prototype.constructor = ChoroplethCountries;
     ChoroplethCountries.prototype._class += " map_ChoroplethCountries";
 
-    ChoroplethCountries.prototype.publish("worldProjection", "mercator", "set", "Map Projection", ["mercator", "orthographic"],{tags:['Private']});
+    ChoroplethCountries.prototype.publish("worldProjection", "mercator", "set", "Map Projection", ["mercator", "orthographic"],{tags:["Private"]});
 
     ChoroplethCountries.prototype.testData = function () {
-        
+
         var nameCodeMap = {};
         for (var key in countries.countryNames) {
             var item = countries.countryNames[key];
             nameCodeMap[item.name] = key;
         }
-        
+
         var rawData = [
             { "name": "United States", "weight": 29.946185501741 }, { "name": "China", "weight": 229.946185501741 }
         ];
-        
+
         var countryData = rawData.map(function (item) {
             return { "country": nameCodeMap[item.name], "weight": item.weight, "label":item.name };
         });
-        
+
         this.columns(["Country", "Weight", "Label"]);
         this.data(countryData);
-        
+
         return this;
     };
 
@@ -65,7 +66,7 @@
 
     ChoroplethCountries.prototype.enter = function (domNode, element) {
         Choropleth.prototype.enter.apply(this, arguments);
-        element.classed("map_Choropleth", true);    
+        element.classed("map_Choropleth", true);
 
         this.projection(this.worldProjection());
 
@@ -84,10 +85,11 @@
         //  Enter  ---
         this.choroPaths = choroPaths.enter().append("path")
             .attr("d", this.d3Path)
+            .call(this._selection.enter.bind(this._selection))
             .on("click", function (d) {
                 if (context._dataMap[d.id]) {
                     var obj = [d.id, context._dataMap[d.id], d.name];
-                    context.click(context.rowToObj(obj), "weight");
+                    context.click(context.rowToObj(obj), "weight", context._selection.selected(this));
                 }
             })
             .on("dblclick", function (d) {
@@ -95,12 +97,22 @@
                 context.zoomToFit(context.active === this ? null : this, 750);
                 context.active = this;
             })
+            .on("mouseover.tooltip", function (d) {
+                if (context._dataMap[d.id]) {
+                    context.tooltipShow([d.name, context._dataMap[d.id]], context._columns, 1);
+                }
+            })
+            .on("mouseout.tooltip", function (d) {
+                context.tooltipShow();
+            })
+            .on("mousemove.tooltip", function (d) {
+                if (context._dataMap[d.id]) {
+                    context.tooltipShow([d.name, context._dataMap[d.id]], context._columns, 1);
+                }
+            })
             .attr("id", function (d) {
                 return d.id;
             })
-        ;
-        this.choroPaths
-            .append("title")
         ;
     };
 
@@ -119,16 +131,6 @@
                     return "url(#hash)";
                 }
                 return context._palette(weight, context._dataMinWeight, context._dataMaxWeight);
-            })
-        ;
-
-        this.choroPaths.select("title")
-            .text(function (d) {
-                var code = countries.countryNames[d.id];
-                if (countries.countryNames[d.id]) {
-                    return countries.countryNames[d.id].name + " (" + context._dataMap[code] + ")";
-                }
-                return "";
             })
         ;
     };

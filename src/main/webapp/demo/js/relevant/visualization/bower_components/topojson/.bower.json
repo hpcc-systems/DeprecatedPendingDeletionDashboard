@@ -24,7 +24,7 @@
     "tag": "v1.6.19",
     "commit": "7c29ad7652b2f00516b635313f8a54cfc8cd2625"
   },
-  "_source": "https://github.com/mbostock/topojson.git",
+  "_source": "git://github.com/mbostock/topojson.git",
   "_target": "^1.6.19",
   "_originalSource": "topojson"
 }

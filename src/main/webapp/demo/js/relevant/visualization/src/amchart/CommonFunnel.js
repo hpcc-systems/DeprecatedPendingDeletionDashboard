@@ -1,48 +1,45 @@
 "use strict";
 (function(root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3", "../common/HTMLWidget", "amcharts.funnel"], factory);
+        define(["d3", "../common/HTMLWidget", "amcharts.funnel", "require"], factory);
     } else {
-        root.amchart_CommonFunnel = factory(root.d3, root.common_HTMLWidget, root.AmCharts);
+        root.amchart_CommonFunnel = factory(root.d3, root.common_HTMLWidget, root.AmCharts, root.require);
     }
 
-}(this, function(d3, HTMLWidget, AmCharts) {
+}(this, function(d3, HTMLWidget, AmCharts, require) {
     function CommonFunnel() {
         HTMLWidget.call(this);
         this._tag = "div";
 
         this._chart = {};
     }
-
     CommonFunnel.prototype = Object.create(HTMLWidget.prototype);
+    CommonFunnel.prototype.constructor = CommonFunnel;
+    CommonFunnel.prototype._class += " amchart_CommonFunnel";
 
-    /**
-     * Publish Params Common To Other Libraries
-     */
-    CommonFunnel.prototype.publish("fontSize", null, "number", "Font Size",null,{tags:['Basic','Shared']});
-    CommonFunnel.prototype.publish("fontFamily", null, "string", "Font Name",null,{tags:['Basic','Shared']});
-    CommonFunnel.prototype.publish("fontColor", null, "html-color", "Font Color",null,{tags:['Basic','Shared']});
+    CommonFunnel.prototype.publish("fontSize", null, "number", "Font Size",null,{tags:["Basic","Shared"]});
+    CommonFunnel.prototype.publish("fontFamily", null, "string", "Font Name",null,{tags:["Basic","Shared"]});
+    CommonFunnel.prototype.publish("fontColor", null, "html-color", "Font Color",null,{tags:["Basic","Shared"]});
 
-    /**
-     * Publish Params Unique To This Widget
-     */
-    CommonFunnel.prototype.publish("flip", true, "boolean", "Flip Chart",null,{tags:['Intermediate']});
-    CommonFunnel.prototype.publish("reverseDataSorting", false, "boolean", "Reverse Data Sorting",null,{tags:['Intermediate']});
+    CommonFunnel.prototype.publish("flip", true, "boolean", "Flip Chart",null,{tags:["Intermediate"]});
+    CommonFunnel.prototype.publish("reverseDataSorting", false, "boolean", "Reverse Data Sorting",null,{tags:["Intermediate"]});
 
-    CommonFunnel.prototype.publish("marginLeft", 0, "number", "Margin (Left)",null,{tags:['Intermediate']});
-    CommonFunnel.prototype.publish("marginRight", 0, "number", "Margin (Right)",null,{tags:['Intermediate']});
+    CommonFunnel.prototype.publish("marginLeft", 0, "number", "Margin (Left)",null,{tags:["Intermediate"]});
+    CommonFunnel.prototype.publish("marginRight", 0, "number", "Margin (Right)",null,{tags:["Intermediate"]});
 
-    CommonFunnel.prototype.publish("marginTop", null, "number", "Margin (Top)",null,{tags:['Intermediate']});
-    CommonFunnel.prototype.publish("marginBottom", null, "number", "Margin (Bottom)",null,{tags:['Intermediate']});
+    CommonFunnel.prototype.publish("marginTop", null, "number", "Margin (Top)",null,{tags:["Intermediate"]});
+    CommonFunnel.prototype.publish("marginBottom", null, "number", "Margin (Bottom)",null,{tags:["Intermediate"]});
 
-    CommonFunnel.prototype.publish("labelPosition", "center", "set", "Label Position", ["left","right","center"],{tags:['Intermediate']});
+    CommonFunnel.prototype.publish("labelPosition", "center", "set", "Label Position", ["left","right","center"],{tags:["Intermediate"]});
 
-    CommonFunnel.prototype.publish("showScrollbar", false, "boolean", "Show Chart Scrollbar",null,{tags:['Intermediate']});
+    CommonFunnel.prototype.publish("showScrollbar", false, "boolean", "Show Chart Scrollbar",null,{tags:["Intermediate"]});
 
-    CommonFunnel.prototype.publish("startDuration", 0.3, "number", "Start Duration (sec)",null,{tags:['Private']});
+    CommonFunnel.prototype.publish("startDuration", 0.3, "number", "Start Duration (sec)",null,{tags:["Private"]});
 
-    CommonFunnel.prototype.publish("Depth3D", 0, "number", "3D Depth (px)",null,{tags:['Basic']});
-    CommonFunnel.prototype.publish("Angle3D", 0, "number", "3D Angle (Deg)",null,{tags:['Basic']});
+    CommonFunnel.prototype.publish("Depth3D", 0, "number", "3D Depth (px)",null,{tags:["Basic"]});
+    CommonFunnel.prototype.publish("Angle3D", 0, "number", "3D Angle (Deg)",null,{tags:["Basic"]});
+
+    CommonFunnel.prototype.publish("useClonedPalette", false, "boolean", "Enable or disable using a cloned palette",null,{tags:["Intermediate","Shared"]});
 
     CommonFunnel.prototype.updateChartOptions = function() {
 
@@ -124,6 +121,7 @@
 
     CommonFunnel.prototype.enter = function(domNode, element) {
         HTMLWidget.prototype.enter.apply(this, arguments);
+        var context = this;
         var initObj = {
             theme: "none",
             type: "funnel",
@@ -131,16 +129,25 @@
             autoMargins: true,
             chartScrollbar: {}
         };
+        if (typeof define === "function" && define.amd) {
+            initObj.pathToImages = require.toUrl("amchartsImg");
+        }
         this._chart = AmCharts.makeChart(domNode, initObj);
+        this._chart.addListener("clickSlice", function(e) {
+            context.click(context.rowToObj(context._data[e.dataItem.index]));
+        });
     };
 
     CommonFunnel.prototype.update = function(domNode, element) {
         HTMLWidget.prototype.update.apply(this, arguments);
 
-        domNode.style.width = this.size().width + 'px';
-        domNode.style.height = this.size().height + 'px';
+        domNode.style.width = this.size().width + "px";
+        domNode.style.height = this.size().height + "px";
 
         this._palette = this._palette.switch(this.paletteID());
+        if (this.useClonedPalette()) {
+            this._palette = this._palette.cloneNotExists(this.paletteID() + "_" + this.id());
+        }
 
         this.updateChartOptions();
 

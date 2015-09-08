@@ -1,11 +1,11 @@
 "use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3", "../common/HTMLWidget", "./Cell", "../common/Text", "../chart/Pie", "../chart/MultiChart", "../c3chart/Line", "css!./Grid"], factory);
+        define(["d3", "../common/HTMLWidget", "./Cell", "../common/TextBox", "../other/Bag", "css!./Grid"], factory);
     } else {
-        root.layout_Grid = factory(root.d3, root.common_HTMLWidget, root.layout_Cell, root.common_Text, root.chart_Pie, root.chart_MultiChart, root.c3chart_Line);
+        root.layout_Grid = factory(root.d3, root.common_HTMLWidget, root.layout_Cell, root.common_TextBox, root.other_Bag);
     }
-}(this, function (d3, HTMLWidget, Cell, Text, Pie, MultiChart, Line) {
+}(this, function (d3, HTMLWidget, Cell, TextBox, Bag) {
     function Grid() {
         HTMLWidget.call(this);
 
@@ -15,28 +15,37 @@
         this._rowCount = 0;
         this._colSize = 0;
         this._rowSize = 0;
+        this._selectionBag = new Bag.Selection();
         
         this.content([]);
     }
     Grid.prototype = Object.create(HTMLWidget.prototype);
+    Grid.prototype.constructor = Grid;
     Grid.prototype._class += " layout_Grid";
 
-    Grid.prototype.publish("designMode", false, "boolean", "Design Mode",null,{tags:['Private']});
-    Grid.prototype.publish("gutter", 4, "number", "Gap Between Widgets",null,{tags:['Private']});
-    Grid.prototype.publish("fitTo", "all", "set", "Sizing Strategy", ["all", "width"], { tags: ['Private'] });
+    Grid.prototype.publish("designMode", false, "boolean", "Design Mode",null,{tags:["Basic"]});
+    Grid.prototype.publish("gutter", 4, "number", "Gap Between Widgets",null,{tags:["Basic"]});
+    Grid.prototype.publish("fitTo", "all", "set", "Sizing Strategy", ["all", "width"], { tags: ["Basic"] });
+    
+    Grid.prototype.publish("designGridColor", "#ddd", "html-color", "Color of grid lines in Design Mode",null,{tags:["Private"]});
+    Grid.prototype.publish("designGridColorExtra", "#333333", "html-color", "Color of excess grid lines in Design Mode",null,{tags:["Private"]});
 
-    Grid.prototype.publish("cellPadding", null, "string", "Cell Padding (px)", null, { tags: ['Intermediate'] });
+    Grid.prototype.publish("cellPadding", null, "string", "Cell Padding (px)", null, { tags: ["Intermediate"] });
+    
+    Grid.prototype.publish("extraDesignModeWidth", 2, "number", "Number of additional columns added when in Design Mode.",null,{tags:["Private"]});
+    Grid.prototype.publish("extraDesignModeHeight", 2, "number", "Number of additional rows added when in Design Mode.",null,{tags:["Private"]});
+    Grid.prototype.publish("cellDensity", 3, "string", "Increase the cell density with this multiplier (Ex: 3 results in 3 cols per col and 3 rows per row)", null, { tags: ["Intermediate"] });
 
-    Grid.prototype.publish("content", [], "widgetArray", "widgets",null,{tags:['Private']});
+    Grid.prototype.publish("content", [], "widgetArray", "widgets",null,{tags:["Basic"]});
 
     Grid.prototype.testData = function () {
         this
-            .setContent(0, 0, new Pie().testData())
-            .setContent(0, 1, new Pie().testData())
-            .setContent(1, 0, new Pie().testData())
-            .setContent(1, 1, new Pie().testData())
-            .setContent(0, 2, new MultiChart().testData(), "Title AAA", 2, 2)
-            .setContent(2, 0, new Line().testData(), "Title BBB", 2, 4)
+            .setContent(0, 0, new TextBox().testData())
+            .setContent(0, 1, new TextBox().testData())
+            .setContent(1, 0, new TextBox().testData())
+            .setContent(1, 1, new TextBox().testData())
+            .setContent(0, 2, new TextBox().testData(), "Title AAA", 2, 2)
+            .setContent(2, 0, new TextBox().testData(), "Title BBB", 2, 4)
         ;
         return this;
     };
@@ -65,23 +74,24 @@
         rowSpan = rowSpan || 1;
         colSpan = colSpan || 1;
         title = title || "";
+        var mult = this.cellDensity();
         this.content(this.content().filter(function (contentWidget) {
-            if (contentWidget.gridRow() === row && contentWidget.gridCol() === col) {
+            if (contentWidget.gridRow() === row*mult && contentWidget.gridCol() === col*mult) {
                 contentWidget.target(null);
                 return false;
             }
             return true;
         }));
-
         if (widget) {
             var cell = new Cell()
-                .gridRow(row)
-                .gridCol(col)
+                .gridRow(row*mult)
+                .gridCol(col*mult)
                 .widget(widget)
                 .title(title)
-                .gridRowSpan(rowSpan)
-                .gridColSpan(colSpan)
+                .gridRowSpan(rowSpan*mult)
+                .gridColSpan(colSpan*mult)
             ;
+            this.prevDensity = mult;
             this.content().push(cell);
         }
         return this;
@@ -112,6 +122,23 @@
         return retVal;
     };
     
+    Grid.prototype.updateCellMultiples = function () {
+        var context = this;
+        if(this.prevDensity !== this.cellDensity()){
+            this.content().forEach(function (cell) {
+                if(context.prevDensity && context.cellDensity()){
+                    var m1 = context.prevDensity;
+                    var m2 = context.cellDensity();
+                    cell.gridRow(Math.floor(cell.gridRow() * m2/m1));
+                    cell.gridCol(Math.floor(cell.gridCol() * m2/m1));
+                    cell.gridRowSpan(Math.floor(cell.gridRowSpan() * m2/m1));
+                    cell.gridColSpan(Math.floor(cell.gridColSpan() * m2/m1));
+                }
+            });
+            this.prevDensity = this.cellDensity();
+        }
+    };
+    
     Grid.prototype.childMoved = Grid.prototype.debounce(function (domNode, element) {
         this.render();
     }, 250);
@@ -132,7 +159,7 @@
     };
     
     Grid.prototype.overHandle = function (e) {
-        var handle = '';
+        var handle = "";
         var handleSize = this._dragCell.handleSize();
         
         //Determines which edge cell (if any) this._currLoc is hovering over
@@ -148,16 +175,16 @@
         var height = this._rowSize - this.gutter();
         
         if(Math.ceil(top + height) >= e.clientY && Math.floor(top + height - handleSize) <= e.clientY && onSouthEdge){
-            handle = 's';//within SOUTH handle range
+            handle = "s";//within SOUTH handle range
         }
         else if(Math.floor(top) <= e.clientY && Math.ceil(top + handleSize) >= e.clientY && onNorthEdge){
-            handle = 'n';//within NORTH handle range
+            handle = "n";//within NORTH handle range
         }
         if(Math.ceil(left + width) >= e.clientX && Math.floor(left + width - handleSize) <= e.clientX && onEastEdge){
-            handle += 'e';//within EAST handle range
+            handle += "e";//within EAST handle range
         }
         else if(Math.floor(left) <= e.clientX && Math.ceil(left + handleSize) >= e.clientX && onWestEdge){
-            handle += 'w';//within WEST handle range
+            handle += "w";//within WEST handle range
         }
         return handle;
     };
@@ -168,11 +195,11 @@
         var colSpan = this._dragCell.gridColSpan();
         var rowSpan = this._dragCell.gridRowSpan();
         
-        var dropTarget = document.createElement('div');
-        dropTarget.id = 'grid-drop-target'+this.id();
-        dropTarget.className = 'grid-drop-target';
+        var dropTarget = document.createElement("div");
+        dropTarget.id = "grid-drop-target"+this.id();
+        dropTarget.className = "grid-drop-target";
         
-        this._target.appendChild(dropTarget);
+        this._element.node().appendChild(dropTarget);
         this.updateDropTarget(col,row,colSpan,rowSpan);
     };
     
@@ -188,37 +215,37 @@
         width = colSpan * this._colSize - this.gutter();
         height = rowSpan * this._rowSize - this.gutter();
         
-        var dropTarget = document.getElementById('grid-drop-target'+this.id());
-        dropTarget.style.top = top + 'px';
-        dropTarget.style.left = left + 'px';
-        dropTarget.style.width = width + 'px';
-        dropTarget.style.height = height + 'px';
+        var dropTarget = document.getElementById("grid-drop-target"+this.id());
+        dropTarget.style.top = top + "px";
+        dropTarget.style.left = left + "px";
+        dropTarget.style.width = width + "px";
+        dropTarget.style.height = height + "px";
     };
     
     Grid.prototype.moveDropTarget = function (loc) {
         if(this._handle){
             var pivotCell = [];
             switch(this._handle){
-                case 'nw':
+                case "nw":
                     pivotCell = [this._dragCell.gridCol()+this._dragCell.gridColSpan()-1,this._dragCell.gridRow()+this._dragCell.gridRowSpan()-1];
                     break;
-                case 'n':
-                case 'ne':
+                case "n":
+                case "ne":
                     pivotCell = [this._dragCell.gridCol(),this._dragCell.gridRow()+this._dragCell.gridRowSpan()-1];
                     break;
-                case 'e':
-                case 'se':
-                case 's':
+                case "e":
+                case "se":
+                case "s":
                     pivotCell = [this._dragCell.gridCol(),this._dragCell.gridRow()];
                     break;
-                case 'sw':
-                case 'w':
+                case "sw":
+                case "w":
                     pivotCell = [this._dragCell.gridCol()+this._dragCell.gridColSpan()-1,this._dragCell.gridRow()];
                     break;
             }
             switch(this._handle){
-                case 'e':
-                case 'w':
+                case "e":
+                case "w":
                     this._locY = pivotCell[1];
                     break;
                 default:
@@ -226,8 +253,8 @@
                     break;
             }
             switch(this._handle){
-                case 'n':
-                case 's':
+                case "n":
+                case "s":
                     this._locX = pivotCell[0];
                     break;
                 default:
@@ -235,8 +262,8 @@
                     break;
             }
             switch(this._handle){
-                case 'n':
-                case 's':
+                case "n":
+                case "s":
                     this._sizeX = this._dragCell.gridColSpan();
                     break;
                 default:
@@ -244,24 +271,24 @@
                     break;
             }
             switch(this._handle){
-                case 'e':
-                case 'w':
+                case "e":
+                case "w":
                     this._sizeY = this._dragCell.gridRowSpan();
                     break;
                 default:
                     this._sizeY = Math.abs(loc[1] - pivotCell[1]) + 1;
                     break;
             }
-        } else if (document.getElementById('grid-drop-target'+this.id()) !== null) {
+        } else if (document.getElementById("grid-drop-target"+this.id()) !== null) {
             var target = this.getCell(loc[1], loc[0]);
             if(target !== null && this._dragCell._id !== target._id){
-                document.getElementById('grid-drop-target'+this.id()).className = 'grid-drop-target drop-target-over';
+                document.getElementById("grid-drop-target"+this.id()).className = "grid-drop-target drop-target-over";
                 this._locX = target.gridCol();
                 this._locY = target.gridRow();
                 this._sizeX = target.gridColSpan();
                 this._sizeY = target.gridRowSpan();
             } else {
-                document.getElementById('grid-drop-target'+this.id()).className = 'grid-drop-target';
+                document.getElementById("grid-drop-target"+this.id()).className = "grid-drop-target";
                 this._locX = loc[0] - this._dragCellOffsetX;
                 this._locY = loc[1] - this._dragCellOffsetY;
                 this._sizeX = this._dragCell.gridColSpan();
@@ -274,6 +301,9 @@
     
     Grid.prototype.updateCells = function (cellWidth, cellHeight) {
         var context = this;
+        
+        this.updateCellMultiples();
+        
         var rows = this.contentDiv.selectAll(".cell_" + this._id).data(this.content(), function (d) { return d._id; });
         rows.enter().append("div")
             .attr("class", "cell_" + this._id)
@@ -297,6 +327,8 @@
                 context.setGridOffsets();
                 context.findCurrentLocation(d3.event.sourceEvent);
                 
+                context._startLoc = [context._currLoc[0],context._currLoc[1]];
+                
                 context._element.selectAll(".dragHandle")
                     .style("visibility", "hidden")
                 ;
@@ -318,17 +350,24 @@
                         })
                     ;
                 }, 0);
+                
+                context._initSelection = true;
             })
             .on("drag", function (d) {
+                context._initSelection = false;
                 context._dragCell = d;
                 context.findCurrentLocation(d3.event.sourceEvent);
-                if(typeof (context._currLocation) === 'undefined' || (context._currLocation[0] !== context._currLoc[0] || context._currLocation[1] !== context._currLoc[1])){
+                if(typeof (context._currLocation) === "undefined" || (context._currLocation[0] !== context._currLoc[0] || context._currLocation[1] !== context._currLoc[1])){
                     context._currLocation = context._currLoc;
                     context.moveDropTarget(context._currLoc);
                 }
             })
             .on("dragend", function () {
                 d3.event.sourceEvent.stopPropagation();
+        
+                if(context._initSelection || context._startLoc[0] === context._currLoc[0] || context._startLoc[1] === context._currLoc[1]){
+                    context.selectionBagClick(context.getCell(context._currLoc[1],context._currLoc[0]));
+                }
         
                 context._element.selectAll(".dragHandle")
                     .style("visibility", null)
@@ -376,7 +415,7 @@
                         .gridRowSpan(targetRowSpan)
                     ;
                 }
-                var gridDropTarget = document.getElementById('grid-drop-target'+context.id());
+                var gridDropTarget = document.getElementById("grid-drop-target"+context.id());
                 gridDropTarget.parentNode.removeChild(gridDropTarget);
                 
                 setTimeout(function () {
@@ -391,8 +430,13 @@
             
         if(this.designMode()){ 
             this.contentDiv.selectAll(".cell_" + this._id).call(drag);
+            d3.select(context._target).on("click",function(){
+                context._selectionBag.clear();
+                context.postSelectionChange();
+            });
         } else {
             this.contentDiv.selectAll(".cell_" + this._id).on(".drag", null);
+            this._selectionBag.clear();
         }
         
         rows.style("left", function (d) { return d.gridCol() * cellWidth + context.gutter() / 2 + "px"; })
@@ -421,28 +465,93 @@
         }).remove();
     };
 
+    Grid.prototype.postSelectionChange = function(){};
+
     Grid.prototype.updateDropCells = function (dimensions, cellWidth, cellHeight) {
-        var dropCells = [];
-        if (this.designMode()) {
-            for (var rowIdx = 0; rowIdx < dimensions.height; ++rowIdx) {
-                for (var colIdx = 0; colIdx < dimensions.width; ++colIdx) {
-                    dropCells.push({ x: colIdx, y: rowIdx });
+        var context = this;
+        if(_needsCanvasRedraw()){
+            if(this.designMode()){
+                var c_canvas = document.createElement("canvas");
+                c_canvas.width = dimensions.width * cellWidth;
+                c_canvas.height = dimensions.height * cellHeight;
+                var contentWidth = (dimensions.width - this.extraDesignModeWidth()) * cellWidth;
+                var contentHeight = (dimensions.height  - this.extraDesignModeHeight()) * cellHeight;
+                var canvasContext = c_canvas.getContext("2d");
+
+                //Draw vertical lines
+                var xCount = 0;
+                for (var x = 0.5 + cellWidth; x < c_canvas.width; x += cellWidth) {
+                    xCount++;
+                    if(xCount < dimensions.width - this.extraDesignModeWidth()){
+                        _drawLine(_roundHalf(x),_roundHalf(x),0,contentHeight,this.designGridColor());
+                    } else {
+                        _drawLine(_roundHalf(x),_roundHalf(x),0,c_canvas.height,this.designGridColorExtra());
+                    }
                 }
+                //Draw horizontal lines
+                var yCount = 0;
+                for (var y = 0.5 + cellHeight; y < c_canvas.height; y += cellHeight) {
+                    yCount++;
+                    if(yCount < dimensions.height - this.extraDesignModeHeight()){
+                        _drawLine(0,contentWidth,_roundHalf(y),_roundHalf(y),this.designGridColor());
+                    } else {
+                        _drawLine(0,c_canvas.width,_roundHalf(y),_roundHalf(y),this.designGridColorExtra());
+                    }
+                }
+                //Draw excess (short) vertical lines
+                xCount = 0;
+                for (var x2 = 0.5 + cellWidth; x2 < c_canvas.width; x2 += cellWidth) {
+                    if(xCount < dimensions.width - this.extraDesignModeWidth()){
+                        _drawLine(_roundHalf(x2),_roundHalf(x2),contentHeight,c_canvas.height,this.designGridColorExtra());
+                    }
+                }
+                //Draw excess (short) horizontal lines
+                yCount = 0;
+                for (var y2 = 0.5 + cellHeight; y2 < c_canvas.height; y2 += cellHeight) {
+                    if(yCount < dimensions.height - this.extraDesignModeHeight()){
+                        _drawLine(contentWidth,c_canvas.width,_roundHalf(y2),_roundHalf(y2),this.designGridColorExtra());
+                    }
+                }
+
+                if(this._target){
+                    this._target.style.backgroundImage = "url("+ c_canvas.toDataURL()+")";
+                }
+                
+                this.prevDimensions = {
+                    "width":dimensions.width,
+                    "height":dimensions.height
+                };
+                this.prevCellWidth = cellWidth;
+                this.prevCellHeight = cellHeight;
+            } else {
+                this._target.style.backgroundImage = "";
             }
         }
-        var dropRows = this.dropDiv.selectAll(".dropCell_" + this._id).data(dropCells);
-        dropRows.enter().append("div")
-            .attr("class", "dropCell dropCell_" + this._id);
-    
-        var context = this;
-        dropRows
-            .style("position", "absolute")
-            .style("left", function (d) { return d.x * cellWidth + context.gutter() / 2 + "px"; })
-            .style("top", function (d) { return d.y * cellHeight + context.gutter() / 2 + "px"; })
-            .style("width", function (d) { return 1 * cellWidth - context.gutter() + "px"; })
-            .style("height", function (d) { return 1 * cellHeight - context.gutter() + "px"; })
-        ;
-        dropRows.exit().remove();
+        
+        
+        function _roundHalf(n){
+            return parseInt(n) + 0.5;
+        }
+        function _drawLine(x1,x2,y1,y2,color){
+            canvasContext.beginPath();
+            canvasContext.strokeStyle = color;
+            canvasContext.moveTo(x1,y1);
+            canvasContext.lineTo(x2,y2);
+            canvasContext.stroke();
+        }
+        function _needsCanvasRedraw(){
+            var ret = false;
+            if(typeof (context.prevDimensions) === "undefined"){
+                ret = true;
+            } else if (context.prevDimensions.width !== dimensions.width || context.prevDimensions.height !== dimensions.height) {
+                ret = true;
+            } else if (context.prevCellWidth !== cellWidth || context.prevCellHeight !== cellHeight) {
+                ret = true;
+            } else if (context._target.style.backgroundImage === "" && context.designMode()) {
+                ret = true;
+            }
+            return ret;
+        }
     };
 
     Grid.prototype.update = function (domNode, element) {
@@ -452,8 +561,8 @@
         this._parentElement.style("overflow-y", this.fitTo() === "width" ? "scroll" : null);
         var dimensions = this.getDimensions();
         if (this.designMode()) {
-            dimensions.width++;
-            dimensions.height++;
+            dimensions.width+=this.extraDesignModeWidth();
+            dimensions.height+=this.extraDesignModeHeight();
         }
         var cellWidth = (this.width() - (this.fitTo() === "width" ? this._scrollBarWidth : 0)) / dimensions.width;
         var cellHeight = this.fitTo() === "all" ? this.height() / dimensions.height : cellWidth;
@@ -470,30 +579,41 @@
     Grid.prototype.exit = function (domNode, element) {
         HTMLWidget.prototype.exit.apply(this, arguments);
     };
-
-    Grid.prototype.render = function (callback) {
-        var context = this;
-        HTMLWidget.prototype.render.call(this, function (widget) {
-            if (context.content().length) {
-                var renderCount = context.content().length;
-                context.content().forEach(function (contentWidget, idx) {
-                    setTimeout(function () {
-                        contentWidget.render(function () {
-                            if (--renderCount === 0) {
-                                if (callback) {
-                                    callback(widget);
-                                }
-                            }
-                        });
-                    }, 0);
-                });
-            } else {
-                if (callback) {
-                    callback(widget);
-                }
-            }
-        });
+    
+    Grid.prototype._createSelectionObject = function (d) {
+        return {
+            _id: d._id,
+            element: function () {
+                return d._element;
+            },
+            widget:d
+        };
+    };
+    
+    Grid.prototype.selection = function (_) {
+        if (!arguments.length) return this._selectionBag.get().map(function (d) { return d._id; });
+        this._selectionBag.set(_.map(function (row) {
+            return this._createSelectionObject(row);
+        }, this));
         return this;
+    };
+
+    Grid.prototype.selectionBagClick = function (d) {
+        if(d !== null){
+            var selectionObj = this._createSelectionObject(d);
+            if(d3.event.sourceEvent.ctrlKey){
+                if(this._selectionBag.isSelected(selectionObj)){
+                    this._selectionBag.remove(selectionObj);
+                    this.postSelectionChange();
+                } else {
+                    this._selectionBag.append(selectionObj);
+                    this.postSelectionChange();
+                }
+            } else {
+                this._selectionBag.set([selectionObj]);
+                this.postSelectionChange();
+            }
+        }
     };
 
     return Grid;

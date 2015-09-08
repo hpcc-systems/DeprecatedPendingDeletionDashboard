@@ -1,9 +1,9 @@
 ﻿"use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["src/layout/Surface", "src/layout/Grid", "src/other/Comms", "src/graph/Graph", "src/graph/Edge", "src/graph/Vertex", "src/other/Table", "src/chart/Column", "src/other/Persist"], factory);
+        define(["src/layout/Surface", "src/layout/Tabbed", "src/layout/Grid", "src/other/Comms", "src/graph/Graph", "src/graph/Edge", "src/graph/Vertex", "src/other/Table", "src/chart/Column", "src/other/Persist"], factory);
     }
-}(this, function (Surface, Grid, Comms, Graph, Edge, Vertex, Table, Column, Persist) {
+}(this, function (Surface, Tabbed, Grid, Comms, Graph, Edge, Vertex, Table, Column, Persist) {
     function Main(target) {
         Grid.call(this);
 
@@ -14,6 +14,41 @@
         this.claimMap = {};
 
         var context = this;
+
+        this.claimsChart = new Column()
+            .columns(["Date", "Amount"])
+            .selectionMode(true)
+            .xAxisType("time")
+            //.xAxisTypeTimePattern("%Y-%m-%d %H:%M:%S")
+            .yAxisType("none")
+        ;
+        this.claimsChart.selection = function (selected) {
+            var selectionMap = {};
+            var vertexMap = {};
+            var edgeMap = {};
+            var selection = selected.map(function (row) {
+                var vertex = row[2];
+                selectionMap[vertex.id()] = vertex;
+                vertexMap[vertex.id()] = vertex;
+                var tmp = context.graph.getNeighborMap(vertex);
+                for (var key in tmp.vertices) {
+                    vertexMap[key] = tmp.vertices[key];
+                }
+                for (var ekey in tmp.edges) {
+                    edgeMap[ekey] = tmp.edges[ekey];
+                }
+                return vertex;
+            });
+
+            context.graph
+                .selection(selection)
+                .highlightVerticies(vertexMap)
+                .highlightEdges(edgeMap)
+                .render()
+            ;
+            context.graph.graph_selection(selection);
+        }
+
         this.graph = new Graph()
             .layout("ForceDirected")
             .hierarchyRankDirection("TB")
@@ -24,13 +59,15 @@
         ;
         this.graph.vertex_dblclick = function (d) {
             d3.event.stopPropagation();
-            //window.backupAppData.push(context.serializeToObject());
             context._query(d._id, d.element());
         };
         this.graph.graph_selection = function (selection) {
             context.populateTableV(context.selectionTable, selection);
-            context.vertexTable.selection(selection.map(function (vertex) {
-                return vertex.__tableRowIdx;
+            context.allTable.selection(selection.map(function (vertex) {
+                return vertex.__allTableRowIdx;
+            })).render();
+            context.claimsTable.selection(selection.map(function (vertex) {
+                return vertex.__claimsTableRowIdx;
             })).render();
         };
         this.graph.vertex_click = function (d) {
@@ -38,51 +75,66 @@
         };
 
         this.selectionTable = new Table()
+            //.fixedHeader(true)
+            //.fixedColumn(true)
         ;
 
-        this._vertexTableFilter = "all";
-        this.vertexTable = new Table()
-        ;
-        this.vertexTable.click = function (row, col) {
-            var selection = this.selection().map(function (item) {
-                return item[item.length - 1];
-            });
-            context.graph
-                .selection(selection)
-                .render()
-            ;
-            context.populateTableV(context.selectionTable, selection);
-        };
-
-        this.claimsChart = new Column()
-            .columns(["Date", "Amount"])
-            .selectionMode(true)
-            .xAxisType("time")
-            .yAxisType("none")
-            .timeseriesPattern("%Y-%m-%d %H:%M:%S")
-        ;
-        this.claimsChart.selection = function (selected) {
-            var selectionMap = {};
-            var selection = selected.map(function (row) {
-                var vertex = row[2];
-                selectionMap[vertex.id()] = vertex;
-                return vertex;
-            });
-            context.graph
-                .selection(selection)
-                .highlightVerticies(selectionMap)
-                .highlightEdges({})
-                .render()
-            ;
-            context.graph.graph_selection(selection);
+        //  Bottom Tabs/Tables  ---
+        function attachClickEvent(table) {
+            table.click = function (row, col) {
+                var selection = this.selection().map(function (item) {
+                    return item[item.length - 1];
+                });
+                context.graph
+                    .selection(selection)
+                    .render()
+                ;
+                context.populateTableV(context.selectionTable, selection);
+            };
         }
 
+        this._allTableFilter = "all";
+        this.allTable = new Table()
+            //.fixedHeader(true)
+            //.fixedColumn(true)
+        ;
+        attachClickEvent(this.allTable);
+        this.claimsTable = new Table()
+            //.fixedHeader(true)
+            //.fixedColumn(true)
+        ;
+        attachClickEvent(this.claimsTable);
+        this.peopleTable = new Table()
+            //.fixedHeader(true)
+            //.fixedColumn(true)
+        ;
+        attachClickEvent(this.peopleTable);
+        this.policiesTable = new Table()
+            //.fixedHeader(true)
+            //.fixedColumn(true)
+        ;
+        attachClickEvent(this.policiesTable);
+        this.vehiclesTable = new Table()
+            //.fixedHeader(true)
+            //.fixedColumn(true)
+        ;
+        attachClickEvent(this.vehiclesTable);
+
+        this.vertexTabs = new Tabbed()
+            .addTab(this.allTable, "All")
+            .addTab(this.claimsTable, "Claims")
+            .addTab(this.peopleTable, "People")
+            .addTab(this.policiesTable, "Policies")
+            .addTab(this.vehiclesTable, "Vehicles")
+        ;
+
+        //  Main Grid  ---
         this
             .cellPadding(0)
             .setContent(0, 0, this.claimsChart, "", 1, 4)
             .setContent(1, 0, this.graph, "", 6, 4)
             .setContent(0, 4, this.selectionTable, "Selection", 7, 1)
-            .setContent(7, 0, this.vertexTable, "", 2, 5)
+            .setContent(7, 0, this.vertexTabs, "", 3, 5)
         ;
     }
     Main.prototype = Object.create(Grid.prototype);
@@ -108,8 +160,8 @@
     };
 
     Main.prototype.filterEntities = function (filter) {
-        this._vertexTableFilter = filter;
-        this.populateTableH(this.vertexTable, this.vertices);
+        this._allTableFilter = filter;
+        this.populateTableH(this.allTable, this.vertices);
     };
 
     Main.prototype.getVertex = function (id, faChar, label, data) {
@@ -141,6 +193,10 @@
             ;
             this.edgeMap[id] = retVal;
             this.edges.push(retVal);
+        } else {
+            if (retVal.text().indexOf(label) < 0) {
+                retVal += " " + label;
+            }
         }
         return retVal;
     };
@@ -172,13 +228,14 @@
         ;
     };
 
-    Main.prototype.populateTableH = function (table, selection) {
+    Main.prototype.populateTableH = function (table, selection, filter) {
+        filter = filter || this._allTableFilter;
         var columns = ["Entity"];
         var entityIdx = {};
         var propIdx = {};
         var data = [];
-        selection.filter(function (vertex) {
-            switch (this._vertexTableFilter) {
+        var filteredSelection = selection.filter(function (vertex) {
+            switch (filter) {
                 case "claims":
                     return vertex.id().indexOf("c_") === 0;
                 case "people":
@@ -190,7 +247,8 @@
                 default:
                     return true;
             }
-        }, this).forEach(function (item, idx) {
+        }, this);
+        filteredSelection.forEach(function (item, idx) {
             var row = [item.text()];
             var props = item.data();
             for (var key in props) {
@@ -204,9 +262,13 @@
         });
         data.forEach(function (row, idx) {
             row.length = columns.length + 1;
-            row[columns.length] = selection[idx];
-            selection[idx].__tableRowIdx = row;
-        });
+            row[columns.length] = filteredSelection[idx];
+            if (table === this.allTable) {
+                selection[idx].__allTableRowIdx = row;
+            } else if (table === this.claimsTable) {
+                selection[idx].__claimsTableRowIdx = row;
+            }
+        }, this);
         table
             .columns(columns)
             .data(data)
@@ -257,9 +319,7 @@
                 if (element) {
                     element.classed("expanding", false);
                     element.classed("expanded", true);
-                    window.backupAppData.push(context.serializeToObject());
                 }
-                
                 response.claim_list.forEach(function (item, i) {
                     var claim = context.getVertex("c_" + item.report_no, "\uf0d6", item.report_no, item);
                     context.claimMap[item.report_no] = {
@@ -336,7 +396,11 @@
                     .data(claimsData)
                     .render()
                 ;
-                context.populateTableH(context.vertexTable, context.vertices);
+                context.populateTableH(context.allTable, context.vertices);
+                context.populateTableH(context.claimsTable, context.vertices, "claims");
+                context.populateTableH(context.policiesTable, context.vertices, "policies");
+                context.populateTableH(context.peopleTable, context.vertices, "people");
+                context.populateTableH(context.vehiclesTable, context.vertices, "vehicles");
             });
         }
     };
@@ -363,7 +427,7 @@
                 merge: false
             },
             selectionTable: this.selectionTable.data(),
-            vertexTable: this.vertexTable.data(),
+            allTable: this.allTable.data(),
             claimsChart: this.claimsChart.data()
         };
     };
@@ -381,7 +445,7 @@
         }, this);
         this.graph.data(obj.graph).render();
         this.selectionTable.data(obj.selectionTable).render();
-        this.vertexTable.data(obj.vertexTable).render();
+        this.allTable.data(obj.allTable).render();
         this.claimsChart.data(obj.claimsChart).render();
     };
 
