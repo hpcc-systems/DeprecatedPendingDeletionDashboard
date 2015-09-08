@@ -9,7 +9,7 @@
 <?style src="css/jquery-ui.css"?>
 <?script src="js/common.js"?>
 
-<?script src="js/relevant/visualization/bower_components/requirejs/require.js"?> 
+<?script src="js/relevant/visualization/node_modules/requirejs/require.js"?> 
 <?script src="js/relevant/visualization/src/config.js"?>
 
  <?script src="js/lib/d3.v3.min.js"?>

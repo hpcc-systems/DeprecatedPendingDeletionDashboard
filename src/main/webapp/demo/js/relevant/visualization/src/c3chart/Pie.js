@@ -12,16 +12,9 @@
         this._type = "pie";
     }
     Pie.prototype = Object.create(Common2D.prototype);
+    Pie.prototype.constructor = Pie;
     Pie.prototype._class += " c3chart_Pie";
 
-    /**
-     * Publish Params Common To Other Libraries
-     */
-
-    /**
-     * Publish Params Unique To This Widget
-     */   
-    
     Pie.prototype.update = function (domNode, element) {
         Common2D.prototype.update.apply(this, arguments);
     };

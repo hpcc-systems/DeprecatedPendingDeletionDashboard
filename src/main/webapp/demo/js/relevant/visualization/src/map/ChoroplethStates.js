@@ -12,6 +12,7 @@
         this.projection("albersUsaPr");
     }
     ChoroplethStates.prototype = Object.create(Choropleth.prototype);
+    ChoroplethStates.prototype.constructor = ChoroplethStates;
     ChoroplethStates.prototype._class += " map_ChoroplethStates";
 
     ChoroplethStates.prototype.testData = function () {
@@ -42,10 +43,11 @@
         //  Enter  ---
         var context = this;
         this.choroPaths = choroPaths.enter().append("path")
+            .call(this._selection.enter.bind(this._selection))
             .on("click", function (d) {
                 var code = usStates.stateNames[d.id].code;
                 if (context._dataMap[code]) {
-                    context.click(context.rowToObj(context._dataMap[code]), "weight");
+                    context.click(context.rowToObj(context._dataMap[code]), "weight", context._selection.selected(this));
                 }
             })
             .on("dblclick", function (d) {
@@ -53,9 +55,21 @@
                 context.zoomToFit(context.active === this ? null : this, 750);
                 context.active = this;
             })
-        ;
-        this.choroPaths
-            .append("title")
+            .on("mouseover.tooltip", function (d) {
+                var code = usStates.stateNames[d.id].code;
+                if (context._dataMap[code]) {
+                    context.tooltipShow([usStates.stateNames[d.id].name, context._dataMap[code][1]], context._columns, 1);
+                }
+            })
+            .on("mouseout.tooltip", function (d) {
+                context.tooltipShow();
+            })
+            .on("mousemove.tooltip", function (d) {
+                var code = usStates.stateNames[d.id].code;
+                if (context._dataMap[code]) {
+                    context.tooltipShow([usStates.stateNames[d.id].name, context._dataMap[code][1]], context._columns, 1);
+                }
+            })
         ;
     };
 
@@ -71,8 +85,6 @@
                 var weight = context._dataMap[code] ? context._dataMap[code][1] : undefined;
                 d3.select(this)
                     .style("fill", weight === undefined ? "url(#hash)" : context._palette(weight, context._dataMinWeight, context._dataMaxWeight))
-                    .select("title")
-                    .text(usStates.stateNames[d.id].name + (weight === undefined ? "" : " (" + weight + ")"))
                 ;
             })
         ;

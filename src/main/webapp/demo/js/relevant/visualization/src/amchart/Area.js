@@ -8,28 +8,18 @@
 }(this, function(d3, CommonSerial, AmCharts, INDChart) {
     function Area() {
         CommonSerial.call(this);
-        this._class = "amchart_Area";
         this._tag = "div";
-
         this._gType = "line";
     }
-
     Area.prototype = Object.create(CommonSerial.prototype);
+    Area.prototype.constructor = Area;
+    Area.prototype._class += " amchart_Area";
     Area.prototype.implements(INDChart.prototype);
 
-    /**
-     * Publish Params Common To Other Libraries
-     */
-    Area.prototype.publish("paletteID", "default", "set", "Palette ID", Area.prototype._palette.switch(),{tags:['Basic','Shared']});
-    Area.prototype.publish("isStacked", false, "boolean", "Stack Chart",null,{tags:['Basic','Shared']});
-    Area.prototype.publish("fillOpacity", 0.7, "number", "Opacity of The Fill Color", null, {min:0,max:1,step:0.001,inputType:'range',tags:['Intermediate','Shared']});
-
-
-    /**
-     * Publish Params Unique To This Widget
-     */
-    Area.prototype.publish("tooltipTemplate","[[category]]: [[value]]", "string", "Tooltip Text",null,{tags:['Intermediate']});
-    Area.prototype.publish("stackType", "regular", "set", "Stack Type",["none","regular","100%"],{tags:['Basic']});
+    Area.prototype.publish("paletteID", "default", "set", "Palette ID", Area.prototype._palette.switch(),{tags:["Basic","Shared"]});
+    Area.prototype.publish("isStacked", false, "boolean", "Stack Chart",null,{tags:["Basic","Shared"]});
+    Area.prototype.publish("fillOpacity", 0.7, "number", "Opacity of The Fill Color", null, {min:0,max:1,step:0.001,inputType:"range",tags:["Intermediate","Shared"]});
+    Area.prototype.publish("stackType", "regular", "set", "Stack Type",["none","regular","100%"],{tags:["Basic"]});
 
     Area.prototype.enter = function(domNode, element) {
         CommonSerial.prototype.enter.apply(this, arguments);
@@ -55,23 +45,14 @@
     };
 
     Area.prototype.buildGraphs = function(gType) {
-        if (typeof(this._chart.graphs) === 'undefined') { this._chart.graphs = []; }
-        var currentGraphCount = this._chart.graphs.length;
-        var buildGraphCount = Math.max(currentGraphCount, this._valueField.length);
+        this._chart.graphs = [];
+        var buildGraphCount = this._columns.length - 1;
 
         for(var i = 0; i < buildGraphCount; i++) {
-            if ((typeof(this._valueField) !== 'undefined' && typeof(this._valueField[i]) !== 'undefined')) { //mark
-                var gRetVal = CommonSerial.prototype.buildGraphObj.call(this,gType,i);
-                var gObj = buildGraphObj.call(this,gRetVal);
+            var gRetVal = CommonSerial.prototype.buildGraphObj.call(this, gType, i);
+            var gObj = buildGraphObj.call(this, gRetVal, i);
 
-                if (typeof(this._chart.graphs[i]) !== 'undefined') {
-                    for (var key in gObj) { this._chart.graphs[i][key] = gObj[key]; }
-                } else {
-                    this._chart.addGraph(gObj);
-                }
-            } else {
-                this._chart.removeGraph(this._chart.graphs[i]);
-            }
+            this._chart.addGraph(gObj);
         }
 
         function buildGraphObj(gObj) {

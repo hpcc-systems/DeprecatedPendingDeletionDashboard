@@ -1,11 +1,11 @@
 "use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3", "../common/Widget", "../common/HTMLWidget", "./Persist", "css!./PropertyEditor"], factory);
+        define(["d3", "../common/Widget", "../common/HTMLWidget", "./Persist", "../layout/Grid", "css!./PropertyEditor"], factory);
     } else {
-        root.other_PropertyEditor = factory(root.d3, root.common_Widget, root.common_HTMLWidget, root.other_Persist);
+        root.other_PropertyEditor = factory(root.d3, root.common_Widget, root.common_HTMLWidget, root.other_Persist, root.layout_Grid);
     }
-}(this, function (d3, Widget, HTMLWidget, Persist) {
+}(this, function (d3, Widget, HTMLWidget, Persist, Grid) {
     function PropertyEditor() {
         HTMLWidget.call(this);
 
@@ -15,15 +15,44 @@
         this._show_settings = true;
     }
     PropertyEditor.prototype = Object.create(HTMLWidget.prototype);
+    PropertyEditor.prototype.constructor = PropertyEditor;
     PropertyEditor.prototype._class += " other_PropertyEditor";
 
-    PropertyEditor.prototype.publish("themeMode", false, "boolean", "Edit default values",null,{tags:['Basic','TODO2']});
-    PropertyEditor.prototype.publish("showColumns", true, "boolean", "Show Columns",null,{tags:['Intermediate','TODO2']});
-    PropertyEditor.prototype.publish("showData", true, "boolean", "Show Data",null,{tags:['Intermediate','TODO2']});
-    PropertyEditor.prototype.publish("shareCountMin", 2, "number", "Share Count Min",null,{tags:['Basic','TODO2']});
-    PropertyEditor.prototype.publish("paramGrouping", "By Widget", "set", "Param Grouping", ["By Param", "By Widget"],{tags:['Basic','TODO2']});
-    PropertyEditor.prototype.publish("sectionTitle", "", "string", "Section Title",null,{tags:['Private','TODO2']});
-    PropertyEditor.prototype.publish("collapsibleSections", true, "boolean", "Collapsible Sections",null,{tags:['Basic','TODO2']});
+    PropertyEditor.prototype.publish("themeMode", false, "boolean", "Edit default values",null,{tags:["Basic"]});
+    PropertyEditor.prototype.publish("showColumns", true, "boolean", "Show Columns",null,{tags:["Intermediate"]});
+    PropertyEditor.prototype.publish("showData", true, "boolean", "Show Data",null,{tags:["Intermediate"]});
+    PropertyEditor.prototype.publish("shareCountMin", 2, "number", "Share Count Min",null,{tags:["Basic"]});
+    PropertyEditor.prototype.publish("paramGrouping", "By Widget", "set", "Param Grouping", ["By Param", "By Widget"],{tags:["Basic"]});
+    PropertyEditor.prototype.publish("sectionTitle", "", "string", "Section Title",null,{tags:["Private"]});
+    PropertyEditor.prototype.publish("defaultCollapsed", false, "boolean", "Default Collapsed Sections",null,{tags:["Private"]});
+    PropertyEditor.prototype.publish("collapsibleSections", true, "boolean", "Collapsible Sections",null,{tags:["Private"]});
+    PropertyEditor.prototype.publish("excludeTags", [], "array", "Array of publish parameter tags to exclude from PropertEditor",null,{tags:["Private"]});
+    PropertyEditor.prototype.publish("showProperties", [], "array", "Array of publish parameter IDs to include in PropertEditor (all others will be excluded)",null,{tags:["Private"]});
+
+    PropertyEditor.prototype.data = function (_) {
+        var retVal = HTMLWidget.prototype.data.apply(this, arguments);
+        if (arguments.length) {
+            var context = this;
+            if (_[0] instanceof Grid) {
+                _[0].postSelectionChange = function () {
+                    var selectedItems = _[0]._selectionBag.get().map(function(item){ return item.widget; });
+                    context
+                        .data(selectedItems.length > 0 ? selectedItems : [_[0]])
+                        .paramGrouping( selectedItems.length > 1 ? "By Param" : "By Widget")
+                        .render();
+                };
+            }
+        }
+        return retVal;
+    };
+
+    PropertyEditor.prototype.getData = function () {
+        var retVal = this.data();
+        if (retVal[0] instanceof Grid && retVal[0]._selected) {
+            return [retVal[0]._selected];
+        }
+        return retVal;
+    };
 
     PropertyEditor.prototype.show_settings = function (_) {
         if (!arguments.length) {
@@ -36,7 +65,7 @@
         if (!widget) {
             return "";
         }
-        var classParts = widget._class.split("_");
+        var classParts = widget.classID().split("_");
         var path = "src/" + classParts.join("/");
         var label = classParts[classParts.length - 1];
         var propertiesString = properties.split("\n").map(function (item) {
@@ -115,14 +144,14 @@
     PropertyEditor.prototype.getJavaScript = function (fieldName, includeColumns, includeData, postCreate) {
         postCreate = postCreate || "";
         var callbackJS = "";
-        if (this._data._content) {
-            callbackJS = formatJSCallback("_content", formatJSProperties(this._data._content, includeColumns, includeData), "");
+        if (this.getData()._content) {
+            callbackJS = formatJSCallback("_content", formatJSProperties(this.getData()._content, includeColumns, includeData), "");
         }
-        return formatJSRequire(this._data, fieldName, formatJSProperties(this._data, includeColumns, includeData), callbackJS, postCreate);
+        return formatJSRequire(this.getData(), fieldName, formatJSProperties(this.getData(), includeColumns, includeData), callbackJS, postCreate);
     };
 
     PropertyEditor.prototype.getPersistString = function (fieldName) {
-        return "var " + fieldName + " = " + JSON.stringify(Persist.serializeToObject(this._data, null, false), null, "  ") + ";";
+        return "var " + fieldName + " = " + JSON.stringify(Persist.serializeToObject(this.getData(), null, false), null, "  ") + ";";
     };
 
     PropertyEditor.prototype.onChange = function (widget, propID) {
@@ -132,20 +161,20 @@
         HTMLWidget.prototype.enter.apply(this, arguments);
         this._parentElement.style("overflow", "auto");
     };
-    
+
     PropertyEditor.prototype.findSharedProperties = function (data, themeMode) {
         var propsByID = {};
 
-        if (typeof (data) !== 'undefined' && data.length > 0) {
+        if (typeof (data) !== "undefined" && data.length > 0) {
             var allProps = [];
             data.forEach(function (widget) {
                 var gpResponse = this._getParams(themeMode ? Object.getPrototypeOf(widget) : widget, 0);
                 allProps = allProps.concat(gpResponse);
             }, this);
             allProps.forEach(function (prop) {
-                if (['widget', 'widgetArray'].indexOf(prop.type) === -1) {
-                    var tempIdx = prop.id + '_' + prop.description;
-                    if (typeof (propsByID[tempIdx]) === 'undefined') {
+                if (["widget", "widgetArray"].indexOf(prop.type) === -1) {
+                    var tempIdx = prop.id + "_" + prop.description;
+                    if (typeof (propsByID[tempIdx]) === "undefined") {
                         propsByID[tempIdx] = { arr: [] };
                     }
                     propsByID[tempIdx].id = prop.id;
@@ -160,8 +189,30 @@
     };
 
     PropertyEditor.prototype._getParams = function(widgetObj, depth) {
+        var context = this;
         var retArr = [];
-        var paramArr = Persist.discover(widgetObj);
+        var discoverResponse = Persist.discover(widgetObj);
+        var paramArr = [];
+        discoverResponse.forEach(function(paramObj){
+            if(typeof (paramObj.ext) !== "undefined" && typeof (paramObj.ext.tags) !== "undefined"){
+                var exclude = false;
+                for(var t in paramObj.ext.tags){
+                    var showArr = context.showProperties();
+                    if(showArr instanceof Array && showArr.length > 0){
+                        exclude = showArr.indexOf(paramObj.id) === -1;
+                        break;
+                    } else {
+                        if(context.excludeTags().indexOf(paramObj.ext.tags[t]) !== -1){
+                            exclude = true;
+                            break;
+                        }
+                    }
+                }
+                if(!exclude){
+                    paramArr.push(paramObj);
+                }
+            }
+        });
         paramArr.forEach(function (param, i1) {
             retArr.push({
                 id: param.id,
@@ -187,24 +238,30 @@
     };
     var tableNeedsRedraw = function (context) {
         var needsRedraw = false;
-        if (typeof (context._current_grouping) === 'undefined') {
+        if (typeof (context._current_grouping) === "undefined") {
             context._current_grouping = context._group_params_by;
         } else if (context._current_grouping !== context._group_params_by) {
             needsRedraw = true;
         }
-        if (typeof (context._showing_columns) === 'undefined') {
+        if (typeof (context._showing_columns) === "undefined") {
             context._showing_columns = context.showColumns();
         } else if (context._showing_columns !== context.showColumns()) {
             needsRedraw = true;
         }
-        if (typeof (context._showing_data) === 'undefined') {
+        if (typeof (context._showing_data) === "undefined") {
             context._showing_data = context.showData();
         } else if (context._showing_data !== context.showData()) {
             needsRedraw = true;
         }
-        if (typeof (context._showing_themeMode) === 'undefined') {
+        if (typeof (context._showing_themeMode) === "undefined") {
             context._showing_themeMode = context.themeMode();
         } else if (context._showing_themeMode !== context.themeMode()) {
+            needsRedraw = true;
+        }
+        if (typeof (context._prevExcludeTags) === "undefined") {
+            context._prevExcludeTags = JSON.stringify(context.excludeTags());
+        } else if (context._prevExcludeTags !== JSON.stringify(context.excludeTags())) {
+            context._prevExcludeTags = JSON.stringify(context.excludeTags());
             needsRedraw = true;
         }
         return needsRedraw;
@@ -236,8 +293,10 @@
                     .showColumns(false)
                     .showData(false)
                     .show_settings(false)
-                    .paramGrouping('By Widget')
-                    .sectionTitle('Property Editor Settings')
+                    .defaultCollapsed(true)
+                    .excludeTags(context.excludeTags())
+                    .paramGrouping("By Widget")
+                    .sectionTitle("Property Editor Settings")
                     .target(d3.select(this).node())
                     .data([widget])
                     .render()
@@ -245,11 +304,11 @@
             });
         }
         //Update tables based on "group by" setting
+        var sPropSections = [];
         if (this.paramGrouping() === "By Param") {
             var sharedPropsMainSections = [];
-            var sPropSections = [];
-            if (this._data.length > 0) {
-                sharedPropsMainSections.push(this.findSharedProperties(this._data, this.themeMode()));
+            if (this.getData().length > 0) {
+                sharedPropsMainSections.push(this.findSharedProperties(this.getData(), this.themeMode()));
                 for (var k1 in sharedPropsMainSections) {
                     var sectionArr = [];
                     for (var k2 in sharedPropsMainSections[k1]) {
@@ -257,9 +316,9 @@
                         sharedPropsMainSections[k1][k2].arr.forEach(function (n) {
                             widgetArr.push(n.widget);
                         });
-                        if (this.shareCountMin() <= widgetArr.length || widgetArr[0]._class.indexOf('PropertyEditor') !== -1) {
+                        if (this.shareCountMin() <= widgetArr.length || widgetArr[0]._class.indexOf("PropertyEditor") !== -1) {
                             sectionArr.push({
-                                rowType: 'shared',
+                                rowType: "shared",
                                 widgetArr: widgetArr,
                                 id: sharedPropsMainSections[k1][k2].id,
                                 description: sharedPropsMainSections[k1][k2].description,
@@ -268,7 +327,7 @@
                             });
                             sharedPropsMainSections[k1][k2].arr.forEach(function (widgetNode) {
                                 sectionArr.push({
-                                    rowType: 'individual',
+                                    rowType: "individual",
                                     widgetArr: [widgetNode.widget],
                                     id: sharedPropsMainSections[k1][k2].id,
                                     description: sharedPropsMainSections[k1][k2].description,
@@ -285,7 +344,7 @@
         //Creating Table and THEAD
         var table = null;
         if (true) {
-            table = element.selectAll("#" + this._id + " > table").data(this._data, function (d) {
+            table = element.selectAll("#" + this._id + " > table").data(context.paramGrouping() === "By Param" ? sPropSections : this.getData(), function (d) {
                 return d._id;
             });
             table.enter().append("table")
@@ -293,7 +352,7 @@
                     var element = d3.select(this);
                     var thead = element.append("thead");
                     if (context.collapsibleSections()) {
-                        thead.attr("class", "mm-label max").on("click", function () {
+                        thead.attr("class", context.defaultCollapsed() ? "mm-label min" : "mm-label max").on("click", function () {
                             var elm = d3.select(this);
                             if (elm.classed("min")) {
                                 elm.classed("max", true);
@@ -306,11 +365,13 @@
                     }
 
                     thead.append("tr").append("th").attr("colspan", context._columns.length).attr("class", "th-widget-class").text(function () {
-                        var text = '';
+                        var text = "";
                         if (context.sectionTitle()) {
                             text = context.sectionTitle();
+                        } else if (context.paramGrouping() === "By Param"){
+                            text = "Grouped By Param";
                         } else {
-                            var splitClass = widget._class.split('_');
+                            var splitClass = widget.classID().split("_");
                             if (splitClass.length > 1) {
                                 text = "Widget: " + splitClass[splitClass.length - 1];
                             } else {
@@ -387,44 +448,44 @@
                         input.node().value = e;
                     }
                 }
-                //Updating TR 'By Param'
+                //Updating TR "By Param"
                 if (context.paramGrouping() === "By Param") {
                     rows = tbody.selectAll(".tr_" + widget._id).data(sPropSections[widgetIdx]);
                     rows.enter().append("tr").each(function (d) {
                         var tr = d3.select(this);
                         var rowClass = "propertyRow";
-                        if (d.rowType === 'shared') {
+                        if (d.rowType === "shared") {
                             rowClass = "sharedPropertyRow";
                         }
-                        else if (d.rowType === 'individual') {
+                        else if (d.rowType === "individual") {
                             this.hidden = true;
                         }
                         tr.attr("class", "tr_" + widget._id + " " + rowClass);
                         tr.append("td").attr("class", "pe-label").html(function (sProp) {
-                            var text = '';
+                            var text = "";
                             switch (sProp.rowType) {
-                                case 'shared':
+                                case "shared":
                                     text = sProp.id;
                                     break;
-                                case 'individual':
-                                    var splitClass = sProp.widgetArr[0]._class.split('_');
+                                case "individual":
+                                    var splitClass = sProp.widgetArr[0].classID().split("_");
                                     var displayClass = splitClass[splitClass.length - 1];
-                                    text = displayClass + ' [' + sProp.widgetArr[0]._id + ']';
+                                    text = displayClass + " [" + sProp.widgetArr[0]._id + "]";
                                     break;
                             }
                             return text;
                         })
                         .on("click", function (sProp) {
-                            var hidden, classList = this.className.split(' ');
-                            if (classList.indexOf('expanded') === -1) {
+                            var hidden, classList = this.className.split(" ");
+                            if (classList.indexOf("expanded") === -1) {
                                 hidden = false;
-                                classList.push('expanded');
-                                this.className = classList.join(' ');
+                                classList.push("expanded");
+                                this.className = classList.join(" ");
                             } else {
                                 hidden = true;
-                                var newClassList = '';
+                                var newClassList = "";
                                 classList.forEach(function (c) {
-                                    if (c !== 'expanded') {
+                                    if (c !== "expanded") {
                                         newClassList += c;
                                     }
                                 });
@@ -458,21 +519,21 @@
                                     ;
                                     break;
                                 case "number":
-                                    if (typeof (d.ext) !== 'undefined' && typeof (d.ext.inputType) !== 'undefined') {
+                                    if (typeof (d.ext) !== "undefined" && typeof (d.ext.inputType) !== "undefined") {
                                         if (d.ext.inputType === "textarea") {
-                                            input = td.append('textarea');
+                                            input = td.append("textarea");
                                         }
-                                        else if (d.ext.inputType === 'range') {
-                                            input = td.append('input')
-                                                .attr('type', 'range')
-                                                .attr('min', d.ext.min)
-                                                .attr('max', d.ext.max)
-                                                .attr('step', d.ext.step)
+                                        else if (d.ext.inputType === "range") {
+                                            input = td.append("input")
+                                                .attr("type", "range")
+                                                .attr("min", d.ext.min)
+                                                .attr("max", d.ext.max)
+                                                .attr("step", d.ext.step)
                                             ;
                                         }
                                     }
-                                    if (typeof (input) === 'undefined' || input === null) {
-                                        input = td.append('input');
+                                    if (typeof (input) === "undefined" || input === null) {
+                                        input = td.append("input");
                                     }
                                     input.attr("class", "input_" + widget._id)
                                         .on("change", function () {
@@ -484,13 +545,13 @@
                                         });
                                     break;
                                 case "string":
-                                    if (typeof (d.ext) !== 'undefined' && typeof (d.ext.inputType) !== 'undefined') {
+                                    if (typeof (d.ext) !== "undefined" && typeof (d.ext.inputType) !== "undefined") {
                                         if (d.ext.inputType === "textarea") {
-                                            input = td.append('textarea');
+                                            input = td.append("textarea");
                                         }
                                     }
-                                    if (typeof (input) === 'undefined' || input === null) {
-                                        input = td.append('input');
+                                    if (typeof (input) === "undefined" || input === null) {
+                                        input = td.append("input");
                                     }
                                     input.attr("class", "input_" + widget._id)
                                         .on("change", function () {
@@ -516,9 +577,10 @@
                                         })
                                     ;
                                     if (!context.isIE) {
+                                        var colorInput = input;
+                                        var inputColor = td.append("input");
                                         try {
-                                            var colorInput = input;
-                                            var inputColor = td.append("input")
+                                            inputColor
                                                 .attr("type", "color")
                                                 .on("change", function () {
                                                     var node = colorInput.node();
@@ -576,15 +638,15 @@
                         });
                     });
                     //Setting the td.pe-label html content
-                    rows.selectAll('td.pe-label').each(function (sProp) {
-                        var text = '';
+                    rows.selectAll("td.pe-label").each(function (sProp) {
+                        var text = "";
                         switch (sProp.rowType) {
-                            case 'shared':
+                            case "shared":
                                 text = sProp.id;
                                 break;
-                            case 'individual':
-                                var displayClass = sProp.widgetArr[0]._class.split('_')[1];
-                                text = displayClass + ' [' + sProp.widgetArr[0]._id + ']';
+                            case "individual":
+                                var displayClass = sProp.widgetArr[0].classID().split("_")[1];
+                                text = displayClass + " [" + sProp.widgetArr[0]._id + "]";
                                 break;
                         }
                         this.innerHTML = text;
@@ -592,7 +654,7 @@
                     //Setting the state of the inputs
                     rows.select(".input_" + widget._id).each(function (sProp) {
                         var input = d3.select(this);
-                        if (sProp.rowType === 'individual') {
+                        if (sProp.rowType === "individual") {
                             sProp.widgetArr.forEach(function (w) {
                                 switch (sProp.type) {
                                     case "boolean":
@@ -644,8 +706,29 @@
                         }
                     }).remove();
                 } else if (context.paramGrouping() === "By Widget") {
-                    //Updating TR 'By Widget'
-                    rows = tbody.selectAll(".tr_" + widget._id).data(Persist.discover(context.themeMode() ? Object.getPrototypeOf(widget) : widget), function (d) {
+                    //Updating TR "By Widget"
+                    var discoverResponse = Persist.discover(context.themeMode() ? Object.getPrototypeOf(widget) : widget);
+                    var tbodyArr = [];
+                    discoverResponse.forEach(function(paramObj){
+                        var exclude = false;
+                        var showArr = context.showProperties();
+                        if(showArr instanceof Array && showArr.length > 0){
+                            exclude = showArr.indexOf(paramObj.id) === -1;
+                        } else {
+                            if(typeof (paramObj.ext) !== "undefined" && typeof (paramObj.ext.tags) !== "undefined"){
+                                for(var t in paramObj.ext.tags){
+                                    if(context.excludeTags().indexOf(paramObj.ext.tags[t]) !== -1){
+                                        exclude = true;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        if(!exclude){
+                            tbodyArr.push(paramObj);
+                        }
+                    });
+                    rows = tbody.selectAll(".tr_" + widget._id).data(tbodyArr, function (d) {
                         return widget._id + "_" + d.id + "_" + d.type;
                     });
                     rows.enter().append("tr").each(function (d) {
@@ -654,11 +737,11 @@
                         tr.append("td").attr("class", "pe-label").text(function (d) {
                             return d.id;
                         });
-                        var inputType = 'input';
-                        if (typeof (d.ext) !== 'undefined' &&
-                            typeof (d.ext.inputType) !== 'undefined' &&
+                        var inputType = "input";
+                        if (typeof (d.ext) !== "undefined" &&
+                            typeof (d.ext.inputType) !== "undefined" &&
                             d.ext.inputType === "textarea") {
-                            inputType = 'textarea';
+                            inputType = "textarea";
                         }
                         tr.append("td")
                             .attr("class", "field")
@@ -680,21 +763,21 @@
                                         break;
                                     case "number":
                                     case "string":
-                                        if (typeof (d.ext) !== 'undefined' && typeof (d.ext.inputType) !== 'undefined') {
+                                        if (typeof (d.ext) !== "undefined" && typeof (d.ext.inputType) !== "undefined") {
                                             if (d.ext.inputType === "textarea") {
-                                                input = td.append('textarea');
+                                                input = td.append("textarea");
                                             }
-                                            else if (d.type === 'number' && d.ext.inputType === 'range') {
-                                                input = td.append('input')
-                                                    .attr('type', 'range')
-                                                    .attr('min', d.ext.min)
-                                                    .attr('max', d.ext.max)
-                                                    .attr('step', d.ext.step)
+                                            else if (d.type === "number" && d.ext.inputType === "range") {
+                                                input = td.append("input")
+                                                    .attr("type", "range")
+                                                    .attr("min", d.ext.min)
+                                                    .attr("max", d.ext.max)
+                                                    .attr("step", d.ext.step)
                                                 ;
                                             }
                                         }
                                         if (input === null) {
-                                            input = td.append('input');
+                                            input = td.append("input");
                                         }
                                         input.attr("class", "input_" + widget._id)
                                             .on("change", function () {
@@ -716,9 +799,10 @@
                                             })
                                         ;
                                         if (!context.isIE) {
+                                            var colorInput = input;
+                                            var inputColor = td.append("input");
                                             try {
-                                                var colorInput = input;
-                                                var inputColor = td.append("input")
+                                                inputColor
                                                     .attr("type", "color")
                                                     .on("change", function () {
                                                         var node = colorInput.node();
@@ -768,9 +852,11 @@
                                             .attr("class", "input_" + widget._id)
                                         ;
                                         widget["_propertyEditor_" + d.id] = new PropertyEditor()
-                                            .paramGrouping('By Widget')
+                                            .paramGrouping("By Widget")
                                             .showColumns(context.showColumns())
                                             .showData(context.showData())
+                                            .excludeTags(context.excludeTags())
+                                            .showProperties(context.showProperties())
                                             .show_settings(false)
                                             .target(input.node())
                                         ;

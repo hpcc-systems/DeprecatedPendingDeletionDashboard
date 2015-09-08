@@ -1,24 +1,31 @@
 "use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3", "../common/SVGWidget", "./IChoropleth", "css!./Choropleth"], factory);
+        define(["d3", "../common/SVGWidget", "./IChoropleth", "../other/Bag", "../api/ITooltip", "css!./Choropleth"], factory);
     } else {
-        root.map_Choropleth = factory(root.d3, root.common_SVGWidget, root.map_IChoropleth);
+        root.map_Choropleth = factory(root.d3, root.common_SVGWidget, root.map_IChoropleth, root.other_Bag, root.api_ITooltip);
     }
-}(this, function (d3, SVGWidget, IChoropleth) {
+}(this, function (d3, SVGWidget, IChoropleth, Bag, ITooltip) {
     function Choropleth() {
         SVGWidget.call(this);
         IChoropleth.call(this);
+        ITooltip.call(this);
 
         this._dataMap = {};
         this._dataMinWeight = 0;
         this._dataMaxWeight = 0;
+
+        this._prevTranslate = [0, 0];
+        this._prevScale = 1.0;
     }
     Choropleth.prototype = Object.create(SVGWidget.prototype);
+    Choropleth.prototype.constructor = Choropleth;
     Choropleth.prototype._class += " map_Choropleth";
     Choropleth.prototype.implements(IChoropleth.prototype);
+    Choropleth.prototype.implements(ITooltip.prototype);
 
-    Choropleth.prototype.publish("paletteID", "YlOrRd", "set", "Palette ID", Choropleth.prototype._palette.switch(),{tags:['Basic','Shared']});
+    Choropleth.prototype.publish("paletteID", "YlOrRd", "set", "Palette ID", Choropleth.prototype._palette.switch(),{tags:["Basic","Shared"]});
+    Choropleth.prototype.publish("useClonedPalette", false, "boolean", "Enable or disable using a cloned palette",null,{tags:["Intermediate","Shared"]});
 
     Choropleth.prototype.data = function (_) {
         var retVal = SVGWidget.prototype.data.apply(this, arguments);
@@ -103,10 +110,10 @@
 
         var defs = this._parentElement.insert("defs", ":first-child");
         var g = defs.append("pattern")
-            .attr('id', 'hash')
-            .attr('patternUnits', 'userSpaceOnUse')
-            .attr('width', '10')
-            .attr('height', '10')
+            .attr("id", "hash")
+            .attr("patternUnits", "userSpaceOnUse")
+            .attr("width", "10")
+            .attr("height", "10")
             .attr("x", 0).attr("y", 0)
             .append("g");
         g.append("rect")
@@ -125,10 +132,19 @@
         ;
 
         this._svg = element.append("g");
+        this._selection = new Bag.SimpleSelection(this._svg);
     };
 
     Choropleth.prototype.update = function (domNode, element) {
         this._palette = this._palette.switch(this.paletteID());
+        if (this.useClonedPalette()) {
+            this._palette = this._palette.cloneNotExists(this.paletteID() + "_" + this.id());
+        }
+    };
+
+    Choropleth.prototype.exit = function (domNode, element) {
+        SVGWidget.prototype.enter.apply(this, arguments);
+        delete this._selection;
     };
 
     // A modified d3.geo.albersUsa to include Puerto Rico.
@@ -279,6 +295,19 @@
         return albersUsa.scale(1070);
     };
 
+    Choropleth.prototype.project = function (lat, long) {
+        var pos = this.d3Projection([long, lat]);
+
+        var offsetX = this.x() + this._prevTranslate[0];
+        var offsetY = this.y() + this._prevTranslate[1];
+
+        pos[0] *= this._prevScale;
+        pos[1] *= this._prevScale;
+        pos[0] += offsetX;
+        pos[1] += offsetY;
+        return pos;
+    };
+
     Choropleth.prototype.zoomToFit = function (node, transitionDuration, scaleFactor) {
         scaleFactor = scaleFactor || 0.9;
 
@@ -288,6 +317,8 @@
         var scale = scaleFactor / Math.max(bbox.width / this.width(), bbox.height / this.height());
         var translate = [-scale * x, -scale * y];
 
+        this._prevTranslate = translate;
+        this._prevScale = scale;
         (transitionDuration ? this._svg.transition().duration(transitionDuration) : this._svg)
             .attr("transform", "translate(" + translate + ")scale(" + scale + ")")
         ;

@@ -4,15 +4,12 @@
         define(["d3"], factory);
     } else {
         root.require = root.require || function (paths, cb) {
-            if (typeof paths === 'function') {
+            if (typeof paths === "function") {
                 cb = paths;
                 paths = [];
             }
 
             var objs = paths.map(function (path) {
-                if (path === "d3-cloud/d3.layout.cloud") {
-                    return root.d3.layout.cloud;
-                }
                 var prop = path.substring("src/".length).split("/").join("_");
                 return root[prop];
             });
@@ -34,6 +31,17 @@
         this._size = { width: 0, height: 0 };
         this._scale = 1;
 
+        for (var key in this) {
+            if (key.indexOf("__meta_") === 0) {
+                switch (this[key].type) {
+                    case "array":
+                    case "widgetArray":
+                        this["__prop_" + this[key].id] = [];
+                        break;
+                }
+            }
+        }
+
         this._target = null;
         this._parentElement = null;
         this._parentWidget = null;
@@ -43,8 +51,35 @@
         this._watchArr = [];
 
         this._renderCount = 0;
+
+        if (window.__hpcc_debug) {
+            if (window.g_all === undefined) {
+                window.g_all = {};
+            }
+            window.g_all[this._id] = this;
+        }
+
+        if (window.__hpcc_theme) {
+            this.applyTheme(window.__hpcc_theme);
+        }
     }
-    Widget.prototype._class = " common_Widget";
+    Widget.prototype._class = "common_Widget";
+
+    Widget.prototype.applyTheme = function (theme) {
+        if (!theme) {
+            return;
+        }
+        var clsArr = this._class.split(" ");
+        for (var i in clsArr) {
+            if (theme[clsArr[i]]) {
+                for (var paramName in theme[clsArr[i]]) {
+                    if (this["__meta_" + paramName]) {
+                        this["__meta_" + paramName].defaultValue = theme[clsArr[i]][paramName];
+                    }
+                }
+            }
+        }
+    };
 
     Widget.prototype.ieVersion = (function () {
         var ua = navigator.userAgent, tem,
@@ -92,20 +127,20 @@
             if (config.attributes) {
                 listener = new MutationListener(this.callback, domNode, "attributes");
                 this.listeners.push(listener);
-                domNode.addEventListener('DOMAttrModified', listener, true);
+                domNode.addEventListener("DOMAttrModified", listener, true);
             }
 
             if (config.characterData) {
                 listener = new MutationListener(this.callback, domNode, "characterData");
                 this.listeners.push(listener);
-                domNode.addEventListener('DOMCharacterDataModified', listener, true);
+                domNode.addEventListener("DOMCharacterDataModified", listener, true);
             }
 
             if (config.childList) {
                 listener = new MutationListener(this.callback, domNode, "childList");
                 this.listeners.push(listener);
-                domNode.addEventListener('DOMNodeInserted', listener, true);
-                domNode.addEventListener('DOMNodeRemoved', listener, true);
+                domNode.addEventListener("DOMNodeInserted", listener, true);
+                domNode.addEventListener("DOMNodeRemoved", listener, true);
             }
         };
 
@@ -113,14 +148,14 @@
             this.listeners.forEach(function (item) {
                 switch (item.type) {
                     case "attributes":
-                        item.domNode.removeEventListener('DOMAttrModified', item, true);
+                        item.domNode.removeEventListener("DOMAttrModified", item, true);
                         break;
                     case "characterData":
-                        item.domNode.removeEventListener('DOMCharacterDataModified', item, true);
+                        item.domNode.removeEventListener("DOMCharacterDataModified", item, true);
                         break;
                     case "childList":
-                        item.domNode.removeEventListener('DOMNodeRemoved', item, true);
-                        item.domNode.removeEventListener('DOMNodeInserted', item, true);
+                        item.domNode.removeEventListener("DOMNodeRemoved", item, true);
+                        item.domNode.removeEventListener("DOMNodeInserted", item, true);
                         break;
                 }
             });
@@ -147,6 +182,7 @@
         this["__meta_" + id] = {
             id: id,
             type: type,
+            origDefaultValue: defaultValue,
             defaultValue: defaultValue,
             description: description,
             set: set,
@@ -157,42 +193,52 @@
             if (!arguments.length) {
                 return !isPrototype && this["__prop_" + id] !== undefined ? this["__prop_" + id] : this["__meta_" + id].defaultValue;
             }
-            switch (type) {
-                case "set":
-                    if (!set || set.indexOf(_) < 0) {
-                        console.log("Invalid value for '" + id + "':  " + _);
-                    }
-                    break;
-                case "html-color":
-                    var litmus = 'red';
-                    var d = document.createElement('div');
-                    d.style.color=litmus;
-                    d.style.color=_;
-                    //Element's style.color will be reverted to litmus or set to '' if an invalid color is given
-                    if( _ !== litmus && (d.style.color === litmus || d.style.color === '')){
-                        console.log("Invalid value for '" + id + "':  " + _);
-                    }
-                    break;
-                case "boolean":
-                    _ = Boolean(_);
-                    break;
-                case "number":
-                    _ = Number(_);
-                    break;
-                case "string":
-                    _ = String(_);
-                    break;
-                case "array":
-                    if (!(_ instanceof Array)) {
-                        console.log("Invalid value for '" + id);
-                    }
-                    break;
+            if (_ === "" && this["__meta_" + id].ext.optional) {
+                _ = null;
+            } else if (_ !== null) {
+                switch (type) {
+                    case "set":
+                        if (!set || set.indexOf(_) < 0) {
+                            console.log("Invalid value for '" + id + "':  " + _);
+                        }
+                        break;
+                    case "html-color":
+                        if (window.__hpcc_debug && _ && _ !== "red") {
+                            var litmus = "red";
+                            var d = document.createElement("div");
+                            d.style.color = litmus;
+                            d.style.color = _;
+                            //Element's style.color will be reverted to litmus or set to "" if an invalid color is given
+                            if (d.style.color === litmus || d.style.color === "") {
+                                console.log("Invalid value for '" + id + "':  " + _);
+                            }
+                        }
+                        break;
+                    case "boolean":
+                        _ = typeof (_) === "string" && ["false", "off", "0"].indexOf(_.toLowerCase()) >= 0 ? false : Boolean(_);
+                        break;
+                    case "number":
+                        _ = Number(_);
+                        break;
+                    case "string":
+                        _ = String(_);
+                        break;
+                    case "array":
+                        if (!(_ instanceof Array)) {
+                            console.log("Invalid value for '" + id);
+                        }
+                        break;
+                }
             }
             if (isPrototype) {
                 this["__meta_" + id].defaultValue = _;
             } else {
                 this.broadcast(id, _, this["__prop_" + id]);
-                this["__prop_" + id] = _;
+                if (_ === null) {
+                    delete this["__prop_" + id];
+                } else {
+                    this["__prop_" + id] = _;
+                }
             }
             return this;
         };
@@ -203,7 +249,28 @@
             }
             return this["__prop_" + id] !== undefined;
         };
+        this[id + "_exists"] = function () {
+            var isPrototype = this._id === undefined;
+            if (isPrototype) {
+                return this["__meta_" + id].defaultValue !== undefined;
+            }
+            return this["__prop_" + id] !== undefined || this["__meta_" + id].defaultValue !== undefined;
+        };
         this[id + "_reset"] = function () {
+            switch (type) {
+                case "widget":
+                    if (this["__prop_" + id]) {
+                        this["__prop_" + id].target(null);
+                    }
+                    break;
+                case "widgetArray":
+                    if (this["__prop_" + id]) {
+                        this["__prop_" + id].forEach(function (widget) {
+                            widget.target(null);
+                        });
+                    }
+                    break;
+            }
             this["__prop_" + id] = undefined;
         };
         this["__prop_" + id] = undefined;
@@ -311,6 +378,10 @@
         return this;
     };
 
+    Widget.prototype.classID = function () {
+        return this._class.split(" ").pop();
+    };
+
     Widget.prototype.columns = function (_) {
         if (!arguments.length) return this._columns;
         this._columns = _;
@@ -325,6 +396,25 @@
 
     Widget.prototype.cloneData = function () {
         return this._data.map(function (row) { return row.slice(0); });
+    };
+
+    Widget.prototype.flattenData = function () {
+        var retVal = [];
+        this.data().forEach(function (row, rowIdx) {
+            this.columns().filter(function (col, idx) { return idx > 0; }).forEach(function (col, idx) {
+                var val = row[idx + 1];
+                if (val) {
+                    var newItem = {
+                        rowIdx: rowIdx,
+                        colIdx: idx + 1,
+                        label: row[0],
+                        value: val
+                    };
+                    retVal.push(newItem);
+                }
+            }, this);
+        }, this);
+        return retVal;
     };
 
     Widget.prototype.rowToObj = function (row) {
@@ -444,7 +534,10 @@
         if (!arguments.length) return this._visible;
         this._visible = _;
         if (this._parentElement) {
-            this._parentElement.style("visibility", this._visible ? null : "hidden");
+            this._parentElement.style({
+                visibility: this._visible ? null : "hidden",
+                opacity: this._visible ? null : 0
+            });
         }
         return this;
     };
@@ -486,7 +579,7 @@
         var element = d3.select(domNode);
         if (element) {
             var widget = element.datum();
-            if (widget) {
+            if (widget && widget instanceof Widget) {
                 return widget;
             }
         }
@@ -589,50 +682,86 @@
 
     //  Render  ---
     Widget.prototype.render = function (callback) {
-        if (!this._parentElement)
-            return this;
+        callback = callback || function () { };
+        if (this._parentElement) {
+            if (!this._tag)
+                throw "No DOM tag specified";
 
-        if (!this._tag)
-            throw "No DOM tag specified";
-
-        var elements = this._parentElement.selectAll("#" + this._id).data([this], function (d) { return d._id; });
-        elements.enter().append(this._tag)
-            .classed(this._class, true)
-            .attr("id", this._id)
-            //.attr("opacity", 0.50)  //  Uncomment to debug position offsets  ---
-            .each(function (context) {
-                context._element = d3.select(this);
-                context.enter(this, context._element);
-            })
-        ;
-        elements
-            .each(function (context) {
-                context.update(this, context._element);
-                if (context._drawStartPos === "origin" && context._target instanceof SVGElement) {
-                    context._element.attr("transform", function (d) { return "translate(" + (context._pos.x - context._size.width / 2) + "," + (context._pos.y - context._size.height / 2) + ")scale(" + context._scale + ")"; });
-                } else {
-                    context._element.attr("transform", function (d) { return "translate(" + context._pos.x + "," + context._pos.y + ")scale(" + context._scale + ")"; });
-                }
-            })
-        ;
-        elements.exit()
-            .each(function exit(context) {
-                context.exit(this, context._element);
-            })
-            .remove()
-        ;
-        this._renderCount++;
-
-        if (callback) {
-            callback(this);
+            var elements = this._parentElement.selectAll("#" + this._id).data([this], function (d) { return d._id; });
+            elements.enter().append(this._tag)
+                .classed(this._class, true)
+                .attr("id", this._id)
+                //.attr("opacity", 0.50)  //  Uncomment to debug position offsets  ---
+                .each(function (context) {
+                    context._element = d3.select(this);
+                    context.enter(this, context._element);
+                })
+            ;
+            elements
+                .each(function (context) {
+                    context.preUpdate(this, context._element);
+                    context.update(this, context._element);
+                    context.postUpdate(this, context._element);
+                })
+            ;
+            elements.exit()
+                .each(function exit(context) {
+                    context.exit(this, context._element);
+                })
+                .remove()
+            ;
+            this._renderCount++;
         }
 
+        //  ASync Render Contained Widgets  ---
+        var widgets = [];
+        for (var key in this) {
+            if (key.indexOf("__meta_") === 0) {
+                var meta = this[key];
+                switch (meta.type) {
+                    case "widget":
+                        var widget = this[meta.id]();
+                        if (widget) {
+                            widgets.push(this[meta.id]());
+                        }
+                        break;
+                    case "widgetArray":
+                        widgets = widgets.concat(this[meta.id]());
+                        break;
+                }
+            }
+        }
+        var context = this;
+        switch (widgets.length) {
+            case 0:
+                callback(this);
+                break;
+            case 1:
+                widgets[0].render(function () {
+                    callback(context);
+                });
+                break;
+            default:
+                var renderCount = widgets.length;
+                widgets.forEach(function (widget, idx) {
+                    setTimeout(function () {
+                        widget.render(function () {
+                            if (--renderCount === 0) {
+                                callback(context);
+                            }
+                        });
+                    }, 0);
+                });
+                break;
+        }
         return this;
     };
 
-    Widget.prototype.enter = function (domeNode, element, d) { };
-    Widget.prototype.update = function (domeNode, element, d) { };
-    Widget.prototype.exit = function (domeNode, element, d) { };
+    Widget.prototype.enter = function (domeNode, element) { };
+    Widget.prototype.preUpdate = function (domeNode, element) { };
+    Widget.prototype.update = function (domeNode, element) { };
+    Widget.prototype.postUpdate = function (domeNode, element) { };
+    Widget.prototype.exit = function (domeNode, element) { };
 
     //  Util  ---
     Widget.prototype.debounce = function (func, threshold, execAsap) {
