@@ -7,24 +7,26 @@
 			</caption>
 			<panelchildren>			
 				<vbox vflex="1" id="editHpccVbox" spacing="0" style="background: rgba(170, 170, 170, 0.45);width: 1000px;">
-					<hbox sclass="form-group" hflex="1" align="center" spacing="50px">
+					<hbox sclass="form-group" hflex="1" align="center" spacing="50px" height="80px">
 						<div width="350px" sclass="form-label-div" align="right">
 							<label zclass="control-label" value="${labels.claimId}"></label>
 						</div>
 						<combobox id="claimCombobox" autodrop="true" height="20px" ></combobox>
 					</hbox>
-						<hbox sclass="form-group" hflex="1" align="center" >
+					<vbox height="100px" hflex="1">
+						<hbox sclass="form-group" hflex="1" align="center" spacing="50px">
 							<div width="350px" sclass="form-label-div" align="right">
 								<label zclass="control-label" value="${labels.groupTypeId}"></label>
 							</div>
 							<combobox id="groupTypeIdCombobox" height="20px" ></combobox>
 						</hbox>
-						<hbox sclass="form-group" hflex="1" align="center" >
+						<hbox sclass="form-group" hflex="1" align="center" spacing="50px">
 							<div width="350px" sclass="form-label-div" align="right">
 								<label zclass="control-label" value="${labels.groupId}"></label>
 							</div>
 							<combobox id="groupIdCombobox" height="20px" ></combobox>
 						</hbox>
+					</vbox>
 				<hbox sclass="form-group" hflex="1" align="center" spacing="50px" height="80px">
 					<div width="350px" sclass="form-label-div" align="right">
 						<label zclass="control-label" value="${labels.claimsImageIcon}"></label>
@@ -197,11 +199,5 @@
 			</vbox>
 		</panelchildren>
 		</panel>
-		<!-- <panel id="displayPanel" height="500px" collapsible="true">
-				<panelchildren>
-					<vbox id="displayChart" hflex="1" spacing="0">
-					</vbox>
-				</panelchildren>
-		</panel> -->
 	</vbox>
 </zk>
