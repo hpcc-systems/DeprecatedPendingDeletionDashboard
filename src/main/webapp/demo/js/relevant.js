@@ -5,8 +5,8 @@ var app;
 var backupAppData = [];
 function createRelevantChart(divId, reqData) {
 	var chartData = jq.parseJSON(reqData);
-	console.log(chartData);	
-	
+	console.log(chartData.claimId);	
+	//chartData.claimId = 'CLM00042945';
 	console.log("file -->"+chartData.files[0]);	
 	console.log("Calling createRelevantChart...");
 	

@@ -1,20 +1,31 @@
 <zk xmlns:w="client">
-	<vbox width="1000px" height="570px" apply="org.hpccsystems.dashboard.controller.RelevantController">
-		<panel sclass="pagePanel" width="1000px" id="formPaneldiv">
+	<vbox width="1000px" vflex="1" apply="org.hpccsystems.dashboard.controller.RelevantController">
+	
+		<panel sclass="pagePanel" vflex="1" width="1000px" id="formPaneldiv">
 			<caption iconSclass="glyphicon glyphicon-globe">
 				<label value="${labels.relevantConfigScreen}" sclass="h5"/>
 			</caption>
-			<panelchildren>
-				<vbox id="editHpccVbox" spacing="0" style="background: rgba(170, 170, 170, 0.45);width: 1000px;">
-				
-				<hbox sclass="form-group" hflex="1" align="center" spacing="50px" height="100px">
-					<div width="350px" sclass="form-label-div" align="right">
-						<label zclass="control-label" value="${labels.claimId}"></label>
-					</div>
-					<combobox id="claimCombobox" autodrop="true" height="20px" ></combobox>
-				</hbox>
-				
-				<hbox sclass="form-group" hflex="1" align="center" spacing="50px" height="100px">
+			<panelchildren>			
+				<vbox vflex="1" id="editHpccVbox" spacing="0" style="background: rgba(170, 170, 170, 0.45);width: 1000px;">
+					<hbox sclass="form-group" hflex="1" align="center" spacing="50px">
+						<div width="350px" sclass="form-label-div" align="right">
+							<label zclass="control-label" value="${labels.claimId}"></label>
+						</div>
+						<combobox id="claimCombobox" autodrop="true" height="20px" ></combobox>
+					</hbox>
+						<hbox sclass="form-group" hflex="1" align="center" >
+							<div width="350px" sclass="form-label-div" align="right">
+								<label zclass="control-label" value="${labels.groupTypeId}"></label>
+							</div>
+							<combobox id="groupTypeIdCombobox" height="20px" ></combobox>
+						</hbox>
+						<hbox sclass="form-group" hflex="1" align="center" >
+							<div width="350px" sclass="form-label-div" align="right">
+								<label zclass="control-label" value="${labels.groupId}"></label>
+							</div>
+							<combobox id="groupIdCombobox" height="20px" ></combobox>
+						</hbox>
+				<hbox sclass="form-group" hflex="1" align="center" spacing="50px" height="80px">
 					<div width="350px" sclass="form-label-div" align="right">
 						<label zclass="control-label" value="${labels.claimsImageIcon}"></label>
 					</div>
@@ -57,7 +68,7 @@
 		  			</combobox>	
 				</hbox>
 				
-				<hbox sclass="form-group" hflex="1" align="center" spacing="50px" height="100px">
+				<hbox sclass="form-group" hflex="1" align="center" spacing="50px" height="80px">
 					<div width="350px" sclass="form-label-div" align="right">
 						<label zclass="control-label" value="${labels.policyImageIcon}"></label>
 					</div>
@@ -99,7 +110,7 @@
 		    			<comboitem image="js/relevant/img/user.png" label=" " value="\uf007"/>
 		  			</combobox>	
 				</hbox>
-				<hbox sclass="form-group" hflex="1" align="center" spacing="50px" height="100px">
+				<hbox sclass="form-group" hflex="1" align="center" spacing="50px" height="80px">
 					<div width="350px" sclass="form-label-div" align="right">
 						<label zclass="control-label" value="${labels.vehicleImageIcon}"></label>
 					</div>
@@ -141,7 +152,7 @@
 		    			<comboitem image="js/relevant/img/user.png" label=" " value="\uf007"/>
 		  			</combobox>	
 				</hbox>
-				<hbox sclass="form-group" hflex="1" align="center" spacing="50px" height="110px">
+				<hbox sclass="form-group" hflex="1" align="center" spacing="50px" height="80px">
 					<div width="350px" sclass="form-label-div" align="right">
 						<label zclass="control-label" value="${labels.personImageIcon}"></label>
 					</div>
@@ -184,7 +195,7 @@
 		  			</combobox>	
 				</hbox>
 			</vbox>
-			</panelchildren>
+		</panelchildren>
 		</panel>
 		<!-- <panel id="displayPanel" height="500px" collapsible="true">
 				<panelchildren>

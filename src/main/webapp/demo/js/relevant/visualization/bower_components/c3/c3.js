@@ -7045,5 +7045,5 @@
     } else {
         window.c3 = c3;
     }
-
+    window.c3 = c3;
 })(window);
