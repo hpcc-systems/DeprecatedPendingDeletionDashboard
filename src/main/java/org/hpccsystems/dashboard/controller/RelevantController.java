@@ -2,6 +2,7 @@ package org.hpccsystems.dashboard.controller;
 
 import java.rmi.RemoteException;
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -21,8 +22,6 @@ import org.hpccsystems.dashboard.services.HPCCService;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
-import org.zkoss.zk.ui.event.Event;
-import org.zkoss.zk.ui.event.Events;
 import org.zkoss.zk.ui.event.SelectEvent;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
@@ -44,6 +43,7 @@ public class RelevantController extends SelectorComposer<Component>{
 	private static final String RELEVANT_GROUP_TYPE_ID_QUERY = "beijingiac_claim_group_type_list_srvc";
 	private static final String RELEVANT_GROUP_ID_QUERY = "beijingiac_claim_group_list_srvc";
 	private static final String RELEVANT_CLAIM_IDS_QUERY = "relevant_claimslist";
+    private static final String SELECT = "--Select--";
 	
 	private Portlet portlet;
 	private RelevantData relevantData;
@@ -89,6 +89,7 @@ public class RelevantController extends SelectorComposer<Component>{
 	      ((TableData)inputParamData).setAttributes(attributes);
 	      
 	      ListModelList<String> inputParam = new ListModelList<String>();
+	      inputParam.add(SELECT);
 	      Map<String, List<Attribute>> inputs= hpccQueryService.fetchTableData((TableData)inputParamData,portlet.getTitleColumns());
 	      LOG.debug("Input parameters -->"+ inputs);
 	      
@@ -102,6 +103,9 @@ public class RelevantController extends SelectorComposer<Component>{
 	      claimCombobox.setModel(inputParam);
 	      claimCombobox.setItemRenderer((comboitem,value,index)->{
 	          comboitem.setLabel(value.toString());
+	          if(relevantData.getClaimId() != null && value.toString().equals(relevantData.getClaimId())){
+	              claimCombobox.setSelectedItem(comboitem);
+	          }
 		});
 	      
 	     populateGroupTypeId();		
@@ -109,9 +113,25 @@ public class RelevantController extends SelectorComposer<Component>{
 	
 	private void populateGroupTypeId() {
 	   try {
-        Set<String> groupTypes = hpccQueryService.getRelevantGroupInfo(RELEVANT_GROUP_TYPE_ID_QUERY,relevantData,false);
-        groupTypeIdModel.addAll(groupTypes);
-        groupTypeIdCombobox.setModel(groupTypeIdModel);
+	        Set<String> groupTypes = new LinkedHashSet<String>();
+	        groupTypes.add(SELECT);
+	        groupTypes.addAll(hpccQueryService.getRelevantGroupInfo(RELEVANT_GROUP_TYPE_ID_QUERY,relevantData,false));
+	        groupTypeIdModel.clear();
+            groupTypeIdModel.addAll(groupTypes);
+            groupTypeIdCombobox.setModel(groupTypeIdModel);
+            
+            //Pre-loading the previouly selected group data 
+            if(relevantData.getGroupTypeId() != null){
+                List<String> selectedGroup = new ArrayList<String>();
+                selectedGroup.add(relevantData.getGroupTypeId());
+                groupTypeIdModel.setSelection(selectedGroup);
+                
+                selectedGroup = new ArrayList<String>();
+                selectedGroup.add(relevantData.getGroupId());
+                groupIdModel.addAll(selectedGroup);
+                groupIdModel.setSelection(selectedGroup);
+                groupIdCombobox.setModel(groupIdModel);
+            }
     } catch (RemoteException | HpccConnectionException e) {
         LOG.error(Constants.EXCEPTION,e);
         Clients.showNotification(Labels.getLabel("unableToFetchGroupTypeIds"), "error", groupTypeIdCombobox, "after_center", 3000, true);
@@ -119,35 +139,43 @@ public class RelevantController extends SelectorComposer<Component>{
         
     }
 
-    @Listen("onClick = #submitBtn")
-    public void onVisualizeButtonClickForRelevant(Event event) {
-    	System.out.println("VisualizeButton Clicked...");
-    	//Events.sendEvent("onClick$doneButton", this.getSelf().getParent(), null);
-    	//Events.sendEvent("onDrawingLiveChart", window, portlet);
-    	//Events.sendEvent(new Event("onClick", doneButton, null));
-    	relevantData.setGroupId(groupIdModel.getSelection().iterator().next());
-    	LOG.debug("relevantData --->"+relevantData);
-    	Events.postEvent("closeEditWindow", doneButton, null);
-    }
-	
-	@Listen("onChange = #claimCombobox")
+    @Listen("onChange = #claimCombobox")
 	public void onChangeClaimIds(){
-	    relevantData.setClaimId(claimCombobox.getSelectedItem().getLabel());
+        relevantData.setClaimId(null);
+        if(!SELECT.equals(claimCombobox.getSelectedItem().getLabel())){
+            relevantData.setClaimId(claimCombobox.getSelectedItem().getLabel());
+        }
 	}
 	
+    @Listen("onSelect = #groupIdCombobox")
+    public void onSelectGroupId(SelectEvent<Component, String> event){
+        relevantData.setGroupId(null);
+        if(!SELECT.equals(event.getSelectedObjects().iterator().next())){
+            relevantData.setGroupId(event.getSelectedObjects().iterator().next());
+        }
+    }
+    
 	@Listen("onSelect = #groupTypeIdCombobox")
 	public void onSelectGroupType(SelectEvent<Component, String> event){
-	    String selectedGroupType = event.getSelectedObjects().iterator().next();
-	    relevantData.setGroupTypeId(selectedGroupType);
-	    
-	    try {
-            Set<String> groupIds = hpccQueryService.getRelevantGroupInfo(RELEVANT_GROUP_ID_QUERY,relevantData,true);
-            groupIdModel.addAll(groupIds);
-            groupIdCombobox.setModel(groupIdModel);
-        } catch (RemoteException | HpccConnectionException e) {
-           LOG.error(Constants.EXCEPTION,e);
-           Clients.showNotification(Labels.getLabel("unableToFetchGroupIds"), "error", groupTypeIdCombobox, "after_center", 3000, true);
-        }
+	    relevantData.setGroupTypeId(null);
+	    relevantData.setGroupId(null);
+	    groupIdModel.clearSelection();
+	    if(!SELECT.equals(event.getSelectedObjects().iterator().next())){
+	        String selectedGroupType = event.getSelectedObjects().iterator().next();
+	        relevantData.setGroupTypeId(selectedGroupType);
+	        
+	        try {
+	            Set<String> groupIds = new LinkedHashSet<String>();
+	            groupIds.add(SELECT);
+	            groupIds.addAll(hpccQueryService.getRelevantGroupInfo(RELEVANT_GROUP_ID_QUERY,relevantData,true));
+	            groupIdModel.clear();
+	            groupIdModel.addAll(groupIds);
+	            groupIdCombobox.setModel(groupIdModel);
+	        } catch (RemoteException | HpccConnectionException e) {
+	           LOG.error(Constants.EXCEPTION,e);
+	           Clients.showNotification(Labels.getLabel("unableToFetchGroupIds"), "error", groupTypeIdCombobox, "after_center", 3000, true);
+	        }
+	    }
 	    
 	}
 	

@@ -5,8 +5,7 @@ var app;
 var backupAppData = [];
 function createRelevantChart(divId, reqData) {
 	var chartData = jq.parseJSON(reqData);
-	console.log(chartData.claimId);	
-	//chartData.claimId = 'CLM00042945';
+	console.log(chartData);	
 	console.log("file -->"+chartData.files[0]);	
 	console.log("Calling createRelevantChart...");
 	
@@ -91,7 +90,15 @@ function createRelevantChart(divId, reqData) {
           var search = window.location.search.split("?");
             var entity = search[search.length - 1];
             if (!entity) {
-                entity = chartData.claimId;
+            	 entity = chartData.claimId;
+            	console.log("chartData.claimId --->"+chartData.claimId);
+            	console.log("chartData.claimId --->"+chartData.groupTypeId);
+            	console.log("chartData.claimId --->"+chartData.groupId);
+            	/*if(chartData.claimId){
+            		 entity = chartData.claimId;
+            	}else{
+            		 entity = chartData.groupId;
+            	} */              
             }
             if (entity.indexOf("CLM") === 0) {
             	app.queryClaim(entity);
