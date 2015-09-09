@@ -1,4 +1,25 @@
 <zk xmlns:w="client">
+<style>
+.pagePanel .z-groupbox{
+	width:480px;
+	margin:auto;
+}
+.pagePanel .z-groupbox-content{
+	border-radius:5px;
+	padding:10px;	
+}
+
+.pagePanel .z-groupbox-content .control-label{
+	width:200px;
+	margin-right:10px;
+	text-align:left;
+	display:inline-block;
+}
+
+.pagePanel .z-groupbox-content .group-row{
+	margin:10px;
+}
+</style>
 	<vbox width="1000px" vflex="1" apply="org.hpccsystems.dashboard.controller.RelevantController">
 	
 		<panel sclass="pagePanel" vflex="1" width="1000px" id="formPaneldiv">
@@ -6,198 +27,190 @@
 				<label value="${labels.relevantConfigScreen}" sclass="h5"/>
 			</caption>
 			<panelchildren>			
-				<vbox vflex="1" id="editHpccVbox" spacing="0" style="background: rgba(170, 170, 170, 0.45);width: 1000px;">
-					<hbox sclass="form-group" hflex="1" align="center" spacing="50px" height="80px">
-						<div width="350px" sclass="form-label-div" align="right">
-							<label zclass="control-label" value="${labels.claimId}"></label>
-						</div>
-						<combobox id="claimCombobox" autodrop="true" height="20px" ></combobox>
-					</hbox>
-					<vbox height="100px" hflex="1">
-						<hbox sclass="form-group" hflex="1" align="center" spacing="50px">
-							<div width="350px" sclass="form-label-div" align="right">
-								<label zclass="control-label" value="${labels.groupTypeId}"></label>
-							</div>
+				<vbox vflex="1" id="editHpccVbox" spacing="0" style="width: 1000px;">
+					<space height="10px"></space>
+					<groupbox>
+						<div sclass="group-row">													
+					    	<label zclass="control-label" value="${labels.claimId}"></label>					    
+					    	<combobox id="claimCombobox" autodrop="true" height="20px"></combobox>
+					    </div>
+					</groupbox>
+					<space height="10px"></space>					
+					<groupbox >
+						<div sclass="group-row">
+							<label zclass="control-label" value="${labels.groupTypeId}"></label>
 							<combobox id="groupTypeIdCombobox" height="20px" ></combobox>
-						</hbox>
-						<hbox sclass="form-group" hflex="1" align="center" spacing="50px">
-							<div width="350px" sclass="form-label-div" align="right">
-								<label zclass="control-label" value="${labels.groupId}"></label>
-							</div>
+						</div>
+						<div sclass="group-row">
+							<label zclass="control-label" value="${labels.groupId}"></label>
 							<combobox id="groupIdCombobox" height="20px" ></combobox>
-						</hbox>
-					</vbox>
-				<hbox sclass="form-group" hflex="1" align="center" spacing="50px" height="80px">
-					<div width="350px" sclass="form-label-div" align="right">
-						<label zclass="control-label" value="${labels.claimsImageIcon}"></label>
-					</div>
-					<combobox id="cmbClaim" autodrop="true" height="20px" >
-						<attribute w:name="bind_"><![CDATA[
-					       function (a, b, c) {
-					                this.$bind_(a, b, c);
-					                // anchor used to position selected image
-					                var n = this.$n(),
-					                    ref = n.firstChild,
-					                    span = document.createElement('span');
-					                jq(span).css('position', 'relative')
-					                    .addClass('custom-selected-image-anchor');
-					                n.insertBefore(span, ref);
-					            }
-					        ]]></attribute>
-					        <attribute w:name="_hilite2"><![CDATA[
-					            function (sel, opts) {
-					                this.$_hilite2(sel, opts);
-					                if (opts && opts.sendOnSelect && sel) {
-					                    var $anchor = jq(this.$n()).find('.custom-selected-image-anchor');
-					                    $anchor.find('.custom-selected-image')
-					                        .each(function () {
-					                            this.parentNode.removeChild(this);
-					                        });
-					                    $anchor[0].appendChild(
-					                        jq(sel.getImageNode()).clone() // clone node
-					                            .css({'position': 'absolute', // add style
-					                                'left': '5px',
-					                                'top': '0px'}) // also add class
-					                            .addClass('custom-selected-image')[0]       
-					                    );
-					                }
-					            }
-					        ]]></attribute>
-		    			<comboitem image="js/relevant/img/money.png" label=" " value="\uf0f6" />
-		    			<comboitem image="js/relevant/img/file-text.png" label=" " value="\uf0d6"/>
-		    			<comboitem image="js/relevant/img/car.png" label=" " value="\uf1b9"/>
-		    			<comboitem image="js/relevant/img/user.png" label=" " value="\uf007"/>
-		  			</combobox>	
-				</hbox>
-				
-				<hbox sclass="form-group" hflex="1" align="center" spacing="50px" height="80px">
-					<div width="350px" sclass="form-label-div" align="right">
-						<label zclass="control-label" value="${labels.policyImageIcon}"></label>
-					</div>
-					<combobox id="cmbPolicy" autodrop="true" >
-						<attribute w:name="bind_"><![CDATA[
-					       function (a, b, c) {
-					                this.$bind_(a, b, c);
-					                // anchor used to position selected image
-					                var n = this.$n(),
-					                    ref = n.firstChild,
-					                    span = document.createElement('span');
-					                jq(span).css('position', 'relative')
-					                    .addClass('custom-selected-image-anchor');
-					                n.insertBefore(span, ref);
-					            }
-					        ]]></attribute>
-					        <attribute w:name="_hilite2"><![CDATA[
-					            function (sel, opts) {
-					                this.$_hilite2(sel, opts);
-					                if (opts && opts.sendOnSelect && sel) {
-					                    var $anchor = jq(this.$n()).find('.custom-selected-image-anchor');
-					                    $anchor.find('.custom-selected-image')
-					                        .each(function () {
-					                            this.parentNode.removeChild(this);
-					                        });
-					                    $anchor[0].appendChild(
-					                        jq(sel.getImageNode()).clone() // clone node
-					                            .css({'position': 'absolute', // add style
-					                                'left': '5px',
-					                                'top': '1px'}) // also add class
-					                            .addClass('custom-selected-image')[0]       
-					                    );
-					                }
-					            }
-					        ]]></attribute>
-		    			<comboitem image="js/relevant/img/money.png" label=" " value="\uf0f6" />
-		    			<comboitem image="js/relevant/img/file-text.png" label=" " value="\uf0d6"/>
-		    			<comboitem image="js/relevant/img/car.png" label=" " value="\uf1b9"/>
-		    			<comboitem image="js/relevant/img/user.png" label=" " value="\uf007"/>
-		  			</combobox>	
-				</hbox>
-				<hbox sclass="form-group" hflex="1" align="center" spacing="50px" height="80px">
-					<div width="350px" sclass="form-label-div" align="right">
-						<label zclass="control-label" value="${labels.vehicleImageIcon}"></label>
-					</div>
-					<combobox id="cmbVehicle" autodrop="true" >
-						<attribute w:name="bind_"><![CDATA[
-					       function (a, b, c) {
-					                this.$bind_(a, b, c);
-					                // anchor used to position selected image
-					                var n = this.$n(),
-					                    ref = n.firstChild,
-					                    span = document.createElement('span');
-					                jq(span).css('position', 'relative')
-					                    .addClass('custom-selected-image-anchor');
-					                n.insertBefore(span, ref);
-					            }
-					        ]]></attribute>
-					        <attribute w:name="_hilite2"><![CDATA[
-					            function (sel, opts) {
-					                this.$_hilite2(sel, opts);
-					                if (opts && opts.sendOnSelect && sel) {
-					                    var $anchor = jq(this.$n()).find('.custom-selected-image-anchor');
-					                    $anchor.find('.custom-selected-image')
-					                        .each(function () {
-					                            this.parentNode.removeChild(this);
-					                        });
-					                    $anchor[0].appendChild(
-					                        jq(sel.getImageNode()).clone() // clone node
-					                            .css({'position': 'absolute', // add style
-					                                'left': '5px',
-					                                'top': '1px'}) // also add class
-					                            .addClass('custom-selected-image')[0]       
-					                    );
-					                }
-					            }
-					        ]]></attribute>
-		    			<comboitem image="js/relevant/img/money.png" label=" " value="\uf0f6" />
-		    			<comboitem image="js/relevant/img/file-text.png" label=" " value="\uf0d6"/>
-		    			<comboitem image="js/relevant/img/car.png" label=" " value="\uf1b9"/>
-		    			<comboitem image="js/relevant/img/user.png" label=" " value="\uf007"/>
-		  			</combobox>	
-				</hbox>
-				<hbox sclass="form-group" hflex="1" align="center" spacing="50px" height="80px">
-					<div width="350px" sclass="form-label-div" align="right">
-						<label zclass="control-label" value="${labels.personImageIcon}"></label>
-					</div>
-					<combobox id="cmbPerson" autodrop="true" >
-						<attribute w:name="bind_"><![CDATA[
-					       function (a, b, c) {
-					                this.$bind_(a, b, c);
-					                // anchor used to position selected image
-					                var n = this.$n(),
-					                    ref = n.firstChild,
-					                    span = document.createElement('span');
-					                jq(span).css('position', 'relative')
-					                    .addClass('custom-selected-image-anchor');
-					                n.insertBefore(span, ref);
-					            }
-					        ]]></attribute>
-					        <attribute w:name="_hilite2"><![CDATA[
-					            function (sel, opts) {
-					                this.$_hilite2(sel, opts);
-					                if (opts && opts.sendOnSelect && sel) {
-					                    var $anchor = jq(this.$n()).find('.custom-selected-image-anchor');
-					                    $anchor.find('.custom-selected-image')
-					                        .each(function () {
-					                            this.parentNode.removeChild(this);
-					                        });
-					                    $anchor[0].appendChild(
-					                        jq(sel.getImageNode()).clone() // clone node
-					                            .css({'position': 'absolute', // add style
-					                                'left': '5px',
-					                                'top': '1px'}) // also add class
-					                            .addClass('custom-selected-image')[0]       
-					                    );
-					                }
-					            }
-					        ]]></attribute>
-		    			<comboitem image="js/relevant/img/money.png" label=" " value="\uf0f6" />
-		    			<comboitem image="js/relevant/img/file-text.png" label=" " value="\uf0d6"/>
-		    			<comboitem image="js/relevant/img/car.png" label=" " value="\uf1b9"/>
-		    			<comboitem image="js/relevant/img/user.png" label=" " value="\uf007"/>
-		  			</combobox>	
-				</hbox>
-			</vbox>
-		</panelchildren>
+						</div>
+					</groupbox>	
+					<space height="10px"></space>
+					<groupbox >
+						<div sclass="group-row">
+							<label zclass="control-label" value="${labels.claimsImageIcon}"></label>						
+							<combobox id="cmbClaim" autodrop="true" height="20px" >
+								<attribute w:name="bind_"><![CDATA[
+						       		function (a, b, c) {
+							                this.$bind_(a, b, c);
+							                // anchor used to position selected image
+							                var n = this.$n(),
+							                    ref = n.firstChild,
+							                    span = document.createElement('span');
+							                jq(span).css('position', 'relative')
+							                    .addClass('custom-selected-image-anchor');
+							                n.insertBefore(span, ref);
+							            }
+							        ]]></attribute>
+						        <attribute w:name="_hilite2"><![CDATA[
+						            function (sel, opts) {
+						                this.$_hilite2(sel, opts);
+						                if (opts && opts.sendOnSelect && sel) {
+						                    var $anchor = jq(this.$n()).find('.custom-selected-image-anchor');
+						                    $anchor.find('.custom-selected-image')
+						                        .each(function () {
+						                            this.parentNode.removeChild(this);
+						                        });
+						                    $anchor[0].appendChild(
+						                        jq(sel.getImageNode()).clone() // clone node
+						                            .css({'position': 'absolute', // add style
+						                                'left': '5px',
+						                                'top': '0px'}) // also add class
+						                            .addClass('custom-selected-image')[0]       
+						                    );
+						                }
+						            }
+						        ]]></attribute>
+			    				<comboitem image="js/relevant/img/money.png" label=" " value="\uf0f6" />
+			    				<comboitem image="js/relevant/img/file-text.png" label=" " value="\uf0d6"/>
+			    				<comboitem image="js/relevant/img/car.png" label=" " value="\uf1b9"/>
+			    				<comboitem image="js/relevant/img/user.png" label=" " value="\uf007"/>
+			  				</combobox>	
+			  			</div>					
+						<div sclass="group-row">
+							<label zclass="control-label" value="${labels.policyImageIcon}"></label>						
+							<combobox id="cmbPolicy" autodrop="true" >
+								<attribute w:name="bind_"><![CDATA[
+							       function (a, b, c) {
+							                this.$bind_(a, b, c);
+							                // anchor used to position selected image
+							                var n = this.$n(),
+							                    ref = n.firstChild,
+							                    span = document.createElement('span');
+							                jq(span).css('position', 'relative')
+							                    .addClass('custom-selected-image-anchor');
+							                n.insertBefore(span, ref);
+							            }
+							        ]]></attribute>
+							        <attribute w:name="_hilite2"><![CDATA[
+							            function (sel, opts) {
+							                this.$_hilite2(sel, opts);
+							                if (opts && opts.sendOnSelect && sel) {
+							                    var $anchor = jq(this.$n()).find('.custom-selected-image-anchor');
+							                    $anchor.find('.custom-selected-image')
+							                        .each(function () {
+							                            this.parentNode.removeChild(this);
+							                        });
+							                    $anchor[0].appendChild(
+							                        jq(sel.getImageNode()).clone() // clone node
+							                            .css({'position': 'absolute', // add style
+							                                'left': '5px',
+							                                'top': '1px'}) // also add class
+							                            .addClass('custom-selected-image')[0]       
+							                    );
+							                }
+							            }
+							        ]]></attribute>
+				    			<comboitem image="js/relevant/img/money.png" label=" " value="\uf0f6" />
+				    			<comboitem image="js/relevant/img/file-text.png" label=" " value="\uf0d6"/>
+				    			<comboitem image="js/relevant/img/car.png" label=" " value="\uf1b9"/>
+				    			<comboitem image="js/relevant/img/user.png" label=" " value="\uf007"/>
+				  			</combobox>	
+						</div>					
+						<div sclass="group-row">
+							<label zclass="control-label" value="${labels.vehicleImageIcon}"></label>						
+							<combobox id="cmbVehicle" autodrop="true" >
+								<attribute w:name="bind_"><![CDATA[
+							       function (a, b, c) {
+							                this.$bind_(a, b, c);
+							                // anchor used to position selected image
+							                var n = this.$n(),
+							                    ref = n.firstChild,
+							                    span = document.createElement('span');
+							                jq(span).css('position', 'relative')
+							                    .addClass('custom-selected-image-anchor');
+							                n.insertBefore(span, ref);
+							            }
+							        ]]></attribute>
+							        <attribute w:name="_hilite2"><![CDATA[
+							            function (sel, opts) {
+							                this.$_hilite2(sel, opts);
+							                if (opts && opts.sendOnSelect && sel) {
+							                    var $anchor = jq(this.$n()).find('.custom-selected-image-anchor');
+							                    $anchor.find('.custom-selected-image')
+							                        .each(function () {
+							                            this.parentNode.removeChild(this);
+							                        });
+							                    $anchor[0].appendChild(
+							                        jq(sel.getImageNode()).clone() // clone node
+							                            .css({'position': 'absolute', // add style
+							                                'left': '5px',
+							                                'top': '1px'}) // also add class
+							                            .addClass('custom-selected-image')[0]       
+							                    );
+							                }
+							            }
+							        ]]></attribute>
+				    			<comboitem image="js/relevant/img/money.png" label=" " value="\uf0f6" />
+				    			<comboitem image="js/relevant/img/file-text.png" label=" " value="\uf0d6"/>
+				    			<comboitem image="js/relevant/img/car.png" label=" " value="\uf1b9"/>
+				    			<comboitem image="js/relevant/img/user.png" label=" " value="\uf007"/>
+				  			</combobox>	
+						</div>					
+						<div sclass="group-row">
+							<label zclass="control-label" value="${labels.personImageIcon}"></label>
+							<combobox id="cmbPerson" autodrop="true" >
+								<attribute w:name="bind_"><![CDATA[
+							       function (a, b, c) {
+							                this.$bind_(a, b, c);
+							                // anchor used to position selected image
+							                var n = this.$n(),
+							                    ref = n.firstChild,
+							                    span = document.createElement('span');
+							                jq(span).css('position', 'relative')
+							                    .addClass('custom-selected-image-anchor');
+							                n.insertBefore(span, ref);
+							            }
+							        ]]></attribute>
+							        <attribute w:name="_hilite2"><![CDATA[
+							            function (sel, opts) {
+							                this.$_hilite2(sel, opts);
+							                if (opts && opts.sendOnSelect && sel) {
+							                    var $anchor = jq(this.$n()).find('.custom-selected-image-anchor');
+							                    $anchor.find('.custom-selected-image')
+							                        .each(function () {
+							                            this.parentNode.removeChild(this);
+							                        });
+							                    $anchor[0].appendChild(
+							                        jq(sel.getImageNode()).clone() // clone node
+							                            .css({'position': 'absolute', // add style
+							                                'left': '5px',
+							                                'top': '1px'}) // also add class
+							                            .addClass('custom-selected-image')[0]       
+							                    );
+							                }
+							            }
+							        ]]></attribute>
+				    			<comboitem image="js/relevant/img/money.png" label=" " value="\uf0f6"/>
+				    			<comboitem image="js/relevant/img/file-text.png" label=" " value="\uf0d6"/>
+				    			<comboitem image="js/relevant/img/car.png" label=" " value="\uf1b9"/>
+				    			<comboitem image="js/relevant/img/user.png" label=" " value="\uf007"/>
+				  			</combobox>	
+						</div>
+					</groupbox>	
+				</vbox>
+			</panelchildren>
 		</panel>
 	</vbox>
 </zk>
