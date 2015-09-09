@@ -19,6 +19,8 @@
     Area.prototype.publish("paletteID", "default", "set", "Palette ID", Area.prototype._palette.switch(),{tags:["Basic","Shared"]});
     Area.prototype.publish("isStacked", false, "boolean", "Stack Chart",null,{tags:["Basic","Shared"]});
     Area.prototype.publish("fillOpacity", 0.7, "number", "Opacity of The Fill Color", null, {min:0,max:1,step:0.001,inputType:"range",tags:["Intermediate","Shared"]});
+
+    Area.prototype.publish("tooltipTemplate","[[category]]: [[value]]", "string", "Tooltip Text",null,{tags:["Intermediate"]});
     Area.prototype.publish("stackType", "regular", "set", "Stack Type",["none","regular","100%"],{tags:["Basic"]});
 
     Area.prototype.enter = function(domNode, element) {
@@ -45,14 +47,23 @@
     };
 
     Area.prototype.buildGraphs = function(gType) {
-        this._chart.graphs = [];
-        var buildGraphCount = this._columns.length - 1;
+        if (typeof(this._chart.graphs) === "undefined") { this._chart.graphs = []; }
+        var currentGraphCount = this._chart.graphs.length;
+        var buildGraphCount = Math.max(currentGraphCount, this._valueField.length);
 
         for(var i = 0; i < buildGraphCount; i++) {
-            var gRetVal = CommonSerial.prototype.buildGraphObj.call(this, gType, i);
-            var gObj = buildGraphObj.call(this, gRetVal, i);
+            if ((typeof(this._valueField) !== "undefined" && typeof(this._valueField[i]) !== "undefined")) { //mark
+                var gRetVal = CommonSerial.prototype.buildGraphObj.call(this,gType,i);
+                var gObj = buildGraphObj.call(this,gRetVal);
 
-            this._chart.addGraph(gObj);
+                if (typeof(this._chart.graphs[i]) !== "undefined") {
+                    for (var key in gObj) { this._chart.graphs[i][key] = gObj[key]; }
+                } else {
+                    this._chart.addGraph(gObj);
+                }
+            } else {
+                this._chart.removeGraph(this._chart.graphs[i]);
+            }
         }
 
         function buildGraphObj(gObj) {

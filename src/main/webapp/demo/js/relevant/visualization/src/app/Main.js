@@ -19,7 +19,7 @@
             .columns(["Date", "Amount"])
             .selectionMode(true)
             .xAxisType("time")
-            //.xAxisTypeTimePattern("%Y-%m-%d %H:%M:%S")
+            .xAxisTypeTimePattern("%Y-%m-%d %H:%M:%S")
             .yAxisType("none")
         ;
         this.claimsChart.selection = function (selected) {
@@ -75,8 +75,8 @@
         };
 
         this.selectionTable = new Table()
-            //.fixedHeader(true)
-            //.fixedColumn(true)
+            .fixedHeader(true)
+            .fixedColumn(true)
         ;
 
         //  Bottom Tabs/Tables  ---
@@ -95,28 +95,28 @@
 
         this._allTableFilter = "all";
         this.allTable = new Table()
-            //.fixedHeader(true)
-            //.fixedColumn(true)
+            .fixedHeader(true)
+            .fixedColumn(true)
         ;
         attachClickEvent(this.allTable);
         this.claimsTable = new Table()
-            //.fixedHeader(true)
-            //.fixedColumn(true)
+            .fixedHeader(true)
+            .fixedColumn(true)
         ;
         attachClickEvent(this.claimsTable);
         this.peopleTable = new Table()
-            //.fixedHeader(true)
-            //.fixedColumn(true)
+            .fixedHeader(true)
+            .fixedColumn(true)
         ;
         attachClickEvent(this.peopleTable);
         this.policiesTable = new Table()
-            //.fixedHeader(true)
-            //.fixedColumn(true)
+            .fixedHeader(true)
+            .fixedColumn(true)
         ;
         attachClickEvent(this.policiesTable);
         this.vehiclesTable = new Table()
-            //.fixedHeader(true)
-            //.fixedColumn(true)
+            .fixedHeader(true)
+            .fixedColumn(true)
         ;
         attachClickEvent(this.vehiclesTable);
 

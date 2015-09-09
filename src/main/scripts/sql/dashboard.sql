@@ -154,8 +154,6 @@ VALUES('Relevant',
                                 <functionName>createRelevantChart</functionName>
                                 <imageURL>chart/China_Relevant_Graph.jpg</imageURL>
                                 <dependentCssURL>js/relevant/css/relevant.css</dependentCssURL>
-								<dependentJsURL>js/relevant/visualization/bower_components/requirejs/require.js</dependentJsURL>
-								<dependentJsURL>js/relevant/visualization/src/config.js</dependentJsURL>
                                 <jsURL>js/relevant.js</jsURL>
                 </xyConfiguration>',
 '2',10,false);

@@ -20,6 +20,7 @@
     Line.prototype.publish("smoothLines", false, "boolean", "Causes chart data lines to draw smoothly",null,{tags:["Basic","Shared"]});
 
     Line.prototype.publish("stepLines", false, "boolean", "Causes chart data lines to draw smoothly",null,{tags:["Basic"]});
+    Line.prototype.publish("tooltipTemplate","[[category]]([[title]]): [[value]]", "string", "Tooltip Text",null,{tags:["Basic"]});
 
     Line.prototype.enter = function(domNode, element) {
         CommonSerial.prototype.enter.apply(this, arguments);
@@ -39,14 +40,23 @@
     };
 
     Line.prototype.buildGraphs = function(gType) {
-        this._chart.graphs = [];
-        var buildGraphCount = this._columns.length - 1;
+        if (typeof(this._chart.graphs) === "undefined") { this._chart.graphs = []; }
+        var currentGraphCount = this._chart.graphs.length;
+        var buildGraphCount = Math.max(currentGraphCount, this._valueField.length);
 
         for(var i = 0; i < buildGraphCount; i++) {
-            var gRetVal = CommonSerial.prototype.buildGraphObj.call(this, gType, i);
-            var gObj = buildGraphObj.call(this, gRetVal, i);
+            if ((typeof(this._valueField) !== "undefined" && typeof(this._valueField[i]) !== "undefined")) { //mark
+                var gRetVal = CommonSerial.prototype.buildGraphObj.call(this,gType,i);
+                var gObj = buildGraphObj.call(this,gRetVal);
 
-            this._chart.addGraph(gObj);
+                if (typeof(this._chart.graphs[i]) !== "undefined") {
+                    for (var key in gObj) { this._chart.graphs[i][key] = gObj[key]; }
+                } else {
+                    this._chart.addGraph(gObj);
+                }
+            } else {
+                this._chart.removeGraph(this._chart.graphs[i]);
+            }
         }
 
         function buildGraphObj(gObj) {

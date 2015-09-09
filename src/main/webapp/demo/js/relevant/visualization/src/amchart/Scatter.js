@@ -19,6 +19,7 @@
     Scatter.prototype.implements(INDChart.prototype);
 
     Scatter.prototype.publish("paletteID", "default", "set", "Palette ID", Scatter.prototype._palette.switch(), {tags:["Basic","Shared"]});
+    Scatter.prototype.publish("tooltipTemplate","x:[[x]] y:[[y]]", "string", "Tooltip Text");
 
     Scatter.prototype.enter = function(domNode, element) {
         CommonXY.prototype.enter.apply(this, arguments);
@@ -33,14 +34,23 @@
     };
 
     Scatter.prototype.buildGraphs = function(gType) {
-        this._chart.graphs = [];
-        var buildGraphCount = this._columns.length - 1;
+        if (typeof(this._chart.graphs) === "undefined") { this._chart.graphs = []; }
+        var currentGraphCount = this._chart.graphs.length;
+        var buildGraphCount = Math.max(currentGraphCount, this._valueField.length);
 
         for(var i = 0; i < buildGraphCount; i++) {
-            var gRetVal = CommonXY.prototype.buildGraphObj.call(this, gType, i);
-            var gObj = buildGraphObj.call(this, gRetVal, i);
+            if ((typeof(this._valueField) !== "undefined" && typeof(this._valueField[i]) !== "undefined")) { //mark
+                var gRetVal = CommonXY.prototype.buildGraphObj.call(this,gType,i);
+                var gObj = buildGraphObj.call(this,gRetVal);
 
-            this._chart.addGraph(gObj);
+                if (typeof(this._chart.graphs[i]) !== "undefined") {
+                    for (var key in gObj) { this._chart.graphs[i][key] = gObj[key]; }
+                } else {
+                    this._chart.addGraph(gObj);
+                }
+            } else {
+                this._chart.removeGraph(this._chart.graphs[i]);
+            }
         }
 
         function buildGraphObj(gObj) {
