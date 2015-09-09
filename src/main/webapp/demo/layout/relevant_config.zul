@@ -35,7 +35,11 @@
 					    	<combobox id="claimCombobox" autodrop="true" height="20px"></combobox>
 					    </div>
 					</groupbox>
-					<space height="10px"></space>					
+					<space height="10px"></space>
+					<hbox hflex="1" pack="center">
+						<label style="font-size: 15px" value="--- OR ---"></label>
+					</hbox>	
+					<space height="10px"></space>			
 					<groupbox >
 						<div sclass="group-row">
 							<label zclass="control-label" value="${labels.groupTypeId}"></label>
