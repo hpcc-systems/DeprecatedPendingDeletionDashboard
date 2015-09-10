@@ -1248,16 +1248,14 @@ public class DashboardController extends SelectorComposer<Window>{
      */
     private void updateDashboardInputparam() throws JAXBException {
        
-        List<InputParam> CommonInputParamWithValue = appliedCommonInputParam
-                .stream()
-                .filter(commonInputparam -> commonInputparam.getValue() != null)
-                .collect(Collectors.toList());
-        
-        //For query widget need to update dashboard_filters table with common input params
-            dashboardService
-                .addOrUpdateCommonInput(dashboard.getDashboardId(),
-                            authenticationService.getUserCredential()
-                                    .getUserId(), CommonInputParamWithValue);
+        if (appliedCommonInputParam != null) {
+            List<InputParam> CommonInputParamWithValue = appliedCommonInputParam.stream()
+                    .filter(commonInputparam -> commonInputparam.getValue() != null).collect(Collectors.toList());
+
+            //For query widget need to update dashboard_filters table with common input params
+            dashboardService.addOrUpdateCommonInput(dashboard.getDashboardId(), authenticationService.getUserCredential().getUserId(),
+                    CommonInputParamWithValue);
+        }
     }
 
 
