@@ -447,11 +447,11 @@ public class EditWidgetController extends SelectorComposer<Component> {
     private boolean validateRelevantData(RelevantData relevantData) {
         if(relevantData.getClaimId() == null && (relevantData.getGroupTypeId() == null 
                 || relevantData.getGroupId() == null)){
-            Clients.showNotification(Labels.getLabel("provideClaimIdOrGroupId"), "error", holderInclude, "middle_center", 3000, true);
+            Clients.showNotification(Labels.getLabel("provideClaimIdOrGroupId"), "error", holderInclude.getFellow("claimGroupbox"), "end_center", 3000, true);
             return false;
         }else if(relevantData.getClaimId() != null && (relevantData.getGroupTypeId() != null 
                 || relevantData.getGroupId() != null)){
-            Clients.showNotification(Labels.getLabel("provideAnyOneOfInput"), "error", holderInclude, "middle_center", 3000, true);
+            Clients.showNotification(Labels.getLabel("provideAnyOneOfInput"), "error", holderInclude.getFellow("groupDatabox"), "end_center", 3000, true);
             return false;
         }else if(((Combobox)holderInclude.getFellow("cmbClaim")).getSelectedItem() == null){
             Clients.showNotification(Labels.getLabel("chooseClaimImage"), "error", holderInclude.getFellow("cmbClaim"), "end_center", 3000, true);

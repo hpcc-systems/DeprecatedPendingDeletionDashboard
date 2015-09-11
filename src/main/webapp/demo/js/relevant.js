@@ -1,7 +1,7 @@
 /**
  * Code for displaying data for the Relavant graph 
  */
-var app;
+
 var backupAppData = [];
 function createRelevantChart(divId, reqData) {
 	var chartData = jq.parseJSON(reqData);
@@ -85,30 +85,27 @@ function createRelevantChart(divId, reqData) {
             app = new Main()
 	            .url(url)
 	            .target(chartHolderDiv)	            
-	            .render();
-            
-          var search = window.location.search.split("?");
-            var entity = search[search.length - 1];
+	            .render();            
+                       
+      	var search = window.location.search.split("?");
+        var entity = search[search.length - 1];
             if (!entity) {
             	 entity = chartData.claimId;
-            	console.log("chartData.claimId --->"+chartData.claimId);
-            	console.log("chartData.claimId --->"+chartData.groupTypeId);
-            	console.log("chartData.claimId --->"+chartData.groupId);
-            	/*if(chartData.claimId){
-            		 entity = chartData.claimId;
-            	}else{
-            		 entity = chartData.groupId;
-            	} */              
+            }            
+            if(!chartData.claimId && chartData.groupTypeId && chartData.groupId ){
+            	app.queryGroup(chartData.groupId,chartData.groupTypeId);
             }
-            if (entity.indexOf("CLM") === 0) {
-            	app.queryClaim(entity);
-            } else if (entity.indexOf("POL") === 0) {
-            	app.queryPolicy(entity);
-            } else if (entity.indexOf("VEH") === 0) {
-            	app.queryVehicle(entity);
-            } else {
-            	app.queryPerson(entity);
-            }
+            if(entity){
+	            if (entity.indexOf("CLM") === 0) {
+	            	app.queryClaim(entity);
+	            } else if (entity.indexOf("POL") === 0) {
+	            	app.queryPolicy(entity);
+	            } else if (entity.indexOf("VEH") === 0) {
+	            	app.queryVehicle(entity);
+	            } else {
+	            	app.queryPerson(entity);
+	            }
+	        }
             divElement.on("click", ".showHideSelectTable",function(event) {
             	app.showSelection(event.target.checked);
             });

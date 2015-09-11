@@ -29,7 +29,7 @@
 			<panelchildren>			
 				<vbox vflex="1" id="editHpccVbox" spacing="0" style="width: 1000px;">
 					<space height="10px"></space>
-					<groupbox>
+					<groupbox id="claimGroupbox">
 						<div sclass="group-row">													
 					    	<label zclass="control-label" value="${labels.claimId}"></label>					    
 					    	<combobox id="claimCombobox" autodrop="true" height="20px"></combobox>
@@ -40,7 +40,7 @@
 						<label style="font-size: 15px" value="--- OR ---"></label>
 					</hbox>	
 					<space height="10px"></space>			
-					<groupbox >
+					<groupbox id="groupDatabox">
 						<div sclass="group-row">
 							<label zclass="control-label" value="${labels.groupTypeId}"></label>
 							<combobox id="groupTypeIdCombobox" height="20px" ></combobox>
