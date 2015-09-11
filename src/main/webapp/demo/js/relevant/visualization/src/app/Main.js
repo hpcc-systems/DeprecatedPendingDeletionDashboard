@@ -14,7 +14,9 @@
         this.claimMap = {};
 
         var context = this;
-
+        var group_ids = null;
+        var group_type_id = null;
+        
         this.claimsChart = new Column()
             .columns(["Date", "Amount"])
             .selectionMode(true)
@@ -276,6 +278,13 @@
         ;
     };
 
+    Main.prototype.queryGroup = function (groupId,groupTypeId) {
+    	console.log('groupId----------------->'+groupId);
+    	console.log('groupTypeId----------------->'+groupTypeId);
+    	this.group_ids = groupId;
+    	this.group_type_id = groupTypeId;
+        this._query("g");
+    };
     Main.prototype.queryClaim = function (id) {
         this._query("c_" + id);
     };
@@ -292,21 +301,29 @@
         if (element) {
             element.classed("expanding", true);
         }
-        var request = null;
-        var catId = id.split("_");
-        switch (catId[0]) {
-            case "c":
-                request = { claim_ids: catId[1] };
-                break;
-            case "p":
-                request = { person_ids: catId[1] };
-                break;
-            case "pol":
-                break;
-            case "v":
-                request = { vehicle_ids: catId[1] };
-                break;
+        var request=[] ;
+        if(id != "g"){
+	        var catId = id.split("_");
+	        switch (catId[0]) {
+	            case "c":
+	                request = { claim_ids: catId[1]};
+	                break;
+	            case "p":
+	                request = { person_ids: catId[1]};
+	                break;
+	            case "pol":
+	                break;
+	            case "v":
+	                request = { vehicle_ids: catId[1]};
+	                break;
+	        }
+    	}
+
+        if(this.group_ids != null && this.group_type_id != null){
+        	request.group_ids = this.group_ids;
+            request.group_type_id = this.group_type_id;
         }
+        
         if (!request) {
             if (element) {
                 element.classed("expanding", false);
@@ -315,7 +332,9 @@
         } else {
             var service = Comms.createESPConnection(this.url());
             var context = this;
+            
             service.send(request, function (response) {
+            	
                 if (element) {
                     element.classed("expanding", false);
                     element.classed("expanded", true);
