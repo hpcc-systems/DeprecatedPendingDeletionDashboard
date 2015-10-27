@@ -16,6 +16,7 @@ import org.hpccsystems.dashboard.chart.entity.RelevantData;
 import org.hpccsystems.dashboard.chart.entity.TableData;
 import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.entity.Portlet;
+import org.hpccsystems.dashboard.entity.RelevantGroupType;
 import org.hpccsystems.dashboard.exception.HpccConnectionException;
 import org.hpccsystems.dashboard.services.HPCCQueryService;
 import org.hpccsystems.dashboard.services.HPCCService;
@@ -31,6 +32,7 @@ import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
 import org.zkoss.zul.Combobox;
+import org.zkoss.zul.ComboitemRenderer;
 import org.zkoss.zul.ListModelList;
 
 
@@ -44,6 +46,8 @@ public class RelevantController extends SelectorComposer<Component>{
 	private static final String RELEVANT_GROUP_ID_QUERY = "beijingiac_claim_group_list_srvc";
 	private static final String RELEVANT_CLAIM_IDS_QUERY = "relevant_claimslist";
     private static final String SELECT = "--Select--";
+    private static final Object PARANTHESIS_OPEN = "(";
+    private static final Object PARANTHESIS_CLOSE = ")";
 	
 	private Portlet portlet;
 	private RelevantData relevantData;
@@ -60,7 +64,7 @@ public class RelevantController extends SelectorComposer<Component>{
 	@WireVariable
     private HPCCService hpccService;
 	
-	private ListModelList<String> groupTypeIdModel = new ListModelList<String>();
+	private ListModelList<RelevantGroupType> groupTypeIdModel = new ListModelList<RelevantGroupType>();
 	
 	private ListModelList<String> groupIdModel = new ListModelList<String>();
 	
@@ -111,22 +115,31 @@ public class RelevantController extends SelectorComposer<Component>{
 	     populateGroupTypeId();		
 	}
 	
+	ComboitemRenderer<RelevantGroupType> groupTypeRenderer = (item,data,index) ->{
+        StringBuilder builder = new StringBuilder();
+        builder.append(data.getDescription()).append(PARANTHESIS_OPEN)
+                .append(data.getId()).append(PARANTHESIS_CLOSE);
+        item.setLabel(builder.toString());
+        item.setValue(data.getId());
+	};
+	
 	private void populateGroupTypeId() {
 	   try {
-	        Set<String> groupTypes = new LinkedHashSet<String>();
-	        groupTypes.add(SELECT);
-	        groupTypes.addAll(hpccQueryService.getRelevantGroupInfo(RELEVANT_GROUP_TYPE_ID_QUERY,relevantData,false));
+	        Set<RelevantGroupType> groupTypes= new LinkedHashSet<RelevantGroupType>();
+	        groupTypes.add(new RelevantGroupType(SELECT,""));
+	        groupTypes.addAll(hpccQueryService.getRelevantGroupTypes(RELEVANT_GROUP_TYPE_ID_QUERY,relevantData));
 	        groupTypeIdModel.clear();
             groupTypeIdModel.addAll(groupTypes);
             groupTypeIdCombobox.setModel(groupTypeIdModel);
+            groupTypeIdCombobox.setItemRenderer(groupTypeRenderer);
             
             //Pre-loading the previouly selected group data 
-            if(relevantData.getGroupTypeId() != null){
-                List<String> selectedGroup = new ArrayList<String>();
-                selectedGroup.add(relevantData.getGroupTypeId());
-                groupTypeIdModel.setSelection(selectedGroup);
+            if(relevantData.getGroupType() != null && groupTypes.contains(relevantData.getGroupType())){
+                List<RelevantGroupType> selectedGroupType = new ArrayList<RelevantGroupType>();               
+                selectedGroupType.add(relevantData.getGroupType());
+                groupTypeIdModel.setSelection(selectedGroupType);
                 
-                selectedGroup = new ArrayList<String>();
+                List<String> selectedGroup = new ArrayList<String>();
                 selectedGroup.add(relevantData.getGroupId());
                 groupIdModel.addAll(selectedGroup);
                 groupIdModel.setSelection(selectedGroup);
@@ -141,7 +154,7 @@ public class RelevantController extends SelectorComposer<Component>{
 
     @Listen("onChange = #claimCombobox")
 	public void onChangeClaimIds(){
-        relevantData.setClaimId(null);
+        relevantData.setClaimId(null);        
         if(!SELECT.equals(claimCombobox.getSelectedItem().getLabel())){
             relevantData.setClaimId(claimCombobox.getSelectedItem().getLabel());
         }
@@ -150,24 +163,26 @@ public class RelevantController extends SelectorComposer<Component>{
     @Listen("onSelect = #groupIdCombobox")
     public void onSelectGroupId(SelectEvent<Component, String> event){
         relevantData.setGroupId(null);
-        if(!SELECT.equals(event.getSelectedObjects().iterator().next())){
+        //if(!SELECT.equals(event.getSelectedObjects().iterator().next())){
+        if(!SELECT.equals(groupIdModel.getSelection().iterator().next())){
             relevantData.setGroupId(event.getSelectedObjects().iterator().next());
         }
     }
     
 	@Listen("onSelect = #groupTypeIdCombobox")
 	public void onSelectGroupType(SelectEvent<Component, String> event){
-	    relevantData.setGroupTypeId(null);
+	    relevantData.setGroupType(null);
 	    relevantData.setGroupId(null);
 	    groupIdModel.clearSelection();
-	    if(!SELECT.equals(event.getSelectedObjects().iterator().next())){
-	        String selectedGroupType = event.getSelectedObjects().iterator().next();
-	        relevantData.setGroupTypeId(selectedGroupType);
+	    //if(!SELECT.equals(event.getSelectedObjects().iterator().next())){
+	    if(!SELECT.equals(groupTypeIdModel.getSelection().iterator().next().getId())){
+	        RelevantGroupType selectedGroupType = groupTypeIdModel.getSelection().iterator().next();
+	        relevantData.setGroupType(selectedGroupType);
 	        
 	        try {
 	            Set<String> groupIds = new LinkedHashSet<String>();
 	            groupIds.add(SELECT);
-	            groupIds.addAll(hpccQueryService.getRelevantGroupInfo(RELEVANT_GROUP_ID_QUERY,relevantData,true));
+	            groupIds.addAll(hpccQueryService.getRelevantGroups(RELEVANT_GROUP_ID_QUERY,relevantData));
 	            groupIdModel.clear();
 	            groupIdModel.addAll(groupIds);
 	            groupIdCombobox.setModel(groupIdModel);

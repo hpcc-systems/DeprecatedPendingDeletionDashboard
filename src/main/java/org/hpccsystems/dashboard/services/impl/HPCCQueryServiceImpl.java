@@ -58,6 +58,7 @@ import org.hpccsystems.dashboard.chart.tree.entity.TreeData;
 import org.hpccsystems.dashboard.chart.tree.entity.TreeFilter;
 import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.entity.QuerySchema;
+import org.hpccsystems.dashboard.entity.RelevantGroupType;
 import org.hpccsystems.dashboard.exception.HpccConnectionException;
 import org.hpccsystems.dashboard.services.HPCCQueryService;
 import org.hpccsystems.dashboard.util.DashboardUtil;
@@ -94,6 +95,7 @@ public class HPCCQueryServiceImpl implements HPCCQueryService {
     private final String CLAIM_GROUP_TYPE_ID = "claim_group_type_id";
     private final String CLAIM_GROUP_ID = "claim_group_id";
     private final String RESULT_COUNT = "result_cnt";
+    private final String DESCRIPTION  ="description";
     
         static {
         // To bypass SSL Handshake exception
@@ -2068,46 +2070,21 @@ return resultDataMap;
     }
 
     @Override
-    public Set<String> getRelevantGroupInfo(String relevantGroupTypeIdQuery,
-            RelevantData relevantData,boolean fetchGroups) throws HpccConnectionException, RemoteException
+    public Set<String> getRelevantGroups(String relevantGroupTypeIdQuery,
+            RelevantData relevantData) throws HpccConnectionException, RemoteException
             {
-                final Set<String> groupeTypes = new LinkedHashSet<String>();
+                final Set<String> groupes = new LinkedHashSet<String>();
                 try{
-                    StringBuilder urlBuilder = new StringBuilder();
-                    if (relevantData.getHpccConnection().getIsSSL()) {
-                        urlBuilder.append(Constants.HTTPS);
-                    } else {
-                        urlBuilder.append(Constants.HTTP);
-                    }
-                    urlBuilder.append(relevantData.getHpccConnection().getHostIp())
-                    .append(":")
-                    .append(relevantData.getHpccConnection().getWsEclPort())
-                    .append("/WsEcl/submit/query/")
-                    .append(relevantData.getHpccConnection().getClusterType())
-                    .append("/")
-                    .append(relevantGroupTypeIdQuery).append("/xml?");  
+                    StringBuilder urlBuilder =  new StringBuilder(constructRelevantGroupURL(relevantData, relevantGroupTypeIdQuery));
                     
-                    if(fetchGroups){
-                        urlBuilder.append(CLAIM_GROUP_TYPE_ID).append("=")
-                        .append(URLEncoder.encode(relevantData.getGroupTypeId(),Constants.CHAR_CODE))
+                    urlBuilder.append(CLAIM_GROUP_TYPE_ID).append("=")
+                        .append(URLEncoder.encode(relevantData.getGroupType().getId(),Constants.CHAR_CODE))
                         .append("&")
                         .append(RESULT_COUNT).append("=").append(20);                     
                         //.append("&")
                        // .append(CLAIM_GROUP_ID).append("=").append(URLEncoder.encode(relevantData.getGroupId(),Constants.CHAR_CODE));                        
-                    }
                     
-                    URL url = new URL(urlBuilder.toString());
-                    URLConnection urlConnection = url.openConnection();
-                    String authString = relevantData.getHpccConnection().getUsername() + ":"
-                            + relevantData.getHpccConnection().getPassword();
-                    String authStringEnc = new String(Base64.encodeBase64(authString.getBytes()));
-                    urlConnection.setRequestProperty(AUTHORIZATION, BASIC + authStringEnc);
-                    
-                    if (LOG.isDebugEnabled()) {
-                        LOG.debug("URL ->" + url);
-                    }                    
-            
-                    final InputStream respone = urlConnection.getInputStream();
+                    final InputStream respone = hitURL(urlBuilder.toString(), relevantData);
                     
                     if (respone != null) {
                         Node fstNode = null;
@@ -2129,21 +2106,16 @@ return resultDataMap;
                                 fstNode = nodeList.item(count);
                                 if (fstNode.getNodeType() == Node.ELEMENT_NODE) {
                                     fstElmnt = (Element) fstNode;
-                                    if(fetchGroups){
-                                        lstNmElmntLst = fstElmnt.getElementsByTagName(GROUP_ID);
-                                    }else{
-                                        lstNmElmntLst = fstElmnt.getElementsByTagName(GROUP_TYPE_ID);
-                                    }
-                                    lstNmElmnt = (Element) lstNmElmntLst.item(0);
-            
+                                    lstNmElmntLst = fstElmnt.getElementsByTagName(GROUP_ID);                                   
+                                    lstNmElmnt = (Element) lstNmElmntLst.item(0);            
                                     if (lstNmElmnt != null) {
-                                        groupeTypes.add(lstNmElmnt.getTextContent());
+                                        groupes.add(lstNmElmnt.getTextContent());
                                     }                        
                                 }
                             }
                         }
                         if (LOG.isDebugEnabled()) {
-                            LOG.debug("groupeTypes ids -->" + groupeTypes);
+                            LOG.debug("groupeTypes ids -->" + groupes);
                         }
                     } else {
                         throw new HpccConnectionException(Constants.UNABLE_TO_FETCH_DATA);
@@ -2158,7 +2130,100 @@ return resultDataMap;
                     LOG.error(Constants.EXCEPTION, ex);
                     throw new HpccConnectionException(ex.getMessage());
                 }
-          return groupeTypes;
+          return groupes;
+    }
+
+    @Override
+    public Set<RelevantGroupType> getRelevantGroupTypes(
+            String relevantGroupTypeIdQuery, RelevantData relevantData) throws HpccConnectionException, RemoteException{
+        final Set<RelevantGroupType> groupeTypes = new LinkedHashSet<RelevantGroupType>();
+        try {
+        String url = constructRelevantGroupURL(relevantData,relevantGroupTypeIdQuery);
+        final InputStream response = hitURL(url, relevantData);
+        if (response != null) {
+            Node fstNode = null;
+            Element fstElmnt = null, idLstNmElmnt = null, descLstNmElmnt = null;
+            NodeList lstIdNmElmnt = null;
+            NodeList lstDescNmElmnt = null;
+            
+            final DocumentBuilderFactory dbf = DocumentBuilderFactory.newInstance();
+            final DocumentBuilder db = dbf.newDocumentBuilder();
+            final Document doc = db.parse(response);
+            XPathFactory xPathFactory = XPathFactory.newInstance();
+            XPath xPath = xPathFactory.newXPath();
+            
+            XPathExpression expr = xPath.compile("/" + relevantGroupTypeIdQuery + "Response/Result/Dataset/Row");
+            
+            final NodeList nodeList = (NodeList) expr.evaluate(doc, XPathConstants.NODESET);
+            
+            if (nodeList != null) {
+                for (int count = 0; count < nodeList.getLength(); count++) {
+                    fstNode = nodeList.item(count);
+                    if (fstNode.getNodeType() == Node.ELEMENT_NODE) {
+                         fstElmnt = (Element) fstNode;                        
+                         lstIdNmElmnt = fstElmnt.getElementsByTagName(GROUP_TYPE_ID);
+                         lstDescNmElmnt = fstElmnt.getElementsByTagName(DESCRIPTION);
+                         idLstNmElmnt = (Element) lstIdNmElmnt.item(0);
+                         descLstNmElmnt = (Element) lstDescNmElmnt.item(0);
+                         if (idLstNmElmnt != null && descLstNmElmnt != null) {
+                             groupeTypes.add(new RelevantGroupType(idLstNmElmnt.getTextContent(),descLstNmElmnt.getTextContent()));
+                         } else if(idLstNmElmnt != null){
+                             groupeTypes.add(new RelevantGroupType(idLstNmElmnt.getTextContent(),""));
+                       }
+                    }
+                }
+            }
+            if (LOG.isDebugEnabled()) {
+                LOG.debug("groupeTypes ids -->" + groupeTypes);
+            }
+        } else {
+            throw new HpccConnectionException(Constants.UNABLE_TO_FETCH_DATA);
+        }
+        } catch (RemoteException e) {
+            if (e.getMessage().contains("Unauthorized")) {
+                throw new HpccConnectionException("401 Unauthorized");
+            }
+            LOG.error(Constants.EXCEPTION, e);
+            throw e;
+        } catch (ParserConfigurationException | SAXException | IOException | XPathExpressionException ex) {
+            LOG.error(Constants.EXCEPTION, ex);
+            throw new HpccConnectionException(ex.getMessage());
+        }
+        return groupeTypes;
+    }
+
+    private InputStream hitURL(String URL, RelevantData relevantData) throws IOException {
+        URL url = new URL(URL);
+        URLConnection urlConnection = url.openConnection();
+        String authString = relevantData.getHpccConnection().getUsername() + ":"
+                + relevantData.getHpccConnection().getPassword();
+        String authStringEnc = new String(Base64.encodeBase64(authString.getBytes()));
+        urlConnection.setRequestProperty(AUTHORIZATION, BASIC + authStringEnc);
+        
+        if (LOG.isDebugEnabled()) {
+            LOG.debug("URL ->" + url);
+        }                    
+
+        final InputStream respone = urlConnection.getInputStream();
+        return respone;
+    }
+
+    private String constructRelevantGroupURL(RelevantData relevantData,String relevantGroupTypeIdQuery) {
+        StringBuilder urlBuilder = new StringBuilder();
+        if (relevantData.getHpccConnection().getIsSSL()) {
+            urlBuilder.append(Constants.HTTPS);
+        } else {
+            urlBuilder.append(Constants.HTTP);
+        }
+        urlBuilder.append(relevantData.getHpccConnection().getHostIp())
+        .append(":")
+        .append(relevantData.getHpccConnection().getWsEclPort())
+        .append("/WsEcl/submit/query/")
+        .append(relevantData.getHpccConnection().getClusterType())
+        .append("/")
+        .append(relevantGroupTypeIdQuery).append("/xml?");  
+        
+        return urlBuilder.toString();
     }    
 
 }

@@ -24,6 +24,7 @@ import org.hpccsystems.dashboard.chart.tree.entity.Level;
 import org.hpccsystems.dashboard.chart.tree.entity.TreeData;
 import org.hpccsystems.dashboard.chart.tree.entity.TreeFilter;
 import org.hpccsystems.dashboard.entity.QuerySchema;
+import org.hpccsystems.dashboard.entity.RelevantGroupType;
 import org.hpccsystems.dashboard.exception.HpccConnectionException;
 import org.xml.sax.SAXException;
 
@@ -48,6 +49,7 @@ public interface HPCCQueryService {
 	
 	HashMap<String, HashMap<String, List<Attribute>>> fetchScoredSearchData(ScoredSearchData searchData) throws HpccConnectionException,RemoteException;
 
-    Set<String> getRelevantGroupInfo(String relevantGroupTypeIdQuery, RelevantData relevantData,boolean appendInput) throws HpccConnectionException,
+    Set<String> getRelevantGroups(String relevantGroupTypeIdQuery, RelevantData relevantData) throws HpccConnectionException,
             RemoteException;
+    Set<RelevantGroupType> getRelevantGroupTypes(String relevantGroupTypeIdQuery, RelevantData relevantData) throws HpccConnectionException, RemoteException;
 }
