@@ -55,6 +55,7 @@ import org.hpccsystems.dashboard.services.HPCCService;
 import org.hpccsystems.dashboard.services.WidgetService;
 import org.springframework.dao.DataAccessException;
 import org.xml.sax.SAXException;
+import org.zkoss.json.JSONObject;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Components;
@@ -757,7 +758,7 @@ public class ChartPanel extends Panel {
             inputListbox.addEventListener("onAddInputParams", onAddInputParams);
             Listhead head = new Listhead();
             Listheader header = new Listheader();
-            header.setLabel("Input Parameters");
+            header.setLabel(Labels.getLabel("inputParameters"));
             Button doneButton = new Button();
             doneButton.setSclass("glyphicon glyphicon-ok btn btn-link img-btn");
             doneButton.setStyle("float:right");
@@ -1032,7 +1033,14 @@ public class ChartPanel extends Panel {
         }else{
             chartJson = portlet.getChartDataJSON();
         }
-                
+        chartDiv.addEventListener("onRemove", event -> {
+            String[] data = event.getData().toString().split(",");
+            JSONObject jo = new JSONObject();
+            for (String data1 : data) {
+                jo.put(data1, Labels.getLabel(data1));
+            }
+            Clients.evalJavaScript("logShowrelevantLayout('" + chartDiv.getId() + "'," + jo + ");");
+        });
         
         ChartDetails chartDetails = chartService.getCharts().get(portlet.getChartType());
         

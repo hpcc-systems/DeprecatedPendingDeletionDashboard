@@ -123,11 +123,11 @@
         attachClickEvent(this.vehiclesTable);
 
         this.vertexTabs = new Tabbed()
-            .addTab(this.allTable, "All")
-            .addTab(this.claimsTable, "Claims")
-            .addTab(this.peopleTable, "People")
-            .addTab(this.policiesTable, "Policies")
-            .addTab(this.vehiclesTable, "Vehicles")
+            .addTab(this.allTable, obj.all)
+            .addTab(this.claimsTable, obj.claims)
+            .addTab(this.peopleTable, obj.people)
+            .addTab(this.policiesTable, obj.policies)
+            .addTab(this.vehiclesTable, obj.vehicle)
         ;
 
         //  Main Grid  ---

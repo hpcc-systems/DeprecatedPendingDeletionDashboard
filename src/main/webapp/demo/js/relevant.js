@@ -3,7 +3,15 @@
  */
 
 var backupAppData = [];
-function createRelevantChart(divId, reqData) {
+var obj;
+function logShowrelevantLayout(divId, releventlayout){
+	console.log(releventlayout);
+	obj = releventlayout;
+	var reqData;
+	jq('$'+divId).attr("reqData", function(i, origValue){
+		reqData = origValue;
+    });
+	console.log(releventlayout.layout);
 	var chartData = jq.parseJSON(reqData);
 	console.log(chartData);	
 	console.log("file -->"+chartData.files[0]);	
@@ -34,27 +42,31 @@ function createRelevantChart(divId, reqData) {
 						"<a style=\"float:left;\" class=\"back\"> <i class=\"fa fa-arrow-left\"></i></a>"+	
 						"<div style=\"height:37px;border-left:1px solid #000;display:inline;float:left;\"> &nbsp;</div>"+
 						"<select style=\"float:left;\" id=\"selectbox\" class=\"chartOptions\">"+
-						"<option value=\"\">-layout-</option>"+
-						"<option value=\"Randomize\">Randomize</option>"+
-						"<option value=\"Circle\">Circle</option>"+
-						"<option value=\"ForceDirected\">Force Directed</option>"+
-						"<option value=\"Animated\">Force Directed(Animated)</option>"+
-						"<option value=\"Hierarchy\">Hierarchy</option>"+
-						"<option value=\"Show/Hide\">Show/Hide</option>"+
-						"<option value=\"Fit\">Zoom:Fit</option>"+
-						"<option value=\"Expand\">Zoom:Width</option>"+
-						"<option value=\"ZoomSelected\">Zoom:Selection</option>"+
-						"<option value=\"Zoom\">Zoom:100%</option>"+
-						"</select>"+	
+						"<option value=\"\">-"+releventlayout.layout+"-</option>"+
+						"<option value=\"Randomize\">"+releventlayout.randomize+"</option>"+
+						"<option value=\"Circle\">"+releventlayout.circle+"</option>"+
+						"<option value=\"ForceDirected\">"+releventlayout.forceDirected+"</option>"+
+						"<option value=\"Animated\">"+releventlayout.forceDirectedAnimated+"</option>"+
+						"<option value=\"Hierarchy\">"+releventlayout.hierarchy+"</option>"+
+						"</select>"+
 						
-					 	"<li><label class=\"showHideSelectTableLabel\"><input type=\"checkbox\" checked class=\"showHideSelectTable\"/>Show Selection</label></li>"+					 	
+						"<select style=\"float:left;\" id=\"selectbox1\" class=\"chartOptions1\">"+
+						"<option value=\"\">-"+releventlayout.zoom+"-</option>"+
+						"<option value=\"Fit\">"+releventlayout.zoomFit+"</option>"+
+						"<option value=\"Expand\">"+releventlayout.zoomWidth+"</option>"+
+						"<option value=\"ZoomSelected\">"+releventlayout.zoomSelection+"</option>"+
+						"<option value=\"Zoom\">"+releventlayout.zoom100+"</option>"+
+						"<option value=\"Show/Hide\">"+releventlayout.showHide+"</option>"+
+						"</select>"+
+						
 						"<select style=\"float:left;\" id=\"filterTable\" class=\"filterTableOptions\">"+
-						"<option value=\"all\">All</option>"+
-						"<option value=\"claims\">Claims</option>"+
-						"<option value=\"people\">People</option>"+
-						"<option value=\"vehicles\">Vehicle</option>"+
-						"<option value=\"policies\">Policies</option>"+							
+						"<option value=\"all\">"+releventlayout.all+"</option>"+
+						"<option value=\"claims\">"+releventlayout.claims+"</option>"+
+						"<option value=\"people\">"+releventlayout.people+"</option>"+
+						"<option value=\"vehicles\">"+releventlayout.vehicle+"</option>"+
+						"<option value=\"policies\">"+releventlayout.policies+"</option>"+							
 						"</select>"+						
+						"<li><label class=\"showHideSelectTableLabel\"><input type=\"checkbox\" checked class=\"showHideSelectTable\"/>"+releventlayout.showSelection+"</label></li>"+					 	
 					 	
 				 	"</nav>" +
 				 "</header>"));
@@ -114,6 +126,31 @@ function createRelevantChart(divId, reqData) {
             	app.filterEntities(event.target.value);
             });
             
+            divElement.on("change", ".chartOptions1",function() {
+				switch($("#selectbox1").val()){
+				case "Show/Hide":
+					app.graph.showEdges(!app.graph.showEdges()).render();
+					break;
+					
+				case "Fit":
+					app.graph.zoomTo('all');
+					break;
+					
+				case "Expand":
+					app.graph.zoomTo('width');
+					break;
+					
+				case "ZoomSelected":
+					app.graph.zoomTo('selection');
+					break;
+					
+				case "Zoom":
+					app.graph.zoomTo('100%');
+					break;
+					
+				}
+			});
+            
 			divElement.on("change", ".chartOptions",function() {
 				switch($("#selectbox").val()){
 					case "Circle":
@@ -151,26 +188,6 @@ function createRelevantChart(divId, reqData) {
 						app.graph.layout('Hierarchy', transitionDuration);
 						break;
 						
-					case "Show/Hide":
-						app.graph.showEdges(!app.graph.showEdges()).render();
-						break;
-						
-					case "Fit":
-						app.graph.zoomTo('all');
-						break;
-						
-					case "Expand":
-						app.graph.zoomTo('width');
-						break;
-						
-					case "ZoomSelected":
-						app.graph.zoomTo('selection');
-						break;
-						
-					case "Zoom":
-						app.graph.zoomTo('100%');
-						break;
-						
 				}
 			});
 			divElement.on("click", ".back",function() {				
@@ -180,6 +197,14 @@ function createRelevantChart(divId, reqData) {
 			});
 			
         });        
+
+}
+function createRelevantChart(divId, reqData) {
+	console.log("div-->"+divId);
+	console.log("div-->"+reqData);
+	jq('$'+divId).attr("reqData", reqData);
+	var releventlayout1 = "layout,randomize,circle,forceDirected,forceDirectedAnimated,hierarchy,showHide,zoom,zoomFit,zoomWidth,zoomSelection,zoom100,all,claims,people,vehicle,policies,showSelection";
+	zAu.send(new zk.Event(zk.Widget.$('$'+divId), "onRemove",   releventlayout1, {toServer:true}));
 }
 
 function resizeGraph() {
