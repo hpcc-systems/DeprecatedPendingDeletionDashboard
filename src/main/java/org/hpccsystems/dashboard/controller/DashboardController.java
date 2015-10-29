@@ -389,7 +389,7 @@ public class DashboardController extends SelectorComposer<Window>{
                 
                 //Constructing chart data only when live chart is drawn
                 if(Constants.STATE_LIVE_CHART.equals(portlet.getWidgetState())){
-                    Clients.showBusy("Loading Dashboard");
+                    Clients.showBusy(Labels.getLabel("loadingDashboard"));
                     drawnLiveChartCount++;
                     Map<String, Object> parameters = new HashMap<String, Object>();
                     parameters.put(Constants.DASHBOARD_ID, dashboardId);

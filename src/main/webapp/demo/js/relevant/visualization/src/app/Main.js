@@ -135,7 +135,7 @@
             .cellPadding(0)
             .setContent(0, 0, this.claimsChart, "", 1, 4)
             .setContent(1, 0, this.graph, "", 6, 4)
-            .setContent(0, 4, this.selectionTable, "Selection", 7, 1)
+            .setContent(0, 4, this.selectionTable, obj.selection, 7, 1)
             .setContent(7, 0, this.vertexTabs, "", 3, 5)
         ;
     }
@@ -148,7 +148,7 @@
         if (_) {
             this.getCell(7, 0).gridColSpan(5);
             this
-                .setContent(0, 4, this.selectionTable, "Selection", 7, 1)
+                .setContent(0, 4, this.selectionTable, obj.selection, 7, 1)
                 .render()
             ;
         } else {
@@ -204,7 +204,7 @@
     };
 
     Main.prototype.populateTableV = function (table, selection) {
-        var columns = ["Property"];
+        var columns = [obj.property];
         var propIdx = {};
         var data = [];
         selection.forEach(function (item, idx) {

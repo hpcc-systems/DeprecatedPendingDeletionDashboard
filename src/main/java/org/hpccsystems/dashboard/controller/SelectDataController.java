@@ -235,7 +235,7 @@ public class SelectDataController extends SelectorComposer<Component>{
             updateHpccConnectionObject();
             if(chartData.getIsQuery()) {
                 
-                treeColumn.setLabel("Choose a query to Visualize");
+                treeColumn.setLabel(Labels.getLabel("chooseQuery"));
                 if(constructQueryBrowser(hpccConnection)) {
                     Button btn = (Button) event.getTarget();
                     btn.setDisabled(true);

@@ -37,7 +37,9 @@
 					</groupbox>
 					<space height="10px"></space>
 					<hbox hflex="1" pack="center">
-						<label style="font-size: 15px" value="--- OR ---"></label>
+						<label style="font-size: 15px" value="---"></label>
+						<label style="font-size: 15px" value="${labels.orKey}"></label>
+						<label style="font-size: 15px" value="---"></label>
 					</hbox>	
 					<space height="10px"></space>			
 					<groupbox id="groupDatabox">

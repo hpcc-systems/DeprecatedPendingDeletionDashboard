@@ -158,14 +158,15 @@ public class RelevantController extends SelectorComposer<Component>{
             }
     } catch (RemoteException | HpccConnectionException e) {
         LOG.error(Constants.EXCEPTION,e);
-        Clients.showNotification(Labels.getLabel("unableToFetchGroupTypeIds"), "error", groupTypeIdCombobox, "after_center", 3000, true);
+            Clients.showNotification(Labels.getLabel("unableToFetchGroupTypeIds"), Clients.NOTIFICATION_TYPE_ERROR, groupTypeIdCombobox,
+                    "after_center", 3000, true);
     }
         
     }
 
     @Listen("onChange = #claimCombobox")
 	public void onChangeClaimIds(){
-        relevantData.setClaimId(null);        
+        relevantData.setClaimId(null);
         if(!SELECT.equals(claimCombobox.getSelectedItem().getLabel())){
             relevantData.setClaimId(claimCombobox.getSelectedItem().getLabel());
         }
@@ -199,7 +200,8 @@ public class RelevantController extends SelectorComposer<Component>{
 	            groupIdCombobox.setModel(groupIdModel);
 	        } catch (RemoteException | HpccConnectionException e) {
 	           LOG.error(Constants.EXCEPTION,e);
-	           Clients.showNotification(Labels.getLabel("unableToFetchGroupIds"), "error", groupTypeIdCombobox, "after_center", 3000, true);
+                Clients.showNotification(Labels.getLabel("unableToFetchGroupIds"), Clients.NOTIFICATION_TYPE_ERROR, groupTypeIdCombobox,
+                        "after_center", 3000, true);
 	        }
 	    }
 	    

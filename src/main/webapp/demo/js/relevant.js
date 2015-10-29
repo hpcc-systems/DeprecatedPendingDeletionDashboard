@@ -203,7 +203,7 @@ function createRelevantChart(divId, reqData) {
 	console.log("div-->"+divId);
 	console.log("div-->"+reqData);
 	jq('$'+divId).attr("reqData", reqData);
-	var releventlayout1 = "layout,randomize,circle,forceDirected,forceDirectedAnimated,hierarchy,showHide,zoom,zoomFit,zoomWidth,zoomSelection,zoom100,all,claims,people,vehicle,policies,showSelection";
+	var releventlayout1 = "layout,randomize,circle,forceDirected,forceDirectedAnimated,hierarchy,showHide,zoom,zoomFit,zoomWidth,zoomSelection,zoom100,all,claims,people,vehicle,policies,showSelection,selection,property";
 	zAu.send(new zk.Event(zk.Widget.$('$'+divId), "onRemove",   releventlayout1, {toServer:true}));
 }
 
