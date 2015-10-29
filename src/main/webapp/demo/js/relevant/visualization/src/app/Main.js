@@ -135,7 +135,7 @@
         this
             .setContent(0, 0, this.claimsChart, "", 1, 4)
             .setContent(1, 0, this.graph, "", 6, 4)
-            .setContent(0, 4, this.selectionTable, "Selection", 7, 1.23)
+            .setContent(0, 4, this.selectionTable, obj.selection, 7, 1.23)
             .setContent(7, 0, this.vertexTabs, "", 3, 5)
         ;
     }
@@ -150,7 +150,7 @@
             this.setContent(0, 0, this.claimsChart, "", 1, 4);
             this.setContent(1, 0, this.graph, "", 6, 4);
             this
-                .setContent(0, 4, this.selectionTable, "Selection", 7, 1.23)
+                .setContent(0, 4, this.selectionTable, obj.selection, 7, 1.23)
                 .render()
             ;
         } else {
