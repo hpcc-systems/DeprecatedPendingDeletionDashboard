@@ -112,10 +112,21 @@ public class RelevantController extends SelectorComposer<Component>{
 	          }
 		});
 	      
-	     populateGroupTypeId();		
+	     populateGroupTypeId();		    
+	     //populateImages();
 	}
-	
-	ComboitemRenderer<RelevantGroupType> groupTypeRenderer = (item,data,index) ->{
+    
+   /* private void populateImages() {
+        
+	    if(relevantData.getClaimImage() != null){
+	       Listitem selectItem = listbox.getItems().stream().filter(item ->
+            relevantData.getClaimImage().equals(((Listcell)item.getFirstChild()).getValue().toString())).findAny().get();
+	       listbox.setSelectedItem(selectItem);
+	    }    	    
+        
+    }*/
+
+    ComboitemRenderer<RelevantGroupType> groupTypeRenderer = (item,data,index) ->{
         StringBuilder builder = new StringBuilder();
         builder.append(data.getDescription()).append(PARANTHESIS_OPEN)
                 .append(data.getId()).append(PARANTHESIS_CLOSE);
@@ -134,7 +145,7 @@ public class RelevantController extends SelectorComposer<Component>{
             groupTypeIdCombobox.setItemRenderer(groupTypeRenderer);
             
             //Pre-loading the previouly selected group data 
-            if(relevantData.getGroupType() != null && groupTypes.contains(relevantData.getGroupType())){
+            if(relevantData.getGroupType() != null){
                 List<RelevantGroupType> selectedGroupType = new ArrayList<RelevantGroupType>();               
                 selectedGroupType.add(relevantData.getGroupType());
                 groupTypeIdModel.setSelection(selectedGroupType);
