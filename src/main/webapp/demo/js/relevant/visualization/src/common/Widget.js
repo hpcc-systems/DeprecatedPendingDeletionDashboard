@@ -10,7 +10,8 @@
             }
 
             var objs = paths.map(function (path) {
-                var prop = path.substring("src/".length).split("/").join("_");
+                var pathIdx = path.indexOf("src/") === 0 ? "src/".length : 0;
+                var prop = path.substring(pathIdx).split("/").join("_");
                 return root[prop];
             });
 
@@ -25,8 +26,8 @@
         this._class = Object.getPrototypeOf(this)._class;
         this._id = "_w" + widgetID++;
 
-        this._columns = [];
-        this._data = [];
+        this._private_columns = [];
+        this._private_data = [];
         this._pos = { x: 0, y: 0 };
         this._size = { width: 0, height: 0 };
         this._scale = 1;
@@ -176,7 +177,7 @@
 
     // Serialization  ---
     Widget.prototype.publish = function (id, defaultValue, type, description, set, ext) {
-        if (this["__meta_" + id] !== undefined) {
+        if (this["__meta_" + id] !== undefined && !ext.override) {
             throw id + " is already published.";
         }
         this["__meta_" + id] = {
@@ -193,7 +194,9 @@
             if (!arguments.length) {
                 return !isPrototype && this["__prop_" + id] !== undefined ? this["__prop_" + id] : this["__meta_" + id].defaultValue;
             }
-            if (_ !== null) {
+            if (_ === "" && this["__meta_" + id].ext.optional) {
+                _ = null;
+            } else if (_ !== null) {
                 switch (type) {
                     case "set":
                         if (!set || set.indexOf(_) < 0) {
@@ -223,6 +226,11 @@
                         break;
                     case "array":
                         if (!(_ instanceof Array)) {
+                            console.log("Invalid value for '" + id);
+                        }
+                        break;
+                    case "object":
+                        if (!(_ instanceof Object)) {
                             console.log("Invalid value for '" + id);
                         }
                         break;
@@ -381,19 +389,19 @@
     };
 
     Widget.prototype.columns = function (_) {
-        if (!arguments.length) return this._columns;
-        this._columns = _;
+        if (!arguments.length) return this._private_columns;
+        this._private_columns = _;
         return this;
     };
 
     Widget.prototype.data = function (_) {
-        if (!arguments.length) return this._data;
-        this._data = _;
+        if (!arguments.length) return this._private_data;
+        this._private_data = _;
         return this;
     };
 
     Widget.prototype.cloneData = function () {
-        return this._data.map(function (row) { return row.slice(0); });
+        return this.data().map(function (row) { return row.slice(0); });
     };
 
     Widget.prototype.flattenData = function () {
@@ -417,11 +425,11 @@
 
     Widget.prototype.rowToObj = function (row) {
         var retVal = {};
-        this._columns.forEach(function(col, idx) {
+        this.columns().forEach(function(col, idx) {
             retVal[col] = row[idx];
         });
-        if (row.length === this._columns.length + 1) {
-            retVal.__lparam = row[this._columns.length];
+        if (row.length === this.columns().length + 1) {
+            retVal.__lparam = row[this.columns().length];
         }
         return retVal;
     };

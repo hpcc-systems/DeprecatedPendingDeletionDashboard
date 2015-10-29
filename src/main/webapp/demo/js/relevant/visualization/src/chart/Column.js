@@ -24,7 +24,7 @@
     Column.prototype.publish("stackedOpacity", 0.66, "number", "Fill Stacked Opacity", null, { tags: ["Basic"] });
     Column.prototype.publish("useClonedPalette", false, "boolean", "Enable or disable using a cloned palette",null,{tags:["Intermediate","Shared"]});
 
-    Column.prototype.updateChart = function (domNode, element, margin, width, height) {
+    Column.prototype.updateChart = function (domNode, element, margin, width, height, isHorizontal) {
         var context = this;
 
         this._palette = this._palette.switch(this.paletteID());
@@ -47,8 +47,8 @@
         }
 
         var columnScale = d3.scale.ordinal()
-            .domain(context._columns.filter(function (d, idx) { return idx > 0; }))
-            .rangeRoundBands([0, dataLen])
+            .domain(context.columns().filter(function (d, idx) { return idx > 0; }))
+            .rangeRoundBands(isHorizontal ? [0, dataLen] : [dataLen, 0])
         ;
 
         var column = this.svgData.selectAll(".dataRow")
@@ -65,7 +65,7 @@
 
                 var columnRect = element.selectAll("rect").data(dataRow.map(function (d, i) {
                     return {
-                        column: context._columns[i],
+                        column: context.columns()[i],
                         row: dataRow,
                         value: d,
                         idx: i
@@ -77,20 +77,20 @@
                     .attr("class", "columnRect")
                     .call(context._selection.enter.bind(context._selection))
                     .on("mouseover.tooltip", function (d) {
-                        context.tooltipShow(dataRow, context._columns, d.idx);
+                        context.tooltipShow(d.row, context.columns(), d.idx);
                     })
                     .on("mouseout.tooltip", function (d) {
                         context.tooltipShow();
                     })
                     .on("mousemove.tooltip", function (d) {
-                        context.tooltipShow(dataRow, context._columns, d.idx);
+                        context.tooltipShow(d.row, context.columns(), d.idx);
                     })
                     .on("click", function (d, idx) {
-                        context.click(context.rowToObj(dataRow), d.column, context._selection.selected(this));
+                        context.click(context.rowToObj(d.row), d.column, context._selection.selected(this));
                     })
                 ;
 
-                if (context.orientation() === "horizontal") {
+                if (isHorizontal) {
                     columnRect.transition()
                         .attr("class", "columnRect")
                         .attr("x", function (d) { return context.dataScale(dataRow[0]) + (context.stacked() ? 0 : columnScale(d.column)) + offset; })

@@ -10,6 +10,8 @@
         HTMLWidget.call(this);
         this._tag = "div";
         this._chart = {};
+
+        this._selected = null;
     }
     Pie.prototype = Object.create(HTMLWidget.prototype);
     Pie.prototype.constructor = Pie;
@@ -17,11 +19,9 @@
     Pie.prototype.implements(I2DChart.prototype);
 
     Pie.prototype.publish("paletteID", "default", "set", "Palette ID", Pie.prototype._palette.switch(), {tags:["Basic","Shared"]});
-    Pie.prototype.publish("fontFamily", "Verdana", "string", "Label Font Family",null,{tags:["Basic","Shared"]});
-    Pie.prototype.publish("fontSize", 11, "number", "Label Font Size",null,{tags:["Basic","Shared"]});
-    Pie.prototype.publish("fontColor", null, "html-color", "Label Font Color",null,{tags:["Basic","Shared"]});
-
-    Pie.prototype.publish("tooltipTemplate","[[title]]<br><span style='font-size:14px'><b>[[value]]</b> ([[percents]]%)</span>", "string", "Tooltip Text",null,{tags:["Intermediate"]});
+    Pie.prototype.publish("fontSize", 11, "number", "Font Size",null,{tags:["Basic","Shared"]});
+    Pie.prototype.publish("fontFamily", "Verdana", "string", "Font Name",null,{tags:["Basic","Shared","Shared"]});
+    Pie.prototype.publish("fontColor", "#000000", "html-color", "Font Color",null,{tags:["Basic","Shared"]});
 
     Pie.prototype.publish("Depth3D", 0, "number", "3D Depth (px)",null,{tags:["Basic"]});
     Pie.prototype.publish("Angle3D", 0, "number", "3D Angle (Deg)",null,{tags:["Basic"]});
@@ -38,22 +38,36 @@
     Pie.prototype.publish("radius", null, "number", "Radius",null,{tags:["Basic"]});
     Pie.prototype.publish("pieAlpha", [], "array", "Individual Alpha per Slice",null,{tags:["Private"]});
 
-    Pie.prototype.publish("labelPosition", "right", "set", "Label Position", ["left","right"],{tags:["Intermediate"]});
+    Pie.prototype.publish("labelPosition", "outside", "set", "Label Position", ["inside","outside"],{tags:["Intermediate"]});
 
     Pie.prototype.publish("useClonedPalette", false, "boolean", "Enable or disable using a cloned palette",null,{tags:["Intermediate","Shared"]});
+    Pie.prototype.publish("selectionMode", "simple", "set", "Selection Mode", ["simple", "multi"], { tags: ["Intermediate"] });
+    Pie.prototype.publish("selectionColor", "#f00", "html-color", "Font Color",null,{tags:["Basic"]});
+
+    Pie.prototype.calcRadius = function (_) {
+        return Math.min(this._size.width, this._size.height) / 2 - 2;
+    };
 
     Pie.prototype.updateChartOptions = function() {
-        var context = this;
-
         this._chart.type = "pie";
-        this._chart.radius = this.radius();
+        
+        this._chart.labelsEnabled = true;
 
-        this._chart.balloonText = context.tooltipTemplate();
+        if (this.labelPosition()==="inside") {
+            this._chart.radius = "50%";
+            this._chart.labelRadius = -40;
+            this._chart.pullOutRadius = "20%";
+        } else {
+            this._chart.radius = "45%";
+            this._chart.labelRadius = 20;
+            this._chart.pullOutRadius = "20%";
+        }
 
-        this._chart.labelPosition = this.labelPosition();
-
-        if (this.marginLeft()) { this._chart.marginLeft = this.marginLeft(); }
+        this._chart.labelFunction = function(d) {
+            return d.title;
+        };
         if (this.marginRight()) { this._chart.marginRight = this.marginRight(); }
+        if (this.marginLeft()) { this._chart.marginLeft = this.marginLeft(); }
         if (this.marginTop()) { this._chart.marginTop = this.marginTop(); }
         if (this.marginBottom()) { this._chart.marginBottom = this.marginBottom(); }
 
@@ -65,24 +79,24 @@
         this._chart.fontSize = this.fontSize();
         this._chart.color = this.fontColor();
 
-        this._chart.allLabels = [];
-        this._chart.pieAlpha =  this.pieAlpha();
-
-        this._chart.titleField = this._columns[0];
-        this._chart.valueField = this._columns[1];
+        this._chart.titleField = this.columns()[0];
+        this._chart.valueField = this.columns()[1];
         var sortingMethod;
         if(this.reverseDataSorting()){
             sortingMethod = function(a,b){ return a[1] < b[1] ? 1 : -1; };
         } else {
         	sortingMethod = function(a,b){ return a[1] > b[1] ? 1 : -1; };
         }
-        this._data = this._data.sort(sortingMethod);
+        this.data(this.data().sort(sortingMethod));
 
-        this._chart.dataProvider = this.formatData(this._data);
+        this._chart.colorField = "sliceColor";
 
-        this._chart.colors = this._data.map(function (row) {
+        this._chart.dataProvider = this.formatData(this.data());
+
+        this._chart.colors = this.data().map(function (row) {
             return this._palette(row[0]);
         }, this);
+        this._chart.pullOutOnlyOne = this.selectionMode() === "simple";
 
         this.pieAlpha().forEach(function(d,i) {
             if (typeof(this._chart.chartData[i])==="undefined") {
@@ -99,7 +113,7 @@
         var context = this;
         dataArr.forEach(function(dataRow){
             var dataObj = {};
-            context._columns.forEach(function(colName,cIdx){
+            context.columns().forEach(function(colName,cIdx){
                 dataObj[colName] = dataRow[cIdx];
             });
             dataObjArr.push(dataObj);
@@ -107,26 +121,12 @@
         return dataObjArr;
     };
 
-    Pie.prototype.columns = function(colArr) {
-        if (!arguments.length) return this._columns;
-        var retVal = HTMLWidget.prototype.columns.apply(this, arguments);
-        var context = this;
-        if (arguments.length) {
-            this._valueField = [];
-            colArr.slice(1,colArr.length).forEach(function(col){
-                context._valueField.push(col);
-            });
-            this._columns = colArr;
-            return this;
-        }
-        return retVal;
-    };
-
-    Pie.prototype.enter = function(domNode, element) {
+    Pie.prototype.enter = function (domNode, element) {
         HTMLWidget.prototype.enter.apply(this, arguments);
         var context = this;
         var initObj = {
             type: "pie",
+            addClassNames: true,
             theme: "none"
         };
         if (typeof define === "function" && define.amd) {
@@ -134,7 +134,33 @@
         }
         this._chart = AmCharts.makeChart(domNode, initObj);
         this._chart.addListener("clickSlice", function(e) {
-            context.click(context.rowToObj(context._data[e.dataItem.index]));
+            var field = e.chart.colorField;
+            var data = e.dataItem.dataContext;
+
+            if (data[field] !== null && data[field] !== undefined) {
+                delete data[field];
+                if (context.selectionMode() === "simple") {
+                    if (context._selected !== null) {
+                        delete context._selected.data[context._selected.field];
+                    }
+                    context._selected = null;
+                }
+            } else {
+                data[field] = context.selectionColor();
+                if (context.selectionMode() === "simple") {
+                    if (context._selected !== null) {
+                        delete context._selected.data[context._selected.field];
+                    }
+                    context._selected = {
+                        field: field,
+                        data: data
+                    };
+                }
+            }
+
+            e.chart.validateData();
+
+            context.click(context.rowToObj(context.data()[e.dataItem.index]));
         });
     };
 

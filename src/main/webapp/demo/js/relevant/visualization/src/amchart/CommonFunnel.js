@@ -12,14 +12,16 @@
         this._tag = "div";
 
         this._chart = {};
+
+        this._selected = null;
     }
     CommonFunnel.prototype = Object.create(HTMLWidget.prototype);
     CommonFunnel.prototype.constructor = CommonFunnel;
     CommonFunnel.prototype._class += " amchart_CommonFunnel";
 
-    CommonFunnel.prototype.publish("fontSize", null, "number", "Font Size",null,{tags:["Basic","Shared"]});
-    CommonFunnel.prototype.publish("fontFamily", null, "string", "Font Name",null,{tags:["Basic","Shared"]});
-    CommonFunnel.prototype.publish("fontColor", null, "html-color", "Font Color",null,{tags:["Basic","Shared"]});
+    CommonFunnel.prototype.publish("fontSize", 11, "number", "Font Size",null,{tags:["Basic","Shared"]});
+    CommonFunnel.prototype.publish("fontFamily", "Verdana", "string", "Font Name",null,{tags:["Basic","Shared","Shared"]});
+    CommonFunnel.prototype.publish("fontColor", "#000000", "html-color", "Font Color",null,{tags:["Basic","Shared"]});
 
     CommonFunnel.prototype.publish("flip", true, "boolean", "Flip Chart",null,{tags:["Intermediate"]});
     CommonFunnel.prototype.publish("reverseDataSorting", false, "boolean", "Reverse Data Sorting",null,{tags:["Intermediate"]});
@@ -40,13 +42,18 @@
     CommonFunnel.prototype.publish("Angle3D", 0, "number", "3D Angle (Deg)",null,{tags:["Basic"]});
 
     CommonFunnel.prototype.publish("useClonedPalette", false, "boolean", "Enable or disable using a cloned palette",null,{tags:["Intermediate","Shared"]});
+    CommonFunnel.prototype.publish("selectionMode", "simple", "set", "Selection Mode", ["simple", "multi"], { tags: ["Intermediate"] });
+    CommonFunnel.prototype.publish("selectionColor", "#f00", "html-color", "Font Color",null,{tags:["Basic"]});
 
     CommonFunnel.prototype.updateChartOptions = function() {
 
         this._chart.startDuration = this.startDuration();
         this._chart.rotate = this.flip();
 
+        this._chart.pullOutOnlyOne = this.selectionMode() === "simple";
+        
         this._chart.color = this.fontColor();
+        this._chart.colorField = "sliceColor";
         this._chart.fontSize = this.fontSize();
         this._chart.fontFamily = this.fontFamily();
 
@@ -60,8 +67,8 @@
         this.titles = [];
         this.baloon = {};
 
-        this._chart.titleField = this._columns[0];
-        this._chart.valueField = this._columns[1];
+        this._chart.titleField = this.columns()[0];
+        this._chart.valueField = this.columns()[1];
 
         this._chart.depth3D = this.Depth3D();
         this._chart.angle = this.Angle3D();
@@ -70,13 +77,13 @@
         if(this.reverseDataSorting()){
             sortingMethod = function(a,b){ return a[1] < b[1] ? 1 : -1; };
         }
-        this._data = this._data.sort(sortingMethod);
+        this.data(this.data().sort(sortingMethod));
 
         // DataProvider
-        this._chart.dataProvider = this.formatData(this._data);
+        this._chart.dataProvider = this.formatData(this.data());
 
         // Color Palette
-        this._chart.colors = this._data.map(function (row) {
+        this._chart.colors = this.data().map(function (row) {
             return this._palette(row[0]);
         }, this);
 
@@ -95,28 +102,12 @@
         var context = this;
         dataArr.forEach(function(dataRow){
             var dataObj = {};
-            context._columns.forEach(function(colName,cIdx){
+            context.columns().forEach(function(colName,cIdx){
                 dataObj[colName] = dataRow[cIdx];
             });
             dataObjArr.push(dataObj);
         });
         return dataObjArr;
-    };
-
-    CommonFunnel.prototype.columns = function(colArr) {
-        if (!arguments.length) return this._columns;
-        var retVal = HTMLWidget.prototype.columns.apply(this, arguments);
-        var context = this;
-        if (arguments.length) {
-            this._categoryField = colArr[0];
-            this._valueField = [];
-            colArr.slice(1,colArr.length).forEach(function(col){
-                context._valueField.push(col);
-            });
-            this._columns = colArr;
-            return this;
-        }
-        return retVal;
     };
 
     CommonFunnel.prototype.enter = function(domNode, element) {
@@ -125,6 +116,7 @@
         var initObj = {
             theme: "none",
             type: "funnel",
+            addClassNames: true,
             autoResize: true,
             autoMargins: true,
             chartScrollbar: {}
@@ -133,8 +125,34 @@
             initObj.pathToImages = require.toUrl("amchartsImg");
         }
         this._chart = AmCharts.makeChart(domNode, initObj);
-        this._chart.addListener("clickSlice", function(e) {
-            context.click(context.rowToObj(context._data[e.dataItem.index]));
+        this._chart.addListener("clickSlice", function(e) {   
+            var field = e.chart.colorField;
+            var data = e.dataItem.dataContext;
+
+            if (data[field] !== null && data[field] !== undefined) {
+                delete data[field];
+                if (context.selectionMode() === "simple") {
+                    if (context._selected !== null) {
+                        delete context._selected.data[context._selected.field];
+                    }
+                    context._selected = null;
+                }
+            } else {
+                data[field] = context.selectionColor();
+                if (context.selectionMode() === "simple") {
+                    if (context._selected !== null) {
+                        delete context._selected.data[context._selected.field];
+                    }
+                    context._selected = {
+                        field: field,
+                        data: data
+                    };
+                }
+            }
+
+            e.chart.validateData();
+
+            context.click(context.rowToObj(context.data()[e.dataItem.index]));
         });
     };
 

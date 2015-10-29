@@ -15,6 +15,8 @@
         this._rowCount = 0;
         this._colSize = 0;
         this._rowSize = 0;
+        
+        this._shrinkWrapBoxes = {};
 
         this.content([]);
         this.sectionTypes([]);
@@ -29,37 +31,28 @@
     
     Border.prototype.publish("gutter", 2, "number", "Gap Between Widgets",null,{tags:["Basic"]});
 
-    Border.prototype.publish("layoutType", "Default", "set", "This determines the placement/size of the Cells relative to the Border._target element", ["Default"], { tags: ["Private"] });
+    Border.prototype.publish("topShrinkWrap", false, "boolean", "'Top' Cell shrinks to fit content",null,{tags:["Intermediate"]});
+    Border.prototype.publish("leftShrinkWrap", false, "boolean", "'Left' Cell shrinks to fit content",null,{tags:["Intermediate"]});
+    Border.prototype.publish("rightShrinkWrap", false, "boolean", "'Right' Cell shrinks to fit content",null,{tags:["Intermediate"]});
+    Border.prototype.publish("bottomShrinkWrap", false, "boolean", "'Bottom' Cell shrinks to fit content",null,{tags:["Intermediate"]});
+    
+    Border.prototype.publish("topSize", 0, "number", "Height of the 'Top' Cell (px)",null,{tags:["Private"]});
+    Border.prototype.publish("leftSize", 0, "number", "Width of the 'Left' Cell (px)",null,{tags:["Private"]});
+    Border.prototype.publish("rightSize", 0, "number", "Width of the 'Right' Cell (px)",null,{tags:["Private"]});
+    Border.prototype.publish("bottomSize", 0, "number", "Height of the 'Bottom' Cell (px)",null,{tags:["Private"]});
 
-    Border.prototype.publish("topCellSize", 0, "number", "Height of the 'Top' Cell (px)",null,{tags:["Private"]});
-    Border.prototype.publish("leftCellSize", 0, "number", "Width of the 'Left' Cell (px)",null,{tags:["Private"]});
-    Border.prototype.publish("rightCellSize", 0, "number", "Width of the 'Right' Cell (px)",null,{tags:["Private"]});
-    Border.prototype.publish("bottomCellSize", 0, "number", "Height of the 'Bottom' Cell (px)",null,{tags:["Private"]});
+    Border.prototype.publish("topPercentage", 20, "number", "Percentage (of parent) Height of the 'Top' Cell",null,{tags:["Private"]});
+    Border.prototype.publish("leftPercentage", 20, "number", "Percentage (of parent) Width of the 'Left' Cell",null,{tags:["Private"]});
+    Border.prototype.publish("rightPercentage", 20, "number", "Percentage (of parent) Width of the 'Right' Cell",null,{tags:["Private"]});
+    Border.prototype.publish("bottomPercentage", 20, "number", "Percentage (of parent) Height of the 'Bottom' Cell",null,{tags:["Private"]});
 
-    Border.prototype.publish("topCellPercentage", 20, "number", "Percentage (of parent) Height of the 'Top' Cell",null,{tags:["Private"]});
-    Border.prototype.publish("leftCellPercentage", 20, "number", "Percentage (of parent) Width of the 'Left' Cell",null,{tags:["Private"]});
-    Border.prototype.publish("rightCellPercentage", 20, "number", "Percentage (of parent) Width of the 'Right' Cell",null,{tags:["Private"]});
-    Border.prototype.publish("bottomCellPercentage", 20, "number", "Percentage (of parent) Height of the 'Bottom' Cell",null,{tags:["Private"]});
-
-    Border.prototype.publish("cellPadding", 0, "number", "Cell Padding (px)", null, { tags: ["Intermediate"] });
+    Border.prototype.publish("surfacePadding", 0, "number", "Cell Padding (px)", null, { tags: ["Intermediate"] });
 
 
     Border.prototype.publish("sectionTypes", [], "array", "Section Types sharing an index with 'content' - Used to determine position/size.", null, { tags: ["Private"] });
 
-    Border.prototype.testData = function () {
-        this
-            .setContent("topSection",new Text().testData())
-            .setContent("rightSection",new Text().testData())
-            .setContent("bottomSection",new Text().testData())
-            .setContent("leftSection",new Text().testData())
-            .setContent("centerSection",new Text().testData())
-        ;
-
-        return this;
-    };
-
-    Border.prototype.applyLayoutType = function (layoutType) {
-        var layoutObj = this.borderLayoutObject(layoutType);
+    Border.prototype.applyLayoutType = function () {
+        var layoutObj = this.borderLayoutObject();
         this.content().forEach(function (cell, i) {
             cell._fixedLeft = layoutObj[this.sectionTypes()[i]].left;
             cell._fixedTop = layoutObj[this.sectionTypes()[i]].top;
@@ -69,15 +62,12 @@
         }, this);
     };
     Border.prototype.cellSpecificDragHandles = function (sectionType) {
-        switch(this.layoutType()){
-            default:
-                switch(sectionType){
-                    case "topSection":return ["s"];
-                    case "rightSection":return ["w"];
-                    case "bottomSection":return ["n"];
-                    case "leftSection":return ["e"];
-                    case "centerSection":return [];
-                }
+        switch(sectionType){
+            case "top":return ["s"];
+            case "right":return ["w"];
+            case "bottom":return ["n"];
+            case "left":return ["e"];
+            case "center":return [];
         }
     };
     Border.prototype.borderLayoutObject = function (layoutType) {
@@ -97,63 +87,76 @@
             gridRect.width = bcRect.width;
             gridRect.height = bcRect.height;
         }
-        switch(layoutType){
-            default:
-                if(this.sectionTypes().indexOf("topSection") !== -1){
-                    topSize = this.topCellSize();
-                    topPerc = this.topCellPercentage();
-                }
-                if(this.sectionTypes().indexOf("bottomSection") !== -1){
-                    bottomSize = this.bottomCellSize();
-                    bottomPerc = this.bottomCellPercentage();
-                }
-                if(this.sectionTypes().indexOf("leftSection") !== -1){
-                    leftSize = this.leftCellSize();
-                    leftPerc = this.leftCellPercentage();
-                }
-                if(this.sectionTypes().indexOf("rightSection") !== -1){
-                    rightSize = this.rightCellSize();
-                    rightPerc = this.rightCellPercentage();
-                }
-
-                t = _sectionPlacementObject({
-                    width:{"px":0,"%":100},
-                    height:{"px":topSize,"%":topPerc},
-                    top:{"px":0,"%":0},
-                    left:{"px":0,"%":0}
-                });
-                b = _sectionPlacementObject({
-                    width:{"px":0,"%":100},
-                    height:{"px":bottomSize,"%":bottomPerc},
-                    top:{"px":0,"%":100},
-                    left:{"px":0,"%":0}
-                });
-                b.top -= b.height;
-                l = _sectionPlacementObject({
-                    width:{"px":leftSize,"%":leftPerc},
-                    height:{"px":-t.height-b.height,"%":100},
-                    top:{"px":t.height,"%":0},
-                    left:{"px":0,"%":0}
-                });
-                r = _sectionPlacementObject({
-                    width:{"px":rightSize,"%":rightPerc},
-                    height:{"px":-t.height-b.height,"%":100},
-                    top:{"px":t.height,"%":0},
-                    left:{"px":0,"%":100}
-                });
-                r.left -= r.width;
-                c = _sectionPlacementObject({
-                    width:{"px":-r.width-l.width,"%":100},
-                    height:{"px":-t.height-b.height,"%":100},
-                    top:{"px":t.height,"%":0},
-                    left:{"px":l.width,"%":0}
-                });
-                retObj["topSection"] = t;
-                retObj["bottomSection"] = b;
-                retObj["rightSection"] = r;
-                retObj["leftSection"] = l;
-                retObj["centerSection"] = c;
+        if(this.sectionTypes().indexOf("top") !== -1){
+            topSize = this.topSize();
+            topPerc = this.topPercentage();
+            if(typeof (this._shrinkWrapBoxes["top"]) !== "undefined"){
+                topSize = this._shrinkWrapBoxes["top"].height + this.gutter();
+                topPerc = 0;
+            }
         }
+        if(this.sectionTypes().indexOf("bottom") !== -1){
+            bottomSize = this.bottomSize();
+            bottomPerc = this.bottomPercentage();
+            if(typeof (this._shrinkWrapBoxes["bottom"]) !== "undefined"){
+                bottomSize = this._shrinkWrapBoxes["bottom"].height + this.gutter();
+                bottomPerc = 0;
+            }
+        }
+        if(this.sectionTypes().indexOf("left") !== -1){
+            leftSize = this.leftSize();
+            leftPerc = this.leftPercentage();
+            if(typeof (this._shrinkWrapBoxes["left"]) !== "undefined"){
+                leftSize = this._shrinkWrapBoxes["left"].width + this.gutter();
+                leftPerc = 0;
+            }
+        }
+        if(this.sectionTypes().indexOf("right") !== -1){
+            rightSize = this.rightSize();
+            rightPerc = this.rightPercentage();
+            if(typeof (this._shrinkWrapBoxes["right"]) !== "undefined"){
+                rightSize = this._shrinkWrapBoxes["right"].width + this.gutter();
+                rightPerc = 0;
+            }
+        }
+
+        t = _sectionPlacementObject({
+            width:{"px":0,"%":100},
+            height:{"px":topSize,"%":topPerc},
+            top:{"px":0,"%":0},
+            left:{"px":0,"%":0}
+        });
+        b = _sectionPlacementObject({
+            width:{"px":0,"%":100},
+            height:{"px":bottomSize,"%":bottomPerc},
+            top:{"px":0,"%":100},
+            left:{"px":0,"%":0}
+        });
+        b.top -= b.height;
+        l = _sectionPlacementObject({
+            width:{"px":leftSize,"%":leftPerc},
+            height:{"px":-t.height-b.height,"%":100},
+            top:{"px":t.height,"%":0},
+            left:{"px":0,"%":0}
+        });
+        r = _sectionPlacementObject({
+            width:{"px":rightSize,"%":rightPerc},
+            height:{"px":-t.height-b.height,"%":100},
+            top:{"px":t.height,"%":0},
+            left:{"px":0,"%":100}
+        });
+        r.left -= r.width;
+        c = _sectionPlacementObject({
+            width:{"px":-r.width-l.width,"%":100},
+            height:{"px":-t.height-b.height,"%":100},
+            top:{"px":t.height,"%":0},
+            left:{"px":l.width,"%":0}
+        });
+        retObj["top"] = t;
+        retObj["bottom"] = b;
+        retObj["right"] = r;
+        retObj["left"] = l;
+        retObj["center"] = c;
         return retObj;
 
         function _sectionPlacementObject(obj){
@@ -162,10 +165,10 @@
             obj.height["px"] = typeof (obj.height["px"]) !== "undefined" ? obj.height["px"] : 0;
             obj.height["%"] = typeof (obj.height["%"]) !== "undefined" ? obj.height["%"] : 0;
             var ret = {
-                width:obj.width["px"] + (obj.width["%"]/100 * gridRect.width),
-                height:obj.height["px"] + (obj.height["%"]/100 * gridRect.height),
-                top:obj.top["px"] + (obj.top["%"]/100 * gridRect.height) + context.gutter()/2,
-                left:obj.left["px"] + (obj.left["%"]/100 * gridRect.width) + context.gutter()/2
+                width:obj.width["px"] + (obj.width["%"]/100 * context.width()),
+                height:obj.height["px"] + (obj.height["%"]/100 * context.height()),
+                top:obj.top["px"] + (obj.top["%"]/100 * context.height()) + context.gutter()/2,
+                left:obj.left["px"] + (obj.left["%"]/100 * context.width()) + context.gutter()/2
             };
             return ret;
         }
@@ -197,6 +200,7 @@
         title = typeof (title) !== "undefined" ? title : "";
         if (widget) {
             var cell = new Cell()
+                .surfaceBorderWidth(0)
                 .widget(widget)
                 .title(title)
             ;
@@ -214,30 +218,30 @@
         return null;
     };
 
-    Border.prototype.getCellSize = function(i){
+    Border.prototype.getSize = function(i){
         switch(this.sectionTypes()[i]){
-            case "topSection":return this.topCellSize();
-            case "rightSection":return this.rightCellSize();
-            case "bottomSection":return this.bottomCellSize();
-            case "leftSection":return this.leftCellSize();
+            case "top":return this.topSize();
+            case "right":return this.rightSize();
+            case "bottom":return this.bottomSize();
+            case "left":return this.leftSize();
         }
     };
-    Border.prototype.changeCellSize = function(i,delta){
+    Border.prototype.changeSize = function(i,delta){
         switch(this.sectionTypes()[i]){
-            case "topSection":
-                this.topCellSize(this.topCellSize() + delta);
+            case "top":
+                this.topSize(this.topSize() + delta);
                 break;
-            case "rightSection":
-                this.rightCellSize(this.rightCellSize() + delta);
+            case "right":
+                this.rightSize(this.rightSize() + delta);
                 break;
-            case "bottomSection":
-                this.bottomCellSize(this.bottomCellSize() + delta);
+            case "bottom":
+                this.bottomSize(this.bottomSize() + delta);
                 break;
-            case "leftSection":
-                this.leftCellSize(this.leftCellSize() + delta);
+            case "left":
+                this.leftSize(this.leftSize() + delta);
                 break;
-            case "centerSection":
-                this.centerCellSize(this.centerCellSize() + delta);
+            case "center":
+                this.centerSize(this.centerSize() + delta);
                 break;
         }
     };
@@ -276,7 +280,7 @@
         var context = this;
 
         this._dragCell = d;
-        this._dragCellStartSize = this.getCellSize(i);
+        this._dragCellStartSize = this.getSize(i);
 
         context._handle = context.overHandle(d3.event.sourceEvent);
         if(context._dragCell._dragHandles.indexOf(context._handle) === -1){
@@ -291,27 +295,27 @@
             var yDelta = this._dragPrevY - d3.event.sourceEvent.clientY;
 
             switch(this._sectionTypeArr[i]){
-                case "topSection":
+                case "top":
                     if(yDelta !== 0){
-                        this.changeCellSize(i,-yDelta);
+                        this.changeSize(i,-yDelta);
                     }
                     break;
-                case "rightSection":
+                case "right":
                     if(xDelta !== 0){
-                        this.changeCellSize(i,xDelta);
+                        this.changeSize(i,xDelta);
                     }
                     break;
-                case "bottomSection":
+                case "bottom":
                     if(yDelta !== 0){
-                        this.changeCellSize(i,yDelta);
+                        this.changeSize(i,yDelta);
                     }
                     break;
-                case "leftSection":
+                case "left":
                     if(xDelta !== 0){
-                        this.changeCellSize(i,-xDelta);
+                        this.changeSize(i,-xDelta);
                     }
                     break;
-                case "centerSection":
+                case "center":
                     break;
             }
 
@@ -358,6 +362,15 @@
                    .target(this)
                 ;
             });
+        rows.each(function (d, idx) {
+                var sectionType = context.sectionTypes()[idx];
+                if(typeof (context[sectionType + "ShrinkWrap"]) !== "undefined" && context[sectionType + "ShrinkWrap"]()){
+                    d.render();
+                    context._shrinkWrapBoxes[sectionType] = d.widget().getBBox(true);
+                } else {
+                    delete context._shrinkWrapBoxes[sectionType];
+                }
+            });
 
         var drag = d3.behavior.drag()
             .on("dragstart", function (d,i) { context.dragStart.call(context,d,i); })
@@ -369,7 +382,7 @@
         } else {
             this.contentDiv.selectAll(".cell_" + this._id).on(".drag", null);
         }
-        this.applyLayoutType(this.layoutType());
+        this.applyLayoutType();
 
         rows
             .style("left", function (d) { return d._fixedLeft + "px"; })
@@ -383,7 +396,7 @@
                         .attr("draggable", context.designMode())
                 ;
                 d
-                    .surfacePadding(context.cellPadding())
+                    .surfacePadding(context.surfacePadding())
                     .resize()
                 ;
             });

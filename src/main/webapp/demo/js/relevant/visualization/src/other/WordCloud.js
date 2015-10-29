@@ -3,9 +3,9 @@
     if (typeof define === "function" && define.amd) {
         define(["d3", "../common/SVGWidget", "./IWordCloud", "d3-cloud", "css!./WordCloud"], factory);
     } else {
-        root.other_WordCloud = factory(root.d3, root.common_SVGWidget, root.other_IWordCloud);
+        root.other_WordCloud = factory(root.d3, root.common_SVGWidget, root.other_IWordCloud, root.d3.layout.cloud);
     }
-}(this, function (d3, SVGWidget, IWordCloud) {
+}(this, function (d3, SVGWidget, IWordCloud, D3Cloud) {
     function WordCloud() {
         SVGWidget.call(this);
         IWordCloud.call(this);
@@ -38,11 +38,17 @@
     };
 
     WordCloud.prototype.enter = function (domNode, element) {
-        this.cloud = d3.layout.cloud()
+        this.cloud = new D3Cloud()
             .font(this.fontFamily())
             .padding(this.padding())
         ;
-        this.svg = element.append("g");
+        this.zoomListener = d3.behavior.zoom()
+            .scaleExtent([1, 10])
+            .on("zoom", function () {
+                element.attr("transform", "translate(" + d3.event.translate[0] + "," + d3.event.translate[1] + ")" + "scale(" + d3.event.scale + ")");
+            })
+        ;
+        this._parentElement.call(this.zoomListener);
     };
 
     WordCloud.prototype.update = function (domNode, element) {
@@ -69,7 +75,7 @@
 
         function draw(data, bounds) {
             var fill = d3.scale.category20();
-            var text = context.svg.selectAll("text")
+            var text = element.selectAll("text")
                 .data(data, function (d) { return d.__viz_0 ? d.__viz_0.toLowerCase() : ""; })
             ;
             text.transition()
@@ -109,9 +115,11 @@
                 var dx = bounds[1].x - bounds[0].x,
                     dy = bounds[1].y - bounds[0].y,
                     borderScale = 0.9 / Math.max(dx / w, dy / h);
-                context.svg.transition().delay(1000).duration(750)
-                    .attr("transform", "scale(" + borderScale + ")")
+                
+                element.transition().delay(1000).duration(750)
+                    .attr("transform", "translate("+context._pos.x+","+context._pos.y+")scale(" + borderScale + ")")
                 ;
+                context.zoomListener.scale(borderScale).translate([context._pos.x,context._pos.y]);         
             }
         }
     };

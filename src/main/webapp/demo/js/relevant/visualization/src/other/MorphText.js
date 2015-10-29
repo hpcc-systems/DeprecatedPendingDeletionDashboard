@@ -8,84 +8,40 @@
 }(this, function (SVGWidget) {
     function MorphText() {
         SVGWidget.call(this);
-
-        this._text = "";
-        this._anchor = "middle";
-        this._reverse = false;
     }
     MorphText.prototype = Object.create(SVGWidget.prototype);
     MorphText.prototype.constructor = MorphText;
     MorphText.prototype._class += " other_MorphText";
 
-    MorphText.prototype.testData = function () {
-        var alphabet = "abcdefghijklmnopqrstuvwxyz".split("");
-        this.text(alphabet.join(""));
-        function shuffle(array) {
-            var m = array.length, t, i;
-            while (m) {
-                i = Math.floor(Math.random() * m--);
-                t = array[m];
-                array[m] = array[i];
-                array[i] = t;
-            }
-            return array;
-        }
-        var context = this;
-        setInterval(function () {
-            var randomAlphabet = shuffle(alphabet)
-                .slice(0, Math.floor(Math.random() * 26))
-                .sort()
-            ;
-            context
-                .text(randomAlphabet.join(""))
-                .render()
-            ;
-        }, 1500);
-        return this;
-    };
+    MorphText.prototype.publish("anchor","middle", "set", "Sets anchor point",["middle"],{tags:["Basic"]});
+    MorphText.prototype.publish("fontSize",14, "number", "Sets fontsize",null,{tags:["Basic"]});
+    MorphText.prototype.publish("reverse",false, "boolean", "Reverse Animation",null,{tags:["Basic"]});
+    MorphText.prototype.publish("text","", "string", "Sets text/data of widget",null,{tags:["Basic"]});
 
+    MorphText.prototype._origText = MorphText.prototype.text;
     MorphText.prototype.text = function (_) {
-        if (!arguments.length) return this._text;
-        this._text = _;
-
-        var usedChars = {};
-        var chars = this._text.split("");
-        this.data(chars.map(function(d) {
-            var id = "_" + d;
-            if (usedChars[id] === undefined) {
-                usedChars[id] = 0;
-            }
-            usedChars[id]++;
-            return {text: d, id: d.charCodeAt(0) + (1024 * usedChars[id])};
-        }));
-
-        return this;
-    };
-
-    MorphText.prototype.anchor = function (_) {
-        if (!arguments.length) return this._anchor;
-        this._anchor = _;
-        return this;
-    };
-
-    MorphText.prototype.fontSize = function (_) {
-        if (!arguments.length) return this._fontSize;
-        this._fontSize = _;
-        return this;
-    };
-
-    MorphText.prototype.reverse = function (_) {
-        if (!arguments.length) return this._reverse;
-        this._reverse = _;
-        return this;
+        var retVal = MorphText.prototype._origText.apply(this, arguments);
+        if (arguments.length) {
+            var usedChars = {};
+            var chars = _.split("");
+            this.data(chars.map(function(d) {
+                var id = "_" + d;
+                if (usedChars[id] === undefined) {
+                    usedChars[id] = 0;
+                }
+                usedChars[id]++;
+                return {text: d, id: d.charCodeAt(0) + (1024 * usedChars[id])};
+            }));
+        }
+        return retVal;
     };
 
     MorphText.prototype.enter = function (domNode, element) {
-        if (!this._fontSize) {
+        if (!this.fontSize()) {
             var style = window.getComputedStyle(domNode, null);
-            this._fontSize = parseInt(style.fontSize);
+            this.fontSize(parseInt(style.fontSize));
         }
-        this._fontWidth = this._fontSize * 32 / 48;
+        this._fontWidth = this.fontSize() * 32 / 48;
         this._textElement = element.append("g")
         ;
     };
@@ -110,17 +66,17 @@
           .attr("class", "update")
         ;
         this.transition.apply(text)
-            .attr("x", function (d, i) { return (-context._data.length / 2 + i) * context._fontWidth + context._fontWidth / 2; })
+            .attr("x", function (d, i) { return (-context.data().length / 2 + i) * context._fontWidth + context._fontWidth / 2; })
         ;
 
         var newText = text.enter().append("text")
             .attr("class", "enter")
-            .attr("font-size", this._fontSize)
+            .attr("font-size", this.fontSize())
             .attr("dy", ".35em")
-            .attr("y", (this._reverse ? +1 : -1) * this._fontWidth * 2)
-            .attr("x", function (d, i) { return (-context._data.length / 2 + i) * context._fontWidth + context._fontWidth / 2; })
+            .attr("y", (this.reverse() ? +1 : -1) * this._fontWidth * 2)
+            .attr("x", function (d, i) { return (-context.data().length / 2 + i) * context._fontWidth + context._fontWidth / 2; })
             .style("fill-opacity", 1e-6)
-            .style("text-anchor", this._anchor)
+            .style("text-anchor", this.anchor())
             .text(function (d) { return d.text; })
         ;
         this.transition.apply(newText)
@@ -132,7 +88,7 @@
             .attr("class", "exit")
         ;
         this.transition.apply(text.exit())
-            .attr("y", (this._reverse ? -1 : +1) * this._fontWidth * 2)
+            .attr("y", (this.reverse() ? -1 : +1) * this._fontWidth * 2)
             .style("fill-opacity", 1e-6)
             .remove()
         ;

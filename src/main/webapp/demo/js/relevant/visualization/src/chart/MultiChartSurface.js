@@ -28,8 +28,6 @@
     MultiChartSurface.prototype._class += " chart_MultiChartSurface";
     MultiChartSurface.prototype.implements(INDChart.prototype);
 
-    MultiChartSurface.prototype.testData = INDChart.prototype.testData;
-
     MultiChartSurface.prototype.publish("mode", "2D", "set", "Chart Type", ["1D", "2D", "ND", "all"]);
     MultiChartSurface.prototype.publishProxy("chartType", "_content");
 
@@ -45,9 +43,9 @@
         return this;
     };
 
-    MultiChartSurface.prototype._modeOrig = MultiChartSurface.prototype.mode;
+    MultiChartSurface.prototype._origMode = MultiChartSurface.prototype.mode;
     MultiChartSurface.prototype.mode = function (_) {
-        var retVal = MultiChartSurface.prototype._modeOrig.apply(this, arguments);
+        var retVal = MultiChartSurface.prototype._origMode.apply(this, arguments);
         if (arguments.length) {
             this._mode = _;
             switch (this._mode) {

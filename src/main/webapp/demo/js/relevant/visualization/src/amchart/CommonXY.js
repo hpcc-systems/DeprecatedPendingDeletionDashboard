@@ -11,14 +11,18 @@
         this._tag = "div";
 
         this._chart = {};
+
+        this._selected = null;
     }
     CommonXY.prototype = Object.create(HTMLWidget.prototype);
     CommonXY.prototype.constructor = CommonXY;
     CommonXY.prototype._class += " amchart_CommonXY";
 
-    CommonXY.prototype.publish("fontSize", null, "number", "Font Size",null,{tags:["Basic","Shared"]});
-    CommonXY.prototype.publish("fontFamily", null, "string", "Font Name",null,{tags:["Basic","Shared"]});
-    CommonXY.prototype.publish("fontColor", null, "html-color", "Font Color",null,{tags:["Basic","Shared"]});
+    CommonXY.prototype.publish("xAxisType", "ordinal", "set", "X Axis Type", ["linear", "ordinal"],{tags:["Intermediate"]});
+
+    CommonXY.prototype.publish("fontSize", 11, "number", "Font Size",null,{tags:["Basic","Shared"]});
+    CommonXY.prototype.publish("fontFamily", "Verdana", "string", "Font Name",null,{tags:["Basic","Shared","Shared"]});
+    CommonXY.prototype.publish("fontColor", "#000000", "html-color", "Font Color",null,{tags:["Basic","Shared"]});
 
     CommonXY.prototype.publish("lineWidth", 0, "number", "Line Thickness", null, {min:0,max:10,step:1,inputType:"range",tags:["Basic","Shared"]});
     CommonXY.prototype.publish("lineColor", null, "html-color", "Color of the data/content lines",null,{tags:["Basic","Shared"]});
@@ -29,8 +33,8 @@
     CommonXY.prototype.publish("yAxisTitle", "", "string", "Y-Axis Title",null,{tags:["Basic","Shared"]});
     CommonXY.prototype.publish("xAxisTitle", "", "string", "X-Axis Title",null,{tags:["Basic","Shared"]});
 
-    CommonXY.prototype.publish("xAxisBaselineColor", null, "html-color", "Axis color",null,{tags:["Basic","Shared"]});
-    CommonXY.prototype.publish("yAxisBaselineColor", null, "html-color", "Axis color",null,{tags:["Basic","Shared"]});
+    CommonXY.prototype.publish("xAxisBaselineColor", "#000000", "html-color", "Axis color",null,{tags:["Basic","Shared"]});
+    CommonXY.prototype.publish("yAxisBaselineColor", "#000000", "html-color", "Axis color",null,{tags:["Basic","Shared"]});
 
     CommonXY.prototype.publish("xAxisFontColor", null, "html-color", "Horizontal axis text style (Color)",null,{tags:["Basic","Shared"]});
     CommonXY.prototype.publish("yAxisFontColor", null, "html-color", "Vertical axis text style (Color)",null,{tags:["Basic","Shared"]});
@@ -57,8 +61,6 @@
     CommonXY.prototype.publish("marginTop", 20, "number", "Margin (Top)",null,{tags:["Intermediate"]});
     CommonXY.prototype.publish("marginBottom", 50, "number", "Margin (Bottom)",null,{tags:["Intermediate"]});
 
-    CommonXY.prototype.publish("dataDateFormat", null, "string", "",null,{tags:["Private"]});
-
     CommonXY.prototype.publish("xAxisAutoGridCount", true, "boolean", "Specifies whether number of gridCount is specified automatically, acoarding to the axis size",null,{tags:["Advanced"]});
     CommonXY.prototype.publish("yAxisAutoGridCount", true, "boolean", "Specifies whether number of gridCount is specified automatically, acoarding to the axis size",null,{tags:["Advanced"]});
 
@@ -82,6 +84,12 @@
 
     CommonXY.prototype.publish("useClonedPalette", false, "boolean", "Enable or disable using a cloned palette",null,{tags:["Intermediate","Shared"]});
 
+    CommonXY.prototype.publish("yAxisTickFormat", null, "string", "Y-Axis Tick Format", null, { optional: true });
+    CommonXY.prototype.publish("xAxisTickFormat", null, "string", "X-Axis Tick Format", null, { optional: true });
+
+    CommonXY.prototype.publish("selectionColor", "#f00", "html-color", "Font Color",null,{tags:["Basic"]});
+    CommonXY.prototype.publish("selectionMode", "simple", "set", "Selection Mode", ["simple", "multi"], { tags: ["Intermediate"] });
+
     CommonXY.prototype.updateChartOptions = function() {
         var context = this;
 
@@ -96,8 +104,6 @@
         if (this.marginRight()) { this._chart.marginRight = this.marginRight(); }
         if (this.marginTop()) { this._chart.marginTop = this.marginTop(); }
         if (this.marginBottom()) { this._chart.marginBottom = this.marginBottom(); }
-
-        this._chart.dataDateFormat = this.dataDateFormat();
 
         this._chart.valueAxes[0].position = "bottom";
         this._chart.valueAxes[0].axisAlpha = this.axisAlpha();
@@ -115,6 +121,20 @@
         this._chart.valueAxes[0].gridAlpha = this.xAxisGridAlpha();
         this._chart.valueAxes[0].dashLength = this.xAxisDashLength();
 
+        this._chart.dataProvider = this.formatData(this.data());
+
+        if (this.xAxisType() === "ordinal") {
+            this._chart.valueAxes[0].integersOnly = true;
+            this._chart.valueAxes[0].maximum = this.data().length;
+            this._chart.valueAxes[0].labelFunction = function(val) {
+                return context.data().length && val > 0 ? context.data()[val-1][0] : "";
+            };
+        } else {
+            this._chart.valueAxes[0].labelFunction = function(d) {
+                return d3.format(context.xAxisTickFormat())(d);
+            };
+        }
+
         this._chart.valueAxes[1].position = "left";
         this._chart.valueAxes[1].axisAlpha = this.axisAlpha();
         this._chart.valueAxes[1].title = this.yAxisTitle();
@@ -131,16 +151,17 @@
         this._chart.valueAxes[1].dashLength = this.yAxisDashLength();
         this._chart.valueAxes[1].axisTitleOffset = this.yAxisTitleOffset();
 
-        // DataProvider
-        this._chart.dataProvider = this.formatData(this._data);
+        this._chart.valueAxes[1].labelFunction = function(d) {
+            return d3.format(context.yAxisTickFormat())(d);
+        };
 
         this._chart.dataProvider.forEach(function(dataPoint,i){
-            context._chart.dataProvider[i].color = context._palette(dataPoint[context._columns[2]]); // By Y value
-            context._chart.dataProvider[i].linecolor = context.lineColor() !== null ? context.lineColor() : context._palette(dataPoint[context._columns[2]]);
+            context._chart.dataProvider[i].color = context._palette(dataPoint[context.columns()[2]]); // By Y value
+            context._chart.dataProvider[i].linecolor = context.lineColor() !== null ? context.lineColor() : context._palette(dataPoint[context.columns()[2]]);
         });
+
         this._chart.colors = [];
 
-        // Scroll Bar
         if (this.showScrollbar()) {
             this._chart.chartScrollbar.enabled = true;
         } else {
@@ -154,7 +175,10 @@
         var context = this;
         var gObj = {};
 
-        gObj.balloonText = context.tooltipTemplate();
+        gObj.balloonFunction = function(d) {
+            var balloonText = context.columns()[d.graph.index]  + ": " + context.data()[d.index][d.graph.index];
+            return balloonText;
+        };
         gObj.lineAlpha = context.lineOpacity();
         gObj.lineThickness = context.lineWidth();
         gObj.bullet = context.bulletType();
@@ -166,43 +190,33 @@
 
         gObj.type = gType;
 
-        gObj.colorField = "color";
+        gObj.colorField = "selected" + i;
         gObj.lineColorField = "linecolor";
 
         // XY Values
-        gObj.xField = context._columns[1];
-        gObj.yField = context._columns[2];
-
+        if (this.xAxisType() === "ordinal") {
+            gObj.xField = "idx";
+            gObj.yField = context.columns()[i];
+        }
+        if (this.xAxisType() === "linear") {
+            gObj.xField = context.columns()[0];
+            gObj.yField = context.columns()[1];
+        }
         return gObj;
     };
 
     CommonXY.prototype.formatData = function(dataArr) {
         var context = this;
         var dataObjArr = [];
-        dataArr.forEach(function(dataRow) {
+        dataArr.forEach(function(dataRow, i) {
             var dataObj = {};
-            context._columns.forEach(function(colName, cIdx) {
+            context.columns().forEach(function(colName, cIdx) {
                 dataObj[colName] = dataRow[cIdx];
+                dataObj["idx"] = i + 1;
             });
             dataObjArr.push(dataObj);
         });
         return dataObjArr;
-    };
-
-    CommonXY.prototype.columns = function(colArr) {
-        if (!arguments.length) return this._columns;
-        var context = this;
-        var retVal = HTMLWidget.prototype.columns.apply(this, arguments);
-        if (arguments.length) {
-            this._categoryField = colArr[0];
-            this._valueField = [];
-            colArr.slice(1, colArr.length).forEach(function(col) {
-                context._valueField.push(col);
-            });
-            this._columns = colArr;
-            return this;
-        }
-        return retVal;
     };
 
     CommonXY.prototype.enter = function(domNode, element) {
@@ -211,7 +225,8 @@
         var initObj = {
             theme: "none",
             type: "xy",
-            automargins: false,
+            addClassNames: true,
+            autoMargins: false,
             chartScrollbar: {},
             valueAxes: [
                 {position:"bottom",title:" "},
@@ -228,7 +243,34 @@
         }
         this._chart = AmCharts.makeChart(domNode, initObj);
         this._chart.addListener("clickGraphItem", function(e) {
-            context.click(context.rowToObj(context._data[e.index]), context._columns[e.target.columnIndex+1]);
+            var graph = e.graph;
+            var data  = e.item.dataContext;
+            var field = graph.colorField;
+
+            if (data[field] !== null && data[field] !== undefined) {
+                delete data[field];
+                if (context.selectionMode() === "simple") {
+                    if (context._selected !== null) {
+                        delete context._selected.data[context._selected.field];
+                    }
+                    context._selected = null;
+                }
+            } else {
+                data[field] = context.selectionColor();
+                if (context.selectionMode() === "simple") {
+                    if (context._selected !== null) {
+                        delete context._selected.data[context._selected.field];
+                    }
+                    context._selected = {
+                        field: field,
+                        data: data
+                    };
+                }
+            }
+
+            e.chart.validateData();
+
+            context.click(context.rowToObj(context.data()[e.index]), context.columns()[e.target.index], context.data()[e.index][e.target.index]);
         });
     };
 

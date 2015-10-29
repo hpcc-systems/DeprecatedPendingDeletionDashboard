@@ -1,14 +1,9 @@
-/*
- (c) 2014, Vladimir Agafonkin
- simpleheat, a tiny JavaScript library for drawing heatmaps with Canvas
- https://github.com/mourner/simpleheat
-*/
+'use strict';
 
-(function () { 'use strict';
+if (typeof module !== 'undefined') module.exports = simpleheat;
 
 function simpleheat(canvas) {
-    // jshint newcap: false, validthis: true
-    if (!(this instanceof simpleheat)) { return new simpleheat(canvas); }
+    if (!(this instanceof simpleheat)) return new simpleheat(canvas);
 
     this._canvas = canvas = typeof canvas === 'string' ? document.getElementById(canvas) : canvas;
 
@@ -62,16 +57,21 @@ simpleheat.prototype = {
 
         circle.width = circle.height = r2 * 2;
 
-        ctx.shadowOffsetX = ctx.shadowOffsetY = 200;
+        ctx.shadowOffsetX = ctx.shadowOffsetY = r2 * 2;
         ctx.shadowBlur = blur;
         ctx.shadowColor = 'black';
 
         ctx.beginPath();
-        ctx.arc(r2 - 200, r2 - 200, r, 0, Math.PI * 2, true);
+        ctx.arc(-r2, -r2, r, 0, Math.PI * 2, true);
         ctx.closePath();
         ctx.fill();
 
         return this;
+    },
+
+    resize: function () {
+        this._width = this._canvas.width;
+        this._height = this._canvas.height;
     },
 
     gradient: function (grad) {
@@ -96,12 +96,8 @@ simpleheat.prototype = {
     },
 
     draw: function (minOpacity) {
-        if (!this._circle) {
-            this.radius(this.defaultRadius);
-        }
-        if (!this._grad) {
-            this.gradient(this.defaultGradient);
-        }
+        if (!this._circle) this.radius(this.defaultRadius);
+        if (!this._grad) this.gradient(this.defaultGradient);
 
         var ctx = this._ctx;
 
@@ -110,7 +106,6 @@ simpleheat.prototype = {
         // draw a grayscale heatmap by putting a blurred circle at each data point
         for (var i = 0, len = this._data.length, p; i < len; i++) {
             p = this._data[i];
-
             ctx.globalAlpha = Math.max(p[2] / this._max, minOpacity === undefined ? 0.05 : minOpacity);
             ctx.drawImage(this._circle, p[0] - this._r, p[1] - this._r);
         }
@@ -124,18 +119,14 @@ simpleheat.prototype = {
     },
 
     _colorize: function (pixels, gradient) {
-        for (var i = 3, len = pixels.length, j; i < len; i += 4) {
-            j = pixels[i] * 4; // get gradient color from opacity value
+        for (var i = 0, len = pixels.length, j; i < len; i += 4) {
+            j = pixels[i + 3] * 4; // get gradient color from opacity value
 
             if (j) {
-                pixels[i - 3] = gradient[j];
-                pixels[i - 2] = gradient[j + 1];
-                pixels[i - 1] = gradient[j + 2];
+                pixels[i] = gradient[j];
+                pixels[i + 1] = gradient[j + 1];
+                pixels[i + 2] = gradient[j + 2];
             }
         }
     }
 };
-
-window.simpleheat = simpleheat;
-
-})();

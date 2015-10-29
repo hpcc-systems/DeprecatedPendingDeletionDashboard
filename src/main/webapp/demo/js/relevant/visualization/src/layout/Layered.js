@@ -15,28 +15,9 @@
     Layered.prototype.constructor = Layered;
     Layered.prototype._class += " layout_Layered";
 
-    Layered.prototype.publish("padding", 0, "number", "Padding");
+    Layered.prototype.publish("surfacePadding", 0, "number", "Padding");
 
     Layered.prototype.publish("widgets", [], "widgetArray", "widgets", null, { tags: ["Private"] });
-
-    Layered.prototype.testData = function () {
-        this
-            .addLayer(new AbsoluteSurface().widgetX(0).widgetY(0).widgetWidth(100).widgetHeight(100).widget(new TextBox().testData()))
-            .addLayer(new AbsoluteSurface().widgetX(40).widgetY(40).widgetWidth(50).widgetHeight(50).opacity(0.66).widget(new TextBox().testData()))
-            .addLayer(new AbsoluteSurface().widgetX(30).widgetY(10).widgetWidth(40).widgetHeight(30).widget(new TextBox().testData()))
-        ;
-        var context = this;
-        setInterval(function () {
-            context.widgets().sort(function (l, r) {
-                if (Math.random() < 0.5) {
-                    return -1;
-                }
-                return 1;
-            });
-            context.render();
-        }, 3000);
-        return this;
-    };
 
     Layered.prototype.addLayer = function(widget) {
         var widgets = this.widgets();
@@ -56,7 +37,7 @@
         HTMLWidget.prototype.update.apply(this, arguments);
         var context = this;
 
-        element.style("padding", this.padding() + "px");
+        element.style("padding", this.surfacePadding() + "px");
 
         var content = this._contentContainer.selectAll(".content.id" + this.id()).data(this.widgets(), function (d) { return d.id(); });
         content.enter().append("div")

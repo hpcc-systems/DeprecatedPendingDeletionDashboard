@@ -18,16 +18,17 @@
     Shape.prototype.publish("height", 24, "number", "Height",null,{tags:["Private"]});
     Shape.prototype.publish("colorStroke", null, "html-color", "Stroke Color", null, {tags:["Private"]});
     Shape.prototype.publish("colorFill", null, "html-color", "Fill Color", null, {tags:["Private"]});
+    Shape.prototype.publish("radius", null, "number", "Radius",null,{tags:["Private"]});
 
+    Shape.prototype._origRadius = Shape.prototype.radius;
     Shape.prototype.radius = function (_) {
-        if (!arguments.length) return Math.max(this.width(), this.height()) / 2;
-        this.width(_);
-        this.height(_);
-        return this;
-    };
-
-    Shape.prototype.testData = function () {
-        return this;
+        var retVal = Shape.prototype._origRadius.apply(this, arguments);
+        if (arguments.length) {
+            this.width(_);
+            this.height(_);
+            return retVal;
+        }
+        return Math.max(this.width(), this.height()) / 2;
     };
 
     Shape.prototype.intersection = function (pointA, pointB) {
@@ -45,12 +46,11 @@
             .attr("class", "common_Shape")
         ;
         var context = this;
-        shape.each(function (d) {
+        shape
+            .attr("fill", context.colorFill())
+            .attr("stroke", context.colorStroke())
+            .each(function (d) {
             var element = d3.select(this);
-            element.style({
-                fill: context.colorFill(),
-                stroke: context.colorStroke()
-            });
             switch (context.shape()) {
                 case "circle":
                     var radius = context.radius();

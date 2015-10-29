@@ -17,18 +17,6 @@
     Pyramid.prototype.implements(I2DChart.prototype);
 
     Pyramid.prototype.publish("paletteID", "default", "set", "Palette ID", Pyramid.prototype._palette.switch(), {tags:["Basic","Shared"]});
-    Pyramid.prototype.publish("tooltipTemplate","[[category]]([[title]]): [[value]]", "string", "Tooltip Text",null,{tags:["Intermediate"]});
-
-    Pyramid.prototype.testData = function() {
-        this.columns(["Subject", "Year 1"]);
-        this.data([
-            ["Geography", 75],
-            ["English", 23],
-            ["Math", 98],
-            ["Science", 66]
-        ]);
-        return this;
-    };
 
     Pyramid.prototype.enter = function(domNode, element) {
         CommonFunnel.prototype.enter.apply(this, arguments);

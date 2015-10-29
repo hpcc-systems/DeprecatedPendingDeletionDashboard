@@ -20,28 +20,6 @@
 
     ChoroplethCountries.prototype.publish("worldProjection", "mercator", "set", "Map Projection", ["mercator", "orthographic"],{tags:["Private"]});
 
-    ChoroplethCountries.prototype.testData = function () {
-
-        var nameCodeMap = {};
-        for (var key in countries.countryNames) {
-            var item = countries.countryNames[key];
-            nameCodeMap[item.name] = key;
-        }
-
-        var rawData = [
-            { "name": "United States", "weight": 29.946185501741 }, { "name": "China", "weight": 229.946185501741 }
-        ];
-
-        var countryData = rawData.map(function (item) {
-            return { "country": nameCodeMap[item.name], "weight": item.weight, "label":item.name };
-        });
-
-        this.columns(["Country", "Weight", "Label"]);
-        this.data(countryData);
-
-        return this;
-    };
-
     ChoroplethCountries.prototype.data = function (_) {
         var retVal = Choropleth.prototype.data.apply(this, arguments);
         if (arguments.length) {
@@ -50,7 +28,7 @@
             this._dataMaxWeight = null;
 
             var context = this;
-            this._data.forEach(function (item) {
+            this.data().forEach(function (item) {
                 context._dataMap[item.country] = item.weight;
                 if (!context._dataMinWeight || item.weight < context._dataMinWeight) {
                     context._dataMinWeight = item.weight;
@@ -99,7 +77,7 @@
             })
             .on("mouseover.tooltip", function (d) {
                 if (context._dataMap[d.id]) {
-                    context.tooltipShow([d.name, context._dataMap[d.id]], context._columns, 1);
+                    context.tooltipShow([d.name, context._dataMap[d.id]], context.columns(), 1);
                 }
             })
             .on("mouseout.tooltip", function (d) {
@@ -107,7 +85,7 @@
             })
             .on("mousemove.tooltip", function (d) {
                 if (context._dataMap[d.id]) {
-                    context.tooltipShow([d.name, context._dataMap[d.id]], context._columns, 1);
+                    context.tooltipShow([d.name, context._dataMap[d.id]], context.columns(), 1);
                 }
             })
             .attr("id", function (d) {

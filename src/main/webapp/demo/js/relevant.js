@@ -103,9 +103,9 @@ function logShowrelevantLayout(divId, releventlayout){
         var entity = search[search.length - 1];
             if (!entity) {
             	 entity = chartData.claimId;
-            }            
-            if(!chartData.claimId && chartData.groupTypeId && chartData.groupId ){
-            	app.queryGroup(chartData.groupId,chartData.groupTypeId);
+            } 
+            if(!chartData.claimId && chartData.groupType && chartData.groupId ){
+            	app.queryGroup(chartData.groupId,chartData.groupType);
             }
             if(entity){
 	            if (entity.indexOf("CLM") === 0) {

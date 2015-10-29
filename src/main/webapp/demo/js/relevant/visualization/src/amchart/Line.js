@@ -20,7 +20,9 @@
     Line.prototype.publish("smoothLines", false, "boolean", "Causes chart data lines to draw smoothly",null,{tags:["Basic","Shared"]});
 
     Line.prototype.publish("stepLines", false, "boolean", "Causes chart data lines to draw smoothly",null,{tags:["Basic"]});
-    Line.prototype.publish("tooltipTemplate","[[category]]([[title]]): [[value]]", "string", "Tooltip Text",null,{tags:["Basic"]});
+
+    Line.prototype.publish("bulletSize", 6, "number", "Bullet Size",null,{tags:["Intermediate"]});
+    Line.prototype.publish("bulletType", "round", "set", "Bullet Type", ["none", "round", "square", "triangleUp", "triangleDown", "triangleLeft", "triangleRight", "bubble", "diamond"],{tags:["Basic"]});
 
     Line.prototype.enter = function(domNode, element) {
         CommonSerial.prototype.enter.apply(this, arguments);
@@ -30,7 +32,7 @@
         CommonSerial.prototype.updateChartOptions.apply(this, arguments);
 
         // Color Palette
-        this._chart.colors = this._columns.filter(function (d, i) { return i > 0; }).map(function (row) {
+        this._chart.colors = this.columns().filter(function (d, i) { return i > 0; }).map(function (row) {
             return this._palette(row);
         }, this);
 
@@ -40,26 +42,16 @@
     };
 
     Line.prototype.buildGraphs = function(gType) {
-        if (typeof(this._chart.graphs) === "undefined") { this._chart.graphs = []; }
-        var currentGraphCount = this._chart.graphs.length;
-        var buildGraphCount = Math.max(currentGraphCount, this._valueField.length);
+        this._chart.graphs = [];
 
-        for(var i = 0; i < buildGraphCount; i++) {
-            if ((typeof(this._valueField) !== "undefined" && typeof(this._valueField[i]) !== "undefined")) { //mark
-                var gRetVal = CommonSerial.prototype.buildGraphObj.call(this,gType,i);
-                var gObj = buildGraphObj.call(this,gRetVal);
+        for (var i = 0; i < this.columns().length - 1; i++) {
+            var gRetVal = CommonSerial.prototype.buildGraphObj.call(this, gType, i);
+            var gObj = buildGraphObj.call(this, gRetVal, i);
 
-                if (typeof(this._chart.graphs[i]) !== "undefined") {
-                    for (var key in gObj) { this._chart.graphs[i][key] = gObj[key]; }
-                } else {
-                    this._chart.addGraph(gObj);
-                }
-            } else {
-                this._chart.removeGraph(this._chart.graphs[i]);
-            }
+            this._chart.addGraph(gObj);
         }
 
-        function buildGraphObj(gObj) {
+        function buildGraphObj(gObj, i) {
             if (this.stepLines()) {
                 gObj.type = "step";
             } else if (this.smoothLines()) {
@@ -67,6 +59,11 @@
             } else {
                 gObj.type = "line";
             }
+
+            gObj.colorField = "selected" + i;
+
+            gObj.bullet = this.bulletType();
+            gObj.bulletSize = this.bulletSize();
 
             return gObj;
         }

@@ -175,7 +175,6 @@ public class RelevantController extends SelectorComposer<Component>{
     @Listen("onSelect = #groupIdCombobox")
     public void onSelectGroupId(SelectEvent<Component, String> event){
         relevantData.setGroupId(null);
-        //if(!SELECT.equals(event.getSelectedObjects().iterator().next())){
         if(!SELECT.equals(groupIdModel.getSelection().iterator().next())){
             relevantData.setGroupId(event.getSelectedObjects().iterator().next());
         }
@@ -186,7 +185,6 @@ public class RelevantController extends SelectorComposer<Component>{
 	    relevantData.setGroupType(null);
 	    relevantData.setGroupId(null);
 	    groupIdModel.clearSelection();
-	    //if(!SELECT.equals(event.getSelectedObjects().iterator().next())){
 	    if(!SELECT.equals(groupTypeIdModel.getSelection().iterator().next().getId())){
 	        RelevantGroupType selectedGroupType = groupTypeIdModel.getSelection().iterator().next();
 	        relevantData.setGroupType(selectedGroupType);

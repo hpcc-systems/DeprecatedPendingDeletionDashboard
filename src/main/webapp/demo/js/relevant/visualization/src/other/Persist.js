@@ -56,10 +56,12 @@
         var publishedProps = discover(widget);
         for (var i = 0; i < publishedProps.length; ++i) {
             var publishItem = publishedProps[i];
-            visitor(widget, publishItem);
+            if(typeof (filter) !== "function" || !filter(widget, publishItem)){
+                visitor(widget, publishItem);
+            }
         }
     }
-
+    
     function widgetPropertyWalker(widget, filter, visitor) {
         widgetWalker(widget, function (widget) {
             propertyWalker(widget, filter, visitor);

@@ -16,7 +16,7 @@
     Bar.prototype.constructor = Bar;
     Bar.prototype._class += " google_Bar";
 
-    Bar.prototype.publish("isStacked", false, "boolean", "Stacks the elements in a series",null,{tags:["Basic","Shared"]});
+    Bar.prototype.publish("stacked", false, "boolean", "Stacks the elements in a series",null,{tags:["Basic","Shared"]});
     //opacity?
     Bar.prototype.publish("axisFontSize", null, "number", "X/Y Axis Label Font Size",null,{tags:["Basic","Shared"]});
     Bar.prototype.publish("axisFontFamily", null, "string", "X/Y Axis Label Font Name",null,{tags:["Basic","Shared"]});
@@ -50,8 +50,8 @@
     Bar.prototype.publish("xAxisInversed", false, "boolean", "The Direction In Which The Values Along The Horizontal Axis Grow.",null,{tags:["Advanced"]});
     Bar.prototype.publish("yAxisInversed", false, "boolean", "The Direction In Which The Values Along The Vertical Axis Grow.",null,{tags:["Advanced"]});
 
-    Bar.prototype.publish("xAxisFormat", "", "string", "Format String For Numeric Axis Labels", ["","decimal","scientific","currency","percent","short","long"],{tags:["Intermediate"]});
-    Bar.prototype.publish("yAxisFormat", "", "string", "Format String For Numeric Axis Labels", ["","decimal","scientific","currency","percent","short","long"],{tags:["Intermediate"]});
+    Bar.prototype.publish("xAxisFormatType", "", "set", "Format String For Numeric Axis Labels", ["","decimal","scientific","currency","percent","short","long"],{tags:["Intermediate"]});
+    Bar.prototype.publish("yAxisFormatType", "", "set", "Format String For Numeric Axis Labels", ["","decimal","scientific","currency","percent","short","long"],{tags:["Intermediate"]});
 
     Bar.prototype.publish("xAxisGridlinesCount", 5, "number", "The Number of Horizontal Gridlines Between Two Regular Gridlines",null,{tags:["Intermediate"]});
     Bar.prototype.publish("yAxisGridlinesCount", 5, "number", "The Number of Vertical Gridlines Between Two Regular Gridline",null,{tags:["Intermediate"]});
@@ -93,7 +93,7 @@
         var retVal = CommonND.prototype.getChartOptions.apply(this, arguments);
 
         retVal.dataOpacity = this.dataOpacity();
-        retVal.isStacked = this.isStacked();
+        retVal.stacked = this.stacked();
         retVal.bar = {
             groupWidth: this.groupWidth()
         };
@@ -121,7 +121,7 @@
         retVal.hAxis.slantedText = this.xAxisLabelRotation() !== 0;
         retVal.hAxis.slantedTextAngle = this.xAxisLabelRotation();
 
-        retVal.hAxis.format = this.xAxisFormat();
+        retVal.hAxis.format = this.xAxisFormatType();
         retVal.hAxis.textStyle = {
             color: this.xAxisFontColor(),
             fontName: this.axisFontFamily() ? this.axisFontFamily() : this.fontFamily(),
@@ -160,7 +160,7 @@
         retVal.vAxis.minValue = this.yAxisMinValue();
         retVal.vAxis.maxValue = this.yAxisMaxValue();
 
-        retVal.vAxis.format = this.yAxisFormat();
+        retVal.vAxis.format = this.yAxisFormatType();
         retVal.vAxis.textStyle = {
             color: this.yAxisFontColor(),
             fontName: this.axisFontFamily() ? this.axisFontFamily() : this.fontFamily(),
