@@ -57,35 +57,35 @@
 				<div zclass="options-div">
 					<label value="${labels.commonFilters}" zclass="h5"></label>
 				</div>
-				<checkbox label="Enable" id="commonFiltersCheckbox"></checkbox>
+				<checkbox label="${labels.enable}" id="commonFiltersCheckbox"></checkbox>
 				<space></space>
-				<checkbox label="Prevent deletion" id="lockCfCheckbox"></checkbox>
+				<checkbox label="${labels.preventDelete}" id="lockCfCheckbox"></checkbox>
 				<space></space>
-				<checkbox label="Prevent Addition" id="lockaddCfCheckbox"></checkbox>
+				<checkbox label="${labels.preventAddition}" id="lockaddCfCheckbox"></checkbox>
 			</hbox>
 			
 			<hbox align="center" sclass="options-form">
 				<div zclass="options-div">
-					<label value="Chart Titles" zclass="h5"></label>
+					<label value="${labels.chartTitle }" zclass="h5"></label>
 				</div>
-				<checkbox id="lockTitleCheckbox" label="Disable title modification"></checkbox>
+				<checkbox id="lockTitleCheckbox" label="${labels.disableTitle}"></checkbox>
 			</hbox>
 			
 			<hbox align="center" sclass="options-form">
 				<div zclass="options-div">
-					<label value="Widget level filters" zclass="h5"></label>
+					<label value="${labels.widgetLevelFilter }" zclass="h5"></label>
 				</div>
-				<checkbox id="localFiltersCheckbox" label="Show filter popup"></checkbox>
+				<checkbox id="localFiltersCheckbox" label="${labels.showFilter}"></checkbox>
 			</hbox>
 			
 			<hbox align="center" sclass="options-form">
 				<div zclass="options-div">
-					<label value="Dashboard Visiblity" zclass="h5"></label>
+					<label value="${labels.dashboardVisibility }" zclass="h5"></label>
 				</div>
 				<radiogroup id="visiblityRadiogroup">
-					<radio  value="0" label="Private" selected="true"></radio>
+					<radio  value="0" label="${labels.privateKey }" selected="true"></radio>
 					<space></space>
-					<radio  value="1" label="Public"></radio>
+					<radio  value="1" label="${labels.publicKey }"></radio>
 				</radiogroup>
 			</hbox>
 		</vlayout>

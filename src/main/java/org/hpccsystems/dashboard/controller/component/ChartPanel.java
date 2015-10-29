@@ -1045,7 +1045,7 @@ public class ChartPanel extends Panel {
             for (String data1 : data) {
                 jo.put(data1, Labels.getLabel(data1));
             }
-            Clients.evalJavaScript("logShowrelevantLayout('" + chartDiv.getId() + "'," + jo + ");");
+            Clients.evalJavaScript("renderRelevantLayout('" + chartDiv.getId() + "'," + jo + ");");
         });
         
         ChartDetails chartDetails = chartService.getCharts().get(portlet.getChartType());
