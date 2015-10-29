@@ -4,7 +4,7 @@
 
 var backupAppData = [];
 var obj;
-function logShowrelevantLayout(divId, releventlayout){
+function renderRelevantLayout(divId, releventlayout){
 	console.log(releventlayout);
 	obj = releventlayout;
 	var reqData;
@@ -39,7 +39,8 @@ function logShowrelevantLayout(divId, releventlayout){
         	
         	divElement.append(jq("<header>" +
 					"<nav>" +
-						"<a style=\"float:left;\" class=\"back\"> <i class=\"fa fa-arrow-left\"></i></a>"+	
+						"<a style=\"float:left;\" class=\"back\"> <i class=\"fa fa-arrow-left\"></i></a>"+
+						"<li><label class=\"relevantBackButton\">"+releventlayout.back+"</label></li>"+
 						"<div style=\"height:37px;border-left:1px solid #000;display:inline;float:left;\"> &nbsp;</div>"+
 						"<select style=\"float:left;\" id=\"selectbox\" class=\"chartOptions\">"+
 						"<option value=\"\">-"+releventlayout.layout+"-</option>"+
@@ -50,7 +51,7 @@ function logShowrelevantLayout(divId, releventlayout){
 						"<option value=\"Hierarchy\">"+releventlayout.hierarchy+"</option>"+
 						"</select>"+
 						
-						"<select style=\"float:left;\" id=\"selectbox1\" class=\"chartOptions1\">"+
+						"<select style=\"float:left;\" id=\"resizeselectbox\" class=\"resizeOptions\">"+
 						"<option value=\"\">-"+releventlayout.zoom+"-</option>"+
 						"<option value=\"Fit\">"+releventlayout.zoomFit+"</option>"+
 						"<option value=\"Expand\">"+releventlayout.zoomWidth+"</option>"+
@@ -126,8 +127,8 @@ function logShowrelevantLayout(divId, releventlayout){
             	app.filterEntities(event.target.value);
             });
             
-            divElement.on("change", ".chartOptions1",function() {
-				switch($("#selectbox1").val()){
+            divElement.on("change", ".resizeOptions",function() {
+				switch($("#resizeselectbox").val()){
 				case "Show/Hide":
 					app.graph.showEdges(!app.graph.showEdges()).render();
 					break;
@@ -203,7 +204,7 @@ function createRelevantChart(divId, reqData) {
 	console.log("div-->"+divId);
 	console.log("div-->"+reqData);
 	jq('$'+divId).attr("reqData", reqData);
-	var releventlayout1 = "layout,randomize,circle,forceDirected,forceDirectedAnimated,hierarchy,showHide,zoom,zoomFit,zoomWidth,zoomSelection,zoom100,all,claims,people,vehicle,policies,showSelection,selection,property";
+	var releventlayout1 = "layout,randomize,circle,forceDirected,forceDirectedAnimated,hierarchy,showHide,zoom,zoomFit,zoomWidth,zoomSelection,zoom100,all,claims,people,vehicle,policies,showSelection,selection,property,back";
 	zAu.send(new zk.Event(zk.Widget.$('$'+divId), "onRemove",   releventlayout1, {toServer:true}));
 }
 

@@ -22,7 +22,7 @@
     <zul:div zclass="container" apply="org.hpccsystems.dashboard.controller.RegisterController">
 		<div id="login-wraper" class="login-form">
            
-                <legend>Register to <span class="blue">Dashboard</span></legend>
+                <legend>${labels.registerTo} <span class="blue">Dashboard</span></legend>
 
 	            <div class="form-group">
 	            	<label for="fname">${labels.firatName}</label > 
@@ -58,7 +58,7 @@
     </zul:div>
 
     <footer class="white navbar-fixed-bottom">
-      Already have an account? <a href="login.zhtml" class="btn btn-black">Sign in</a>
+      ${labels.alreadyHaveAnAccount} <a href="login.zhtml" class="btn btn-black">${labels.signIn}</a>
     </footer>
   </body>
 </html>
