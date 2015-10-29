@@ -33,7 +33,7 @@
         return this.orientation() === "horizontal" ? this.valuePos(d.value) : this.dataPos(d.label);
     };
 
-    Scatter.prototype.updateChart = function (domNode, element, margin, width, height) {
+    Scatter.prototype.updateChart = function (domNode, element, margin, width, height, isHorizontal) {
         var context = this;
 
         this._palette = this._palette.switch(this.paletteID());
@@ -71,17 +71,17 @@
                     .append("circle")
                     .attr("class", "pointSelection")
                     .on("mouseover.tooltip", function (d) {
-                        context.tooltipShow(context.data()[d.rowIdx], context._columns, d.colIdx);
+                        context.tooltipShow(context.data()[d.rowIdx], context.columns(), d.colIdx);
                     })
                     .on("mouseout.tooltip", function (d) {
                         context.tooltipShow();
                     })
                     .on("mousemove.tooltip", function (d) {
-                        context.tooltipShow(context.data()[d.rowIdx], context._columns, d.colIdx);
+                        context.tooltipShow(context.data()[d.rowIdx], context.columns(), d.colIdx);
                     })
                     .call(context._selection.enter.bind(context._selection))
                     .on("click", function (d, idx) {
-                        context.click(context.rowToObj(context.data()[d.rowIdx]), context._columns[d.colIdx], context._selection.selected(this));
+                        context.click(context.rowToObj(context.data()[d.rowIdx]), context.columns()[d.colIdx], context._selection.selected(this));
                     })
                 ;
                 element
@@ -107,7 +107,7 @@
                             .attr("y", function (d) { return context.yPos(d) - context.pointSize() / 2; })
                             .attr("width", context.pointSize())
                             .attr("height", context.pointSize())
-                            .style("fill", function (d, idx) { return context._palette(context._columns[d.colIdx]); })
+                            .style("fill", function (d, idx) { return context._palette(context.columns()[d.colIdx]); })
                         ;
                         break;
                     case "circle":
@@ -115,7 +115,7 @@
                             .attr("cx", function (d) { return context.xPos(d); })
                             .attr("cy", function (d) { return context.yPos(d); })
                             .attr("r", context.pointSize() / 2)
-                            .style("fill", function (d, idx) { return context._palette(context._columns[d.colIdx]); })
+                            .style("fill", function (d, idx) { return context._palette(context.columns()[d.colIdx]); })
                         ;
                         break;
                     case "path":
@@ -126,7 +126,7 @@
                                     "M" + (context.xPos(d) - context.pointSize() / 2) + " " + (context.yPos(d) + context.pointSize() / 2) + " " +
                                     "L" + (context.xPos(d) + context.pointSize() / 2) + " " + (context.yPos(d) - context.pointSize() / 2);
                                 })
-                            .style("stroke", function (d, idx) { return context._palette(context._columns[d.colIdx]); })
+                            .style("stroke", function (d, idx) { return context._palette(context.columns()[d.colIdx]); })
                         ;
                         break;
                 }
@@ -143,21 +143,18 @@
         var area = d3.svg.area()
             .interpolate(this.interpolate())
         ;
-        switch (this.orientation()) {
-            case "horizontal":
-                area
-                    .x(function (d) { return context.xPos(d); })
-                    .y0(function (d) { return height; })
-                    .y1(function (d) { return context.yPos(d); })
-                ;
-                break;
-            default:
-                area
-                    .y(function (d) { return context.yPos(d); })
-                    .x0(function (d) { return 0; })
-                    .x1(function (d) { return context.xPos(d); })
-                ;
-                break;
+        if (isHorizontal) {
+            area
+                .x(function (d) { return context.xPos(d); })
+                .y0(function (d) { return height; })
+                .y1(function (d) { return context.yPos(d); })
+            ;
+        } else {
+            area
+                .y(function (d) { return context.yPos(d); })
+                .x0(function (d) { return 0; })
+                .x1(function (d) { return context.xPos(d); })
+            ;
         }
         areas.each(function (d, idx) {
             var element = d3.select(this);
@@ -165,7 +162,7 @@
                 .attr("d", area(data.filter(function (d2) { return d2.colIdx === idx + 1; })))
                 .style("opacity", context.interpolateFillOpacity())
                 .style("stroke", "none")
-                .style("fill", function (d, i) { return d3.hsl(context._palette(context._columns[idx + 1])).brighter(); })
+                .style("fill", function (d, i) { return d3.hsl(context._palette(context.columns()[idx + 1])).brighter(); })
             ;
         });
         areas.exit().remove();
@@ -184,7 +181,7 @@
             var data2 = data.filter(function (d2) { return d2.colIdx === idx + 1; });
             element
                 .attr("d", line(data2))
-                .style("stroke", function (d, i) { return context._palette(context._columns[idx + 1]); })
+                .style("stroke", function (d, i) { return context._palette(context.columns()[idx + 1]); })
                 .style("fill", "none")
             ;
         });

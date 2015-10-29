@@ -21,9 +21,9 @@
     Gauge.prototype.publish("low", 0, "number", "Gauge lower bound", null, {tags:["Intermediate","Shared"]});
     Gauge.prototype.publish("high", 100, "number", "Gauge higher bound", null, {tags:["Intermediate","Shared"]});
 
-    Gauge.prototype.publish("fontSize", null, "number", "Font Size",null,{tags:["Basic","Shared"]});
-    Gauge.prototype.publish("fontFamily", null, "string", "Font Name",null,{tags:["Basic","Shared","Shared"]});
-    Gauge.prototype.publish("fontColor", null, "html-color", "Font Color",null,{tags:["Basic","Shared"]});
+    Gauge.prototype.publish("fontSize", 11, "number", "Font Size",null,{tags:["Basic","Shared"]});
+    Gauge.prototype.publish("fontFamily", "Verdana", "string", "Font Name",null,{tags:["Basic","Shared","Shared"]});
+    Gauge.prototype.publish("fontColor", "#000000", "html-color", "Font Color",null,{tags:["Basic","Shared"]});
 
     Gauge.prototype.publish("axisLineWidth", 1, "number", "Thickness of axis",null,{tags:["Intermediate"]});
 
@@ -105,7 +105,7 @@
         }
         if (this.colorType() === "c") {
             var c_band = {
-                color: this._palette(this._data, this.low(), this.high()),
+                color: this._palette(this.data(), this.low(), this.high()),
                 startValue: this.low(),
                 endValue: this.high(),
                 innerRadius: this.bandsInnerRadius()[0]
@@ -113,7 +113,7 @@
             this._chart.axes[0].bands.push(c_band);
         }
 
-        this._chart.axes[0].bottomText = this.bottomText().replace("[[data]]",this._data);
+        this._chart.axes[0].bottomText = this.bottomText().replace("[[data]]",this.data());
 
         return this._chart;
     };
@@ -128,7 +128,7 @@
         domNode.style.height = this.size().height + "px";
 
         this.updateChartOptions();
-        this._chart.arrows[0].setValue(this._data);
+        this._chart.arrows[0].setValue(this.data());
 
         this._chart.validateNow();
         this._chart.validateData();
@@ -141,6 +141,7 @@
         var initObj = {
             theme: "none",
             type: "gauge",
+            addClassNames: true,
             axes: [{}],
             arrows:[{}],
         };
@@ -148,24 +149,6 @@
             initObj.pathToImages = require.toUrl("amchartsImg");
         }
         this._chart = AmCharts.makeChart(domNode, initObj);
-    };
-
-    Gauge.prototype.testData = function() {
-        this.numBands(3);
-        this.bandsColor(["#84b761","#fdd400","#cc4748"]);
-        this.bandsEndValue([90,130,220]);
-        this.bandsStartValue([0,90,130]);
-        this.bandsInnerRadius([null, null, "95%"]);
-        this.bottomText("[[data]] km/h");
-        this.high(220);
-        this.low(0);
-        this.data(100);
-        this.axisLineWidth(1);
-        this.axisAlpha(0.2);
-        this.tickAlpha(0.2);
-        this.valueInterval(20);
-
-        return this;
     };
 
     return Gauge;

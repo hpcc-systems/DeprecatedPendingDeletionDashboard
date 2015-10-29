@@ -508,6 +508,7 @@
                     this.loadWidget(this.source.mappings.contains("county") ? "src/map/ChoroplethCounties" : "src/map/ChoroplethStates", function (widget) {
                         widget
                             .id(visualization.id)
+                            .paletteID(visualization.color)
                         ;
                     });
                     break;
@@ -519,7 +520,7 @@
                     this.loadWidget("src/chart/MultiChart", function (widget) {
                         widget
                             .id(visualization.id)
-                            .chartType(context.properties.charttype || context.type)
+                            .chartType(context.properties.chartType || context.properties.charttype || context.type)
                         ;
                     });
                     break;
@@ -527,7 +528,7 @@
                     this.loadWidget("src/chart/MultiChart", function (widget) {
                         widget
                             .id(visualization.id)
-                            .chartType(context.properties.charttype || context.type)
+                            .chartType(context.properties.chartType || context.properties.charttype || context.type)
                         ;
                     });
                     break;
@@ -573,15 +574,57 @@
                 case "FORM":
                     this.loadWidgets(["src/form/Form", "src/form/Input"], function (widget, widgetClasses) {
                         var Input = widgetClasses[1];
+
                         widget
                             .id(visualization.id)
-                            .inputs(visualization.fields.map(function (field) {
-                                return new Input()
+                            .inputs(visualization.fields.map(function(field) {
+
+                                var inputType = null;
+                                var selectOptions = [];
+                                var options = [];
+                                switch(field.properties.charttype) {
+                                    case "TEXT":
+                                        inputType = "textbox";
+                                        break;
+                                    case "TEXTAREA":
+                                        inputType = "textarea";
+                                        break;
+                                    case "CHECKBOX":
+                                        inputType = "checkbox";
+                                        break;
+                                    case "RADIO":
+                                        inputType = "radio";
+                                        break;
+                                    case "HIDDEN":
+                                        inputType = "hidden";
+                                        break;
+                                    default:
+                                        if (field.properties.enumvals) {
+                                            inputType = "select";
+                                            options = field.properties.enumvals;
+                                            for (var val in options) {
+                                                 selectOptions.push([val,options[val]]);
+                                            }
+                                        } else {
+                                            inputType = "textbox";
+                                        }
+                                        break;
+                                }
+
+                                var inp = new Input()
                                     .name(field.id)
                                     .label((field.properties ? field.properties.label : null) || field.label)
-                                    .type("textbox")
-                                    .value(field.properties.default ? field.properties.default : "")
+                                    .type(inputType)
+                                    .value(field.properties.default ? field.properties.default : "") // TODO Hippie support for multiple default values (checkbox only)
                                 ;
+                                if (inputType === "checkbox" || inputType === "radio") {
+                                    var vals = Object.keys(field.properties.enumvals);
+                                    inp.selectOptions(vals);
+                                } else if (selectOptions.length) {
+                                    inp.selectOptions(selectOptions);
+                                }
+
+                                return inp;
                             }))
                         ;
                     });
@@ -638,12 +681,16 @@
         this.widget = widget;
         this.events.setWidget(widget);
         if (!skipProperties) {
-            for (var key in this.properties) {
-                if (this.widget[key]) {
-                    try {
-                        this.widget[key](this.properties[key]);
-                    } catch (e) {
-                        console.log("Invalid Property:" + this.id + ".properties." + key);
+            if (widget.classID() === "chart_MultiChart") {
+                widget.chartTypeProperties(this.properties);
+            } else {
+                for (var key in this.properties) {
+                    if (this.widget[key]) {
+                        try {
+                            this.widget[key](this.properties[key]);
+                        } catch (e) {
+                            console.log("Invalid Property:" + this.id + ".properties." + key);
+                        }
                     }
                 }
             }
@@ -684,11 +731,9 @@
             selected = selected === undefined ? true : selected;
             if (event.exists()) {
                 var request = {};
-                if (selected) {
-                    for (var key in event.mappings) {
-                        var origKey = (context.source.mappings && context.source.mappings.hasMappings) ? context.source.mappings.getReverseMap(key) : key;
-                        request[event.mappings[key]] = row[origKey];
-                    }
+                for (var key in event.mappings) {
+                    var origKey = (context.source.mappings && context.source.mappings.hasMappings) ? context.source.mappings.getReverseMap(key) : key;
+                    request[event.mappings[key]] = selected ? row[origKey] : "";
                 }
 
                 //  New request calculation:
@@ -713,6 +758,7 @@
                                     console.log("Duplicate Filter, with mismatched value:  " + key + "=" + inViz._eventValues[key]);
                                 }
                                 datasourceRequests[dataSource.id].request[key] = inViz._eventValues[key];
+                                datasourceRequests[dataSource.id].request[key + "_changed"] = inViz === context;
                             }
                         }
                     });
@@ -848,11 +894,10 @@
         var context = this;
         this.request.refresh = refresh ? true : false;
         this.filter.forEach(function (item) {
-            context.request[item + "_changed"] = false;
+            this.request[item + "_changed"] = request[item + "_changed"] || false;
             var value = request[item] === undefined ? "" : request[item];
             if (this.request[item] !== value) {
                 this.request[item] = value;
-                this.request[item + "_changed"] = true;
             }
         }, this);
         if (window.__hpcc_debug) {

@@ -17,7 +17,7 @@
     Bar.prototype.implements(INDChart.prototype);
 
     Bar.prototype.publish("paletteID", "default", "set", "Palette ID", Bar.prototype._palette.switch(),{tags:["Basic","Shared"]});
-    Bar.prototype.publish("isStacked", false, "boolean", "Stack Chart",null,{tags:["Basic","Shared"]});
+    Bar.prototype.publish("stacked", false, "boolean", "Stack Chart",null,{tags:["Basic","Shared"]});
     Bar.prototype.publish("fillOpacity", 0.7, "number", "Opacity of The Fill Color", null, {min:0,max:1,step:0.001,inputType:"range",tags:["Intermediate","Shared"]});
 
     Bar.prototype.publish("paletteGrouping", "By Column", "set", "Palette Grouping",["By Category","By Column"],{tags:["Basic"]});
@@ -30,9 +30,8 @@
     Bar.prototype.publish("Depth3D", 0, "number", "3D Depth (px)",null,{tags:["Basic"]});
     Bar.prototype.publish("Angle3D", 0, "number", "3D Angle (Deg)",null,{tags:["Basic"]});
 
-    Bar.prototype.publish("stackType", "regular", "set", "Stack Type",["none","regular","100%"],{tags:["Basic"]});
-
-    Bar.prototype.publish("tooltipTemplate","[[category]]([[title]]): [[value]]", "string", "Tooltip Text",null,{tags:["Intermediate"]});
+    Bar.prototype.publish("stackType", "regular", "set", "Stack Type",["none","regular","100%","3d"],{tags:["Basic"]});
+    Bar.prototype.publish("useOhlcLines", false, "boolean", "Use OHLC Lines",null,{tags:["Intermediate"]});
 
     Bar.prototype.enter = function(domNode, element) {
         CommonSerial.prototype.enter.apply(this, arguments);
@@ -43,7 +42,7 @@
         var context = this;
 
         // Stacked
-        if(this.isStacked()){
+        if(this.stacked()){
             this._chart.valueAxes[0].stackType = this.stackType();
         } else {
             this._chart.valueAxes[0].stackType = "none";
@@ -59,12 +58,9 @@
                 this._chart.colors = [];
             break;
             case "By Column":
-                this._chart.colors = this._columns.filter(function (d, i) { return i > 0; }).map(function (row) {
-                    return this._palette(row);
-                }, this);
-            break;
+                /* falls through */
             default:
-                this._chart.colors = this._columns.filter(function (d, i) { return i > 0; }).map(function (row) {
+                this._chart.colors = this.columns().filter(function (d, i) { return i > 0; }).map(function (row) {
                     return this._palette(row);
                 }, this);
             break;
@@ -74,32 +70,28 @@
         this._chart.angle = this.Angle3D();
         this._chart.categoryAxis.startOnAxis = false; //override due to render issue
 
+        if (this._rangeType === "candle-ohlc") {
+            this._gType = this.useOhlcLines() ? "ohlc" : "candlestick";
+        } else {
+            this._gType = "column";
+        }
+
         this.buildGraphs(this._gType);
 
         return this._chart;
     };
 
     Bar.prototype.buildGraphs = function(gType) {
-        if (typeof(this._chart.graphs) === "undefined") { this._chart.graphs = []; }
-        var currentGraphCount = this._chart.graphs.length;
-        var buildGraphCount = Math.max(currentGraphCount, this._valueField.length);
+        this._chart.graphs = [];
 
-        for(var i = 0; i < buildGraphCount; i++) {
-            if ((typeof(this._valueField) !== "undefined" && typeof(this._valueField[i]) !== "undefined")) { //mark
-                var gRetVal = CommonSerial.prototype.buildGraphObj.call(this,gType,i);
-                var gObj = buildGraphObj.call(this,gRetVal);
+        for (var i = 0; i < this.columns().length - 1; i++) {
+            var gRetVal = CommonSerial.prototype.buildGraphObj.call(this, gType, i);
+            var gObj = buildGraphObj.call(this, gRetVal, i);
 
-                if (typeof(this._chart.graphs[i]) !== "undefined") {
-                    for (var key in gObj) { this._chart.graphs[i][key] = gObj[key]; }
-                } else {
-                    this._chart.addGraph(gObj);
-                }
-            } else {
-                this._chart.removeGraph(this._chart.graphs[i]);
-            }
+            this._chart.addGraph(gObj);
         }
 
-        function buildGraphObj(gObj) {
+        function buildGraphObj(gObj, i) {
             if (this.columnWidth()) {
                 gObj.columnWidth = this.columnWidth();
             }
@@ -110,9 +102,18 @@
                  gObj.topRadius = undefined;
             }
 
-            if(this.paletteGrouping() === "By Category"){
-                gObj.colorField = "color";
-                gObj.lineColorField = "linecolor";
+            gObj.lineColorField = "linecolor" + i;
+            gObj.fillColorsField = "color" + i;
+            
+            if (this._rangeType === "normal") {
+                gObj.openField = "openField" + i;
+                gObj.valueField = "valueField" + i;
+            }
+            if (this._rangeType === "candle-ohlc") {
+                gObj.lowField = "lowField" + i;
+                gObj.openField = "openField" + i;
+                gObj.closeField = "closeField" + i;
+                gObj.highField = "highField" + i;
             }
 
             gObj.fillAlphas = this.fillOpacity();

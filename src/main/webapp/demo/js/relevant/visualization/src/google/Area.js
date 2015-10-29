@@ -16,7 +16,7 @@
     Area.prototype.constructor = Area;
     Area.prototype._class += " google_Area";
 
-    Area.prototype.publish("isStacked", false, "boolean", "Stacks The Elements In A Series",null,{tags:["Advanced","Shared"]});
+    Area.prototype.publish("stacked", false, "boolean", "Stacks The Elements In A Series",null,{tags:["Advanced","Shared"]});
     Area.prototype.publish("fillOpacity", null, "number", "Opacity of The Fill Color",null,{tags:["Intermediate","Shared"]});
 
     Area.prototype.publish("axisFontSize", null, "number", "X/Y Axis Label Font Size",null,{tags:["Basic","Shared"]});
@@ -54,8 +54,8 @@
     Area.prototype.publish("xAxisInversed", false, "boolean", "The Direction In Which The Values Along The Horizontal Axis Grow.",null,{tags:["Advanced"]});
     Area.prototype.publish("yAxisInversed", false, "boolean", "The Direction In Which The Values Along The Vertical Axis Grow.",null,{tags:["Advanced"]});
 
-    Area.prototype.publish("xAxisFormat", "", "string", "Format String For Numeric Axis Labels", ["","decimal","scientific","currency","percent","short","long"],{tags:["Intermediate"]});
-    Area.prototype.publish("yAxisFormat", "", "string", "Format String For Numeric Axis Labels", ["","decimal","scientific","currency","percent","short","long"],{tags:["Intermediate"]});
+    Area.prototype.publish("xAxisFormatType", "", "set", "Format String For Numeric Axis Labels", ["","decimal","scientific","currency","percent","short","long"],{tags:["Intermediate"]});
+    Area.prototype.publish("yAxisFormatType", "", "set", "Format String For Numeric Axis Labels", ["","decimal","scientific","currency","percent","short","long"],{tags:["Intermediate"]});
 
     Area.prototype.publish("xAxisGridlinesCount", 5, "number", "The Number of Horizontal Gridlines Between Two Regular Gridlines",null,{tags:["Intermediate"]});
     Area.prototype.publish("yAxisGridlinesCount", 5, "number", "The Number of Vertical Gridlines Between Two Regular Gridlines",null,{tags:["Intermediate"]});
@@ -105,7 +105,7 @@
         retVal.selectionMode = this.selectionMode();
         retVal.dataOpacity = this.dataOpacity();
 
-        retVal.isStacked = this.isStacked();
+        retVal.stacked = this.stacked();
         retVal.areaOpacity = this.fillOpacity();
 
         retVal.hAxis = {};
@@ -135,7 +135,7 @@
         retVal.hAxis.maxTextLines = this.xAxisMaxTextLines();
         retVal.hAxis.minTextSpacing = this.xAxisMinTextSpacing();
 
-        retVal.hAxis.format = this.xAxisFormat();
+        retVal.hAxis.format = this.xAxisFormatType();
         retVal.hAxis.textStyle = {
             color: this.xAxisFontColor(),
             fontName: this.axisFontFamily() ? this.axisFontFamily() : this.fontFamily(),
@@ -173,7 +173,7 @@
         retVal.vAxis.minValue = this.yAxisMinValue();
         retVal.vAxis.maxValue = this.yAxisMaxValue();
 
-        retVal.vAxis.format = this.yAxisFormat();
+        retVal.vAxis.format = this.yAxisFormatType();
         retVal.vAxis.textStyle = {
             color: this.yAxisFontColor(),
             fontName: this.axisFontFamily() ? this.axisFontFamily() : this.fontFamily(),

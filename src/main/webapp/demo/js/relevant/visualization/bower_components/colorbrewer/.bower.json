@@ -29,6 +29,6 @@
     "commit": "537e821f7e2f241dcf3240bce887eb4ce720d65f"
   },
   "_source": "git://github.com/undashes/colorbrewer.git",
-  "_target": "^1.0.0",
+  "_target": "~1.0.0",
   "_originalSource": "colorbrewer"
 }

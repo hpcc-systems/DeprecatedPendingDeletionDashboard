@@ -3,6 +3,8 @@ package org.hpccsystems.dashboard.chart.entity;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 
+import org.hpccsystems.dashboard.entity.RelevantGroupType;
+
 @XmlRootElement
 public class RelevantData extends ChartData {
 	
@@ -16,7 +18,7 @@ public class RelevantData extends ChartData {
 	
 	private String policyImage;
 	
-	private String groupTypeId;
+	private RelevantGroupType groupType;
 	
 	private String groupId;
 
@@ -71,7 +73,7 @@ public class RelevantData extends ChartData {
 				+ ", claimImage= " + claimImage
 				+ ", personImage= " + personImage
 				+ ", vehicleImage= " + vehicleImage
-				+ ", groupTypeId= " + groupTypeId
+				+ ", groupTypeId= " + groupType
 				+ ", groupId= " + groupId
 				+ ", policyImage= " + policyImage + "]";
 	}
@@ -86,12 +88,12 @@ public class RelevantData extends ChartData {
     }
 
     @XmlElement
-    public String getGroupTypeId() {
-        return groupTypeId;
+    public RelevantGroupType getGroupType() {
+        return groupType;
     }
 
-    public void setGroupTypeId(String groupTypeId) {
-        this.groupTypeId = groupTypeId;
+    public void setGroupType(RelevantGroupType groupTypeId) {
+        this.groupType = groupTypeId;
     }
 	
 }

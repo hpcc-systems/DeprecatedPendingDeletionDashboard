@@ -1,7 +1,7 @@
 <panel id="inputPanel"
 	apply="org.hpccsystems.dashboard.controller.InputParametersController" 
 	height="170px" 
-	title="Input Parameters" 
+	title="${labels.inputParameters}" 
 	sclass="editPanel">
 	<caption>
 		<button id="saveParams" iconSclass="glyphicon glyphicon-ok btn btn-link img-btn" zclass="img-btn btn-link"

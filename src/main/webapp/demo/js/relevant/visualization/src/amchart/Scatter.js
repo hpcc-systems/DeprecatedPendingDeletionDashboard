@@ -19,7 +19,8 @@
     Scatter.prototype.implements(INDChart.prototype);
 
     Scatter.prototype.publish("paletteID", "default", "set", "Palette ID", Scatter.prototype._palette.switch(), {tags:["Basic","Shared"]});
-    Scatter.prototype.publish("tooltipTemplate","x:[[x]] y:[[y]]", "string", "Tooltip Text");
+
+    Scatter.prototype.publish("scatterType", "scatter", "set", "Bullet Type", ["scatter", "bubble"],{tags:["Basic"]});
 
     Scatter.prototype.enter = function(domNode, element) {
         CommonXY.prototype.enter.apply(this, arguments);
@@ -34,27 +35,21 @@
     };
 
     Scatter.prototype.buildGraphs = function(gType) {
-        if (typeof(this._chart.graphs) === "undefined") { this._chart.graphs = []; }
-        var currentGraphCount = this._chart.graphs.length;
-        var buildGraphCount = Math.max(currentGraphCount, this._valueField.length);
+        this._chart.graphs = [];
 
-        for(var i = 0; i < buildGraphCount; i++) {
-            if ((typeof(this._valueField) !== "undefined" && typeof(this._valueField[i]) !== "undefined")) { //mark
-                var gRetVal = CommonXY.prototype.buildGraphObj.call(this,gType,i);
-                var gObj = buildGraphObj.call(this,gRetVal);
+        for (var i = 0; i < this.columns().length; i++) {
+            var gRetVal = CommonXY.prototype.buildGraphObj.call(this, gType, i);
+            var gObj = buildGraphObj.call(this, gRetVal, i);
 
-                if (typeof(this._chart.graphs[i]) !== "undefined") {
-                    for (var key in gObj) { this._chart.graphs[i][key] = gObj[key]; }
-                } else {
-                    this._chart.addGraph(gObj);
-                }
-            } else {
-                this._chart.removeGraph(this._chart.graphs[i]);
-            }
+            this._chart.addGraph(gObj);
         }
 
         function buildGraphObj(gObj) {
-            // TODO: Scatter Specific Options
+            if (this.scatterType() === "bubble") {
+                gObj["valueField"] = this.columns()[2];
+            } else {
+                delete gObj["valueField"];
+            }
             return gObj;
         }
     };
@@ -66,6 +61,7 @@
 
         this._chart.validateNow();
         this._chart.validateData();
+
     };
 
     return Scatter;

@@ -13,6 +13,7 @@ import org.hpccsystems.dashboard.entity.ChartDetails;
 import org.hpccsystems.dashboard.entity.Portlet;
 import org.hpccsystems.dashboard.services.ChartService;
 import org.hpccsystems.dashboard.services.WidgetService;
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.event.Event;
@@ -79,7 +80,7 @@ public class ChartWidgetController extends GenericForwardComposer<Component> {
                 
                 label = new Label(chartDetails.getName());
                 
-                button = new Button("Add");
+                button = new Button(Labels.getLabel("add"));
                 button.setZclass("btn btn-primary btn-sm");
                 button.setAttribute(Constants.CHART_TYPE, chartDetails.getId());
                 button.addEventListener(Events.ON_CLICK, addListener);

@@ -1,11 +1,11 @@
 "use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3", "../common/SVGWidget", "./IChoropleth", "../other/Bag", "../api/ITooltip", "css!./Choropleth"], factory);
+        define(["d3", "../common/SVGWidget", "./IChoropleth", "../common/Utility", "../api/ITooltip", "css!./Choropleth"], factory);
     } else {
-        root.map_Choropleth = factory(root.d3, root.common_SVGWidget, root.map_IChoropleth, root.other_Bag, root.api_ITooltip);
+        root.map_Choropleth = factory(root.d3, root.common_SVGWidget, root.map_IChoropleth, root.common_Utility, root.api_ITooltip);
     }
-}(this, function (d3, SVGWidget, IChoropleth, Bag, ITooltip) {
+}(this, function (d3, SVGWidget, IChoropleth, Utility, ITooltip) {
     function Choropleth() {
         SVGWidget.call(this);
         IChoropleth.call(this);
@@ -26,6 +26,7 @@
 
     Choropleth.prototype.publish("paletteID", "YlOrRd", "set", "Palette ID", Choropleth.prototype._palette.switch(),{tags:["Basic","Shared"]});
     Choropleth.prototype.publish("useClonedPalette", false, "boolean", "Enable or disable using a cloned palette",null,{tags:["Intermediate","Shared"]});
+    Choropleth.prototype.publish("projection", null, "set", "Map projection type",["albersUsaPr","orthographic","mercator"],{tags:["Intermediate","Shared"]});
 
     Choropleth.prototype.data = function (_) {
         var retVal = SVGWidget.prototype.data.apply(this, arguments);
@@ -35,7 +36,7 @@
             this._dataMaxWeight = null;
 
             var context = this;
-            this._data.forEach(function (item) {
+            this.data().forEach(function (item) {
                 context._dataMap[item[0]] = item;
                 if (!context._dataMinWeight || item[1] < context._dataMinWeight) {
                     context._dataMinWeight = item[1];
@@ -63,26 +64,28 @@
         return retVal;
     };
 
+    Choropleth.prototype.projection_orig = Choropleth.prototype.projection;
     Choropleth.prototype.projection = function (_) {
-        if (!arguments.length) return this._projection;
-        this._projection = _;
-        switch (this._projection) {
-            case "albersUsaPr":
-                this.d3Projection = this.albersUsaPr();
-                break;
-            case "orthographic":
-                this.d3Projection = d3.geo.orthographic()
-                    .clipAngle(90)
-                ;
-                break;
-            case "mercator":
-                this.d3Projection = d3.geo.mercator();
-                break;
+        var retVal = Choropleth.prototype.projection_orig.apply(this, arguments);
+        if (arguments.length) {
+            switch (_) {
+                case "albersUsaPr":
+                    this.d3Projection = this.albersUsaPr();
+                    break;
+                case "orthographic":
+                    this.d3Projection = d3.geo.orthographic()
+                        .clipAngle(90)
+                    ;
+                    break;
+                case "mercator":
+                    this.d3Projection = d3.geo.mercator();
+                    break;
+            }
+            this.d3Path = d3.geo.path()
+                .projection(this.d3Projection)
+            ;
         }
-        this.d3Path = d3.geo.path()
-            .projection(this.d3Projection)
-        ;
-        return this;
+        return retVal;
     };
 
     Choropleth.prototype.render = function () {
@@ -132,7 +135,7 @@
         ;
 
         this._svg = element.append("g");
-        this._selection = new Bag.SimpleSelection(this._svg);
+        this._selection = new Utility.SimpleSelection(this._svg);
     };
 
     Choropleth.prototype.update = function (domNode, element) {

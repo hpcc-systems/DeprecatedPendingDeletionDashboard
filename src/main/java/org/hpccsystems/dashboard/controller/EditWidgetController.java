@@ -445,11 +445,11 @@ public class EditWidgetController extends SelectorComposer<Component> {
     }
 
     private boolean validateRelevantData(RelevantData relevantData) {
-        if(relevantData.getClaimId() == null && (relevantData.getGroupTypeId() == null 
+        if(relevantData.getClaimId() == null && (relevantData.getGroupType() == null 
                 || relevantData.getGroupId() == null)){
             Clients.showNotification(Labels.getLabel("provideClaimIdOrGroupId"), "error", holderInclude.getFellow("claimGroupbox"), "end_center", 3000, true);
             return false;
-        }else if(relevantData.getClaimId() != null && (relevantData.getGroupTypeId() != null 
+        }else if(relevantData.getClaimId() != null && (relevantData.getGroupType() != null 
                 || relevantData.getGroupId() != null)){
             Clients.showNotification(Labels.getLabel("provideAnyOneOfInput"), "error", holderInclude.getFellow("groupDatabox"), "end_center", 3000, true);
             return false;

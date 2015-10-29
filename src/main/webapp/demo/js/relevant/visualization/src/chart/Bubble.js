@@ -1,11 +1,11 @@
 "use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3", "../common/SVGWidget", "../api/I2DChart", "../common/Text", "../common/FAChar", "../other/Bag", "../api/ITooltip", "css!./Bubble"], factory);
+        define(["d3", "../common/SVGWidget", "../api/I2DChart", "../common/Text", "../common/FAChar", "../common/Utility", "../api/ITooltip", "css!./Bubble"], factory);
     } else {
-        root.chart_Bubble = factory(root.d3, root.common_SVGWidget, root.api_I2DChart, root.common_Text, root.common_FAChar, root.other_Bag, root.api_ITooltip);
+        root.chart_Bubble = factory(root.d3, root.common_SVGWidget, root.api_I2DChart, root.common_Text, root.common_FAChar, root.common_Utility, root.api_ITooltip);
     }
-}(this, function (d3, SVGWidget, I2DChart, Text, FAChar, Bag, ITooltip) {
+}(this, function (d3, SVGWidget, I2DChart, Text, FAChar, Utility, ITooltip) {
     function Bubble(target) {
         SVGWidget.call(this);
         I2DChart.call(this);
@@ -41,7 +41,7 @@
 
     Bubble.prototype.enter = function (domNode, element) {
         SVGWidget.prototype.enter.apply(this, arguments);
-        this._selection = new Bag.SimpleSelection(element);
+        this._selection = new Utility.SimpleSelection(element);
     };
 
     Bubble.prototype.update = function (domNode, element) {
@@ -53,7 +53,7 @@
         }
 
         var node = element.selectAll(".node")
-            .data(this._data.length ? this.d3Pack.nodes({ children: this.cloneData() }).filter(function (d) { return !d.children; }) : [], function (d) { return d[0]; })
+            .data(this.data().length ? this.d3Pack.nodes({ children: this.cloneData() }).filter(function (d) { return !d.children; }) : [], function (d) { return d[0]; })
         ;
 
         //  Enter  ---
@@ -62,20 +62,20 @@
             .attr("opacity", 0)
             .call(this._selection.enter.bind(this._selection))
             .on("click", function (d) {
-                context.click(context.rowToObj(d), context._columns[1], context._selection.selected(this));
+                context.click(context.rowToObj(d), context.columns()[1], context._selection.selected(this));
             })
             .each(function (d) {
                 var element = d3.select(this);
                 element.append("circle")
                     .attr("r", function (d) { return d.r; })
                     .on("mouseover.tooltip", function (d) {
-                        context.tooltipShow(d, context._columns, 1);
+                        context.tooltipShow(d, context.columns(), 1);
                     })
                     .on("mouseout.tooltip", function (d) {
                         context.tooltipShow();
                     })
                     .on("mousemove.tooltip", function (d) {
-                        context.tooltipShow(d, context._columns, 1);
+                        context.tooltipShow(d, context.columns(), 1);
                     })
                 ;
                 if (d.__viz_faChar) {

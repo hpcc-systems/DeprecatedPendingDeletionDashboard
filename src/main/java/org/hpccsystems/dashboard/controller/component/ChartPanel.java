@@ -55,6 +55,7 @@ import org.hpccsystems.dashboard.services.HPCCService;
 import org.hpccsystems.dashboard.services.WidgetService;
 import org.springframework.dao.DataAccessException;
 import org.xml.sax.SAXException;
+import org.zkoss.json.JSONObject;
 import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Components;
@@ -106,6 +107,7 @@ import com.google.gson.Gson;
  */
 public class ChartPanel extends Panel {
 
+    private static final String SPACE = " ";
     private static final  Log LOG = LogFactory.getLog(ChartPanel.class);
     private static final long serialVersionUID = 1L;    
     
@@ -307,7 +309,7 @@ public class ChartPanel extends Panel {
                 portlet.getChartData().setInputParams(paramsList);
             }
 
-            Clients.showBusy(ChartPanel.this, "Updating Chart");
+            Clients.showBusy(ChartPanel.this, Labels.getLabel("updatingChart"));
             
             //passing COMMON_FILTERS_ENABLE as false, as file fields not
             // required to fetch
@@ -320,7 +322,8 @@ public class ChartPanel extends Panel {
                 widgetService.updateWidget(portlet);
             } catch (DataAccessException |JAXBException |EncryptDecryptException | CloneNotSupportedException e) {
                 LOG.error(e);
-                Clients.showNotification("Error occurred while persisting current changes","error", ChartPanel.this,"middle_center",3000, false);
+                Clients.showNotification(Labels.getLabel("errorOccuredWhilePersistingChange"), Clients.NOTIFICATION_TYPE_ERROR, ChartPanel.this,
+                        "middle_center", 3000, false);
             }
             //closing popup window
             Popup inputPopup = (Popup)event.getTarget().getParent().getParent().getParent().getParent();
@@ -380,14 +383,14 @@ public class ChartPanel extends Panel {
         toolbar.setStyle("float:right; border-style: none;");
 
         resetBtn.setSclass(RESET_STYLE);
-        resetBtn.setTooltiptext("Reset Chart");
+        resetBtn.setTooltiptext(Labels.getLabel("resetChart"));
 
         deleteBtn.setSclass(DELETE_STYLE);
         deleteBtn.addEventListener(Events.ON_CLICK, deleteListener);
-        deleteBtn.setTooltiptext("Delete Chart");
+        deleteBtn.setTooltiptext(Labels.getLabel("deleteChart"));
         
         resizeBtn.setSclass(RESIZE_MAX_STYLE);
-        resizeBtn.setTooltiptext("Maximize window");
+        resizeBtn.setTooltiptext(Labels.getLabel("maximizeWindow"));
         
         titleTextbox.addEventListener(Events.ON_BLUR, titleChangeLisnr);
         
@@ -399,9 +402,9 @@ public class ChartPanel extends Panel {
         if(Constants.SHOW_ALL_BUTTONS == buttonState) {
         	if(Constants.STATE_EMPTY.equals(portlet.getWidgetState())){
         	    //Adding title change listeners only for ADMINS
-        	    addBtn.setTooltiptext("Add Chart");
+                addBtn.setTooltiptext(Labels.getLabel("addChart"));
             }else{
-                addBtn.setTooltiptext("Configure Chart");
+                addBtn.setTooltiptext(Labels.getLabel("configChart"));
             }
             toolbar.appendChild(addBtn);
             AuthenticationService authenticationService = (AuthenticationService)SpringUtil.getBean("authenticationService");
@@ -446,7 +449,7 @@ public class ChartPanel extends Panel {
             addBtn.addEventListener(Events.ON_CLICK, editListener);
             resetBtn.setDisabled(false);
             createChartHolder();
-            Clients.showBusy(this, "Retriving data");
+            Clients.showBusy(this, Labels.getLabel("retrivingData"));
         } else if(portlet.getWidgetState().equals(Constants.STATE_GRAYED_CHART)){
             //Only Static image is added
             setStaticImage();
@@ -476,13 +479,13 @@ public class ChartPanel extends Panel {
                 }
                 ChartPanel.this.setMaximized(true);
                 resizeBtn.setSclass(RESIZE_MIN_STYLE);
-                resizeBtn.setTooltiptext("Minimize window");
+                    resizeBtn.setTooltiptext(Labels.getLabel("minimizeWindow"));
             }else{
                 holderDiv.setVflex(null);
                 setHeight();
                 ChartPanel.this.setMaximized(false);
                 resizeBtn.setSclass(RESIZE_MAX_STYLE);
-                resizeBtn.setTooltiptext("Maximize window");
+                    resizeBtn.setTooltiptext(Labels.getLabel("maximizeWindow"));
             }
             
             if (Constants.CATEGORY_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()) {
@@ -506,7 +509,7 @@ public class ChartPanel extends Panel {
             }
         }else{
         	
-        	 Clients.showNotification("Add / Configure the chart before maximizing...",
+                Clients.showNotification(Labels.getLabel("addOrConfigChart"),
                      Clients.NOTIFICATION_TYPE_WARNING, this,"middle_center", 3000, true);
         	
         }
@@ -651,42 +654,45 @@ public class ChartPanel extends Panel {
         }
     };
 
-        private void constructRelevantInputParam(ChartData chartData) {
-            
-            ChartData inputParamData = new TableData();
-            inputParamData.setHpccConnection(chartData.getHpccConnection());
-            List<String> files = new ArrayList<String>();
-            files.add("relevant_claimslist");
-            inputParamData.setFiles(files);
-            
-            List<Attribute> attributes = new ArrayList<Attribute>();
-            Attribute attr = new Attribute();
-            //hard coding 'report_no' name, as relevant chart always uses only 'claim id'
-            attr.setColumn("report_no");
-            attributes.add(attr);       
-            ((TableData)inputParamData).setAttributes(attributes);
-            
-            ListModelList<String> inputParam = new ListModelList<String>();
-            
-            Map<String, List<Attribute>> inputs = null;
-            try {
-                inputs = ((HPCCQueryService)SpringUtil.getBean("hpccQueryService")).fetchTableData((TableData)inputParamData,portlet.getTitleColumns());
-            } catch (RemoteException | HpccConnectionException e) {
-               LOG.error(Constants.EXCEPTION,e);
-            }
-            LOG.debug("Input parameters -->"+ inputs);
-            
-            if(inputs != null && inputs.get("report_no") != null){
-                inputs.get("report_no").stream().forEach(attribute ->{
-                    Attribute attribut = (Attribute)attribute;
-                    inputParam.add(attribut.getColumn());
-                });
-            }
-        
-            InputListitem listitem = new InputListitem("report_no", new HashSet<String>(inputParam), String.valueOf(portlet.getId() + "_board_"));
-            inputListbox.appendChild(listitem);
-            listitem.setInputValue(((RelevantData)chartData).getClaimId());            
-      }; 
+    private void constructRelevantInputParam(ChartData chartData) {
+
+        ChartData inputParamData = new TableData();
+        inputParamData.setHpccConnection(chartData.getHpccConnection());
+        List<String> files = new ArrayList<String>();
+        files.add("relevant_claimslist");
+        inputParamData.setFiles(files);
+
+        List<Attribute> attributes = new ArrayList<Attribute>();
+        Attribute attr = new Attribute();
+        // hard coding 'report_no' name, as relevant chart always uses only
+        // 'claim id'
+        attr.setColumn("report_no");
+        attributes.add(attr);
+        ((TableData) inputParamData).setAttributes(attributes);
+
+        ListModelList<String> inputParam = new ListModelList<String>();
+
+        Map<String, List<Attribute>> inputs = null;
+        try {
+            inputs = ((HPCCQueryService) SpringUtil.getBean("hpccQueryService")).fetchTableData((TableData) inputParamData,
+                    portlet.getTitleColumns());
+        } catch (RemoteException | HpccConnectionException e) {
+            LOG.error(Constants.EXCEPTION, e);
+        }
+        LOG.debug("Input parameters -->" + inputs);
+
+        if (inputs != null && inputs.get("report_no") != null) {
+            inputs.get("report_no").stream().forEach(attribute -> {
+                Attribute attribut = (Attribute) attribute;
+                inputParam.add(attribut.getColumn());
+            });
+        }
+
+        InputListitem listitem = new InputListitem(Labels.getLabel("reportNo"), new HashSet<String>(inputParam),
+                String.valueOf(portlet.getId() + "_board_"));
+        inputListbox.appendChild(listitem);
+        listitem.setInputValue(((RelevantData) chartData).getClaimId());
+    };
     
     /**
      * Removes the inputparameters which are already existing in the input param popup
@@ -727,7 +733,7 @@ public class ChartPanel extends Panel {
             inputParamBtn.setSclass(INPUT_PARAM_STYLE);
             inputParamBtn.setZclass("btn btn-sm btn-primary");
             inputParamBtn.setAttribute(Constants.INPUT_PARAM_BTN, true); 
-            inputParamBtn.setTooltiptext("Configure filter");
+            inputParamBtn.setTooltiptext(Labels.getLabel("configureFilter"));
             
             
             final Popup popup = new Popup();
@@ -746,7 +752,7 @@ public class ChartPanel extends Panel {
                      if(Constants.RELEVANT_CONFIG == chartService.getCharts().get(portlet.getChartType()).getCategory()
                              || (portlet.getChartData().getInputParams() != null 
                              && ((hasCommonFilter != null && hasCommonFilter)  || hasParamValues == null || !hasParamValues))){
-                            Clients.showBusy(popup, "Fetching Input Parameters");
+                        Clients.showBusy(popup, Labels.getLabel("fetchInputParam"));
                             Events.echoEvent(new Event("onAddInputParams", inputListbox,popup));
                         }
                      
@@ -757,7 +763,7 @@ public class ChartPanel extends Panel {
             inputListbox.addEventListener("onAddInputParams", onAddInputParams);
             Listhead head = new Listhead();
             Listheader header = new Listheader();
-            header.setLabel("Input Parameters");
+            header.setLabel(Labels.getLabel("inputParameters"));
             Button doneButton = new Button();
             doneButton.setSclass("glyphicon glyphicon-ok btn btn-link img-btn");
             doneButton.setStyle("float:right");
@@ -926,7 +932,7 @@ public class ChartPanel extends Panel {
             }
         } catch (RemoteException | HpccConnectionException e) {
             LOG.error(Constants.EXCEPTION,e);
-            Clients.showNotification("Unable to fetch Hpcc data",
+            Clients.showNotification(Labels.getLabel("unableTofetchHpccData"),
                     Clients.NOTIFICATION_TYPE_ERROR, this,"middle_center", 3000, true);
             return;
         }                    
@@ -936,7 +942,7 @@ public class ChartPanel extends Panel {
 
     private void createErrorUI() {
         chartDiv.setSclass("error-div");
-        Label label = new Label("Unable to recreate this widget.");
+        Label label = new Label(Labels.getLabel("unableToRecreateWidget"));
         label.setZclass("error-label");
         chartDiv.appendChild(label);
     }
@@ -945,7 +951,7 @@ public class ChartPanel extends Panel {
         addBtn.setVisible(false);
         
         final Textbox textbox = new Textbox();
-        textbox.setPlaceholder("Enter new password");
+        textbox.setPlaceholder(Labels.getLabel("enterPassword"));
         textbox.setType("password");
         
         final Button button = new Button("Update");
@@ -956,7 +962,8 @@ public class ChartPanel extends Panel {
             @Override
             public void onEvent(Event event) throws Exception {
                 if(textbox.getValue().length() < 1 && !isWarned) {
-                    Clients.showNotification("Password is empty. If you intend to submit an empty password, hit update again", "warning", textbox, "after_center", 3000, true);
+                    Clients.showNotification(Labels.getLabel("passwordEmpty"), Clients.NOTIFICATION_TYPE_WARNING, textbox, "after_center", 3000,
+                            true);
                     isWarned = true;
                     return;
                 }
@@ -978,12 +985,13 @@ public class ChartPanel extends Panel {
                 //Update password in current Object
                 portlet.getChartData().getHpccConnection().setPassword(textbox.getValue());
                 
-                Clients.showNotification("Password updated sucessfully", "info", ChartPanel.this, "middle_center", 2000, false);
+                Clients.showNotification(Labels.getLabel("passwordSuccessful"), Clients.NOTIFICATION_TYPE_INFO, ChartPanel.this, "middle_center",
+                        2000, false);
                 
                 //Clear existing form
                 chartDiv.getChildren().clear();
                 
-                Clients.showBusy(ChartPanel.this, "Recreating Chart");
+                Clients.showBusy(ChartPanel.this, Labels.getLabel("recreatingChart"));
                 
                 Map<String, Object> parameters = new HashMap<String, Object>();
                 parameters.put(Constants.COMMON_FILTERS_ENABLED, false);
@@ -991,12 +999,11 @@ public class ChartPanel extends Panel {
             }
         });
         
-        Label label = new Label("Unable to connect HPCC server at " + 
-                portlet.getChartData().getHpccConnection().getHostIp() + 
-                " as " + portlet.getChartData().getHpccConnection().getUsername() + 
-                ". Server authentication information might have changed.");
+        Label label = new Label(Labels.getLabel("unableToConnectHpcc") + SPACE + portlet.getChartData().getHpccConnection().getHostIp() + SPACE
+                + Labels.getLabel("as") + SPACE + portlet.getChartData().getHpccConnection().getUsername()
+                + Labels.getLabel("serverAuthunticationError"));
 
-        Label label2 = new Label("* This will update password for all of your widgets created using this credentials");
+        Label label2 = new Label(Labels.getLabel("updateAllWidgetWithCredentials"));
         label2.setSclass("fine-print");
         
         Vbox vbox = new Vbox(new Component[]{label, textbox, button, label2});
@@ -1032,7 +1039,14 @@ public class ChartPanel extends Panel {
         }else{
             chartJson = portlet.getChartDataJSON();
         }
-                
+        chartDiv.addEventListener("onRemove", event -> {
+            String[] data = event.getData().toString().split(",");
+            JSONObject jo = new JSONObject();
+            for (String data1 : data) {
+                jo.put(data1, Labels.getLabel(data1));
+            }
+            Clients.evalJavaScript("renderRelevantLayout('" + chartDiv.getId() + "'," + jo + ");");
+        });
         
         ChartDetails chartDetails = chartService.getCharts().get(portlet.getChartType());
         
@@ -1229,7 +1243,7 @@ public class ChartPanel extends Panel {
             setStaticImage();    
             addBtn.removeEventListener(Events.ON_CLICK, addListener);
             addBtn.setSclass(EDIT_STYLE);
-            addBtn.setTooltiptext("Configure Chart");
+            addBtn.setTooltiptext(Labels.getLabel("configChart"));
             resetBtn.setDisabled(false);
             addBtn.addEventListener(Events.ON_CLICK, editListener);
         }
@@ -1286,7 +1300,7 @@ public class ChartPanel extends Panel {
         chartDiv.detach();
         
         addBtn.setSclass(ADD_STYLE);
-        addBtn.setTooltiptext("Add Chart");
+        addBtn.setTooltiptext(Labels.getLabel("addChart"));
         
         resetBtn.setDisabled(true);
         addBtn.removeEventListener(Events.ON_CLICK, editListener);

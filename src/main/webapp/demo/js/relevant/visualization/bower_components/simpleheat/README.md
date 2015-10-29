@@ -1,10 +1,10 @@
 simpleheat
 ==========
 
-A super-tiny JavaScript library for drawing heatmaps with Canvas by [Vladimir Agafonkin](http://agafonkin.com/en).
+A super-tiny JavaScript library for drawing heatmaps with Canvas.
 Inspired by [heatmap.js](https://github.com/pa7/heatmap.js), but with focus on simplicity and performance.
 
-It also powers [Leaflet.heat](https://github.com/Leaflet/Leaflet.heat), a heatmap plugin for [Leaflet](http://leafletjs.com).
+Powers [Leaflet.heat](https://github.com/Leaflet/Leaflet.heat), a heatmap plugin for [Leaflet](http://leafletjs.com).
 
 Demo: http://mourner.github.io/simpleheat/demo
 
@@ -45,6 +45,9 @@ heat.radius(r, r2);
 
 // set gradient colors as {<stop>: '<color>'}, e.g. {0.4: 'blue', 0.65: 'lime', 1: 'red'}
 heat.gradient(grad);
+
+// call in case Canvas size changed
+heat.resize();
 ```
 
 #### Rendering

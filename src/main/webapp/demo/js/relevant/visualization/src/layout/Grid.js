@@ -1,11 +1,11 @@
 "use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3", "../common/HTMLWidget", "./Cell", "../common/TextBox", "../other/Bag", "css!./Grid"], factory);
+        define(["d3", "../common/HTMLWidget", "./Cell", "../common/TextBox", "../common/Utility", "css!./Grid"], factory);
     } else {
-        root.layout_Grid = factory(root.d3, root.common_HTMLWidget, root.layout_Cell, root.common_TextBox, root.other_Bag);
+        root.layout_Grid = factory(root.d3, root.common_HTMLWidget, root.layout_Cell, root.common_TextBox, root.common_Utility);
     }
-}(this, function (d3, HTMLWidget, Cell, TextBox, Bag) {
+}(this, function (d3, HTMLWidget, Cell, TextBox, Utility) {
     function Grid() {
         HTMLWidget.call(this);
 
@@ -15,7 +15,7 @@
         this._rowCount = 0;
         this._colSize = 0;
         this._rowSize = 0;
-        this._selectionBag = new Bag.Selection();
+        this._selectionBag = new Utility.Selection();
         
         this.content([]);
     }
@@ -30,25 +30,15 @@
     Grid.prototype.publish("designGridColor", "#ddd", "html-color", "Color of grid lines in Design Mode",null,{tags:["Private"]});
     Grid.prototype.publish("designGridColorExtra", "#333333", "html-color", "Color of excess grid lines in Design Mode",null,{tags:["Private"]});
 
-    Grid.prototype.publish("cellPadding", null, "string", "Cell Padding (px)", null, { tags: ["Intermediate"] });
+    Grid.prototype.publish("surfacePadding", null, "string", "Cell Padding (px)", null, { tags: ["Intermediate"] });
+    
+    Grid.prototype.publish("surfaceBorderWidth", 1, "number", "Width (px) of Cell Border", null, { tags: ["Intermediate"] });
     
     Grid.prototype.publish("extraDesignModeWidth", 2, "number", "Number of additional columns added when in Design Mode.",null,{tags:["Private"]});
     Grid.prototype.publish("extraDesignModeHeight", 2, "number", "Number of additional rows added when in Design Mode.",null,{tags:["Private"]});
     Grid.prototype.publish("cellDensity", 3, "string", "Increase the cell density with this multiplier (Ex: 3 results in 3 cols per col and 3 rows per row)", null, { tags: ["Intermediate"] });
 
     Grid.prototype.publish("content", [], "widgetArray", "widgets",null,{tags:["Basic"]});
-
-    Grid.prototype.testData = function () {
-        this
-            .setContent(0, 0, new TextBox().testData())
-            .setContent(0, 1, new TextBox().testData())
-            .setContent(1, 0, new TextBox().testData())
-            .setContent(1, 1, new TextBox().testData())
-            .setContent(0, 2, new TextBox().testData(), "Title AAA", 2, 2)
-            .setContent(2, 0, new TextBox().testData(), "Title BBB", 2, 4)
-        ;
-        return this;
-    };
 
     Grid.prototype.getDimensions = function () {
         var size = { width: 0, height: 0 };
@@ -304,9 +294,9 @@
         
         this.updateCellMultiples();
         
-        var rows = this.contentDiv.selectAll(".cell_" + this._id).data(this.content(), function (d) { return d._id; });
+        var rows = this.contentDiv.selectAll(".cell_." + this._id).data(this.content(), function (d) { return d._id; });
         rows.enter().append("div")
-            .attr("class", "cell_" + this._id)
+            .attr("class", "cell_ " + this._id)
             .style("position", "absolute")
             .each(function (d) {
                 d
@@ -342,7 +332,7 @@
                 context._dragCellOffsetY = context._currLoc[1] - d.gridRow();
                 context.createDropTarget(context._currLoc);
                 setTimeout(function () {
-                    context.contentDiv.selectAll(".cell_" + context._id)
+                    context.contentDiv.selectAll(".cell_." + context._id)
                         .classed("dragItem", function (d2) {
                             return d._id === d2._id;
                         }).classed("notDragItem", function (d2) {
@@ -419,7 +409,7 @@
                 gridDropTarget.parentNode.removeChild(gridDropTarget);
                 
                 setTimeout(function () {
-                    context.contentDiv.selectAll(".cell_" + context._id)
+                    context.contentDiv.selectAll(".cell_." + context._id)
                         .classed("dragItem", false)
                         .classed("notDragItem", false)
                     ;
@@ -429,13 +419,13 @@
             });
             
         if(this.designMode()){ 
-            this.contentDiv.selectAll(".cell_" + this._id).call(drag);
+            this.contentDiv.selectAll(".cell_." + this._id).call(drag);
             d3.select(context._target).on("click",function(){
                 context._selectionBag.clear();
                 context.postSelectionChange();
             });
         } else {
-            this.contentDiv.selectAll(".cell_" + this._id).on(".drag", null);
+            this.contentDiv.selectAll(".cell_." + this._id).on(".drag", null);
             this._selectionBag.clear();
         }
         
@@ -451,7 +441,8 @@
                 ;
 
                 d
-                    .surfacePadding(context.cellPadding())
+                    .surfacePadding(context.surfacePadding())
+                    .surfaceBorderWidth(context.surfaceBorderWidth())
                     .resize()
                 ;
             });

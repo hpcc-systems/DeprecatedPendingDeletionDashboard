@@ -1,30 +1,23 @@
 "use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3", "./Table", "../chart/MultiChart", "../layout/Grid", "css!./Legend"], factory);
+        define(["d3", "./Table", "css!./Legend"], factory);
     } else {
-        root.other_Legend = factory(root.d3, root.other_Table, root.chart_MultiChart, root.layout_Grid);
+        root.other_Legend = factory(root.d3, root.other_Table);
     }
-}(this, function (d3, Table, MultiChart, Grid) {
+}(this, function (d3, Table) {
     function Legend() {
         Table.call(this);
         this._tag = "div";
-        this._columns = [];
+        
+        this.showHeader(false);
     }
     Legend.prototype = Object.create(Table.prototype);
+    Legend.prototype.constructor = Legend;
     Legend.prototype._class += " other_Legend";
 
     //We may need a new publish param "type" to store references to widgets
     //Legend.prototype.publish("targetWidget", null, "widget", "Target widget for Legend",null,{tags:["Private"]});
-    
-    Legend.prototype.testData = function(){
-        var multiChart = new MultiChart().testData().chartType("AM_BAR");
-        return new Grid()
-            .setContent(0, 0, multiChart)
-            .setContent(0, 1, this.targetWidget(multiChart))
-            .cellPadding(0)
-        ;
-    };
     
     Legend.prototype.targetWidget = function (widget) {
         var context = this;
@@ -100,6 +93,16 @@
             this.targetWidget(this._targetWidget);
         }
         
+        var table = element.select(".tableDiv > table");
+        var tableRect = table.node().getBoundingClientRect();
+        var elementRect = this._parentElement.node().getBoundingClientRect();
+        
+        element.select(".tableDiv").style({overflow:"visible"});
+        
+        var top = elementRect.height/2 - tableRect.height/2;
+        var left = elementRect.width/2 - tableRect.width/2;
+        table.style({position:"absolute",top:top+"px",left:left+"px"});
+        
         var startIndex = this.pageNumber()-1;
         var itemsOnPage = this.itemsPerPage();
 
@@ -108,9 +111,9 @@
 
         var tData = null;
         if (this.pagination()) {
-            tData = this._data.slice(start,end);
+            tData = this.data().slice(start,end);
         } else {
-            tData = this._data;
+            tData = this.data();
         }
 
         var rows = this.tbody.selectAll("tr").data(tData);

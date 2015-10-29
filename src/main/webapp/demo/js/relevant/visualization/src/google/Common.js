@@ -17,6 +17,7 @@
         this._data_google = google.visualization.arrayToDataTable([["", { role: "annotation" }],["",""]]);
 
         this._chart = null;
+        this._selection = {};
     }
     Common.prototype = Object.create(HTMLWidget.prototype);
     Common.prototype.constructor = Common;
@@ -61,8 +62,8 @@
         var retVal = HTMLWidget.prototype.data.apply(this, arguments);
         if (arguments.length) {
             var data = null;
-            if (this._data.length) {
-                data = [this._columns].concat(this._data.map(function (row, row_idx) {
+            if (this.data().length) {
+                data = [this.columns()].concat(this.data().map(function (row, row_idx) {
                     return row.map(function (cell, idx) {
                         if (idx > 0) {
                             if (isNaN(cell)) {
@@ -85,7 +86,7 @@
     };
 
     Common.prototype.getChartOptions = function () {
-        var colors = this._columns.filter(function (d, i) { return i > 0; }).map(function (row) {
+        var colors = this.columns().filter(function (d, i) { return i > 0; }).map(function (row) {
             return this._palette(row);
         }, this);
 
@@ -132,7 +133,7 @@
     };
 
     Common.prototype.getNumSeries = function () {
-        return this._columns.slice(1).length;
+        return this.columns().slice(1).length;
     };
 
     Common.prototype.enter = function (domNode, element) {
@@ -144,8 +145,14 @@
         google.visualization.events.addListener(this._chart, "select", function () {
             var selectedItem = context._chart.getSelection()[0];
             if (selectedItem) {
-                context.click(context.rowToObj(context._data[selectedItem.row]), context._columns[selectedItem.column]);
+                context._selection = {
+                    data: context.rowToObj(context.data()[selectedItem.row]),
+                    column: context.columns()[selectedItem.column] || null
+                };
+            } else {
+                context._selection = {data: {}, column: null};
             }
+            context.click(context._selection.data, context._selection.column, Object.keys(context._selection.data).length !== 0);
         });
     };
 

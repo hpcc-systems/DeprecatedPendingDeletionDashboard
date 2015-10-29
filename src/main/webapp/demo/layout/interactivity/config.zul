@@ -10,9 +10,9 @@
 			<panelchildren>
 				<vbox hflex="1" vflex="1" align="center" pack="center">
 					<combobox hflex="1"  id="sourceCombobox" autodrop="true"></combobox>
-					<listbox hflex="1"  id="sourceListBox" style="margin:3px;"	vflex="1" multiple="false" emptyMessage="Select source widget">
+					<listbox hflex="1"  id="sourceListBox" style="margin:3px;"	vflex="1" multiple="false" emptyMessage="${labels.selectSourceWidget}">
 						<listhead>
-							<listheader label="Columns" sclass="lightHeader">
+							<listheader label="${labels.columns }" sclass="lightHeader">
 							</listheader>
 						</listhead>
 					</listbox>
@@ -23,9 +23,9 @@
 			<panelchildren>
 				<vbox hflex="1" vflex="1" align="center" pack="center">
 					<combobox hflex="1"  id="targetCombobox" autodrop="true"></combobox>
-					<listbox hflex="1"  id="targetListBox" style="margin:3px;" vflex="1" multiple="false" emptyMessage="Select target widget">
+					<listbox hflex="1"  id="targetListBox" style="margin:3px;" vflex="1" multiple="false" emptyMessage="${labels.selectTargetWidget}">
 						<listhead>
-							<listheader label="Columns"	sclass="lightHeader">
+							<listheader label="${labels.columns }"	sclass="lightHeader">
 							</listheader>
 						</listhead>
 					</listbox>
@@ -42,7 +42,7 @@
 
 	<panel sclass="editPanel"  id="joinConditionPanel"  hflex="1" title="${labels.definedinteractivity}">
 		<panelchildren>
-			<listbox id="interactivityListbox"  emptyMessage="Define a Interactivity" height="60px">
+			<listbox id="interactivityListbox"  emptyMessage="${labels.defineInteractivity }" height="60px">
 			</listbox>
 		</panelchildren>
 	</panel>

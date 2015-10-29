@@ -79,10 +79,11 @@
         this.selectionTable = new Table()
             .fixedHeader(true)
             .fixedColumn(true)
+            .fixedSize(true)
         ;
 
         //  Bottom Tabs/Tables  ---
-        function attachClickEvent(table) {
+        function attachClickEvent(table) {        	
             table.click = function (row, col) {
                 var selection = this.selection().map(function (item) {
                     return item[item.length - 1];
@@ -123,19 +124,18 @@
         attachClickEvent(this.vehiclesTable);
 
         this.vertexTabs = new Tabbed()
-            .addTab(this.allTable, "All")
-            .addTab(this.claimsTable, "Claims")
-            .addTab(this.peopleTable, "People")
-            .addTab(this.policiesTable, "Policies")
-            .addTab(this.vehiclesTable, "Vehicles")
+            .addTab(this.allTable, obj.all)
+            .addTab(this.claimsTable, obj.claims)
+            .addTab(this.peopleTable, obj.people)
+            .addTab(this.policiesTable, obj.policies)
+            .addTab(this.vehiclesTable, obj.vehicle)
         ;
 
         //  Main Grid  ---
         this
-            .cellPadding(0)
             .setContent(0, 0, this.claimsChart, "", 1, 4)
             .setContent(1, 0, this.graph, "", 6, 4)
-            .setContent(0, 4, this.selectionTable, "Selection", 7, 1)
+            .setContent(0, 4, this.selectionTable, obj.selection, 7, 1.23)
             .setContent(7, 0, this.vertexTabs, "", 3, 5)
         ;
     }
@@ -147,12 +147,16 @@
     Main.prototype.showSelection = function (_) {
         if (_) {
             this.getCell(7, 0).gridColSpan(5);
+            this.setContent(0, 0, this.claimsChart, "", 1, 4);
+            this.setContent(1, 0, this.graph, "", 6, 4);
             this
-                .setContent(0, 4, this.selectionTable, "Selection", 7, 1)
+                .setContent(0, 4, this.selectionTable, obj.selection, 7, 1.23)
                 .render()
             ;
         } else {
             this.getCell(7, 0).gridColSpan(4);
+            this.setContent(0, 0, this.claimsChart, "", 1, 4.5);
+            this.setContent(1, 0, this.graph, "", 6, 4.5);            
             this
                 .setContent(0, 4, null)
                 .render()
@@ -163,7 +167,7 @@
 
     Main.prototype.filterEntities = function (filter) {
         this._allTableFilter = filter;
-        this.populateTableH(this.allTable, this.vertices);
+       	this.populateTableH(this.allTable, this.vertices);
     };
 
     Main.prototype.getVertex = function (id, faChar, label, data) {
@@ -204,7 +208,7 @@
     };
 
     Main.prototype.populateTableV = function (table, selection) {
-        var columns = ["Property"];
+        var columns = [obj.property];
         var propIdx = {};
         var data = [];
         selection.forEach(function (item, idx) {
@@ -274,7 +278,6 @@
         table
             .columns(columns)
             .data(data)
-            .render()
         ;
     };
 
@@ -338,6 +341,7 @@
                 if (element) {
                     element.classed("expanding", false);
                     element.classed("expanded", true);
+                    window.backupAppData.push(context.serializeToObject());
                 }
                 response.claim_list.forEach(function (item, i) {
                     var claim = context.getVertex("c_" + item.report_no, "\uf0d6", item.report_no, item);

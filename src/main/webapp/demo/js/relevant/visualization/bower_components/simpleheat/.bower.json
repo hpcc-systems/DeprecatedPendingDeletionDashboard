@@ -1,11 +1,11 @@
 {
   "name": "simpleheat",
   "homepage": "https://github.com/mourner/simpleheat",
-  "_release": "b5ac274dd3",
+  "_release": "b2117b4167",
   "_resolution": {
     "type": "branch",
     "branch": "gh-pages",
-    "commit": "b5ac274dd33a7ae5036ab3b024e470a58104d6db"
+    "commit": "b2117b41678f1b61a882c292057e4bc87fb676ff"
   },
   "_source": "git://github.com/mourner/simpleheat.git",
   "_target": "gh-pages",

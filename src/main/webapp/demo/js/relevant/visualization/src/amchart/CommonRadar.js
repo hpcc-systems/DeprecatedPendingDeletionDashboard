@@ -12,6 +12,8 @@
         this._tag = "div";
 
         this._chart = {};
+
+        this._selected = null;
     }
     CommonRadar.prototype = Object.create(HTMLWidget.prototype);
     CommonRadar.prototype.constructor = CommonRadar;
@@ -19,9 +21,9 @@
 
     // NO X-Axis  !!!
 
-    CommonRadar.prototype.publish("fontSize", null, "number", "Font Size",null,{tags:["Basic","Shared"]});
-    CommonRadar.prototype.publish("fontFamily", null, "string", "Font Name",null,{tags:["Basic","Shared"]});
-    CommonRadar.prototype.publish("fontColor", null, "html-color", "Font Color",null,{tags:["Basic","Shared"]});
+    CommonRadar.prototype.publish("fontSize", 11, "number", "Font Size",null,{tags:["Basic","Shared"]});
+    CommonRadar.prototype.publish("fontFamily", "Verdana", "string", "Font Name",null,{tags:["Basic","Shared","Shared"]});
+    CommonRadar.prototype.publish("fontColor", "#000000", "html-color", "Font Color",null,{tags:["Basic","Shared"]});
 
     CommonRadar.prototype.publish("lineWidth", 2, "number", "Line Thickness", null, {min:0,max:10,step:1,inputType:"range",tags:["Basic","Shared"]});
     CommonRadar.prototype.publish("lineOpacity", 1, "number", "Line Opacity", null, {min:0,max:1,step:0.001,inputType:"range",tags:["Basic","Shared"]});
@@ -29,8 +31,8 @@
 
     CommonRadar.prototype.publish("yAxisBaselineColor", null, "html-color", "Axis color",null,{tags:["Intermediate","Shared"]});
 
-    CommonRadar.prototype.publish("axisFontSize", null, "number", "Size of value labels text. Will use chart's fontSize if not set.",null,{tags:["Basic","Shared"]});
-    CommonRadar.prototype.publish("yAxisFontColor", null, "string", "Font Name",null,{tags:["Basic","Shared"]});
+    CommonRadar.prototype.publish("axisFontSize", undefined, "number", "Size of value labels text. Will use chart's fontSize if not set.",null,{tags:["Basic","Shared"]});
+    CommonRadar.prototype.publish("yAxisFontColor", undefined, "string", "Font Name",null,{tags:["Basic","Shared"]});
 
     CommonRadar.prototype.publish("yAxisTitle", "", "string", "Y-Axis Title",null,{tags:["Basic","Shared"]});
     CommonRadar.prototype.publish("yAxisTitleFontColor", null, "html-color", "Color of axis value labels. Will use chart's color if not set.",null,{tags:["Basic","Shared"]});
@@ -46,8 +48,6 @@
     CommonRadar.prototype.publish("showScrollbar", false, "boolean", "Chart Scrollbar",null,{tags:["Intermediate"]});
 
     CommonRadar.prototype.publish("startDuration", 0.3, "number", "Start Duration (sec)",null,{tags:["Private"]});
-
-    CommonRadar.prototype.publish("dataDateFormat", null, "string", "Date Format String",null,{tags:["Private"]});
 
     CommonRadar.prototype.publish("yAxisAutoGridCount", true, "boolean", "Specifies whether number of gridCount is specified automatically, acoarding to the axis size",null,{tags:["Advanced"]});
     CommonRadar.prototype.publish("yAxisGridPosition", "start", "set", "Specifies if a grid line is placed on the center of a cell or on the beginning of a cell", ["start","middle"],{tags:["Advanced"]});
@@ -70,14 +70,19 @@
     CommonRadar.prototype.publish("fillOpacity", 0.3, "number", "Shape Opacity", null, {min:0,max:1,step:0.001,inputType:"range",tags:["Intermediate"]});
     CommonRadar.prototype.publish("useClonedPalette", false, "boolean", "Enable or disable using a cloned palette",null,{tags:["Intermediate","Shared"]});
 
+    CommonRadar.prototype.publish("yAxisTickFormat", null, "string", "Y-Axis Tick Format", null, { optional: true });
+    
+    CommonRadar.prototype.publish("selectionColor", "#f00", "html-color", "Font Color",null,{tags:["Basic"]});
+    CommonRadar.prototype.publish("selectionMode", "simple", "set", "Selection Mode", ["simple", "multi"], { tags: ["Intermediate"] });
+
     CommonRadar.prototype.updateChartOptions = function() {
         var context = this;
 
-        if (this.dataDateFormat()) { this._chart.dataDateFormat = this.dataDateFormat(); }
         this._chart.theme = "none";
         this._chart.type = "radar";
         this._chart.startDuration = this.startDuration();
-        this._chart.categoryField = this._categoryField;
+        this._chart.categoryField = this.columns()[0];
+        this._valueField = this.columns().slice(1);
 
         this._chart.color = this.fontColor();
         this._chart.fontSize = this.fontSize();
@@ -91,7 +96,7 @@
         this.titles = [];
 
         // DataProvider
-        this._chart.dataProvider = this.formatData(this._data);
+        this._chart.dataProvider = this.formatData(this.data());
 
         // ValueAxis
         this._chart.valueAxes[0].title = this.yAxisTitle();
@@ -109,8 +114,12 @@
         this._chart.valueAxes[0].autoGridCount = this.yAxisAutoGridCount();
         this._chart.valueAxes[0].gridPosition = this.yAxisGridPosition();
 
+        this._chart.valueAxes[0].labelFunction = function(d) {
+            return d3.format(context.yAxisTickFormat())(d);
+        };
+
         // Color Palette
-        this._chart.colors = this._columns.filter(function (d, i) { return i > 0; }).map(function (row) {
+        this._chart.colors = this.columns().filter(function (d, i) { return i > 0; }).map(function (row) {
             return this._palette(row);
         }, this);
 
@@ -133,7 +142,10 @@
         var context = this;
         var gObj = {};
 
-        gObj.balloonText = context.tooltipTemplate();
+        gObj.balloonFunction = function(d) {
+            var balloonText = d.category + ", " + context.columns()[d.graph.index+1]  + ": " + context.data()[d.index][d.graph.columnIndex+1];
+            return balloonText;
+        };
         gObj.fillAlphas = context.fillOpacity();
         gObj.lineAlpha = context.lineOpacity();
         gObj.lineThickness = context.lineWidth();
@@ -145,6 +157,8 @@
 
         gObj.title = "";
 
+        gObj.colorField = "selected" + i;
+
         return gObj;
     };
 
@@ -153,28 +167,12 @@
         var context = this;
         dataArr.forEach(function(dataRow){
             var dataObj = {};
-            context._columns.forEach(function(colName,cIdx){
+            context.columns().forEach(function(colName,cIdx){
                 dataObj[colName] = dataRow[cIdx];
             });
             dataObjArr.push(dataObj);
         });
         return dataObjArr;
-    };
-
-    CommonRadar.prototype.columns = function(colArr) {
-        if (!arguments.length) return this._columns;
-        var context = this;
-        var retVal = HTMLWidget.prototype.columns.apply(this, arguments);
-        if (arguments.length) {
-            this._categoryField = colArr[0];
-            this._valueField = [];
-            colArr.slice(1,colArr.length).forEach(function(col){
-                context._valueField.push(col);
-            });
-            this._columns = colArr;
-            return this;
-        }
-        return retVal;
     };
 
     CommonRadar.prototype.enter = function(domNode, element) {
@@ -183,6 +181,7 @@
         var initObj = {
             theme: "none",
             type: "radar",
+            addClassNames: true,
             chartScrollbar: {}
         };
         if (typeof define === "function" && define.amd) {
@@ -190,7 +189,34 @@
         }
         this._chart = AmCharts.makeChart(domNode, initObj);
         this._chart.addListener("clickGraphItem", function(e) {
-            context.click(context.rowToObj(context._data[e.index]), context._columns[e.target.index+1]);
+            var graph = e.graph;
+            var data  = e.item.dataContext;
+            var field = graph.colorField;
+
+            if (data[field] !== null && data[field] !== undefined) {
+                delete data[field];
+                if (context.selectionMode() === "simple") {
+                    if (context._selected !== null) {
+                        delete context._selected.data[context._selected.field];
+                    }
+                    context._selected = null;
+                }
+            } else {
+                data[field] = context.selectionColor();
+                if (context.selectionMode() === "simple") {
+                    if (context._selected !== null) {
+                        delete context._selected.data[context._selected.field];
+                    }
+                    context._selected = {
+                        field: field,
+                        data: data
+                    };
+                }
+            }
+
+            e.chart.validateData();
+            
+            context.click(context.rowToObj(context.data()[e.index]), context.columns()[e.target.index+1]);
         });
     };
 

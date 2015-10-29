@@ -20,51 +20,6 @@
     Form.prototype.publish("showSubmit", true, "boolean", "Show Submit/Cancel Controls");
     Form.prototype.publish("omitBlank", false, "boolean", "Drop Blank Fields From Submit");
 
-    Form.prototype.testData = function () {
-        this
-            .inputs([
-                new Input()
-                    .name("textbox-test")
-                    .label("Alphanumeric")
-                    .type("textbox")
-                    .validate("^[A-Za-z0-9]+$")
-                    .value("SomeString123"),
-                new Input()
-                    .name("number-test")
-                    .label("Number Test")
-                    .type("number")
-                    .validate("\\d+")
-                    .value(123),
-                new Input()
-                    .name("select-test")
-                    .label("Select Test")
-                    .type("select")
-                    .selectOptions(["A","B","C"])
-                    .value("B"),
-                new WidgetArray()
-                    .content([
-                        new Input()
-                            .name("textbox-test")
-                            .label("Only Alpha")
-                            .type("textbox")
-                            .validate("^[A-Za-z]+$")
-                            .value("SomeString"),
-                        new Input()
-                            .name("checkbox-test")
-                            .label("Checkbox Test")
-                            .type("checkbox")
-                            .value(true)
-                    ]),
-                new Input()
-                    .name("textarea-test")
-                    .label("Textarea Test")
-                    .type("textarea")
-                    .value("Textarea Text")
-            ])
-        ;
-        return this;
-    };
-
     Form.prototype.data = function (_) {
         if (!arguments.length) {
             var retVal = [];
@@ -168,7 +123,8 @@
             .append("table")
         ;
         this.tbody = table.append("tbody");
-        this.btntd = table.append("tfoot").append("tr").append("td")
+        this.tfoot = table.append("tfoot");
+        this.btntd = this.tfoot.append("tr").append("td")
             .attr("colspan", 2)
         ;
 
@@ -234,9 +190,11 @@
         ;
         rows.exit().remove();
 
+        this.tfoot
+            .style("display",this.showSubmit() ? "table-footer-group" : "none")
+        ;
         this.btntd
             .attr("colspan", this._maxCols * 2)
-            .style("visibility", this.showSubmit() ? null : "hidden")
         ;
     };
 

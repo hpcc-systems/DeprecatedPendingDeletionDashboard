@@ -28,8 +28,8 @@
 					<div width="250px" sclass="form-label-div" align="right">
 						<label zclass="control-label" value="${labels.hpccConnection}"></label>
 					</div>
-					<combobox id="defaultConnections" autodrop="true" placeholder="Choose a pre-defined Cluster" sclass="input-sm"/>
-		  			or
+					<combobox id="defaultConnections" autodrop="true" placeholder="${labels.chooseACluster}" sclass="input-sm"/>
+		  			<label value="${labels.orKey}"/>
 		  			<button id="defineConnection" zclass="btn btn-sm btn-info" label="${labels.defineconnection }" />
 				</hbox>
 			</vbox>

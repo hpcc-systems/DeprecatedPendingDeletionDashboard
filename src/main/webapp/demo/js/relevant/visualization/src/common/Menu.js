@@ -44,7 +44,7 @@
         this.preShowMenu();
         this._visible = true;
         this._list
-            .data(this._data)
+            .data(this.data())
             .render()
         ;
 
@@ -80,13 +80,6 @@
         this.postHideMenu();
     };
 
-    Menu.prototype.testData = function () {
-        this
-            .data(["Menu A", "And B", "a longer C"])
-        ;
-        return this;
-    };
-
     Menu.prototype.enter = function (domNode, element) {
         SVGWidget.prototype.enter.apply(this, arguments);
 
@@ -112,7 +105,7 @@
     Menu.prototype.update = function (domNode, element) {
         SVGWidget.prototype.update.apply(this, arguments);
         element
-            .classed("disabled", this._data.length === 0)
+            .classed("disabled", this.data().length === 0)
         ;
 
         this._icon
