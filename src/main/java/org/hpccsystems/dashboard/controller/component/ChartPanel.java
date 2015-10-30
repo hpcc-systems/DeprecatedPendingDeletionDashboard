@@ -157,6 +157,16 @@ public class ChartPanel extends Panel {
 
     };
 
+    EventListener<Event> onTraslateLabels = event ->{
+        LOG.info("Inside relevant chart listener onTraslateLabels-->");
+        String[] data = event.getData().toString().split(",");
+        JSONObject json = new JSONObject();
+        for (String data1 : data) {
+            json.put(data1, Labels.getLabel(data1));
+        }
+        Clients.evalJavaScript("renderRelevantLayout('" + chartDiv.getId() + "'," + json + ");");  
+    };
+     
             
     //Event Listener for Change of title text
     EventListener<Event> titleChangeLisnr = new EventListener<Event>() {
@@ -393,6 +403,8 @@ public class ChartPanel extends Panel {
         resizeBtn.setTooltiptext(Labels.getLabel("maximizeWindow"));
         
         titleTextbox.addEventListener(Events.ON_BLUR, titleChangeLisnr);
+        
+        chartDiv.addEventListener("onTraslateLabels", onTraslateLabels);
         
         if(showLocalFilters) {
             //Shows Input parameters for Quieries(Roxie/Thor)
@@ -1017,6 +1029,7 @@ public class ChartPanel extends Panel {
         chartDiv.appendChild(vbox);
     }
     
+    
     /**
      * Provides the java script to draw the graph
      * @return
@@ -1038,15 +1051,7 @@ public class ChartPanel extends Panel {
             chartJson = StringEscapeUtils.escapeJavaScript(portlet.getChartDataJSON());
         }else{
             chartJson = portlet.getChartDataJSON();
-        }
-        chartDiv.addEventListener("onRemove", event -> {
-            String[] data = event.getData().toString().split(",");
-            JSONObject jo = new JSONObject();
-            for (String data1 : data) {
-                jo.put(data1, Labels.getLabel(data1));
-            }
-            Clients.evalJavaScript("renderRelevantLayout('" + chartDiv.getId() + "'," + jo + ");");
-        });
+        }       
         
         ChartDetails chartDetails = chartService.getCharts().get(portlet.getChartType());
         

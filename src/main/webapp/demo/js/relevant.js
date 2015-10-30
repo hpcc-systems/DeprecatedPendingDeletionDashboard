@@ -205,7 +205,7 @@ function createRelevantChart(divId, reqData) {
 	console.log("div-->"+reqData);
 	jq('$'+divId).attr("reqData", reqData);
 	var releventlayout1 = "layout,randomize,circle,forceDirected,forceDirectedAnimated,hierarchy,showHide,zoom,zoomFit,zoomWidth,zoomSelection,zoom100,all,claims,people,vehicle,policies,showSelection,selection,property,back";
-	zAu.send(new zk.Event(zk.Widget.$('$'+divId), "onRemove",   releventlayout1, {toServer:true}));
+	zAu.send(new zk.Event(zk.Widget.$('$'+divId), "onTraslateLabels",   releventlayout1, {toServer:true}));
 }
 
 function resizeGraph() {

@@ -34,6 +34,8 @@ import org.zkoss.zul.Button;
 import org.zkoss.zul.Combobox;
 import org.zkoss.zul.ComboitemRenderer;
 import org.zkoss.zul.ListModelList;
+import org.zkoss.zul.Radio;
+import org.zkoss.zul.Radiogroup;
 
 
 @VariableResolver(org.zkoss.zkplus.spring.DelegatingVariableResolver.class)
@@ -51,13 +53,21 @@ public class RelevantController extends SelectorComposer<Component>{
 	
 	private Portlet portlet;
 	private RelevantData relevantData;
-	private Button doneButton;
+    private Button doneButton;
 	@Wire
 	private Combobox claimCombobox;
 	@Wire
 	private Combobox groupTypeIdCombobox;
 	@Wire
     private Combobox groupIdCombobox;
+	@Wire
+	private Radiogroup cmbClaim;
+	@Wire
+    private Radiogroup cmbPolicy;
+	@Wire
+    private Radiogroup cmbVehicle;
+	@Wire
+    private Radiogroup cmbPerson;
 	
 	@WireVariable
 	private HPCCQueryService hpccQueryService;
@@ -113,18 +123,33 @@ public class RelevantController extends SelectorComposer<Component>{
 		});
 	      
 	     populateGroupTypeId();		    
-	     //populateImages();
+	     populateImages();
 	}
     
-   /* private void populateImages() {
+    private void populateImages() {
         
 	    if(relevantData.getClaimImage() != null){
-	       Listitem selectItem = listbox.getItems().stream().filter(item ->
-            relevantData.getClaimImage().equals(((Listcell)item.getFirstChild()).getValue().toString())).findAny().get();
-	       listbox.setSelectedItem(selectItem);
-	    }    	    
+	       Radio selectItem = cmbClaim.getItems().stream().filter(radioItem ->
+            relevantData.getClaimImage().equals(radioItem.getValue())).findAny().get();
+	       cmbClaim.setSelectedItem(selectItem);
+	    } 
+	    if(relevantData.getPolicyImage() != null){
+	           Radio selectItem = cmbPolicy.getItems().stream().filter(radioItem ->
+	            relevantData.getPolicyImage().equals(radioItem.getValue())).findAny().get();
+	           cmbPolicy.setSelectedItem(selectItem);
+	    } 
+	    if(relevantData.getVehicleImage() != null){
+	           Radio selectItem = cmbVehicle.getItems().stream().filter(radioItem ->
+	            relevantData.getVehicleImage().equals(radioItem.getValue())).findAny().get();
+	           cmbVehicle.setSelectedItem(selectItem);
+	     } 
+	    if(relevantData.getPersonImage() != null){
+	           Radio selectItem = cmbPerson.getItems().stream().filter(radioItem ->
+	            relevantData.getPersonImage().equals(radioItem.getValue())).findAny().get();
+	           cmbPerson.setSelectedItem(selectItem);
+	     } 
         
-    }*/
+    }
 
     ComboitemRenderer<RelevantGroupType> groupTypeRenderer = (item,data,index) ->{
         StringBuilder builder = new StringBuilder();
@@ -204,5 +229,13 @@ public class RelevantController extends SelectorComposer<Component>{
 	    }
 	    
 	}
+	
+	public RelevantData getRelevantData() {
+        return relevantData;
+    }
+
+    public void setRelevantData(RelevantData relevantData) {
+        this.relevantData = relevantData;
+    }
 	
 }
