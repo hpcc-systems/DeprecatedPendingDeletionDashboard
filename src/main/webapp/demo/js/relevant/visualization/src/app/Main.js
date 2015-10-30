@@ -278,6 +278,7 @@
         table
             .columns(columns)
             .data(data)
+            .render()
         ;
     };
 

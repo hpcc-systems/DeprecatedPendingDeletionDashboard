@@ -235,13 +235,13 @@ background: #91C3E0;
 	margin-right: 5px;
 }
 
-.z-panelchildren header nav .relevantBackButton{
+  .z-panelchildren header nav .relevantBackButton{
     margin-top: 2px;
     float: left;
     color: #000;
     font-size: small;
     font-weight: 200;
-}
+}  
 
 .z-north-collapsed, .z-south-collapsed, .z-west-collapsed, .z-center-collapsed, .z-east-collapsed {
     background: none repeat scroll 0 0 #333;
