@@ -204,8 +204,15 @@ function createRelevantChart(divId, reqData) {
 	console.log("div-->"+divId);
 	console.log("div-->"+reqData);
 	jq('$'+divId).attr("reqData", reqData);
-	var releventlayout1 = "layout,randomize,circle,forceDirected,forceDirectedAnimated,hierarchy,showHide,zoom,zoomFit,zoomWidth,zoomSelection,zoom100,all,claims,people,vehicle,policies,showSelection,selection,property,back";
-	zAu.send(new zk.Event(zk.Widget.$('$'+divId), "onRemove",   releventlayout1, {toServer:true}));
+	var releventlayout1 = "layout,randomize,circle,forceDirected,forceDirectedAnimated,hierarchy,showHide,zoom," +
+			"zoomFit,zoomWidth,zoomSelection,zoom100,all,claims,people,vehicle,policies,showSelection,selection,property,back," +
+			"report_no,company_id,comm_ind,mand_ind,reporter,accident_reason,claim_amount,accident_time,claim_status,accident_place," +
+			"accident_description,liability,road_accident,injury_accident,brigandage_accident,third_vehicle,estimate_amount," +
+			"main_injury_amount,main_car_amount,third_injury_amount,third_car_amount,third_property_amount,clm_rid,flagged_ind," +
+			"rejected_ind,qrypos,partition_id,estimate_factory_code,estimate_factory,balance_factory_code,balance_factory," +
+			"vehicle_list,person_list,policy_no,car_mark,driver_name,rack_no,certi_code,encrypt_flag,dob,fpos,person_id,cnt," +
+			"name,address,zip,phone,by_claim,by_policy,lhs_person,rhs_person,policy_cnt,entity";
+	zAu.send(new zk.Event(zk.Widget.$('$'+divId), "onTraslateLabels",   releventlayout1, {toServer:true}));
 }
 
 function resizeGraph() {

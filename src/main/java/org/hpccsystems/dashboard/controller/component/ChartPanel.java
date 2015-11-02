@@ -22,6 +22,7 @@ import javax.xml.rpc.ServiceException;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.chart.cluster.ClusterData;
@@ -157,6 +158,17 @@ public class ChartPanel extends Panel {
 
     };
 
+    EventListener<Event> onTraslateLabels = event ->{
+        LOG.info("Inside relevant chart listener onTraslateLabels-->");
+        String[] data = event.getData().toString().split(",");
+        JSONObject json = new JSONObject();
+        for (String data1 : data) {
+            String label = Labels.getLabel(data1);
+            json.put(data1, StringUtils.isEmpty(label) ? data1 : label);
+        }
+        Clients.evalJavaScript("renderRelevantLayout('" + chartDiv.getId() + "'," + json + ");");  
+    };
+     
             
     //Event Listener for Change of title text
     EventListener<Event> titleChangeLisnr = new EventListener<Event>() {
@@ -393,6 +405,8 @@ public class ChartPanel extends Panel {
         resizeBtn.setTooltiptext(Labels.getLabel("maximizeWindow"));
         
         titleTextbox.addEventListener(Events.ON_BLUR, titleChangeLisnr);
+        
+        chartDiv.addEventListener("onTraslateLabels", onTraslateLabels);
         
         if(showLocalFilters) {
             //Shows Input parameters for Quieries(Roxie/Thor)
@@ -1017,6 +1031,7 @@ public class ChartPanel extends Panel {
         chartDiv.appendChild(vbox);
     }
     
+    
     /**
      * Provides the java script to draw the graph
      * @return
@@ -1038,15 +1053,7 @@ public class ChartPanel extends Panel {
             chartJson = StringEscapeUtils.escapeJavaScript(portlet.getChartDataJSON());
         }else{
             chartJson = portlet.getChartDataJSON();
-        }
-        chartDiv.addEventListener("onRemove", event -> {
-            String[] data = event.getData().toString().split(",");
-            JSONObject jo = new JSONObject();
-            for (String data1 : data) {
-                jo.put(data1, Labels.getLabel(data1));
-            }
-            Clients.evalJavaScript("renderRelevantLayout('" + chartDiv.getId() + "'," + jo + ");");
-        });
+        }       
         
         ChartDetails chartDetails = chartService.getCharts().get(portlet.getChartType());
         

@@ -55,11 +55,11 @@ import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
-import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.Listbox;
 import org.zkoss.zul.Messagebox;
+import org.zkoss.zul.Radiogroup;
 import org.zkoss.zul.Tab;
 import org.zkoss.zul.Tabbox;
 import org.zkoss.zul.Tabpanel;
@@ -373,10 +373,10 @@ public class EditWidgetController extends SelectorComposer<Component> {
             	if(!validateRelevantData(objRelevantData)){
                     return;
                 }
-            	objRelevantData.setClaimImage((Combobox)holderInclude.getFellow("cmbClaim") != null ? ((Combobox)holderInclude.getFellow("cmbClaim")).getSelectedItem().getValue().toString() : null);
-            	objRelevantData.setPersonImage((Combobox)holderInclude.getFellow("cmbPerson") != null ? ((Combobox)holderInclude.getFellow("cmbPerson")).getSelectedItem().getValue().toString() : null);
-            	objRelevantData.setVehicleImage((Combobox)holderInclude.getFellow("cmbVehicle") != null ? ((Combobox)holderInclude.getFellow("cmbVehicle")).getSelectedItem().getValue().toString() : null);
-            	objRelevantData.setPolicyImage((Combobox)holderInclude.getFellow("cmbPolicy") != null ? ((Combobox)holderInclude.getFellow("cmbPolicy")).getSelectedItem().getValue().toString() : null);
+            	objRelevantData.setClaimImage((Radiogroup)holderInclude.getFellow("cmbClaim") != null ? ((Radiogroup)holderInclude.getFellow("cmbClaim")).getSelectedItem().getValue().toString() : null);
+            	objRelevantData.setPersonImage((Radiogroup)holderInclude.getFellow("cmbPerson") != null ? ((Radiogroup)holderInclude.getFellow("cmbPerson")).getSelectedItem().getValue().toString() : null);
+            	objRelevantData.setVehicleImage((Radiogroup)holderInclude.getFellow("cmbVehicle") != null ? ((Radiogroup)holderInclude.getFellow("cmbVehicle")).getSelectedItem().getValue().toString() : null);
+            	objRelevantData.setPolicyImage((Radiogroup)holderInclude.getFellow("cmbPolicy") != null ? ((Radiogroup)holderInclude.getFellow("cmbPolicy")).getSelectedItem().getValue().toString() : null);
             	
             	LOG.debug("RELEVANT DATA: "+objRelevantData);
             	
@@ -453,16 +453,16 @@ public class EditWidgetController extends SelectorComposer<Component> {
                 || relevantData.getGroupId() != null)){
             Clients.showNotification(Labels.getLabel("provideAnyOneOfInput"), "error", holderInclude.getFellow("groupDatabox"), "end_center", 3000, true);
             return false;
-        }else if(((Combobox)holderInclude.getFellow("cmbClaim")).getSelectedItem() == null){
+        }else if(((Radiogroup)holderInclude.getFellow("cmbClaim")).getSelectedItem() == null){
             Clients.showNotification(Labels.getLabel("chooseClaimImage"), "error", holderInclude.getFellow("cmbClaim"), "end_center", 3000, true);
             return false;
-        }else if(((Combobox)holderInclude.getFellow("cmbPolicy")).getSelectedItem() == null ){
+        }else if(((Radiogroup)holderInclude.getFellow("cmbPolicy")).getSelectedItem() == null ){
             Clients.showNotification(Labels.getLabel("choosePolicyImage"), "error", holderInclude.getFellow("cmbPolicy"), "end_center", 3000, true);
             return false;
-        }else if(((Combobox)holderInclude.getFellow("cmbVehicle")).getSelectedItem() == null ){
+        }else if(((Radiogroup)holderInclude.getFellow("cmbVehicle")).getSelectedItem() == null ){
             Clients.showNotification(Labels.getLabel("chooseVehicleImage"), "error", holderInclude.getFellow("cmbVehicle"), "end_center", 3000, true);
             return false;
-        }else if(((Combobox)holderInclude.getFellow("cmbPerson")).getSelectedItem() == null ){
+        }else if(((Radiogroup)holderInclude.getFellow("cmbPerson")).getSelectedItem() == null ){
             Clients.showNotification(Labels.getLabel("choosePersonImage"), "error", holderInclude.getFellow("cmbPerson"), "end_center", 3000, true);
             return false;
         }

@@ -55,164 +55,40 @@
 					<space height="10px"></space>
 					<groupbox >
 						<div sclass="group-row">
-							<label zclass="control-label" value="${labels.claimsImageIcon}"></label>						
-							<combobox id="cmbClaim" autodrop="true" height="20px" >
-								<attribute w:name="bind_"><![CDATA[
-						       		function (a, b, c) {
-							                this.$bind_(a, b, c);
-							                // anchor used to position selected image
-							                var n = this.$n(),
-							                    ref = n.firstChild,
-							                    span = document.createElement('span');
-							                jq(span).css('position', 'relative')
-							                    .addClass('custom-selected-image-anchor');
-							                n.insertBefore(span, ref);
-							            }
-							        ]]></attribute>
-						        <attribute w:name="_hilite2"><![CDATA[
-						            function (sel, opts) {
-						                this.$_hilite2(sel, opts);
-						                if (opts && opts.sendOnSelect && sel) {
-						                    var $anchor = jq(this.$n()).find('.custom-selected-image-anchor');
-						                    $anchor.find('.custom-selected-image')
-						                        .each(function () {
-						                            this.parentNode.removeChild(this);
-						                        });
-						                    $anchor[0].appendChild(
-						                        jq(sel.getImageNode()).clone() // clone node
-						                            .css({'position': 'absolute', // add style
-						                                'left': '5px',
-						                                'top': '0px'}) // also add class
-						                            .addClass('custom-selected-image')[0]       
-						                    );
-						                }
-						            }
-						        ]]></attribute>
-			    				<comboitem image="js/relevant/img/money.png" label=" " value="\uf0f6" />
-			    				<comboitem image="js/relevant/img/file-text.png" label=" " value="\uf0d6"/>
-			    				<comboitem image="js/relevant/img/car.png" label=" " value="\uf1b9"/>
-			    				<comboitem image="js/relevant/img/user.png" label=" " value="\uf007"/>
-			  				</combobox>	
+							<label  zclass="control-label" value="${labels.claimsImageIcon}"></label>							
+							<radiogroup id="cmbClaim" orient="horizontal" class="relevantRadioGrp">
+					            <radio  image="js/relevant/img/money.png" value="\uf0f6"/>
+					            <radio  image="js/relevant/img/file-text.png" value="\uf0d6"/>
+					            <radio  image="js/relevant/img/car.png" value="\uf1b9"/>
+					            <radio  image="js/relevant/img/user.png" value="\uf007"/>
+					        </radiogroup>
 			  			</div>					
 						<div sclass="group-row">
-							<label zclass="control-label" value="${labels.policyImageIcon}"></label>						
-							<combobox id="cmbPolicy" autodrop="true" >
-								<attribute w:name="bind_"><![CDATA[
-							       function (a, b, c) {
-							                this.$bind_(a, b, c);
-							                // anchor used to position selected image
-							                var n = this.$n(),
-							                    ref = n.firstChild,
-							                    span = document.createElement('span');
-							                jq(span).css('position', 'relative')
-							                    .addClass('custom-selected-image-anchor');
-							                n.insertBefore(span, ref);
-							            }
-							        ]]></attribute>
-							        <attribute w:name="_hilite2"><![CDATA[
-							            function (sel, opts) {
-							                this.$_hilite2(sel, opts);
-							                if (opts && opts.sendOnSelect && sel) {
-							                    var $anchor = jq(this.$n()).find('.custom-selected-image-anchor');
-							                    $anchor.find('.custom-selected-image')
-							                        .each(function () {
-							                            this.parentNode.removeChild(this);
-							                        });
-							                    $anchor[0].appendChild(
-							                        jq(sel.getImageNode()).clone() // clone node
-							                            .css({'position': 'absolute', // add style
-							                                'left': '5px',
-							                                'top': '1px'}) // also add class
-							                            .addClass('custom-selected-image')[0]       
-							                    );
-							                }
-							            }
-							        ]]></attribute>
-				    			<comboitem image="js/relevant/img/money.png" label=" " value="\uf0f6" />
-				    			<comboitem image="js/relevant/img/file-text.png" label=" " value="\uf0d6"/>
-				    			<comboitem image="js/relevant/img/car.png" label=" " value="\uf1b9"/>
-				    			<comboitem image="js/relevant/img/user.png" label=" " value="\uf007"/>
-				  			</combobox>	
+							<label zclass="control-label" value="${labels.policyImageIcon}"></label>
+							<radiogroup id="cmbPolicy" orient="horizontal" class="relevantRadioGrp">
+					            <radio  image="js/relevant/img/money.png" value="\uf0f6"/>
+					            <radio  image="js/relevant/img/file-text.png" value="\uf0d6"/>
+					            <radio  image="js/relevant/img/car.png" value="\uf1b9"/>
+					            <radio  image="js/relevant/img/user.png" value="\uf007"/>
+					        </radiogroup>	
 						</div>					
 						<div sclass="group-row">
-							<label zclass="control-label" value="${labels.vehicleImageIcon}"></label>						
-							<combobox id="cmbVehicle" autodrop="true" >
-								<attribute w:name="bind_"><![CDATA[
-							       function (a, b, c) {
-							                this.$bind_(a, b, c);
-							                // anchor used to position selected image
-							                var n = this.$n(),
-							                    ref = n.firstChild,
-							                    span = document.createElement('span');
-							                jq(span).css('position', 'relative')
-							                    .addClass('custom-selected-image-anchor');
-							                n.insertBefore(span, ref);
-							            }
-							        ]]></attribute>
-							        <attribute w:name="_hilite2"><![CDATA[
-							            function (sel, opts) {
-							                this.$_hilite2(sel, opts);
-							                if (opts && opts.sendOnSelect && sel) {
-							                    var $anchor = jq(this.$n()).find('.custom-selected-image-anchor');
-							                    $anchor.find('.custom-selected-image')
-							                        .each(function () {
-							                            this.parentNode.removeChild(this);
-							                        });
-							                    $anchor[0].appendChild(
-							                        jq(sel.getImageNode()).clone() // clone node
-							                            .css({'position': 'absolute', // add style
-							                                'left': '5px',
-							                                'top': '1px'}) // also add class
-							                            .addClass('custom-selected-image')[0]       
-							                    );
-							                }
-							            }
-							        ]]></attribute>
-				    			<comboitem image="js/relevant/img/money.png" label=" " value="\uf0f6" />
-				    			<comboitem image="js/relevant/img/file-text.png" label=" " value="\uf0d6"/>
-				    			<comboitem image="js/relevant/img/car.png" label=" " value="\uf1b9"/>
-				    			<comboitem image="js/relevant/img/user.png" label=" " value="\uf007"/>
-				  			</combobox>	
+							<label zclass="control-label" value="${labels.vehicleImageIcon}"></label>	
+							<radiogroup id="cmbVehicle" orient="horizontal" class="relevantRadioGrp">
+					            <radio  image="js/relevant/img/money.png" value="\uf0f6"/>
+					            <radio  image="js/relevant/img/file-text.png" value="\uf0d6" />
+					            <radio  image="js/relevant/img/car.png" value="\uf1b9"/>
+					            <radio  image="js/relevant/img/user.png" value="\uf007"/>
+					        </radiogroup>	
 						</div>					
 						<div sclass="group-row">
 							<label zclass="control-label" value="${labels.personImageIcon}"></label>
-							<combobox id="cmbPerson" autodrop="true" >
-								<attribute w:name="bind_"><![CDATA[
-							       function (a, b, c) {
-							                this.$bind_(a, b, c);
-							                // anchor used to position selected image
-							                var n = this.$n(),
-							                    ref = n.firstChild,
-							                    span = document.createElement('span');
-							                jq(span).css('position', 'relative')
-							                    .addClass('custom-selected-image-anchor');
-							                n.insertBefore(span, ref);
-							            }
-							        ]]></attribute>
-							        <attribute w:name="_hilite2"><![CDATA[
-							            function (sel, opts) {
-							                this.$_hilite2(sel, opts);
-							                if (opts && opts.sendOnSelect && sel) {
-							                    var $anchor = jq(this.$n()).find('.custom-selected-image-anchor');
-							                    $anchor.find('.custom-selected-image')
-							                        .each(function () {
-							                            this.parentNode.removeChild(this);
-							                        });
-							                    $anchor[0].appendChild(
-							                        jq(sel.getImageNode()).clone() // clone node
-							                            .css({'position': 'absolute', // add style
-							                                'left': '5px',
-							                                'top': '1px'}) // also add class
-							                            .addClass('custom-selected-image')[0]       
-							                    );
-							                }
-							            }
-							        ]]></attribute>
-				    			<comboitem image="js/relevant/img/money.png" label=" " value="\uf0f6"/>
-				    			<comboitem image="js/relevant/img/file-text.png" label=" " value="\uf0d6"/>
-				    			<comboitem image="js/relevant/img/car.png" label=" " value="\uf1b9"/>
-				    			<comboitem image="js/relevant/img/user.png" label=" " value="\uf007"/>
-				  			</combobox>	
+							<radiogroup id="cmbPerson" orient="horizontal" class="relevantRadioGrp">
+					            <radio  image="js/relevant/img/money.png" value="\uf0f6"/>
+					            <radio  image="js/relevant/img/file-text.png" value="\uf0d6"/>
+					            <radio  image="js/relevant/img/car.png" value="\uf1b9"/>
+					            <radio  image="js/relevant/img/user.png" value="\uf007"/>
+					        </radiogroup>							
 						</div>
 					</groupbox>	
 				</vbox>
