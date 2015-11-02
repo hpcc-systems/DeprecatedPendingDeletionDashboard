@@ -22,6 +22,7 @@ import javax.xml.rpc.ServiceException;
 import javax.xml.xpath.XPathExpressionException;
 
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.chart.cluster.ClusterData;
@@ -162,7 +163,8 @@ public class ChartPanel extends Panel {
         String[] data = event.getData().toString().split(",");
         JSONObject json = new JSONObject();
         for (String data1 : data) {
-            json.put(data1, Labels.getLabel(data1));
+            String label = Labels.getLabel(data1);
+            json.put(data1, StringUtils.isEmpty(label) ? data1 : label);
         }
         Clients.evalJavaScript("renderRelevantLayout('" + chartDiv.getId() + "'," + json + ");");  
     };
