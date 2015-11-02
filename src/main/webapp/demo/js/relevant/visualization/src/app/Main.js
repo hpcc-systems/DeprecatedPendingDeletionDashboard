@@ -83,7 +83,7 @@
         ;
 
         //  Bottom Tabs/Tables  ---
-        function attachClickEvent(table) {        	
+        function attachClickEvent(table) { 
             table.click = function (row, col) {
                 var selection = this.selection().map(function (item) {
                     return item[item.length - 1];
@@ -218,7 +218,7 @@
                 var row = null;
                 if (propIdx[key] === undefined) {
                     propIdx[key] = data.length;
-                    row = [key];
+                    row = [obj[key]];
                     row.length = selection.length + 1;
                     data.push(row);
                 } else {
@@ -231,12 +231,12 @@
             .columns(columns)
             .data(data)
             .render()
-        ;
+        ;        
     };
 
     Main.prototype.populateTableH = function (table, selection, filter) {
         filter = filter || this._allTableFilter;
-        var columns = ["Entity"];
+        var columns = [obj.entity];
         var entityIdx = {};
         var propIdx = {};
         var data = [];
@@ -260,7 +260,8 @@
             for (var key in props) {
                 if (propIdx[key] === undefined) {
                     propIdx[key] = columns.length;
-                    columns.push(key);
+                    //get the Translated header column here
+                    columns.push([obj[key]]);
                 }
                 row[propIdx[key]] = props[key];
             }
@@ -275,13 +276,37 @@
                 selection[idx].__claimsTableRowIdx = row;
             }
         }, this);
+        
         table
             .columns(columns)
             .data(data)
             .render()
         ;
     };
-
+    
+//Can be used later point while the query service is modified to return data based on input flag
+    Main.prototype.translateTableHeader = function(table,colArray){
+    	var origColumns = table.columns;
+    	 console.log("colArray -->"+colArray);
+    	table.columns = function(colArray) {
+    		console.log("arguments -->"+arguments.length);
+    	  if (!arguments.length){
+      			console.log("Here len-->");
+    		  return origColumns.apply(this, arguments);
+    	  }
+    	  var traslatedColumns = colArray.map(function(d) {
+    		  console.log("d -->"+d);
+    		  console.log("obj.d -->"+obj[d]);
+    		  /* translate  here */
+    		  var traslatedColumn = obj[d]; 
+    		  return traslatedColumn;
+    		  });
+    	  origColumns.call(this, traslatedColumns);
+    	  console.log("this -->"+this);
+    	  return this;
+    	}
+    };
+    
     Main.prototype.queryGroup = function (groupId,groupTypeId) {
     	console.log('groupId----------------->'+groupId);
     	console.log('groupTypeId----------------->'+groupTypeId);
