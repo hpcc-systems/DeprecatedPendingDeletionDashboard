@@ -36,10 +36,12 @@ import org.zkoss.web.Attributes;
 import org.zkoss.zhtml.Div;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.Page;
 import org.zkoss.zk.ui.Session;
 import org.zkoss.zk.ui.Sessions;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
+import org.zkoss.zk.ui.metainfo.ComponentInfo;
 import org.zkoss.zk.ui.select.SelectorComposer;
 import org.zkoss.zk.ui.select.annotation.Listen;
 import org.zkoss.zk.ui.select.annotation.VariableResolver;
@@ -100,20 +102,35 @@ public class LoginController extends SelectorComposer<Component> {
         
     Map<String, String[]> args = null;
     
+    
+    @Override
+    public ComponentInfo doBeforeCompose(Page page, Component parent,
+            ComponentInfo compInfo) {
+        //Defaulting language as English       
+        Session session = Sessions.getCurrent();
+        if(session.getAttribute(Constants.LANG) == null){
+            session.setAttribute(Constants.LANG, Constants.LANG_ENGLISH);
+            changeLocale(Constants.LANG_ENGLISH_CODE);
+        }
+        
+        return super.doBeforeCompose(page, parent, compInfo);
+    }
+
+
     @Override
     public void doAfterCompose(final Component comp) throws Exception {
         super.doAfterCompose(comp);
         args = Executions.getCurrent().getParameterMap();
-        //setting default language as English
         Session session = Sessions.getCurrent();
-        String lang = (String)session.getAttribute("lang");
-        if(lang!=null && "Chinese".equalsIgnoreCase(lang)){
+        String lang = (String)session.getAttribute(Constants.LANG);
+        
+        if(lang!=null && Constants.LANG_CHINESE.equalsIgnoreCase(lang)){
             listItemChinese.setSelected(true);
-            listItemChinese.setValue("Chinese");
+            listItemChinese.setValue(Constants.LANG_CHINESE);
         }
         else{
             listItemEnglish.setSelected(true);
-            listItemEnglish.setValue("English");
+            listItemEnglish.setValue(Constants.LANG_ENGLISH);
         }
         
         //Redirecting if the user is already logged in.
@@ -162,23 +179,27 @@ public class LoginController extends SelectorComposer<Component> {
     public void doSelect() {
         Session session = Sessions.getCurrent();
         String lang = language.getSelectedItem().getValue();
-        if ("English".equalsIgnoreCase(lang)) {
-            session.setAttribute("lang", "English");
-            changeLocale("en");
+        if (Constants.LANG_ENGLISH.equalsIgnoreCase(lang)) {
+            session.setAttribute(Constants.LANG, Constants.LANG_ENGLISH);
+            changeLocaleAndRedirect(Constants.LANG_ENGLISH_CODE);
         } else {
-            session.setAttribute("lang", "Chinese");
-            changeLocale("zh");
+            session.setAttribute(Constants.LANG,  Constants.LANG_CHINESE);
+            changeLocaleAndRedirect(Constants.LANG_CHINESE_CODE);
         }
         if (LOG.isDebugEnabled()) {
             LOG.debug("Current Language" + lang);
         }
     }
 
+    private void changeLocaleAndRedirect(String locale) {
+        changeLocale(locale);
+        Executions.sendRedirect(null);
+    }
+    
     private void changeLocale(String locale) {
         Session session = Sessions.getCurrent();
         Locale preferredLocale = Locales.getLocale(locale);
         session.setAttribute(Attributes.PREFERRED_LOCALE, preferredLocale);
-        Executions.sendRedirect(null);
     }
 
     @Listen("onClick=#login")

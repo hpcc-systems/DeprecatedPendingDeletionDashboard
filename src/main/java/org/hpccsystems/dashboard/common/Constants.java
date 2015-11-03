@@ -247,6 +247,12 @@ public class Constants {
 	public static final String TRUE = "true";
 	public static final String FALSE = "false";
 	
+	public static final String LANG = "lang";
+	public static final String LANG_CHINESE = "Chinese";
+	public static final String LANG_ENGLISH = "English";
+	public static final String LANG_CHINESE_CODE = "zh";
+    public static final String LANG_ENGLISH_CODE = "en";
+	
 	//EVENTS
 	public static final String DRAW_CHART_EVENT = "onDrawChart";
 	public static final String CREATE_FILTER_EVENT = "onFilterAdded";

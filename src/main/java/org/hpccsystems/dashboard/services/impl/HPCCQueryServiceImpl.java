@@ -19,6 +19,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
@@ -69,6 +70,8 @@ import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 import org.xml.sax.SAXException;
+import org.zkoss.web.Attributes;
+import org.zkoss.zk.ui.Sessions;
 
 import com.mysql.jdbc.StringUtils;
 
@@ -2138,6 +2141,8 @@ return resultDataMap;
             String relevantGroupTypeIdQuery, RelevantData relevantData) throws HpccConnectionException, RemoteException{
         final Set<RelevantGroupType> groupeTypes = new LinkedHashSet<RelevantGroupType>();
         try {
+            Locale locale = (Locale)Sessions.getCurrent().getAttribute(Attributes.PREFERRED_LOCALE);
+            LOG.debug("lang selected -->"+locale);
         String url = constructRelevantGroupURL(relevantData,relevantGroupTypeIdQuery);
         final InputStream response = hitURL(url, relevantData);
         if (response != null) {
@@ -2166,7 +2171,11 @@ return resultDataMap;
                          idLstNmElmnt = (Element) lstIdNmElmnt.item(0);
                          descLstNmElmnt = (Element) lstDescNmElmnt.item(0);
                          if (idLstNmElmnt != null && descLstNmElmnt != null) {
-                             groupeTypes.add(new RelevantGroupType(idLstNmElmnt.getTextContent(),descLstNmElmnt.getTextContent()));
+                             if(Constants.LANG_ENGLISH_CODE.equals(locale.getLanguage()) && descLstNmElmnt.getTextContent().matches(".*[a-zA-Z]+.*")){
+                                 groupeTypes.add(new RelevantGroupType(idLstNmElmnt.getTextContent(),descLstNmElmnt.getTextContent()));
+                             }else if(Constants.LANG_CHINESE_CODE.equals(locale.getLanguage()) && !descLstNmElmnt.getTextContent().matches(".*[a-zA-Z]+.*")){
+                                 groupeTypes.add(new RelevantGroupType(idLstNmElmnt.getTextContent(),descLstNmElmnt.getTextContent()));
+                             }                             
                          } else if(idLstNmElmnt != null){
                              groupeTypes.add(new RelevantGroupType(idLstNmElmnt.getTextContent(),""));
                        }
