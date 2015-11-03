@@ -8,7 +8,7 @@
 			apply="org.hpccsystems.dashboard.controller.LogoutController" 
 			hflex="1" vflex="1" pack="end" align="start" style="margin-right:30px">
 			<menubar zclass="user-nav">
-				<menuitem zclass="btn" iconSclass="glyphicon glyphicon-user" id="profile-link" label="${sessionScope.userCredential.userName}" if="${not sessionScope.userCredential.getApplicationId().equals('circuit') and not sessionScope.userCredential.hasRole('ApiViewDashboard')}" />
+				<menuitem zclass="btn" iconSclass="glyphicon glyphicon-user" id="profileLink" if="${not sessionScope.userCredential.getApplicationId().equals('circuit') and not sessionScope.userCredential.hasRole('ApiViewDashboard')}" />
 				<menuitem zclass="btn" iconSclass="glyphicon glyphicon-pushpin" id="plugin" label="${labels.plugin}" if="${not sessionScope.userCredential.hasRole('ApiViewDashboard') and sessionScope.userCredential.superUser}"/> 
 				<menuitem zclass="btn" iconSclass="glyphicon glyphicon-share-alt" id="logout" label="${labels.logout}" if="${not sessionScope.userCredential.anonymous}"/>
 			</menubar>

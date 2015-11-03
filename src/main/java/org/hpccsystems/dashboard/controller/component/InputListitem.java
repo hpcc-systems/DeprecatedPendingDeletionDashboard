@@ -2,6 +2,7 @@ package org.hpccsystems.dashboard.controller.component;
 
 import java.util.Set;
 
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
@@ -45,7 +46,7 @@ public class InputListitem extends Listitem {
             Listhead listhead = new Listhead();
             Listheader listheader = new Listheader();
             listheader.setLabel(paramName);
-            Button clearButton = new Button("Clear");
+            Button clearButton = new Button(Labels.getLabel("administrator"));
             clearButton.setZclass("clear-text-btn btn btn-link btn-sm");
             listheader.appendChild(clearButton);
             

@@ -4,6 +4,8 @@ import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.services.AuthenticationService;
+import org.hpccsystems.dashboard.services.UserCredential;
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Executions;
 import org.zkoss.zk.ui.Sessions;
@@ -39,6 +41,24 @@ public class LogoutController extends SelectorComposer<Component> {
     @Wire
     Menuitem logout;
 
+    @Wire
+    Menuitem profileLink;
+
+    UserCredential userCredential;
+
+    @Override
+    public void doAfterCompose(Component comp) throws Exception {
+        super.doAfterCompose(comp);
+        userCredential = authenticationService.getUserCredential();
+        if (profileLink != null) {
+            if ("Administrator".equals(userCredential.getUserName().trim())) {
+                profileLink.setLabel(Labels.getLabel("administrator"));
+            } else {
+                profileLink.setLabel(userCredential.getUserName());
+            }
+        }
+    }
+
     @Listen("onClick=#logout")
     public void doLogout() throws Exception {
         authenticationService.logout(Sessions.getCurrent().getAttribute("user"));
@@ -48,7 +68,7 @@ public class LogoutController extends SelectorComposer<Component> {
         }
     }
 
-    @Listen("onClick=#profile-link")
+    @Listen("onClick=#profileLink")
     public void onEvent(final Event arg0) throws Exception {
         // use iterable to find the first include only
         final Include include = (Include) Selectors
