@@ -35,7 +35,7 @@
 
         <div id="login-wraper" class="login-form">
            
-                <legend>${labels.signinto} <span class="blue">Dashboard</span></legend>
+                <legend>${labels.signinto} <span class="blue">${labels.dashboard }</span></legend>
 	            <div class="form-group">
 				  <label for="apps">${labels.lblApplication}</label >
 				   <zul:listbox sclass="form-control" id="apps" mold="select" width="200px" style="display:inline">

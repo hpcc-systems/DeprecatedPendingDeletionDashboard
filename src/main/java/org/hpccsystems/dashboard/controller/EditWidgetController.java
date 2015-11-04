@@ -29,6 +29,7 @@ import org.hpccsystems.dashboard.common.Constants;
 import org.hpccsystems.dashboard.controller.component.ChartPanel;
 import org.hpccsystems.dashboard.entity.Dashboard;
 import org.hpccsystems.dashboard.entity.Portlet;
+import org.hpccsystems.dashboard.entity.RelevantGroupType;
 import org.hpccsystems.dashboard.exception.EncryptDecryptException;
 import org.hpccsystems.dashboard.exception.HpccConnectionException;
 import org.hpccsystems.dashboard.services.AuthenticationService;
@@ -55,6 +56,7 @@ import org.zkoss.zk.ui.select.annotation.Wire;
 import org.zkoss.zk.ui.select.annotation.WireVariable;
 import org.zkoss.zk.ui.util.Clients;
 import org.zkoss.zul.Button;
+import org.zkoss.zul.Combobox;
 import org.zkoss.zul.Div;
 import org.zkoss.zul.Include;
 import org.zkoss.zul.Listbox;
@@ -370,6 +372,28 @@ public class EditWidgetController extends SelectorComposer<Component> {
             } else if(Constants.RELEVANT_CONFIG == chartService.getCharts().get(portlet.getChartType()).getCategory()){
             	RelevantData objRelevantData = (RelevantData)portlet.getChartData();
             	LOG.debug("RelevantData --->"+objRelevantData);
+                Combobox claimCombo = (Combobox) holderInclude.getFellow("claimCombobox");
+                if (claimCombo.getSelectedIndex() > -1) {
+                    String claimId = (String) claimCombo.getModel().getElementAt(claimCombo.getSelectedIndex());
+                    objRelevantData.setClaimId(claimId);
+                } else {
+                    objRelevantData.setClaimId(null);
+                }
+                Combobox groupIDCombo = (Combobox) holderInclude.getFellow("groupIdCombobox");
+                if (groupIDCombo.getSelectedIndex() > -1) {
+                    String groupId = (String) groupIDCombo.getModel().getElementAt(groupIDCombo.getSelectedIndex());
+                    objRelevantData.setGroupId(groupId);
+                } else {
+                    objRelevantData.setGroupId(null);
+                }
+                Combobox groupTypeCombo = (Combobox) holderInclude.getFellow("groupTypeIdCombobox");
+                if (groupTypeCombo.getSelectedIndex() > -1) {
+                    RelevantGroupType selectedGroupType = (RelevantGroupType) groupTypeCombo.getModel()
+                            .getElementAt(groupTypeCombo.getSelectedIndex());
+                    objRelevantData.setGroupType(selectedGroupType);
+                } else {
+                    objRelevantData.setGroupType(null);
+                }
             	if(!validateRelevantData(objRelevantData)){
                     return;
                 }

@@ -136,7 +136,7 @@
             .setContent(0, 0, this.claimsChart, "", 1, 4)
             .setContent(1, 0, this.graph, "", 6, 4)
             .setContent(0, 4, this.selectionTable, obj.selection, 7, 1.23)
-            .setContent(7, 0, this.vertexTabs, "", 3, 5)
+            .setContent(7, 0, this.vertexTabs, "", 3, 5.22)
         ;
     }
     Main.prototype = Object.create(Grid.prototype);
@@ -155,8 +155,8 @@
             ;
         } else {
             this.getCell(7, 0).gridColSpan(4);
-            this.setContent(0, 0, this.claimsChart, "", 1, 4.5);
-            this.setContent(1, 0, this.graph, "", 6, 4.5);            
+            this.setContent(0, 0, this.claimsChart, "", 1, 5.2);
+            this.setContent(1, 0, this.graph, "", 6, 5.2);            
             this
                 .setContent(0, 4, null)
                 .render()
@@ -287,22 +287,16 @@
 //Can be used later point while the query service is modified to return data based on input flag
     Main.prototype.translateTableHeader = function(table,colArray){
     	var origColumns = table.columns;
-    	 console.log("colArray -->"+colArray);
     	table.columns = function(colArray) {
-    		console.log("arguments -->"+arguments.length);
     	  if (!arguments.length){
-      			console.log("Here len-->");
     		  return origColumns.apply(this, arguments);
     	  }
     	  var traslatedColumns = colArray.map(function(d) {
-    		  console.log("d -->"+d);
-    		  console.log("obj.d -->"+obj[d]);
     		  /* translate  here */
     		  var traslatedColumn = obj[d]; 
     		  return traslatedColumn;
     		  });
     	  origColumns.call(this, traslatedColumns);
-    	  console.log("this -->"+this);
     	  return this;
     	}
     };
