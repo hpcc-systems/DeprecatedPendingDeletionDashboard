@@ -136,7 +136,7 @@
             .setContent(0, 0, this.claimsChart, "", 1, 4)
             .setContent(1, 0, this.graph, "", 6, 4)
             .setContent(0, 4, this.selectionTable, obj.selection, 7, 1.23)
-            .setContent(7, 0, this.vertexTabs, "", 3, 5)
+            .setContent(7, 0, this.vertexTabs, "", 3, 5.22)
         ;
     }
     Main.prototype = Object.create(Grid.prototype);
@@ -155,8 +155,8 @@
             ;
         } else {
             this.getCell(7, 0).gridColSpan(4);
-            this.setContent(0, 0, this.claimsChart, "", 1, 4.5);
-            this.setContent(1, 0, this.graph, "", 6, 4.5);            
+            this.setContent(0, 0, this.claimsChart, "", 1, 5.2);
+            this.setContent(1, 0, this.graph, "", 6, 5.2);            
             this
                 .setContent(0, 4, null)
                 .render()

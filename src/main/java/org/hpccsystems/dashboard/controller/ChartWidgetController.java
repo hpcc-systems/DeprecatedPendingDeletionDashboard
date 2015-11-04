@@ -5,6 +5,7 @@ import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
 
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.logging.Log;
 import org.apache.commons.logging.LogFactory;
 import org.hpccsystems.dashboard.common.Constants;
@@ -78,7 +79,7 @@ public class ChartWidgetController extends GenericForwardComposer<Component> {
                 image = new Image(chartDetails.getConfiguration().getImageURL());
                 image.setZclass("addwidget-img");
                 
-                label = new Label(chartDetails.getName());
+                label = new Label(Labels.getLabel(StringUtils.deleteWhitespace(chartDetails.getName())));
                 
                 button = new Button(Labels.getLabel("add"));
                 button.setZclass("btn btn-primary btn-sm");

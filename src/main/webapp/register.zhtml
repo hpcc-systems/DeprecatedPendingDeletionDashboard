@@ -22,7 +22,7 @@
     <zul:div zclass="container" apply="org.hpccsystems.dashboard.controller.RegisterController">
 		<div id="login-wraper" class="login-form">
            
-                <legend>${labels.registerTo} <span class="blue">Dashboard</span></legend>
+                <legend>${labels.registerTo} <span class="blue">${labels.dashboard }</span></legend>
 
 	            <div class="form-group">
 	            	<label for="fname">${labels.firatName}</label > 
