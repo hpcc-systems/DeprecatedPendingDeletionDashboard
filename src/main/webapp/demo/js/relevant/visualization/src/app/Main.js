@@ -287,22 +287,16 @@
 //Can be used later point while the query service is modified to return data based on input flag
     Main.prototype.translateTableHeader = function(table,colArray){
     	var origColumns = table.columns;
-    	 console.log("colArray -->"+colArray);
     	table.columns = function(colArray) {
-    		console.log("arguments -->"+arguments.length);
     	  if (!arguments.length){
-      			console.log("Here len-->");
     		  return origColumns.apply(this, arguments);
     	  }
     	  var traslatedColumns = colArray.map(function(d) {
-    		  console.log("d -->"+d);
-    		  console.log("obj.d -->"+obj[d]);
     		  /* translate  here */
     		  var traslatedColumn = obj[d]; 
     		  return traslatedColumn;
     		  });
     	  origColumns.call(this, traslatedColumns);
-    	  console.log("this -->"+this);
     	  return this;
     	}
     };

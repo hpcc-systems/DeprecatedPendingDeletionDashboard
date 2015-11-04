@@ -105,8 +105,8 @@ function renderRelevantLayout(divId, releventlayout){
             if (!entity) {
             	 entity = chartData.claimId;
             } 
-            if(!chartData.claimId && chartData.groupType && chartData.groupId ){
-            	app.queryGroup(chartData.groupId,chartData.groupType);
+            if(!chartData.claimId && chartData.groupType && chartData.groupId ){            	
+            	app.queryGroup(chartData.groupId,chartData.groupType.id);
             }
             if(entity){
 	            if (entity.indexOf("CLM") === 0) {
