@@ -171,13 +171,17 @@ public class RelevantController extends SelectorComposer<Component>{
             
             //Pre-loading the previouly selected group data 
             if(relevantData.getGroupType() != null){
-                List<RelevantGroupType> selectedGroupType = new ArrayList<RelevantGroupType>();               
-                selectedGroupType.add(relevantData.getGroupType());
+                List<RelevantGroupType> selectedGroupType = new ArrayList<RelevantGroupType>();
+                groupTypeIdModel.forEach(selectId -> {
+                    if (selectId.getId().equals(relevantData.getGroupType().getId())) {
+                        selectedGroupType.add(selectId);
+                    }
+                });
                 groupTypeIdModel.setSelection(selectedGroupType);
                 
                 List<String> selectedGroup = new ArrayList<String>();
                 selectedGroup.add(relevantData.getGroupId());
-                groupIdModel.addAll(selectedGroup);
+                groupIdModel.addAll(hpccQueryService.getRelevantGroups(RELEVANT_GROUP_ID_QUERY, relevantData));
                 groupIdModel.setSelection(selectedGroup);
                 groupIdCombobox.setModel(groupIdModel);
             }
