@@ -172,9 +172,9 @@ public class RelevantController extends SelectorComposer<Component>{
             //Pre-loading the previouly selected group data 
             if(relevantData.getGroupType() != null){
                 List<RelevantGroupType> selectedGroupType = new ArrayList<RelevantGroupType>();
-                groupTypeIdModel.forEach(selectId -> {
-                    if (selectId.getId().equals(relevantData.getGroupType().getId())) {
-                        selectedGroupType.add(selectId);
+                groupTypeIdModel.forEach(allGroupType -> {
+                    if (allGroupType.getId().equals(relevantData.getGroupType().getId())) {
+                        selectedGroupType.add(allGroupType);
                     }
                 });
                 groupTypeIdModel.setSelection(selectedGroupType);
