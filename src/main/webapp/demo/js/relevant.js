@@ -4,6 +4,7 @@
 
 var backupAppData = [];
 var obj;
+var icons = {"claim":"","vehicle":"","person":"","policy":""};
 function renderRelevantLayout(divId, releventlayout){
 	console.log(releventlayout);
 	obj = releventlayout;
@@ -108,6 +109,11 @@ function renderRelevantLayout(divId, releventlayout){
             if(!chartData.claimId && chartData.groupType && chartData.groupId ){            	
             	app.queryGroup(chartData.groupId,chartData.groupType.id);
             }
+            icons.claim = chartData.claimImage;
+            icons.vehicle = chartData.vehicleImage;
+            icons.person = chartData.personImage;
+            icons.policy = chartData.policyImage;
+            
             if(entity){
 	            if (entity.indexOf("CLM") === 0) {
 	            	app.queryClaim(entity);

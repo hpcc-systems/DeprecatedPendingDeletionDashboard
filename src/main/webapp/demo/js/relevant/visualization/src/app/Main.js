@@ -364,7 +364,7 @@
                     window.backupAppData.push(context.serializeToObject());
                 }
                 response.claim_list.forEach(function (item, i) {
-                    var claim = context.getVertex("c_" + item.report_no, "\uf0d6", item.report_no, item);
+                    var claim = context.getVertex("c_" + item.report_no, icons.claim, item.report_no, item);
                     context.claimMap[item.report_no] = {
                         date: item.accident_time,
                         amount: item.claim_amount,
@@ -399,13 +399,13 @@
                     claim.annotationIcons(annotations);
                 });
                 response.policy_list.forEach(function (item, i) {
-                    context.getVertex("pol_" + item.car_mark, "\uf0f6", item.car_mark, item);
+                    context.getVertex("pol_" + item.car_mark, icons.policy, item.car_mark, item);
                 });
                 response.person_list.forEach(function (item, i) {
-                    context.getVertex("p_" + item.person_id, "\uf007", item.person_id, item);
+                    context.getVertex("p_" + item.person_id, icons.person, item.person_id, item);
                 });
                 response.vehicle_list.forEach(function (item, i) {
-                    context.getVertex("v_" + item.rack_no, "\uf1b9", item.rack_no, item);
+                    context.getVertex("v_" + item.rack_no, icons.vehicle, item.rack_no, item);
                 });
                 response.claim_policy.forEach(function (item, i) {
                     context.getEdge(context.vertexMap["c_" + item.report_no], context.vertexMap["pol_" + item.car_mark], "", item);
