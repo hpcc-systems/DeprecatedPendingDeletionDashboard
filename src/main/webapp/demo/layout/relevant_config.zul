@@ -57,8 +57,8 @@
 						<div sclass="group-row">
 							<label  zclass="control-label" value="${labels.claimsImageIcon}"></label>							
 							<radiogroup id="cmbClaim" orient="horizontal" class="relevantRadioGrp">
-					            <radio  image="js/relevant/img/money.png" value="\uf0f6"/>
-					            <radio  image="js/relevant/img/file-text.png" value="\uf0d6"/>
+					            <radio  image="js/relevant/img/money.png" value="\uf0d6"/>
+					            <radio  image="js/relevant/img/file-text.png" value="\uf0f6"/>
 					            <radio  image="js/relevant/img/car.png" value="\uf1b9"/>
 					            <radio  image="js/relevant/img/user.png" value="\uf007"/>
 					        </radiogroup>
@@ -66,8 +66,8 @@
 						<div sclass="group-row">
 							<label zclass="control-label" value="${labels.policyImageIcon}"></label>
 							<radiogroup id="cmbPolicy" orient="horizontal" class="relevantRadioGrp">
-					            <radio  image="js/relevant/img/money.png" value="\uf0f6"/>
-					            <radio  image="js/relevant/img/file-text.png" value="\uf0d6"/>
+					            <radio  image="js/relevant/img/money.png" value="\uf0d6"/>
+					            <radio  image="js/relevant/img/file-text.png" value="\uf0f6"/>
 					            <radio  image="js/relevant/img/car.png" value="\uf1b9"/>
 					            <radio  image="js/relevant/img/user.png" value="\uf007"/>
 					        </radiogroup>	
@@ -75,8 +75,8 @@
 						<div sclass="group-row">
 							<label zclass="control-label" value="${labels.vehicleImageIcon}"></label>	
 							<radiogroup id="cmbVehicle" orient="horizontal" class="relevantRadioGrp">
-					            <radio  image="js/relevant/img/money.png" value="\uf0f6"/>
-					            <radio  image="js/relevant/img/file-text.png" value="\uf0d6" />
+					            <radio  image="js/relevant/img/money.png" value="\uf0d6"/>
+					            <radio  image="js/relevant/img/file-text.png" value="\uf0f6" />
 					            <radio  image="js/relevant/img/car.png" value="\uf1b9"/>
 					            <radio  image="js/relevant/img/user.png" value="\uf007"/>
 					        </radiogroup>	
@@ -84,8 +84,8 @@
 						<div sclass="group-row">
 							<label zclass="control-label" value="${labels.personImageIcon}"></label>
 							<radiogroup id="cmbPerson" orient="horizontal" class="relevantRadioGrp">
-					            <radio  image="js/relevant/img/money.png" value="\uf0f6"/>
-					            <radio  image="js/relevant/img/file-text.png" value="\uf0d6"/>
+					            <radio  image="js/relevant/img/money.png" value="\uf0d6"/>
+					            <radio  image="js/relevant/img/file-text.png" value="\uf0f6"/>
 					            <radio  image="js/relevant/img/car.png" value="\uf1b9"/>
 					            <radio  image="js/relevant/img/user.png" value="\uf007"/>
 					        </radiogroup>							

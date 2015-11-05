@@ -4,6 +4,7 @@
 
 var backupAppData = [];
 var obj;
+var icons = {"claim":"","vehicle":"","person":"","policy":""};
 function renderRelevantLayout(divId, releventlayout){
 	console.log(releventlayout);
 	obj = releventlayout;
@@ -108,6 +109,11 @@ function renderRelevantLayout(divId, releventlayout){
             if(!chartData.claimId && chartData.groupType && chartData.groupId ){            	
             	app.queryGroup(chartData.groupId,chartData.groupType.id);
             }
+            icons.claim = chartData.claimImage;
+            icons.vehicle = chartData.vehicleImage;
+            icons.person = chartData.personImage;
+            icons.policy = chartData.policyImage;
+            
             if(entity){
 	            if (entity.indexOf("CLM") === 0) {
 	            	app.queryClaim(entity);
@@ -211,7 +217,7 @@ function createRelevantChart(divId, reqData) {
 			"main_injury_amount,main_car_amount,third_injury_amount,third_car_amount,third_property_amount,clm_rid,flagged_ind," +
 			"rejected_ind,qrypos,partition_id,estimate_factory_code,estimate_factory,balance_factory_code,balance_factory," +
 			"vehicle_list,person_list,policy_no,car_mark,driver_name,rack_no,certi_code,encrypt_flag,dob,fpos,person_id,cnt," +
-			"name,address,zip,phone,by_claim,by_policy,lhs_person,rhs_person,policy_cnt,entity";
+			"name,address,zip,phone,by_claim,by_policy,lhs_person,rhs_person,policy_cnt,entity,roadAccident,thirdVehicle,injuryAccident";
 	zAu.send(new zk.Event(zk.Widget.$('$'+divId), "onTraslateLabels",   releventlayout1, {toServer:true}));
 }
 
