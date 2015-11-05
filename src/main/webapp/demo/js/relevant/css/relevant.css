@@ -156,4 +156,31 @@
    		 fill:white;
 		}
 		
+		.graph_Vertex .common_Icon .common_Shape {
+		    fill: white;
+		    stroke: #1f77b4;
+		}
+		
+		.graph_Vertex .common_Icon .common_FAChar .common_Text {
+		    fill: #1f77b4;
+		}
+		
+		.graph_Vertex.expanding .common_Icon .common_Shape {
+		    fill: #b41f3a;
+		    stroke: none;
+		}
+		
+		.graph_Vertex.expanding .common_Icon .common_FAChar .common_Text {
+		    fill: white;
+		}
+		
+		.graph_Vertex.expanded .common_Icon .common_Shape {
+		    fill: #1f77b4;
+		    stroke: none;
+		}
+		
+		.graph_Vertex.expanded .common_Icon .common_FAChar .common_Text {
+		    fill: white;
+		}
+		
 		
