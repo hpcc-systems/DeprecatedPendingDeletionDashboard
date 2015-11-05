@@ -374,7 +374,7 @@
                     if (item.road_accident && item.road_accident !== "0") {
                         annotations.push({
                             "faChar": "\uf018",
-                            "tooltip": "Road Accident",
+                            "tooltip": obj["roadAccident"],
                             "shape_color_fill": "darkgreen",
                             "image_color_fill": "white"
                         });
@@ -382,7 +382,7 @@
                     if (item.third_vehicle && item.third_vehicle !== "0") {
                         annotations.push({
                             "faChar": "\uf1b9",
-                            "tooltip": "Third Vehicle",
+                            "tooltip": obj["thirdVehicle"],
                             "shape_color_fill": "navy",
                             "image_color_fill": "white"
                         });
@@ -390,7 +390,7 @@
                     if (item.injury_accident && item.injury_accident !== "0") {
                         annotations.push({
                             "faChar": "\uf067",
-                            "tooltip": "Injury Accident",
+                            "tooltip": obj["injuryAccident"],
                             "shape_color_fill": "white",
                             "shape_color_stroke": "red",
                             "image_color_fill": "red"
