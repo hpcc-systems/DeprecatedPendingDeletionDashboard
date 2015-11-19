@@ -37,11 +37,13 @@
         switch (this.xAxisType()) {
             case "ordinal":
                 dataLen = this.dataScale.rangeBand();
+                console.log("ordinal-->?",dataLen);
                 offset = 0;
                 break;
             case "linear":
             case "time":
                 dataLen = Math.max(Math.abs(this.dataScale(2) - this.dataScale(1)) * (100 - this._linearGap) / 100, dataLen);
+                console.log("time-->?",dataLen);
                 offset = -dataLen/2;
                 break;
         }
@@ -92,7 +94,6 @@
 
                 if (isHorizontal) {
                     columnRect.transition()
-                        .attr("class", "columnRect")
                         .attr("x", function (d) { return context.dataScale(dataRow[0]) + (context.stacked() ? 0 : columnScale(d.column)) + offset; })
                         .attr("width", context.stacked() ? dataLen : columnScale.rangeBand())
                         .attr("y", function (d) { return d.value instanceof Array ? context.valueScale(d.value[1]) : context.valueScale(d.value); })
@@ -102,7 +103,6 @@
                     ;
                 } else {
                     columnRect.transition()
-                        .attr("class", "columnRect")
                         .attr("y", function (d) { return context.dataScale(dataRow[0]) + (context.stacked() ? 0 : columnScale(d.column)) + offset; })
                         .attr("height", context.stacked() ? dataLen : columnScale.rangeBand())
                         .attr("x", function (d) { return d.value instanceof Array ? context.valueScale(d.value[0]) : 0; })

@@ -1,7 +1,7 @@
 "use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3"], factory);
+        define(["d3", "./Database"], factory);
     } else {
         root.require = root.require || function (paths, cb) {
             if (typeof paths === "function") {
@@ -18,19 +18,19 @@
             cb.apply(null, objs);
         };
 
-        root.common_Widget = factory(root.d3);
+        root.common_Widget = factory(root.d3, root.common_Database);
     }
-}(this, function (d3) {
+}(this, function (d3, Database) {
     var widgetID = 0;
     function Widget() {
         this._class = Object.getPrototypeOf(this)._class;
         this._id = "_w" + widgetID++;
 
-        this._private_columns = [];
-        this._private_data = [];
+        this._db = new Database.Grid();
         this._pos = { x: 0, y: 0 };
         this._size = { width: 0, height: 0 };
         this._scale = 1;
+        this._visible = true;
 
         for (var key in this) {
             if (key.indexOf("__meta_") === 0) {
@@ -65,6 +65,32 @@
         }
     }
     Widget.prototype._class = "common_Widget";
+
+    Widget.prototype.leakCheck = function (newNode) {
+        var context = this;
+        var watchArray = [newNode];
+        var destructObserver = new this.MutationObserver(function (mutations) {
+            var leaks = false;
+            mutations.forEach(function (mutation) {
+                for (var i = 0; i < mutation.removedNodes.length; ++i) {
+                    var node = mutation.removedNodes.item(i);
+                    if (watchArray.indexOf(node) >= 0 && context._target) {
+                        leaks = true;
+                        destructObserver.disconnect();
+                    }
+                }
+            });
+            if (leaks) {
+                console.log("leak:  " + context.id() + " - " + context.classID() + "\t\twidget.target(null); was not called for this widget before it was removed from the page.");
+            }
+        });
+        var pNode = newNode.parentNode;
+        while (pNode) {
+            destructObserver.observe(pNode, { childList: true });
+            watchArray.push(pNode);
+            pNode = pNode.parentNode;
+        }
+    };
 
     Widget.prototype.applyTheme = function (theme) {
         if (!theme) {
@@ -343,7 +369,7 @@
     };
 
     Widget.prototype.broadcast = function (key, newVal, oldVal) {
-        if (this._watchArr) {
+        if (this._watchArr && newVal !== oldVal) {
             this._watchArr.forEach(function (func) {
                 if (func) {
                     setTimeout(function () {
@@ -389,14 +415,14 @@
     };
 
     Widget.prototype.columns = function (_) {
-        if (!arguments.length) return this._private_columns;
-        this._private_columns = _;
+        if (!arguments.length) return this._db.legacyColumns();
+        this._db.legacyColumns(_);
         return this;
     };
 
     Widget.prototype.data = function (_) {
-        if (!arguments.length) return this._private_data;
-        this._private_data = _;
+        if (!arguments.length) return this._db.legacyData();
+        this._db.legacyData(_);
         return this;
     };
 
@@ -689,6 +715,10 @@
     //  Render  ---
     Widget.prototype.render = function (callback) {
         callback = callback || function () { };
+        if (!this.visible()) {
+            callback(this);
+            return this;
+        }
         if (this._parentElement) {
             if (!this._tag)
                 throw "No DOM tag specified";
@@ -701,6 +731,9 @@
                 .each(function (context) {
                     context._element = d3.select(this);
                     context.enter(this, context._element);
+                    if (window.__hpcc_debug) {
+                        context.leakCheck(this);
+                    }
                 })
             ;
             elements
@@ -711,7 +744,8 @@
                 })
             ;
             elements.exit()
-                .each(function exit(context) {
+                .each(function (context) {
+                    d3.select(this).datum(null);
                     context.exit(this, context._element);
                 })
                 .remove()
@@ -763,7 +797,7 @@
         return this;
     };
 
-    Widget.prototype.enter = function (domeNode, element) { };
+    Widget.prototype.enter = function (domNode, element) { };
     Widget.prototype.preUpdate = function (domeNode, element) { };
     Widget.prototype.update = function (domeNode, element) { };
     Widget.prototype.postUpdate = function (domeNode, element) { };

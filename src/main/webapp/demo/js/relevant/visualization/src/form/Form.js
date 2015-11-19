@@ -62,15 +62,26 @@
         return retVal;
     };
 
-    Form.prototype.values = function () {
-        var dataArr = {};
-        this.inputsForEach(function (inp) {
-            var value = inp.value();
-            if (value || !this.omitBlank()) {
-                dataArr[inp.name()] = inp.value();
-            }
-        }, this);
-        return dataArr;
+    Form.prototype.values = function (_) {
+        if (!arguments.length) {
+            var dataArr = {};
+            this.inputsForEach(function (inp) {
+                var value = inp.value();
+                if (value || !this.omitBlank()) {
+                    dataArr[inp.name()] = inp.value();
+                }
+            }, this);
+            return dataArr;
+        } else {
+            this.inputsForEach(function (inp) {
+                if (_[inp.name()]) {
+                    inp.value(_[inp.name()]);
+                } else if (this.omitBlank()){
+                    inp.value("");
+                }
+            }, this);
+        }
+        return this;
     };
 
     Form.prototype.submit = function(){
@@ -129,25 +140,25 @@
         ;
 
         var context = this;
-        var controls = [
+        this._controls = [
                 new Input()
                     .type("button")
                     .value("Submit")
                     .on("click", function () {
-                        context.submit();
+                        context.submit(context.values());
                     }, true),
                 new Input()
                     .type("button")
                     .value("Clear")
                     .on("click", function () {
-                        context.clear();
+                        context.clear({});
                     }, true)
         ];
         var rightJust = context.btntd
             .append("div")
             .style("float", "right")
         ;
-        controls.forEach(function (w) {
+        this._controls.forEach(function (w) {
             var leftJust = rightJust
                 .append("span")
                 .style("float", "left")
@@ -199,6 +210,10 @@
     };
 
     Form.prototype.exit = function (domNode, element) {
+        this.inputs_reset();
+        this._controls.forEach(function (w) {
+            w.target(null);
+        });
         HTMLWidget.prototype.exit.apply(this, arguments);
     };
 
