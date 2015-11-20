@@ -41,9 +41,11 @@ import org.hpccsystems.dashboard.services.UserCredential;
 import org.hpccsystems.dashboard.services.WidgetService;
 import org.springframework.dao.DataAccessException;
 import org.zkoss.util.resource.Labels;
+import org.zkoss.web.Attributes;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
+import org.zkoss.zk.ui.Sessions;
 import org.zkoss.zk.ui.event.Event;
 import org.zkoss.zk.ui.event.EventListener;
 import org.zkoss.zk.ui.event.Events;
@@ -404,11 +406,19 @@ public class EditWidgetController extends SelectorComposer<Component> {
             	
             	LOG.debug("RELEVANT DATA: "+objRelevantData);
             	
-        		String relJSON = new Gson().toJson(objRelevantData);
-        		LOG.debug("RELEVANT JSON: "+relJSON);
-            	
-            	//portlet.setChartDataJSON(" { \"claimId\": \"CLM00042945-C034\", \"claimImage\": \"\\uf0d6\", \"personImage\": \"\\uf007\", \"vehicleImage\": \"\\uf1b9\", \"policyImage\": \"\\uf0f6\" }");
-        		portlet.setChartDataJSON(relJSON);
+        		 Gson gson = new Gson();
+                 String relJSON = gson.toJson(objRelevantData);
+                 LOG.debug("RELEVANT JSON: "+relJSON);
+                 if(Sessions.getCurrent().getAttribute(Attributes.PREFERRED_LOCALE) != null){   
+                     JsonElement element = gson.fromJson (relJSON, JsonElement.class);
+                     JsonObject jsonObj = element.getAsJsonObject();                    
+                     jsonObj.addProperty(Constants.LOCALE , Sessions.getCurrent().getAttribute(Attributes.PREFERRED_LOCALE).toString());
+                     portlet.setChartDataJSON(jsonObj.toString());
+                     LOG.debug("RELEVANT JSON: "+jsonObj);
+                 }else{
+                     portlet.setChartDataJSON(relJSON);
+                     LOG.debug("RELEVANT JSON: "+relJSON);
+                 }
         		
             	final String divToDraw = div.getId(); 
             	chartRenderer.drawChart(divToDraw, portlet);

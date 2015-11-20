@@ -85,7 +85,7 @@
         if(this.reverseDataSorting()){
             sortingMethod = function(a,b){ return a[1] < b[1] ? 1 : -1; };
         } else {
-        	sortingMethod = function(a,b){ return a[1] > b[1] ? 1 : -1; };
+            sortingMethod = function(a,b){ return a[1] > b[1] ? 1 : -1; };
         }
         this.data(this.data().sort(sortingMethod));
 
@@ -160,7 +160,7 @@
 
             e.chart.validateData();
 
-            context.click(context.rowToObj(context.data()[e.dataItem.index]));
+            context.click(context.rowToObj(context.data()[e.dataItem.index]), context.columns()[1], context._selected !== null);
         });
     };
 

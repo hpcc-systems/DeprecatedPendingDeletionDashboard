@@ -20,6 +20,6 @@
     "commit": "08001a7723697ee4f17d55739e9bc625ff882aa1"
   },
   "_source": "git://github.com/jasondavies/d3-cloud.git",
-  "_target": "~1.2.0",
+  "_target": "~1.2.1",
   "_originalSource": "d3-cloud"
 }

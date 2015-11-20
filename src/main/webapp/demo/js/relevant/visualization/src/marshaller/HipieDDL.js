@@ -1,11 +1,11 @@
 ﻿"use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3", "../other/Comms", "../common/Widget", "require"], factory);
+        define(["d3", "../common/Database", "../common/Utility", "../other/Comms", "../common/Widget", "require"], factory);
     } else {
-        root.marshaller_HipieDDL = factory(root.d3, root.other_Comms, root.common_Widget, root.require);
+        root.marshaller_HipieDDL = factory(root.d3, root.common_Database, root.common_Utility, root.other_Comms, root.common_Widget, root.require);
     }
-}(this, function (d3, Comms, Widget, require) {
+}(this, function (d3, Database, Utility, Comms, Widget, require) {
     var Vertex = null;
     var Edge = null;
     var exists = function (prop, scope) {
@@ -79,10 +79,7 @@
     };
 
     SourceMappings.prototype.doMapAll = function (data) {
-        var context = this;
-        return data.map(function (item) {
-            return context.doMap(item);
-        });
+        return data.hipieMappings(this.columnsRHS);
     };
 
     SourceMappings.prototype.getMap = function (key) {
@@ -214,7 +211,8 @@
         return null;
     };
 
-    GraphMappings.prototype.doMapAll = function (data) {
+    GraphMappings.prototype.doMapAll = function (db) {
+        var data = db.jsonObj();
         var context = this;
         var vertexMap = {};
         var vertices = [];
@@ -333,7 +331,7 @@
     };
 
     Source.prototype.hasData = function () {
-        return this.getOutput().data ? true : false;
+        return this.getOutput().db ? true : false;
     };
 
     Source.prototype.getColumns = function () {
@@ -341,40 +339,26 @@
     };
 
     Source.prototype.getData = function () {
-        var context = this;
-        var data = this.getOutput().data;
+        var db = this.getOutput().db;
+        var retVal = this.mappings.doMapAll(db);
         if (this.sort) {
-            data.sort(function (l, r) {
-                for (var i = 0; i < context.sort.length; ++i) {
-                    var sortField = context.sort[i];
-                    var reverse = false;
-                    if (sortField.indexOf("-") === 0) {
-                        sortField = sortField.substring(1);
-                        reverse = true;
-                    }
-                    var lVal = l[sortField];
-                    if (lVal === undefined) {
-                        lVal = l[sortField.toLowerCase()];
-                    }
-                    var rVal = r[sortField];
-                    if (rVal === undefined) {
-                        rVal = r[sortField.toLowerCase()];
-                    }
-
-                    if (lVal !== rVal) {
-                        return reverse ? d3.descending(lVal, rVal) : d3.ascending(lVal,  rVal);
-                    }
-                }
-                return 0;
-            });
+            Utility.multiSort(retVal, db.hipieMapSortArray(this.sort));
         }
         if (this.reverse) {
-            data.reverse();
+            retVal.reverse();
         }
-        if (this.first && data.length > this.first) {
-            data.length = this.first;
+        if (this.first && retVal.length > this.first) {
+            retVal.length = this.first;
         }
-        return this.mappings.doMapAll(data);
+        return retVal;
+    };
+
+    Source.prototype.getXTitle = function () {
+        return this.mappings.columns[0];
+    };
+
+    Source.prototype.getYTitle = function () {
+        return this.mappings.columns.filter(function(d, i) {return i > 0;}).join(" / ");
     };
 
     //  Viz Events ---
@@ -517,7 +501,7 @@
                 case "BUBBLE":
                 case "BAR":
                 case "WORD_CLOUD":
-                    this.loadWidget("src/chart/MultiChart", function (widget) {
+                    this.loadWidget("src/composite/MegaChart", function (widget) {
                         widget
                             .id(visualization.id)
                             .chartType(context.properties.chartType || context.properties.charttype || context.type)
@@ -525,9 +509,12 @@
                     });
                     break;
                 case "LINE":
-                    this.loadWidget("src/chart/MultiChart", function (widget) {
+                    this.loadWidget("src/composite/MegaChart", function (widget) {
                         widget
                             .id(visualization.id)
+                            .showLegend(true)
+                            .domainAxisTitle(context.source.getXTitle())
+                            .valueAxisTitle(context.source.getYTitle())
                             .chartType(context.properties.chartType || context.properties.charttype || context.type)
                         ;
                     });
@@ -702,27 +689,41 @@
         visitor.visit(this);
     };
 
+    Visualization.prototype.update = function () {
+        var params = this.source.getOutput().getParams();
+        if (exists("widgetSurface.title", this)) {
+            this.widgetSurface.title(this.title + (params ? " (" + params + ")" : ""));
+            this.widgetSurface.render();
+        } else {
+            this.widget.render();
+        }
+    };
+
     Visualization.prototype.notify = function () {
         if (this.source.hasData()) {
             if (this.widget) {
                 var columns = this.source.getColumns();
                 this.widget.columns(columns);
                 var data = this.source.getData();
-                this.dashboard.marshaller.updateViz(this, data);
                 this.widget.data(data);
 
-                var params = this.source.getOutput().getParams();
-                if (exists("widget.title", this)) {
-                    this.widget.title(this.title + (params ? " (" +params + ")": ""));
-                    this.widget.render();
-                } else if (exists("widgetSurface.title", this)) {
-                    this.widgetSurface.title(this.title + (params ? " (" + params + ")" : ""));
-                    this.widgetSurface.render();
-                } else {
-                    this.widget.render();
-                }
+                this.update();
             }
         }
+    };
+
+    Visualization.prototype.clear = function () {
+        if (this.widget) {
+            this.widget.data([]);
+            this.source.getOutput().request = {};
+        }
+        if (this._eventValues) {
+            delete this._eventValues;
+            this.events.getUpdatesVisualizations().forEach(function (updatedViz) {
+                updatedViz.clear();
+            });
+        }
+        this.update();
     };
 
     Visualization.prototype.onEvent = function (eventID, event, row, col, selected) {
@@ -762,6 +763,7 @@
                             }
                         }
                     });
+                    updatedViz.clear();
                     if (dataSource.WUID || dataSource.databomb) { // TODO If we have filters for each output this would not be needed  ---
                         dataSource.fetchData(datasourceRequests[dataSource.id].request, false, [updatedViz.id]);
                     }
@@ -802,10 +804,12 @@
     Output.prototype.getParams = function () {
         var retVal = "";
         for (var key in this.request) {
-            if (retVal.length) {
-                retVal += ", ";
+            if (!Utility.endsWith(key, "_changed")) {
+                if (retVal.length) {
+                    retVal += ", ";
+                }
+                retVal += this.request[key];
             }
-            retVal += this.request[key];
         }
         return retVal;
     };
@@ -817,7 +821,7 @@
     Output.prototype.setData = function (data, request, updates) {
         var context = this;
         this.request = request;
-        this.data = data;
+        this.db = new Database.Grid().jsonObj(data);
         this.notify.forEach(function (item) {
             if (!updates || updates.indexOf(item) >= 0) {
                 var viz = context.dataSource.dashboard.getVisualization(item);
@@ -1131,9 +1135,6 @@
             }
         }
         waitForLoad(callback);
-    };
-
-    Marshaller.prototype.updateViz = function (vizInfo, data) {
     };
 
     return {

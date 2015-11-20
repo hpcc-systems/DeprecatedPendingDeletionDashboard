@@ -58,6 +58,7 @@ import org.springframework.dao.DataAccessException;
 import org.xml.sax.SAXException;
 import org.zkoss.json.JSONObject;
 import org.zkoss.util.resource.Labels;
+import org.zkoss.web.Attributes;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Components;
 import org.zkoss.zk.ui.Executions;
@@ -100,6 +101,8 @@ import org.zkoss.zul.Vbox;
 import org.zkoss.zul.Window;
 
 import com.google.gson.Gson;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 
 
 /**
@@ -852,13 +855,22 @@ public class ChartPanel extends Panel {
                 chartRenderer.constructClusterJSON((ClusterData) chartData, portlet);
             } else if (Constants.RELEVANT_CONFIG == category) {
             	RelevantData objRelevantData = (RelevantData)portlet.getChartData();
-            	LOG.debug("RELEVANT DATA: "+objRelevantData);
+            	LOG.debug("RELEVANT DATA: "+objRelevantData);            	
             	
-        		String relJSON = new Gson().toJson(objRelevantData);
-        		LOG.debug("RELEVANT JSON: "+relJSON);
-            	
-            	//portlet.setChartDataJSON(" { \"claimId\": \"CLM00042945-C034\", \"claimImage\": \"\\uf0d6\", \"personImage\": \"\\uf007\", \"vehicleImage\": \"\\uf1b9\", \"policyImage\": \"\\uf0f6\" }");
-        		portlet.setChartDataJSON(relJSON);
+            	 Gson gson = new Gson();
+        		String relJSON = gson.toJson(objRelevantData);
+        		
+        		if(Sessions.getCurrent().getAttribute(Attributes.PREFERRED_LOCALE) != null){   
+        		    JsonElement element = gson.fromJson (relJSON, JsonElement.class);
+                    JsonObject jsonObj = element.getAsJsonObject();                    
+                    jsonObj.addProperty(Constants.LOCALE , Sessions.getCurrent().getAttribute(Attributes.PREFERRED_LOCALE).toString());
+                    portlet.setChartDataJSON(jsonObj.toString());
+                    LOG.debug("RELEVANT JSON: "+jsonObj);
+                }else{
+                    portlet.setChartDataJSON(relJSON);
+                    LOG.debug("RELEVANT JSON: "+relJSON);
+                }
+                  
             }          
 
             // To construct Table Widget

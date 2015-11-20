@@ -1,13 +1,13 @@
 {
   "name": "simpleheat",
-  "homepage": "https://github.com/mourner/simpleheat",
-  "_release": "b2117b4167",
-  "_resolution": {
-    "type": "branch",
-    "branch": "gh-pages",
-    "commit": "b2117b41678f1b61a882c292057e4bc87fb676ff"
+  "_cacheHeaders": {
+    "ETag": "\"35e07a10ea7eb95630c3ab4a4dd4d4fe7f298230\"",
+    "Content-Length": "3602",
+    "Content-Type": "text/plain; charset=utf-8"
   },
-  "_source": "git://github.com/mourner/simpleheat.git",
-  "_target": "gh-pages",
-  "_originalSource": "git://github.com/mourner/simpleheat.git"
+  "_release": "e-tag:35e07a10e",
+  "main": "index.js",
+  "_source": "https://raw.githubusercontent.com/mourner/simpleheat/v0.3.0/simpleheat.js",
+  "_target": "*",
+  "_originalSource": "https://raw.githubusercontent.com/mourner/simpleheat/v0.3.0/simpleheat.js"
 }

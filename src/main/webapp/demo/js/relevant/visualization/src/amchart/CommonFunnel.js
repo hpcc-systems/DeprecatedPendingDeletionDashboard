@@ -114,7 +114,6 @@
         HTMLWidget.prototype.enter.apply(this, arguments);
         var context = this;
         var initObj = {
-            theme: "none",
             type: "funnel",
             addClassNames: true,
             autoResize: true,
@@ -152,7 +151,7 @@
 
             e.chart.validateData();
 
-            context.click(context.rowToObj(context.data()[e.dataItem.index]));
+            context.click(context.rowToObj(context.data()[e.dataItem.index]), context.columns()[1], context._selected !== null);
         });
     };
 

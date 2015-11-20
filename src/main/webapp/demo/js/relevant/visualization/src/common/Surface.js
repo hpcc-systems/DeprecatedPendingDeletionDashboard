@@ -264,10 +264,27 @@
             ;
         }
 
-        this._menu.element().node().parentNode.appendChild(this._menu.element().node()); // Make sure menu is on top (Z-Order POV)
+        if (this._menu.element() && this._menu.element().node() && this._menu.element().node().parentNode) {
+            this._menu.element().node().parentNode.appendChild(this._menu.element().node()); // Make sure menu is on top (Z-Order POV)
+        }
     };
 
     Surface.prototype.exit = function (domNode, element) {
+        this._titleRect
+            .target(null)
+        ;
+        this._icon
+            .target(null)
+        ;
+        this._menu
+            .target(null)
+        ;
+        this._text
+            .target(null)
+        ;
+        this._container
+            .target(null)
+        ;
         if (this.content()) {
             this.content().target(null);
         }

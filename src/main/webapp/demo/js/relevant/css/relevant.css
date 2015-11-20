@@ -18,7 +18,9 @@
             /* bottom: 8px;
             top: 8px; */
         }
-        
+       .common_Widget.common_HTMLWidget.other_Table{
+         overflow: auto;
+        }
         #table table {
             width: 100%
         }

@@ -15,10 +15,11 @@
 
         var context = this;
         var group_ids = null;
-        var group_type_id = null;
+        var group_type_id = null;       
+       
         
         this.claimsChart = new Column()
-            .columns(["Date", "Amount"])
+            .columns([obj.date, obj.amount])
             .selectionMode(true)
             .xAxisType("time")
             .xAxisTypeTimePattern("%Y-%m-%d %H:%M:%S")
@@ -156,7 +157,7 @@
         } else {
             this.getCell(7, 0).gridColSpan(4);
             this.setContent(0, 0, this.claimsChart, "", 1, 5.2);
-            this.setContent(1, 0, this.graph, "", 6, 5.2);            
+            this.setContent(1, 0, this.graph, "", 6, 4);            
             this
                 .setContent(0, 4, null)
                 .render()

@@ -179,7 +179,6 @@
         HTMLWidget.prototype.enter.apply(this, arguments);
         var context = this;
         var initObj = {
-            theme: "none",
             type: "radar",
             addClassNames: true,
             chartScrollbar: {}
@@ -216,7 +215,7 @@
 
             e.chart.validateData();
             
-            context.click(context.rowToObj(context.data()[e.index]), context.columns()[e.target.index+1]);
+            context.click(context.rowToObj(context.data()[e.index]), context.columns()[e.target.index + 1], context._selected !== null);
         });
     };
 

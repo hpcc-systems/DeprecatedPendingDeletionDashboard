@@ -1,7 +1,7 @@
 "use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3", "./XYAxis", "../api/INDChart", "../api/ITooltip", "css!./Column"], factory);
+        define(["d3", "./XYAxisDashboard", "../api/INDChart", "../api/ITooltip", "css!./Column"], factory);
     } else {
         root.chart_Column = factory(root.d3, root.chart_XYAxis, root.api_INDChart, root.api_ITooltip);
     }
@@ -50,7 +50,7 @@
             .domain(context.columns().filter(function (d, idx) { return idx > 0; }))
             .rangeRoundBands(isHorizontal ? [0, dataLen] : [dataLen, 0])
         ;
-
+        
         var column = this.svgData.selectAll(".dataRow")
             .data(this.formattedData())
         ;
@@ -92,7 +92,6 @@
 
                 if (isHorizontal) {
                     columnRect.transition()
-                        .attr("class", "columnRect")
                         .attr("x", function (d) { return context.dataScale(dataRow[0]) + (context.stacked() ? 0 : columnScale(d.column)) + offset; })
                         .attr("width", context.stacked() ? dataLen : columnScale.rangeBand())
                         .attr("y", function (d) { return d.value instanceof Array ? context.valueScale(d.value[1]) : context.valueScale(d.value); })
@@ -102,7 +101,6 @@
                     ;
                 } else {
                     columnRect.transition()
-                        .attr("class", "columnRect")
                         .attr("y", function (d) { return context.dataScale(dataRow[0]) + (context.stacked() ? 0 : columnScale(d.column)) + offset; })
                         .attr("height", context.stacked() ? dataLen : columnScale.rangeBand())
                         .attr("x", function (d) { return d.value instanceof Array ? context.valueScale(d.value[0]) : 0; })
