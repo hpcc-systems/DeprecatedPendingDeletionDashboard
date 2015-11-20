@@ -1,6 +1,6 @@
 # amCharts Export
 
-Version: 1.1.1
+Version: 1.2.8
 
 
 ## Description
@@ -26,7 +26,14 @@ bundled CSS file. I.e.:
 
 ```
 <script src="amcharts/plugins/export/export.min.js"></script>
-<link  type="text/css" href="../export.css" rel="stylesheet">
+<link  type="text/css" href="amcharts/plugins/export/export.css" rel="stylesheet">
+```
+
+Or if you'd rather use amCharts CDN:
+
+```
+<script src="//cdn.amcharts.com/lib/3/plugins/export/export.min.js"></script>
+<link  type="text/css" href="//cdn.amcharts.com/lib/3/plugins/export/export.css" rel="stylesheet">
 ```
 
 (this needs to go after all the other amCharts includes)
@@ -82,8 +89,10 @@ There are two ways to load them. Choose the one that is right:
 All libraries required for plugin operation are included withing plugins */libs* 
 subdirectory.
 
-If you want the plugin to load them on-demand (when it's needed for a certain 
-operation), make sure you've set the [`path`](http://docs.amcharts.com/3/javascriptcharts/AmSerialChart#path) property in your chart setup.
+The plugin will automatically try to look in chart's [`path`](http://docs.amcharts.com/3/javascriptcharts/AmSerialChart#path) 
+property. If your plugin files are located within plugins folder under amcharts 
+(as is the case with the default distributions), you don't need to do anything -
+the libraries will load on-demand.
 
 If you are using relative url, note that it is relative to the web page you are 
 displaying your chart on, not the export.js library.
@@ -115,15 +124,24 @@ Property | Default | Description
 -------- | ------- | -----------
 backgroundColor | #FFFFFF | RGB code of the color for the background of the exported image
 enabled | true | Enables or disables export functionality
-legend | {} | Places the legend in case it is within an external container
+divId | | ID or a reference to div object in case you want the menu in a separate container.
+fabric | {} | Overwrites the default drawing settings (fabricJS library)
+fallback | {} | Holds the messages to guide the user to copy the generated output; `false` will disable the fallback feature
 fileName | amCharts | A file name to use for generated export files (an extension will be appended to it based on the export format)
+legend | {} | Places the legend in case it is within an external container ([skip to chapter](#adding-external-legend))
 libs | | 3rd party required library settings (see the above section)
 menu | [] | A list of menu or submenu items (see the next chapter for details)
-fabric | {} | Overwrites the default drawing settings (fabricJS library)
 pdfMake | {} | Overwrites the default settings for PDF export (pdfMake library)
+position | top-right | A position of export icon. Possible values: "top-left", "top-right" (default), "bottom-left", "bottom-right"
 removeImages | true | If true export checks for and removes "tainted" images that area lodead from different domains
-divId | | ID or a reference to div object in case you want the menu in a separate container.
-fallback | {} | Holds the messages to guide the user to copy the generated output; `false` will disable the fallback feature
+delay | | General setting to delay the capturing of the chart ([skip to chapter](#delay-the-capturing-before-export))
+exportTitles | false | Exchanges the data field names with it's dedicated title ( data export only )
+exportSelection | false | Exports the current data selection only ( data export only )
+dataDateFormat | | Format to convert date strings to date objects, uses by default charts dataDateFormat ( data export only )
+dateFormat | YYYY-MM-DD | Formats the category field in given date format ( data export only )
+keyListener | false | If true it observes the pressed keys to undo/redo the annotations
+fileListener | false | If true it observes the drag and drop feature and loads the dropped image file into the annotation
+drawing | {} | Object which holds all possible settings for the annotation mode ([skip to chaper](#annotation-settings))
 
 
 ## Configuring export menu
@@ -212,12 +230,14 @@ Now we have a hierarchical menu with the following topology:
 We can mix "string" and "object" formats the way we see fit, i.e.:
 
 ```
-"menu": [
-  "PNG", 
-  { "label": "JPEG",
-    "format": "JPG" },
-  "SVG"
-]
+"export": {
+  "menu": [
+    "PNG", 
+    { "label": "JPEG",
+      "format": "JPG" },
+    "SVG"
+  ]
+}
 ```
 
 The magic does not end here, though.
@@ -230,37 +250,58 @@ Just like we set `label` and `format` properties for menu item, we can set
 This needs to be a function reference. I.e.:
 
 ```
-"menu": [
-  "PNG", 
-  { "label": "JPEG",
-    "click": function () {
-      alert( "Clicked JPEG. Wow cool!" );
-    } },
-  "SVG"
-]
+"export": {
+  "menu": [
+    "PNG", 
+    { "label": "JPEG",
+      "click": function () {
+        alert( "Clicked JPEG. Wow cool!" );
+      } },
+    "SVG"
+  ]
+}
+```
+
+### Adding external legend
+
+In case you have an external legend you need to define the position where it should get placed in your export.
+By default it obtains the dimensions from the container but you can optionally overwrite those settings as shown below.
+
+```
+"export": {
+  "legend": {
+    "position": "top",  // or "right", "bottom" and "left" are possible
+    "width": 200,       // optional
+    "height": 200       // optional
+  }
+}
 ```
 
 ### Menu item reviver
 
-By passing the `menuReviver` callback you are to adapt or completely replace the
-generated menu item before it gets appended to the list (`ul`).
-It retrieves two arguments and it needs to return a valid DOM element.
+By passing the `menuReviver` callback function you can modify the resulting menu 
+item or relative container, before it gets appended to the list (`ul`). The 
+function takes two arguments and it needs to return a valid DOM element.
 
 ```
-"menuReviver": function(item,li) {
-  li.setAttribute("class","something special");
-  return li;
+"export": {
+  "menuReviver": function(item,li) {
+    li.setAttribute("class","something special");
+    return li;
+  }
 }
 ```
 
 ### Menu walker
 
-In case you don't like our structure, go ahead and write your own recursive function
-to create the menu by the given list configured through `menu`.
+In case you don't like our structure, go ahead and write your own recursive 
+function to create the menu by the given list configured through `menu`.
 
 ```
-"menuWalker": function(list,container) {
-  // some magic to generate the nested lists using the given list
+"export": {
+  "menuWalker": function(list,container) {
+    // some magic to generate the nested lists using the given list
+  }
 }
 ```
 
@@ -270,24 +311,28 @@ Adding menu item to print the chart or map is as easy as adding export ones. You
 just use "PRINT" as `format`. I.e.:
 
 ```
-"menu": [
-  "PNG", 
-  "SVG",
-  "PRINT"
-]
+"export": {
+  "menu": [
+    "PNG", 
+    "SVG",
+    "PRINT"
+  ]
+}
 ```
 
 Or if you want to change the label:
 
 ```
-"menu": [
-  "PNG", 
-  "SVG",
-  {
-    "format": "PRINT",
-    "label": "Print Chart"
-  }
-]
+"export": {
+  "menu": [
+    "PNG", 
+    "SVG",
+    {
+      "format": "PRINT",
+      "label": "Print Chart"
+    }
+  ]
+}
 ```
 
 ### Annotating the chart before export
@@ -298,70 +343,195 @@ By default each menu item triggers some kind of export. You can trigger an
 "annotation" mode instead by including `"action": "draw"` instead.
 
 ```
-"menu": [ {
-  "class": "export-main",
+"export": {
   "menu": [ {
-    "label": "Download",
-    "menu": [ "PNG", "JPG", "CSV", "XLSX" ]
-  }, {
-    "label": "Annotate",
-    "action": "draw"
+    "class": "export-main",
+    "menu": [ {
+      "label": "Download",
+      "menu": [ "PNG", "JPG", "CSV", "XLSX" ]
+    }, {
+      "label": "Annotate",
+      "action": "draw"
+    } ]
   } ]
-} ]
+}
 ```
 
 Now, when you click on the "Annotate" item in the menu, the chart will turn into 
-an image editor which you can actual draw on.
+an image editor which you can actual draw on and the menu gets replaced by the 
+default annotation menu.
 
-As cool as it may sound, there's little we can do if the annotated chart if we 
-can't save the result image.
-
-That's where sub-menus come for the rescue again:
+If you don't like the detault annotation menu, you can define your own:
 
 ```
-"menu": [ {
-  "class": "export-main",
+"export": {
   "menu": [ {
-    "label": "Download",
-    "menu": [ "PNG", "JPG", "CSV", "XLSX" ]
-  }, {
-    "label": "Annotate",
-    "action": "draw",
+    "class": "export-main",
     "menu": [ {
-      "class": "export-drawing",
-      "menu": [ "JPG", "PNG", "SVG", PDF" ]
-    } ]
-  } ]
-} ]
-```
-
-Now, when you turn on the annotation mode, a submenu will display, allowing to 
-export the image into either PNG,JPG,SVG or PDF.
-
-And that's not even the end of it. You can add menu items to cancel, undo, redo.
-
-```
-"menu": [ {
-  "class": "export-main",
-  "menu": [ {
-    "label": "Download",
-    "menu": [ "PNG", "JPG", "CSV", "XLSX" ]
-  }, {
-    "label": "Annotate",
-    "action": "draw",
-    "menu": [ {
-      "class": "export-drawing",
+      "label": "Download",
+      "menu": [ "PNG", "JPG", "CSV", "XLSX" ]
+    }, {
+      "label": "Annotate",
+      "action": "draw",
       "menu": [ {
-        "label": "Edit",
-        "menu": [ "UNDO", "REDO", "CANCEL" ]
-      }, {
-        "label": "Save",
-        "format": "PNG"
+        "class": "export-drawing",
+        "menu": [ "JPG", "PNG", "SVG", "PDF" ]
       } ]
     } ]
   } ]
-} ]
+}
 ```
+
+Now, when you turn on the annotation mode, your own submenu will display, 
+allowing to export the image into either PNG, JPG, SVG or PDF.
+
+And that's not even the end of it. You can add menu items to cancel, undo, redo 
+and still be able to reuse the choices by using the actions `draw.modes`, 
+`draw.widths`, `draw.colors` or `draw.shapes`.
+
+```
+"export": {
+  "menu": [ {
+    "class": "export-main",
+    "menu": [ {
+      "label": "Download",
+      "menu": [ "PNG", "JPG", "CSV", "XLSX" ]
+    }, {
+      "label": "Annotate",
+      "action": "draw",
+      "menu": [ {
+        "class": "export-drawing",
+        "menu": [ {
+            label: "Size ...",
+            action: "draw.widths",
+            widths: [ 5, 20, 30 ] // replaces the default choice
+        }, {
+          "label": "Edit",
+          "menu": [ "UNDO", "REDO", "CANCEL" ]
+        }, {
+          "label": "Save",
+          "format": "PNG"
+        } ]
+      } ]
+    } ]
+  } ]
+}
+```
+
+### Annotation settings
+
+Since 1.2.1 it's also possible to set some of the annotation options without the 
+need to re-define the whole menu structure. You can easily adjust the choice of 
+modes, colors, widths or shapes, and set the defaults when entering the 
+annotation mode.
+
+Following setup shows you all available settings. If you don't have the 
+`drawing` property at all, it will falls back to the defaults.
+
+```
+"export": {
+  "drawing": {
+    "enabled": true, // Flag for `action: "draw"` menu items to toggle it's visibility
+    "shapes": [ "test.svg" ], // Choice of shapes offered in the menu (shapes are being loaded from the shapes folder)
+
+    "width": 2, // Width of the pencil and line when entering the annotation mode
+    "widths": [ 2, 10, 20 ], // Choice of widths offered in the menu
+
+    "color": "#000000", // Color of the pencil, line, text and shapes when entering the annotation mode
+    "colors": [ "#000000", "#FF0000" ] // Choice of colors offered in the menu
+
+    "opacity": 1, // Opacity of the pencil, line, text and shapes when entering the annotation mode
+    "opacities": [ 1, 0.8, 0.6, 0.4, 0.2 ] // Choice of opacity offered in the menu
+
+    "menu": [ ... ], // Shown menu when entering the annotation mode
+
+    "mode": "pencil", // Drawing mode when entering the annotation mode "pencil", "line" and "arrow" are available
+    "modes": [ "pencil" , "line", "arrow" ], // Choice of modes offered in the menu
+    "arrow": "end", // position of the arrow on drawn lines; "start","middle" and "end" are available
+  }
+}
+```
+
+If you need to filter the drawn elements, you can pass the `reviver` method in 
+your global configuration, or pass it to the `capture` method if you export 
+manually. For example, to hide all free labels you can simply do something like 
+the following:
+
+```
+"export": {
+  "menu": ["PNG"],
+  "reviver": function(obj) {
+    if ( obj.className == "amcharts-label" ) {
+      obj.opacity = 0;
+    }
+  }
+}
+```
+
+### Delay the capturing before export
+
+In some cases you may want to delay the capturing of the current chart snapshot 
+to highlight the current value. For this you can simply define the 'delay' 
+property in your menu item:
+
+```
+"export": {
+  "delay": 3,
+
+  // or specifically on individual menu items
+
+  "menu": [{
+    "label": "PNG",
+    "format": "PNG",
+    "delay": 3
+  }]
+}
+```
+
+### Events
+
+Since version 1.1.7 the plugin introduces some events you can use. For example 
+the `afterCapture` event allows you to add some texts or images which can't be 
+seen on the regular chart but only the generated export. Use it to watermark 
+your exported images.
+
+```
+"export": {
+  "afterCapture": function(menuConfig) {
+      var text = new fabric.Text("This is shown on exported image only", {
+        top: 50,
+        left: 100,
+        family: this.setup.chart.fontFamily,
+        size: this.setup.chart.fontSize * 2
+      });
+      this.setup.fabric.add(text);
+  },
+
+  // or specifically on individual menu items
+
+  "menu": [{
+    "label": "PNG",
+    "format": "PNG",  
+    "afterCapture": function(menuConfig) {
+        var text = new fabric.Text("This is shown on exported image only", {
+          top: 50,
+          left: 100,
+          family: this.setup.chart.fontFamily,
+          size: this.setup.chart.fontSize * 2
+        });
+        this.setup.fabric.add(text);
+    }
+  }]
+}
+```
+
+### A list of the events
+
+Name | Arguments | Description
+---- | --------- | -----------
+beforeCapture | [menu item setup](#a-list-of-menu-item-properties) | Called before the SVG element gets converted
+afterCapture | [menu item setup](#a-list-of-menu-item-properties) | Called right before the passed callback of the capture method
+
 
 ### A list of menu item properties
 
@@ -383,9 +553,13 @@ pageSize | A string or { width: number, height: number } ([details](#exporting-t
 pageOrientation | By default we use portrait, you can change it to landscape if you wish ([details](#exporting-to-pdf))
 pageMargins | [left, top, right, bottom] or [horizontal, vertical] or just a number for equal margins ([details](#exporting-to-pdf))
 content | Array of elements which represents the content ([details](#exporting-to-pdf))
-freeDrawingBrush | Object which hold the settings of the brush e.G.: { color: "#FF00FF" }
 multiplier | Scale factor for the generated image
 lossless | Flag to print the actual vector graphic instead of buffered bitmap (print option only, experimental)
+delay | A numeric value to delay the capturing in seconds ([details](#delay-the-capturing-before-export))
+exportTitles | Exchanges the data field names with it's dedicated title ( data export only )
+exportSelection | Exports the current data selection only ( data export only )
+dataDateFormat | Format to convert date strings to date objects, uses by default charts dataDateFormat ( data export only )
+dateFormat | Formats the category field in given date format ( data export only )
 
 Available `format` values:
 
@@ -511,20 +685,22 @@ functionality.
 Here's an example:
 
 ```
-menu: [ {
-  label: "JPG",
-  click: function() {
-    this.capture({},function() {
-      this.toJPG( {}, function( data ) {
-        this.download( data, "image/jpg", "amCharts.jpg" );
+"export": {
+  menu: [ {
+    label: "JPG",
+    click: function() {
+      this.capture({},function() {
+        this.toJPG( {}, function( data ) {
+          this.download( data, "image/jpg", "amCharts.jpg" );
+        });
       });
-    });
-  }
-} ]
+    }
+  } ]
+}
 ```
 
-The above will use plugin's internal `capture` method to capture it's current state and `toJPG()`
-method to export the chart to JPEG format.
+The above will use plugin's internal `capture` method to capture it's current 
+state and `toJPG()` method to export the chart to JPEG format.
 
 Yes, you're right, it's the exact equivalent of just including "JPG" string. The 
 code is here for the explanatory purposes.
@@ -545,29 +721,33 @@ toCanvas | (object) options, (function) callback | Prepares a Canvas and passes 
 toArray | (object) options, (function) callback | Prepares an Array and passes the data to the callback function
 toImage | (object) options, (function) callback | Generates an image element which holds the output in an embedded base64 data url
 
-
 ## Fallback for IE9
 
-Unfortunately our lovely Internet Explorer 9 does not allow us to offer downloads which has been locally generated.
-For those cases the plugin will place an overlay on top of the chart to place an `img` or `textarea` to let the user manually save the generated output with some instructions above.
-To avoid having a bigger payload by including senseless polyfills to your site, you may need to add following metatag in your `<head>` of your HTML document.
+Unfortunately, Internet Explorer 9 has restrictions in place that prevent the 
+download of locally-generated files. In this case the plugin will place the 
+generated image along download instructions directly over the chart area.
+
+To avoid having a bigger payload by including senseless polyfills to your site, 
+you may need to add following metatag in your `<head>` of your HTML document.
 
 ```
 <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 ```
 
-This feature will kick in by default if you want to disable it simply pass `false` to the `fallback` parameter.
+This feature will kick in by default. If you want to disable it simply pass 
+`false` to the `fallback` parameter.
 
 ```
-{
+"export": {
   fallback: false
 }
 ```
 
-In case you want to change our default messages you can modify it like following.
+In case you want to change our default messages you can modify it like 
+following.
 
 ```
-{
+"export": {
   fallback: {
     text: "CTRL + C to copy the data into the clipboard.",
     image: "Rightclick -> Save picture as... to save the image."
@@ -629,6 +809,88 @@ http://www.apache.org/licenses/LICENSE-2.0
 
 
 ## Changelog
+
+### 1.2.8
+* Fixed: Issue in `gatherClassName` checking element type
+
+### 1.2.7
+* Fixed: Generates true JPG file instead PNG with JPG extension
+* Fixed: Drag&Drop feature does not activate automatically the annotation mode
+
+### 1.2.6
+* Added: Native EXCEL date cell type for date fields, forced by default
+* Fixed: Issue in `getChartData` which ignored given data array ( affected API usage only )
+
+### 1.2.5
+* Added: Illustrator support; `reviver` method to `toSVG`; converts by default RGBA to HEX colors codes and places it's dedicated opacity property
+* Fixed: Multiline text positioning / line heights
+
+### 1.2.4
+* Added: `exportSelection` exports the current data selection
+* Added: `dataDateFormat` converts the date-strings to date objects with given format
+* Added: `dateFormat` converts the date in given format
+* Added: `processData` to format date fields and translate fields
+* Changed: `gatherChartData` collects data, fields and titles only and uses `processData` to format
+
+### 1.2.3
+* Fixed: Positioning issue on multiline labels
+
+### 1.2.2
+* Fixed: Issue with object changes which overwrite undo/redo object states
+* Fixed: Issue with default fontSize
+
+### 1.2.1
+* Added: Possibility to add text, lines, shapes ([details](#annotation-settings))
+* Added: Possibility to change drawing mode, color, opacity and size
+* Added: Possibility to select,move,scale drawn items
+* Added: Possibility to define dedicated drawing menu `drawing.menu` individual menu items get prioritised
+* Added: Dropbox feature which allows to drag images into the chart `fileListener: true`
+* Added: Keylistener which allows to undo/redo/remove the drawn steps `keyListener: true`
+* Added: Isolated plugin to be able to initiate manually regardless of the chart setup
+* Fixed: Conflict with prototypeJS which caused tainted return value from `toArray`
+
+### 1.2.0
+* Fixed: Issue with deepMerge which did not allow to modfiy the pdfMake default settings
+* Fixed: Menu issue which did not allow to modify the pdfMake settings
+* Fixed: Undo issue which needed double attempts in the beginning
+* Added: Drag/Scale feature in annotation mode; toggles automatically between drawing/dragging while hovering over the elements
+
+### 1.1.9
+* Added: `exportTitles` available in general or individual setup which exchanges the data field names with it's dedicated title
+* Fix: Interpolates missing data fields across data provider
+
+### 1.1.8
+* Added: Temporary workaround to bypass FileSaver check; issue prevented to open blob urls in safari browser
+
+### 1.1.7
+* Added: beforeCapture to be able to indicate the export process in some way
+* Added: afterCapture to be able to modify the fabric instance if needed
+* Added: SVG element as second argument within the "reviver" callback
+* Added: Multiple arguments supported in "handleCallback" method
+
+### 1.1.6
+* Fix: Pattern render issue in IE;
+* Added: Multiline support (workaround until fabricJS supports tspan)
+* Added: General delay property to delay the capturing of the chart ([details](#delay-the-capturing-before-export))
+
+### 1.1.5
+* Fix: Tainted check issue which failed if location.origin wasn't available
+* Fix: Capture image check, triggers callback only if all images have been loaded
+* Added: Multi language support; embedded english by default; overtakes chart language
+* Added: Delay feature, which allows to delay the capturing ([details](#delay-the-capturing-before-export))
+
+### 1.1.4
+* Fix: Did not collect clip-path and pattern from legend
+* Fix: External legend did not respect given width when positioned on left side
+* Fix: Improved tainted image detection
+
+### 1.1.3
+* Added: Added reviver in capturing method to filter the drawn chart elements
+
+### 1.1.2
+* Added: Generalized fallback; does a lookup on the Blob constructor
+* Fix: Wait for lazy images, triggers capture callback only when all images have been fully loaded
+* Discovered: [Safari 5 issue](https://github.com/kangax/fabric.js/issues/2241) please adapt fabric.js manually to solve it
 
 ### 1.1.1
 * Fix: CSV export issue on date based charts

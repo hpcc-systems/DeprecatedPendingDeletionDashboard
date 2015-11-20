@@ -14,10 +14,11 @@
         ;
     }
     FAChar.prototype = Object.create(SVGWidget.prototype);
+    FAChar.prototype.constructor = FAChar;
     FAChar.prototype._class += " common_FAChar";
 
-    FAChar.prototype.publish("char", "", "string", "Font Awesome Item",null,{tags:['Private']});
-    FAChar.prototype.publish("fontSize", null, "number", "Font Size",null,{tags:['Private']});
+    FAChar.prototype.publish("char", "", "string", "Font Awesome Item",null,{tags:["Private"]});
+    FAChar.prototype.publish("fontSize", null, "number", "Font Size",null,{tags:["Private"]});
     FAChar.prototype.publishProxy("text_colorFill", "_text", "colorFill");
 
     FAChar.prototype.testData = function () {

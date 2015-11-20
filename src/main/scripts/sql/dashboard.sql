@@ -81,26 +81,26 @@ PRIMARY KEY(id)
 INSERT INTO chart_details(name,description,configuration,created_by,category,isplugin) 
 VALUES('Bar Chart',
 'Chart displays data visually as bars',
-'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xyConfiguration><dependentCssURL>css/c3.css</dependentCssURL><dependentJsURL>js/lib/d3.v3.min.js</dependentJsURL><dependentJsURL>js/lib/c3.js</dependentJsURL><functionName>createXYChart</functionName><imageURL>chart/bar.png</imageURL><jsURL>js/XYChart.js</jsURL><enableXGrouping>true</enableXGrouping><maxXColumns>2</maxXColumns><maxYColumns>0</maxYColumns></xyConfiguration>',
+'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xyConfiguration><dependentCssURL>css/c3.css</dependentCssURL><dependentJsURL>js/lib/c3.js</dependentJsURL><functionName>createXYChart</functionName><imageURL>chart/bar.png</imageURL><jsURL>js/XYChart.js</jsURL><enableXGrouping>true</enableXGrouping><maxXColumns>2</maxXColumns><maxYColumns>0</maxYColumns></xyConfiguration>',
 '2',1,false);
 
 INSERT INTO chart_details(name,description,configuration,created_by,category,isplugin) 
 VALUES('Line Chart',
 'Chart displays data visually as lines',
-'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xyConfiguration><dependentCssURL>css/c3.css</dependentCssURL><dependentJsURL>js/lib/d3.v3.min.js</dependentJsURL><dependentJsURL>js/lib/c3.js</dependentJsURL><functionName>createXYChart</functionName><imageURL>chart/line.png</imageURL><jsURL>js/XYChart.js</jsURL><enableXGrouping>true</enableXGrouping><maxXColumns>2</maxXColumns><maxYColumns>0</maxYColumns></xyConfiguration>',
+'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xyConfiguration><dependentCssURL>css/c3.css</dependentCssURL><dependentJsURL>js/lib/c3.js</dependentJsURL><functionName>createXYChart</functionName><imageURL>chart/line.png</imageURL><jsURL>js/XYChart.js</jsURL><enableXGrouping>true</enableXGrouping><maxXColumns>2</maxXColumns><maxYColumns>0</maxYColumns></xyConfiguration>',
 '2',1,false);
 
 
 INSERT INTO chart_details(name,description,configuration,created_by,category,isplugin) 
 VALUES('Pie Chart',
 'Circular chart divided into sectors',
-'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xyConfiguration><dependentCssURL>css/c3.css</dependentCssURL><dependentJsURL>js/lib/d3.v3.min.js</dependentJsURL><dependentJsURL>js/lib/c3.js</dependentJsURL><functionName>createXYChart</functionName><imageURL>chart/pie.png</imageURL><jsURL>js/XYChart.js</jsURL><enableXGrouping>false</enableXGrouping><maxXColumns>1</maxXColumns><maxYColumns>1</maxYColumns></xyConfiguration>',
+'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xyConfiguration><dependentCssURL>css/c3.css</dependentCssURL><dependentJsURL>js/lib/c3.js</dependentJsURL><functionName>createXYChart</functionName><imageURL>chart/pie.png</imageURL><jsURL>js/XYChart.js</jsURL><enableXGrouping>false</enableXGrouping><maxXColumns>1</maxXColumns><maxYColumns>1</maxYColumns></xyConfiguration>',
 '2',2,false);
 
 INSERT INTO chart_details(name,description,configuration,created_by,category,isplugin) 
 VALUES('Donut Chart',
 'A Donut chart',
-'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xyConfiguration><dependentCssURL>css/c3.css</dependentCssURL><dependentJsURL>js/lib/d3.v3.min.js</dependentJsURL><dependentJsURL>js/lib/c3.js</dependentJsURL><functionName>createXYChart</functionName><imageURL>chart/donut.png</imageURL><jsURL>js/XYChart.js</jsURL><enableXGrouping>false</enableXGrouping><maxXColumns>1</maxXColumns><maxYColumns>1</maxYColumns></xyConfiguration>',
+'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xyConfiguration><dependentCssURL>css/c3.css</dependentCssURL><dependentJsURL>js/lib/c3.js</dependentJsURL><functionName>createXYChart</functionName><imageURL>chart/donut.png</imageURL><jsURL>js/XYChart.js</jsURL><enableXGrouping>false</enableXGrouping><maxXColumns>1</maxXColumns><maxYColumns>1</maxYColumns></xyConfiguration>',
 '2',2,false);
 
 INSERT INTO chart_details(name,description,configuration,created_by,category,isplugin) 
@@ -112,19 +112,19 @@ VALUES('Table Widget',
 INSERT INTO chart_details(name,description,configuration,created_by,category,isplugin) 
 VALUES('Tree Layout',
 'Displays data visually in Tree structure',
-'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xyConfiguration><dependentCssURL>css/d3.css</dependentCssURL><dependentJsURL>js/lib/d3.v3.min.js</dependentJsURL><functionName>createTreeChart</functionName><imageURL>chart/tree.png</imageURL><jsURL>js/simpletree.js</jsURL><minLevels>2</minLevels><maxLevels>0</maxLevels></xyConfiguration>',
+'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xyConfiguration><dependentCssURL>css/d3.css</dependentCssURL><functionName>createTreeChart</functionName><imageURL>chart/tree.png</imageURL><jsURL>js/simpletree.js</jsURL><minLevels>2</minLevels><maxLevels>0</maxLevels></xyConfiguration>',
 '2',3,false);
 
 INSERT INTO chart_details(name,description,configuration,created_by,category,isplugin) 
 VALUES('Force Directed Graph',
 'Chart connects nodes based on relation defined',
-'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xyConfiguration><dependentCssURL>css/cluster.css</dependentCssURL><dependentJsURL>js/lib/d3.v3.min.js</dependentJsURL><functionName>createClusterChart</functionName><imageURL>chart/cluster.png</imageURL><jsURL>js/clusterChart.js</jsURL></xyConfiguration>',
+'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xyConfiguration><dependentCssURL>css/cluster.css</dependentCssURL><functionName>createClusterChart</functionName><imageURL>chart/cluster.png</imageURL><jsURL>js/clusterChart.js</jsURL></xyConfiguration>',
 '2',7,false);
 
 INSERT INTO chart_details(name,description,configuration,created_by,category,isplugin) 
 VALUES('Gauge Chart',
 'Gauge Chart',
-'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xyConfiguration><dependentCssURL>css/gauge.css</dependentCssURL><dependentJsURL>js/lib/d3.v3.min.js</dependentJsURL><functionName>createGaugeChart</functionName><imageURL>chart/gauge.png</imageURL><jsURL>js/gaugeChart.js</jsURL></xyConfiguration>',
+'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xyConfiguration><dependentCssURL>css/gauge.css</dependentCssURL><functionName>createGaugeChart</functionName><imageURL>chart/gauge.png</imageURL><jsURL>js/gaugeChart.js</jsURL></xyConfiguration>',
 '2',5,false);
 
 INSERT INTO chart_details(name,description,configuration,created_by,category,isplugin) 
@@ -136,7 +136,7 @@ VALUES('Text Widget',
 INSERT INTO chart_details(name,description,configuration,created_by,category,isplugin) 
 VALUES('Choropleth Map',
 'Choropleth Map',
-'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xyConfiguration><dependentCssURL>css/d3.css</dependentCssURL><dependentJsURL>js/lib/d3.v3.min.js</dependentJsURL><dependentJsURL>js/lib/topojson.v1.min.js</dependentJsURL><dependentJsURL>js/lib/datamaps.usa.min.js</dependentJsURL><functionName>createGeoChart</functionName><imageURL>chart/geo.png</imageURL><jsURL>js/usgeomap.js</jsURL><enableXGrouping>false</enableXGrouping><maxXColumns>1</maxXColumns><maxYColumns>1</maxYColumns></xyConfiguration>',
+'<?xml version="1.0" encoding="UTF-8" standalone="yes"?><xyConfiguration><dependentCssURL>css/d3.css</dependentCssURL><functionName>createGeoChart</functionName><imageURL>chart/geo.png</imageURL><jsURL>js/usgeomap.js</jsURL><enableXGrouping>false</enableXGrouping><maxXColumns>1</maxXColumns><maxYColumns>1</maxYColumns></xyConfiguration>',
 '2',8,false);
 
 INSERT INTO chart_details(name,description,configuration,created_by,category,isplugin) 
@@ -154,8 +154,6 @@ VALUES('Relevant',
                                 <functionName>createRelevantChart</functionName>
                                 <imageURL>chart/China_Relevant_Graph.jpg</imageURL>
                                 <dependentCssURL>js/relevant/css/relevant.css</dependentCssURL>
-								<dependentJsURL>js/relevant/visualization/bower_components/requirejs/require.js</dependentJsURL>
-								<dependentJsURL>js/relevant/visualization/src/config.js</dependentJsURL>
                                 <jsURL>js/relevant.js</jsURL>
                 </xyConfiguration>',
 '2',10,false);

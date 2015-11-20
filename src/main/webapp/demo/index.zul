@@ -8,18 +8,18 @@
 <?script src="js/lib/jquery-ui.custom.js"?>
 <?style src="css/jquery-ui.css"?>
 <?script src="js/common.js"?>
-
+<?script src="http://www.google.com/jsapi"?>
 <?script src="js/lib/d3.v3.min.js"?>
-<?script src="js/lib/c3.js"?>
 <?script src="js/lib/topojson.v1.min.js"?>
 <?script src="js/lib/datamaps.usa.min.js"?>
-<?script src="http://www.google.com/jsapi"?>
 
 <?style src="css/dashboard.css"?>
 <?style src="css/flat.css"?>
 
 <!-- Adding Dependencies of Relavant chart -->
-<?script src="https://code.jquery.com/jquery-1.11.1.min.js" ?>
+
+
+
 <zk >
 	<script type="text/javascript">
 	

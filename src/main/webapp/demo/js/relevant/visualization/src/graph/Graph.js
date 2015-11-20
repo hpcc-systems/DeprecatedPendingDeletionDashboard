@@ -19,23 +19,24 @@
         this._selection = new Bag.Selection();
     }
     Graph.prototype = Object.create(SVGWidget.prototype);
+    Graph.prototype.constructor = Graph;
     Graph.prototype._class += " graph_Graph";
     Graph.prototype.implements(IGraph.prototype);
 
-    Graph.prototype.publish("allowDragging", true, "boolean", "Allow Dragging of Vertices", null, { tags: ['Advanced'] });
-    Graph.prototype.publish("layout", "Circle", "set", "Default Layout", ["Circle", "ForceDirected", "ForceDirected2", "Hierarchy"], { tags: ['Basic'] });
-    Graph.prototype.publish("scale", "100%", "set", "Zoom Level", ["all", "width", "selection", "100%", "90%", "75%", "50%", "25%", "10%"], { tags: ['Basic'] });
-    Graph.prototype.publish("applyScaleOnLayout", false, "boolean", "Shrink to fit on Layout", null, { tags: ['Basic'] });
-    Graph.prototype.publish("highlightOnMouseOverVertex", false, "boolean", "Highlight Vertex on Mouse Over", null, { tags: ['Basic'] });
-    Graph.prototype.publish("highlightOnMouseOverEdge", false, "boolean", "Highlight Edge on Mouse Over", null, { tags: ['Basic'] });
-    Graph.prototype.publish("transitionDuration", 250, "number", "Transition Duration", null, { tags: ['Intermediate'] });
-    Graph.prototype.publish("showEdges", true, "boolean", "Show Edges", null, { tags: ['Intermediate'] });
-    Graph.prototype.publish("snapToGrid", 0, "number", "Snap to Grid", null, { tags: ['Private'] });
+    Graph.prototype.publish("allowDragging", true, "boolean", "Allow Dragging of Vertices", null, { tags: ["Advanced"] });
+    Graph.prototype.publish("layout", "Circle", "set", "Default Layout", ["Circle", "ForceDirected", "ForceDirected2", "Hierarchy", "None"], { tags: ["Basic"] });
+    Graph.prototype.publish("scale", "100%", "set", "Zoom Level", ["all", "width", "selection", "100%", "90%", "75%", "50%", "25%", "10%"], { tags: ["Basic"] });
+    Graph.prototype.publish("applyScaleOnLayout", false, "boolean", "Shrink to fit on Layout", null, { tags: ["Basic"] });
+    Graph.prototype.publish("highlightOnMouseOverVertex", false, "boolean", "Highlight Vertex on Mouse Over", null, { tags: ["Basic"] });
+    Graph.prototype.publish("highlightOnMouseOverEdge", false, "boolean", "Highlight Edge on Mouse Over", null, { tags: ["Basic"] });
+    Graph.prototype.publish("transitionDuration", 250, "number", "Transition Duration", null, { tags: ["Intermediate"] });
+    Graph.prototype.publish("showEdges", true, "boolean", "Show Edges", null, { tags: ["Intermediate"] });
+    Graph.prototype.publish("snapToGrid", 0, "number", "Snap to Grid", null, { tags: ["Private"] });
 
-    Graph.prototype.publish("hierarchyRankDirection", "TB", "set", "Direction for Rank Nodes", ["TB", "BT", "LR", "RL"], { tags: ['Advanced'] });
-    Graph.prototype.publish("hierarchyNodeSeparation", 50, "number", "Number of pixels that separate nodes horizontally in the layout", null, { tags: ['Advanced'] });
-    Graph.prototype.publish("hierarchyEdgeSeparation", 10, "number", "Number of pixels that separate edges horizontally in the layout", null, { tags: ['Advanced'] });
-    Graph.prototype.publish("hierarchyRankSeparation", 50, "number", "Number of pixels between each rank in the layout", null, { tags: ['Advanced'] });
+    Graph.prototype.publish("hierarchyRankDirection", "TB", "set", "Direction for Rank Nodes", ["TB", "BT", "LR", "RL"], { tags: ["Advanced"] });
+    Graph.prototype.publish("hierarchyNodeSeparation", 50, "number", "Number of pixels that separate nodes horizontally in the layout", null, { tags: ["Advanced"] });
+    Graph.prototype.publish("hierarchyEdgeSeparation", 10, "number", "Number of pixels that separate edges horizontally in the layout", null, { tags: ["Advanced"] });
+    Graph.prototype.publish("hierarchyRankSeparation", 50, "number", "Number of pixels between each rank in the layout", null, { tags: ["Advanced"] });
 
     //  Properties  ---
     Graph.prototype.getOffsetPos = function () {
@@ -532,7 +533,7 @@
         this.brush.y(d3.scale.identity().domain([(-this.prevTranslate[1] - this._size.height / 2) * 1 / this.zoom.scale(), (-this.prevTranslate[1] + this._size.height / 2) * 1 / this.zoom.scale()]));
     };
 
-    Graph.prototype.enter = function (domNode, element, d) {
+    Graph.prototype.enter = function (domNode, element) {
         SVGWidget.prototype.enter.apply(this, arguments);
         var context = this;
 
@@ -879,7 +880,7 @@
     };
 
     //  Render  ---
-    Graph.prototype.update = function (domNode, element, d) {
+    Graph.prototype.update = function (domNode, element) {
         SVGWidget.prototype.update.apply(this, arguments);
         var context = this;
 
@@ -1036,9 +1037,9 @@
         var edges = {};
 
         if (vertex) {
-            edges = this.graphData.nodeEdges(vertex.id());
-            for (var i = 0; i < edges.length; ++i) {
-                var edge = this.graphData.edge(edges[i]);
+            var nedges = this.graphData.nodeEdges(vertex.id());
+            for (var i = 0; i < nedges.length; ++i) {
+                var edge = this.graphData.edge(nedges[i]);
                 edges[edge.id()] = edge;
                 if (edge._sourceVertex.id() !== vertex.id()) {
                     vertices[edge._sourceVertex.id()] = edge._sourceVertex;

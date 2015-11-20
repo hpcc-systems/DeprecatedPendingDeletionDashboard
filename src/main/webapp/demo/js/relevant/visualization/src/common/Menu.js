@@ -11,7 +11,7 @@
         IMenu.call(this);
 
         this._icon = new Icon()
-            .shape("rect")
+            .shape("square")
             .diameter(14)
         ;
         this._list = new List();
@@ -25,6 +25,7 @@
         this._visible = false;
     }
     Menu.prototype = Object.create(SVGWidget.prototype);
+    Menu.prototype.constructor = Menu;
     Menu.prototype._class += " common_Menu";
     Menu.prototype.implements(IMenu.prototype);
 

@@ -15,6 +15,10 @@ public class RelevantData extends ChartData {
 	private String vehicleImage;
 	
 	private String policyImage;
+	
+	private String groupTypeId;
+	
+	private String groupId;
 
 	@XmlElement
 	public String getClaimId() {
@@ -67,7 +71,27 @@ public class RelevantData extends ChartData {
 				+ ", claimImage= " + claimImage
 				+ ", personImage= " + personImage
 				+ ", vehicleImage= " + vehicleImage
+				+ ", groupTypeId= " + groupTypeId
+				+ ", groupId= " + groupId
 				+ ", policyImage= " + policyImage + "]";
 	}
+
+	@XmlElement
+    public String getGroupId() {
+        return groupId;
+    }
+
+    public void setGroupId(String groupId) {
+        this.groupId = groupId;
+    }
+
+    @XmlElement
+    public String getGroupTypeId() {
+        return groupTypeId;
+    }
+
+    public void setGroupTypeId(String groupTypeId) {
+        this.groupTypeId = groupTypeId;
+    }
 	
 }

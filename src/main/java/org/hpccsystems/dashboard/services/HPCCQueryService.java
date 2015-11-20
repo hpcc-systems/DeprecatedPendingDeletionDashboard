@@ -14,6 +14,7 @@ import javax.xml.xpath.XPathExpressionException;
 import org.hpccsystems.dashboard.chart.entity.Attribute;
 import org.hpccsystems.dashboard.chart.entity.Field;
 import org.hpccsystems.dashboard.chart.entity.HpccConnection;
+import org.hpccsystems.dashboard.chart.entity.RelevantData;
 import org.hpccsystems.dashboard.chart.entity.ScoredSearchData;
 import org.hpccsystems.dashboard.chart.entity.TableData;
 import org.hpccsystems.dashboard.chart.entity.TitleColumn;
@@ -46,4 +47,7 @@ public interface HPCCQueryService {
 	List<List<String>> getRootValues(TreeData treeData, Level level, List<TreeFilter> treeFilters) throws HpccConnectionException, RemoteException;
 	
 	HashMap<String, HashMap<String, List<Attribute>>> fetchScoredSearchData(ScoredSearchData searchData) throws HpccConnectionException,RemoteException;
+
+    Set<String> getRelevantGroupInfo(String relevantGroupTypeIdQuery, RelevantData relevantData,boolean appendInput) throws HpccConnectionException,
+            RemoteException;
 }

@@ -1,14 +1,15 @@
 "use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3", "../common/SVGWidget", "../api/I2DChart", "../common/Text", "../common/FAChar", "css!./Bubble"], factory);
+        define(["d3", "../common/SVGWidget", "../api/I2DChart", "../common/Text", "../common/FAChar", "../other/Bag", "../api/ITooltip", "css!./Bubble"], factory);
     } else {
-        root.chart_Bubble = factory(root.d3, root.common_SVGWidget, root.api_I2DChart, root.common_Text, root.common_FAChar);
+        root.chart_Bubble = factory(root.d3, root.common_SVGWidget, root.api_I2DChart, root.common_Text, root.common_FAChar, root.other_Bag, root.api_ITooltip);
     }
-}(this, function (d3, SVGWidget, I2DChart, Text, FAChar) {
+}(this, function (d3, SVGWidget, I2DChart, Text, FAChar, Bag, ITooltip) {
     function Bubble(target) {
         SVGWidget.call(this);
         I2DChart.call(this);
+        ITooltip.call(this);
         this._drawStartPos = "origin";
 
         this.labelWidgets = {};
@@ -20,10 +21,13 @@
         ;
     }
     Bubble.prototype = Object.create(SVGWidget.prototype);
+    Bubble.prototype.constructor = Bubble;
     Bubble.prototype._class += " chart_Bubble";
     Bubble.prototype.implements(I2DChart.prototype);
+    Bubble.prototype.implements(ITooltip.prototype);
 
-    Bubble.prototype.publish("paletteID", "default", "set", "Palette ID", Bubble.prototype._palette.switch(),{tags:['Basic','Shared']});
+    Bubble.prototype.publish("paletteID", "default", "set", "Palette ID", Bubble.prototype._palette.switch(),{tags:["Basic","Shared"]});
+    Bubble.prototype.publish("useClonedPalette", false, "boolean", "Enable or disable using a cloned palette",null,{tags:["Intermediate","Shared"]});
 
     Bubble.prototype.size = function (_) {
         var retVal = SVGWidget.prototype.size.apply(this, arguments);
@@ -35,10 +39,19 @@
         return retVal;
     };
 
+    Bubble.prototype.enter = function (domNode, element) {
+        SVGWidget.prototype.enter.apply(this, arguments);
+        this._selection = new Bag.SimpleSelection(element);
+    };
+
     Bubble.prototype.update = function (domNode, element) {
         var context = this;
 
         this._palette = this._palette.switch(this.paletteID());
+        if (this.useClonedPalette()) {
+            this._palette = this._palette.cloneNotExists(this.paletteID() + "_" + this.id());
+        }
+
         var node = element.selectAll(".node")
             .data(this._data.length ? this.d3Pack.nodes({ children: this.cloneData() }).filter(function (d) { return !d.children; }) : [], function (d) { return d[0]; })
         ;
@@ -47,14 +60,23 @@
         node.enter().append("g")
             .attr("class", "node")
             .attr("opacity", 0)
+            .call(this._selection.enter.bind(this._selection))
             .on("click", function (d) {
-                context.click(context.rowToObj(d), context._columns[1]);
+                context.click(context.rowToObj(d), context._columns[1], context._selection.selected(this));
             })
             .each(function (d) {
                 var element = d3.select(this);
                 element.append("circle")
                     .attr("r", function (d) { return d.r; })
-                    .append("title")
+                    .on("mouseover.tooltip", function (d) {
+                        context.tooltipShow(d, context._columns, 1);
+                    })
+                    .on("mouseout.tooltip", function (d) {
+                        context.tooltipShow();
+                    })
+                    .on("mousemove.tooltip", function (d) {
+                        context.tooltipShow(d, context._columns, 1);
+                    })
                 ;
                 if (d.__viz_faChar) {
                     context.labelWidgets[d[0]] = new FAChar()
@@ -112,6 +134,11 @@
             .style("opacity", 0)
             .remove()
         ;
+    };
+
+    Bubble.prototype.exit = function (domNode, element) {
+        SVGWidget.prototype.enter.apply(this, arguments);
+        delete this._selection;
     };
 
     return Bubble;

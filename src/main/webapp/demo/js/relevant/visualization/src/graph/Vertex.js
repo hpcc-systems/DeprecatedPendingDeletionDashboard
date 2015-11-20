@@ -14,6 +14,7 @@
         this._annotationWidgets = {};
     }
     Vertex.prototype = Object.create(SVGWidget.prototype);
+    Vertex.prototype.constructor = Vertex;
     Vertex.prototype._class += " graph_Vertex";
 
     Vertex.prototype.publishProxy("faChar", "_icon");
@@ -27,14 +28,14 @@
     Vertex.prototype.publishProxy("textbox_shape_colorFill", "_textBox", "shape_colorFill");
     Vertex.prototype.publishProxy("textbox_text_colorFill", "_textBox", "text_colorFill");
 
-    Vertex.prototype.publish("annotationDiameter", 14, "number", "Annotation Diameter",null,{tags:['Private']});
-    Vertex.prototype.publish("annotationSpacing", 3, "number", "Annotation Spacing",null,{tags:['Private']});
-    Vertex.prototype.publish("annotationIcons", [], "array", "Annotations",null,{tags:['Private']});
+    Vertex.prototype.publish("annotationDiameter", 14, "number", "Annotation Diameter",null,{tags:["Private"]});
+    Vertex.prototype.publish("annotationSpacing", 3, "number", "Annotation Spacing",null,{tags:["Private"]});
+    Vertex.prototype.publish("annotationIcons", [], "array", "Annotations",null,{tags:["Private"]});
 
     Vertex.prototype.testData = function (_) {
         this._icon.testData();
         this._textBox.testData();
-        this.annotationIcons([{ faChar: "\uf188", tooltip: "Test A", shape_colorFill: "white", image_colorFill: "Red" }, { faChar: "\uf0ad", tooltip: "Test B", shape_colorFill: "green", shape_colorStroke: "green", image_colorFill: "white" }, { faChar: "\uf193", tooltip: "Test C", shape_colorFill: "navy", shape_colorStroke: "navy", image_colorFill: "white" }]);
+        this.annotationIcons([{ faChar: "\uf188", tooltip: "Test A", shape_colorFill: "white", image_colorFill: "red" }, { faChar: "\uf0ad", tooltip: "Test B", shape_colorFill: "green", shape_colorStroke: "green", image_colorFill: "white" }, { faChar: "\uf193", tooltip: "Test C", shape_colorFill: "navy", shape_colorStroke: "navy", image_colorFill: "white" }]);
         return this;
     };
 

@@ -369,7 +369,10 @@ public class EditWidgetController extends SelectorComposer<Component> {
             	costructScoredSearchTable((ScoredSearchData) portlet.getChartData(),div);                	
             } else if(Constants.RELEVANT_CONFIG == chartService.getCharts().get(portlet.getChartType()).getCategory()){
             	RelevantData objRelevantData = (RelevantData)portlet.getChartData();
-            	
+            	LOG.debug("RelevantData --->"+objRelevantData);
+            	if(!validateRelevantData(objRelevantData)){
+                    return;
+                }
             	objRelevantData.setClaimImage((Combobox)holderInclude.getFellow("cmbClaim") != null ? ((Combobox)holderInclude.getFellow("cmbClaim")).getSelectedItem().getValue().toString() : null);
             	objRelevantData.setPersonImage((Combobox)holderInclude.getFellow("cmbPerson") != null ? ((Combobox)holderInclude.getFellow("cmbPerson")).getSelectedItem().getValue().toString() : null);
             	objRelevantData.setVehicleImage((Combobox)holderInclude.getFellow("cmbVehicle") != null ? ((Combobox)holderInclude.getFellow("cmbVehicle")).getSelectedItem().getValue().toString() : null);
@@ -440,6 +443,32 @@ public class EditWidgetController extends SelectorComposer<Component> {
         
         editPortletWindow.detach();        
     }
+
+    private boolean validateRelevantData(RelevantData relevantData) {
+        if(relevantData.getClaimId() == null && (relevantData.getGroupTypeId() == null 
+                || relevantData.getGroupId() == null)){
+            Clients.showNotification(Labels.getLabel("provideClaimIdOrGroupId"), "error", holderInclude, "middle_center", 3000, true);
+            return false;
+        }else if(relevantData.getClaimId() != null && (relevantData.getGroupTypeId() != null 
+                || relevantData.getGroupId() != null)){
+            Clients.showNotification(Labels.getLabel("provideAnyOneOfInput"), "error", holderInclude, "middle_center", 3000, true);
+            return false;
+        }else if(((Combobox)holderInclude.getFellow("cmbClaim")).getSelectedItem() == null){
+            Clients.showNotification(Labels.getLabel("chooseClaimImage"), "error", holderInclude.getFellow("cmbClaim"), "end_center", 3000, true);
+            return false;
+        }else if(((Combobox)holderInclude.getFellow("cmbPolicy")).getSelectedItem() == null ){
+            Clients.showNotification(Labels.getLabel("choosePolicyImage"), "error", holderInclude.getFellow("cmbPolicy"), "end_center", 3000, true);
+            return false;
+        }else if(((Combobox)holderInclude.getFellow("cmbVehicle")).getSelectedItem() == null ){
+            Clients.showNotification(Labels.getLabel("chooseVehicleImage"), "error", holderInclude.getFellow("cmbVehicle"), "end_center", 3000, true);
+            return false;
+        }else if(((Combobox)holderInclude.getFellow("cmbPerson")).getSelectedItem() == null ){
+            Clients.showNotification(Labels.getLabel("choosePersonImage"), "error", holderInclude.getFellow("cmbPerson"), "end_center", 3000, true);
+            return false;
+        }
+        return true;        
+    }
+
 
     /**
      * Renders table while clicking 'doneButton'

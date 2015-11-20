@@ -10,13 +10,14 @@
         SVGWidget.call(this);
     }
     Shape.prototype = Object.create(SVGWidget.prototype);
+    Shape.prototype.constructor = Shape;
     Shape.prototype._class += " common_Shape";
 
-    Shape.prototype.publish("shape", "circle", "set", "Shape Type", ["circle", "square", "rect", "ellipse"],{tags:['Private']});
-    Shape.prototype.publish("width", 24, "number", "Width",null,{tags:['Private']});
-    Shape.prototype.publish("height", 24, "number", "Height",null,{tags:['Private']});
-    Shape.prototype.publish("colorStroke", null, "html-color", "Stroke Color", null, {tags:['Private']});
-    Shape.prototype.publish("colorFill", null, "html-color", "Fill Color", null, {tags:['Private']});
+    Shape.prototype.publish("shape", "circle", "set", "Shape Type", ["circle", "square", "rect", "ellipse"],{tags:["Private"]});
+    Shape.prototype.publish("width", 24, "number", "Width",null,{tags:["Private"]});
+    Shape.prototype.publish("height", 24, "number", "Height",null,{tags:["Private"]});
+    Shape.prototype.publish("colorStroke", null, "html-color", "Stroke Color", null, {tags:["Private"]});
+    Shape.prototype.publish("colorFill", null, "html-color", "Fill Color", null, {tags:["Private"]});
 
     Shape.prototype.radius = function (_) {
         if (!arguments.length) return Math.max(this.width(), this.height()) / 2;
