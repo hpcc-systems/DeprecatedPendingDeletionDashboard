@@ -1,7 +1,7 @@
 "use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3", "./XYAxis", "../api/INDChart", "../api/ITooltip", "css!./Column"], factory);
+        define(["d3", "./XYAxisDashboard", "../api/INDChart", "../api/ITooltip", "css!./Column"], factory);
     } else {
         root.chart_Column = factory(root.d3, root.chart_XYAxis, root.api_INDChart, root.api_ITooltip);
     }
@@ -37,13 +37,11 @@
         switch (this.xAxisType()) {
             case "ordinal":
                 dataLen = this.dataScale.rangeBand();
-                console.log("ordinal-->?",dataLen);
                 offset = 0;
                 break;
             case "linear":
             case "time":
                 dataLen = Math.max(Math.abs(this.dataScale(2) - this.dataScale(1)) * (100 - this._linearGap) / 100, dataLen);
-                console.log("time-->?",dataLen);
                 offset = -dataLen/2;
                 break;
         }
@@ -52,7 +50,7 @@
             .domain(context.columns().filter(function (d, idx) { return idx > 0; }))
             .rangeRoundBands(isHorizontal ? [0, dataLen] : [dataLen, 0])
         ;
-
+        
         var column = this.svgData.selectAll(".dataRow")
             .data(this.formattedData())
         ;
