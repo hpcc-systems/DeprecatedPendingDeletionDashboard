@@ -47,10 +47,17 @@ function createGeoChart(divId, reqData) {
 		.domain([ min, median(arr), max ])
 		.range([ "red", "yellow", "green" ]);
 
+	var labelData = {
+			defaultFill : '#b2e5e5'
+	};
 	jq.each(colorData, function(key, val) {
 		colorData[key] = colors(val);
+		labelData[val]=colors(val);
 	});
-
+	var legendData = {
+			defaultFillName: "No data",
+	}
+	
 	var election = new Datamap({
 		height : fullHeight,
 		width : fullWidth,
@@ -65,14 +72,13 @@ function createGeoChart(divId, reqData) {
 			},
 			highlightBorderWidth : 3
 		},
+		fills : labelData,
 
-		fills : {
-			defaultFill : '#b2e5e5'
-		},
 		data : chartData.states
 	});
 
 	election.labels();
+	election.legend(legendData);
 
 	election.updateChoropleth(colorData);
 }
