@@ -12,17 +12,12 @@
         INDChart.call(this);
     }
     CommonND.prototype = Object.create(Common.prototype);
+    CommonND.prototype.constructor = CommonND;
     CommonND.prototype._class += " google_CommonND";
     CommonND.prototype.implements(INDChart.prototype);
 
-    /**
-     * Publish Params Common To Other Libraries
-     */
-    CommonND.prototype.publish("paletteID", "default", "set", "Palette ID", CommonND.prototype._palette.switch(),{tags:['Basic','Shared']});
-
-    /**
-     * Publish Params Unique To This Widget
-     */
+    CommonND.prototype.publish("paletteID", "default", "set", "Palette ID", CommonND.prototype._palette.switch(),{tags:["Basic","Shared"]});
+    CommonND.prototype.publish("useClonedPalette", false, "boolean", "Enable or disable using a cloned palette",null,{tags:["Intermediate","Shared"]});
 
     CommonND.prototype.getChartOptions = function () {
         var chartOptions = Common.prototype.getChartOptions.call(this);
@@ -31,9 +26,12 @@
 
         return chartOptions;
     };
-    
+
     CommonND.prototype.update = function (domNode, element) {
         this._palette = this._palette.switch(this.paletteID());
+        if (this.useClonedPalette()) {
+            this._palette = this._palette.cloneNotExists(this.paletteID() + "_" + this.id());
+        }
         Common.prototype.update.apply(this, arguments);
     };
 

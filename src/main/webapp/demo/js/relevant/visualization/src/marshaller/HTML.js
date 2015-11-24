@@ -10,11 +10,12 @@
         Grid.call(this);
     }
     HTML.prototype = Object.create(Grid.prototype);
+    HTML.prototype.constructor = HTML;
     HTML.prototype._class += " marshaller_HTML";
 
-    HTML.prototype.publish("ddlUrl", "", "string", "DDL URL",null,{tags:['Private']});
-    HTML.prototype.publish("databomb", "", "string", "Data Bomb",null,{tags:['Private']});
-    HTML.prototype.publish("proxyMappings", [], "array", "Proxy Mappings",null,{tags:['Private']});
+    HTML.prototype.publish("ddlUrl", "", "string", "DDL URL",null,{tags:["Private"]});
+    HTML.prototype.publish("databomb", "", "string", "Data Bomb",null,{tags:["Private"]});
+    HTML.prototype.publish("proxyMappings", [], "array", "Proxy Mappings",null,{tags:["Private"]});
 
     HTML.prototype.testData = function () {
         this.ddlUrl('[ { "visualizations": [ { "color": "Red_Yellow_Blue", "id": "statesummary", "source": { "output": "View_statesummary", "mappings": { "weight": "Cnt", "state": "clean_st" }, "id": "statesum" }, "type": "CHORO", "title": "Count by State", "events": { "click": { "mappings": { "clean_st": "clean_st" }, "updates": [ { "visualization": "statedetails", "instance": "Ins001", "datasource": "details", "merge": false }, { "visualization": "alldetails", "instance": "Ins001", "datasource": "details", "merge": false } ] } }, "onSelect": { "mappings": { "clean_st": "clean_st" }, "updates": [ { "visualization": "statedetails", "instance": "Ins001", "datasource": "details", "merge": false }, { "visualization": "alldetails", "instance": "Ins001", "datasource": "details", "merge": false } ] } }, { "id": "statedetails", "label": [ "State", "Error", "Count" ], "source": { "output": "View_statedetails", "mappings": { "value": [ "clean_st", "clean_error", "Cnt" ] }, "id": "details" }, "type": "TABLE", "title": "State Error Details" }, { "color": "Red_Yellow_Blue", "id": "errorsummary", "source": { "output": "View_errorsummary", "mappings": { "weight": "Cnt", "label": "clean_error" }, "id": "errorsum" }, "type": "PIE", "title": "Count by error--aggregated client side", "events": { "click": { "mappings": { "clean_error": "clean_error" }, "updates": [ { "visualization": "errordetails", "instance": "Ins001", "datasource": "details", "merge": false }, { "visualization": "alldetails", "instance": "Ins001", "datasource": "details", "merge": false } ] } }, "onSelect": { "mappings": { "clean_error": "clean_error" }, "updates": [ { "visualization": "errordetails", "instance": "Ins001", "datasource": "details", "merge": false }, { "visualization": "alldetails", "instance": "Ins001", "datasource": "details", "merge": false } ] } }, { "id": "errordetails", "label": [ "State", "Error", "Count" ], "source": { "output": "View_errordetails", "mappings": { "value": [ "clean_st", "clean_error", "Cnt" ] }, "id": "details" }, "type": "TABLE", "title": "Error Code Details" }, { "id": "alldetails", "label": [ "State", "Error", "Count" ], "source": { "output": "View_alldetails", "mappings": { "value": [ "clean_st", "clean_error", "Cnt" ] }, "id": "details" }, "type": "TABLE", "title": "Details updated from both count by state and count by error" } ], "datasources": [ { "outputs": [ { "from": "View_statesummary", "id": "View_statesummary", "notify": [ "statesummary" ] } ], "databomb": true, "id": "statesum" }, { "outputs": [ { "from": "View_errorsummary", "id": "View_errorsummary", "notify": [ "errorsummary" ] } ], "databomb": true, "id": "errorsum" }, { "filter": [ "clean_st", "clean_error" ], "outputs": [ { "from": "View_statedetails", "id": "View_statedetails", "notify": [ "statedetails" ] }, { "from": "View_errordetails", "id": "View_errordetails", "notify": [ "errordetails" ] }, { "from": "View_alldetails", "id": "View_alldetails", "notify": [ "alldetails" ] } ], "databomb": true, "id": "details" } ], "enable": "true", "id": "Ins001_DatabombDashboard", "label": "DatabombDashboard", "title": "Databomb Dashboard", "primary": false } ]');
@@ -30,19 +31,7 @@
         return this;
     };
 
-    HTML.prototype.content = function () {
-        return Grid.prototype.content.apply(this, arguments);
-    };
-
-    HTML.prototype.setContent = function (row, col, widget, title, rowSpan, colSpan) {
-        return Grid.prototype.setContent.apply(this, arguments);
-    };
-
-    HTML.prototype.enter = function (domNode, element) {
-        Grid.prototype.enter.apply(this, arguments);
-    };
-
-    function createGraphData(marshaller, databomb) {
+    function walkDashboards(marshaller, databomb) {
         if (databomb instanceof Object) {
         } else if (databomb){
             databomb = JSON.parse(databomb);
@@ -78,43 +67,58 @@
     HTML.prototype.render = function (callback) {
         if (this.ddlUrl() === "" || (this.ddlUrl() === this._prev_ddlUrl && this.databomb() === this._prev_databomb)) {
             return Grid.prototype.render.apply(this, arguments);
+        } else if (this._prev_ddlUrl && this._prev_ddlUrl !== this.ddlUrl()) {
+            //  DDL has actually changed (not just a deserialization)
+            this
+                .clearContent()
+            ;
         }
         this._prev_ddlUrl = this.ddlUrl();
         this._prev_databomb = this.databomb();
 
-        var marshaller = new HipieDDL.Marshaller().proxyMappings(this.proxyMappings());
+        //  Gather existing widgets for reuse  ---
+        this.marshaller = new HipieDDL.Marshaller()
+            .proxyMappings(this.proxyMappings())
+            .widgetMappings(d3.map(this.content().map(function (d) {
+                return d.widget();
+            }), function (d) {
+                return d.id();
+            }))
+        ;
+
+        //  Parse DDL  ---
         var context = this;
         if (this.ddlUrl()[0] === "[" || this.ddlUrl()[0] === "{") {
-            marshaller.parse(this.ddlUrl(), function () {
-                postParse();
+            this.marshaller.parse(this.ddlUrl(), function () {
+                populateContent();
             });
         } else {
-            marshaller.url(this.ddlUrl(), function () {
-                postParse();
+            this.marshaller.url(this.ddlUrl(), function () {
+                populateContent();
             });
         }
-        function postParse() {
-            var dashboards = createGraphData(marshaller, context.databomb());
-            for (var key in dashboards) {
-                var cellRow = 0;
-                var cellCol = 0;
-                var maxCol = Math.floor(Math.sqrt(dashboards[key].visualizations.length));
-                dashboards[key].visualizations.forEach(function (viz, idx) {
-                    if (idx && (idx % maxCol === 0)) {
-                        cellRow++;
-                        cellCol = 0;
-                    }
-                    viz.widget.size({ width: 0, height: 0 });
-                    var existingWidget = context.getContent(viz.widget._id);
-                    if (existingWidget) {
-                        viz.setWidget(existingWidget, true);
-                    } else {
+
+        function populateContent() {
+            var dashboards = walkDashboards(context.marshaller, context.databomb());
+            if (context.marshaller.widgetMappings().empty()) {
+                for (var key in dashboards) {
+                    var cellRow = 0;
+                    var cellCol = 0;
+                    var maxCol = Math.floor(Math.sqrt(dashboards[key].visualizations.length));
+                    dashboards[key].visualizations.forEach(function (viz, idx) {
+                        if (idx && (idx % maxCol === 0)) {
+                            cellRow++;
+                            cellCol = 0;
+                        }
+                        viz.widget.size({ width: 0, height: 0 });
                         context.setContent(cellRow, cellCol, viz.widget, viz.title);
-                    }
-                    cellCol++;
-                });
-                for (var key2 in dashboards[key].dashboard.datasources) {
-                    dashboards[key].dashboard.datasources[key2].fetchData({}, true);
+                        cellCol++;
+                    });
+                }
+            }
+            for (var dashKey in dashboards) {
+                for (var dsKey in dashboards[dashKey].dashboard.datasources) {
+                    dashboards[dashKey].dashboard.datasources[dsKey].fetchData({}, true);
                 }
             }
             Grid.prototype.render.call(context, function (widget) {

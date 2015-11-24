@@ -30,27 +30,27 @@
         ;
         var context = this;
         this._menu.preShowMenu = function () {
-            if (context._content && context._content.hasOverlay()) {
-                context._content.visible(false);
+            if (context.content() && context.content().hasOverlay()) {
+                context.content().visible(false);
             }
         };
         this._menu.postHideMenu = function () {
-            if (context._content && context._content.hasOverlay()) {
-                context._content.visible(true);
+            if (context.content() && context.content().hasOverlay()) {
+                context.content().visible(true);
             }
         };
 
         this._showContent = true;
-        this._content = null;
         this._surfaceButtons = [];
     }
     Surface.prototype = Object.create(SVGWidget.prototype);
+    Surface.prototype.constructor = Surface;
     Surface.prototype._class += " common_Surface";
 
     Surface.prototype.publish("showTitle", true, "boolean", "Show Title",null,{tags:["Basic"]});
     Surface.prototype.publish("title", "", "string", "Title",null,{tags:["Basic"]});
     Surface.prototype.publishProxy("titleFontSize", "_text", "fontSize");
-    Surface.prototype.publish("showIcon", true, "boolean", "Show Title",null,{tags:["Advance"]});
+    Surface.prototype.publish("showIcon", true, "boolean", "Show Title",null,{tags:["Advanced"]});
     Surface.prototype.publishProxy("icon_faChar", "_icon", "faChar");
     Surface.prototype.publishProxy("icon_shape", "_icon", "shape");
     //Surface.prototype.publish("menu");
@@ -68,15 +68,9 @@
     Surface.prototype.showContent = function (_) {
         if (!arguments.length) return this._showContent;
         this._showContent = _;
-        if (this._content) {
-            this._content.visible(this._showContent);
+        if (this.content()) {
+            this.content().visible(this._showContent);
         }
-        return this;
-    };
-
-    Surface.prototype.content = function (_) {
-        if (!arguments.length) return this._content;
-        this._content = _;
         return this;
     };
 
@@ -146,22 +140,21 @@
         surfaceButtons.enter().append("button").attr("class","surface-button")
             .each(function (button, idx) {
                 var el = context._surfaceButtons[idx] = d3.select(this)
-                    .attr("class", "surface-button " + (button.class ? button.class : ''))
+                    .attr("class", "surface-button " + (button.class ? button.class : ""))
                     .attr("id", button.id)
-                    .style('padding', button.padding)
-                    .style('width', button.width)
-                    .style('height', button.height)
-                    .style("cursor","pointer");
+                    .style("padding", button.padding)
+                    .style("width", button.width)
+                    .style("height", button.height)
+                    .style("cursor","pointer")
+                    .on("click", function(d) { context.click(d); });
                 if (button.font === "FontAwesome") {
                     el
-                      .append('i')
+                      .append("i")
                       .attr("class","fa")
-                      .text(function(d) { return button.label; })
-                      .on("click", function(d) { context.click(d); });
+                      .text(function(d) { return button.label; });
                 } else {
                     el
-                      .text(function(d) { return button.label; })
-                      .on("click", function(d) { context.click(d); });
+                      .text(function(d) { return button.label; });
                 }
             })
         ;
@@ -174,13 +167,14 @@
         ;
 
         var buttonClientHeight = this.showTitle() ? Math.max.apply(null,this._surfaceButtons.map(function(d) { return d.node().offsetHeight; })) : 0;
-        var iconClientSize = this.showIcon() ? this._icon.getBBox(true) : {width:0, height: 0};
+        var iconClientSize = this.showTitle() && this.showIcon() ? this._icon.getBBox(true) : {width:0, height: 0};
         var textClientSize = this._text.getBBox(true);
         var menuClientSize = this._menu.getBBox(true);
-        var titleRegionHeight = Math.max(iconClientSize.height, textClientSize.height, menuClientSize.height, buttonClientHeight);
-        var yTitle = (-height + titleRegionHeight) / 2;
+        var _titleRegionHeight = Math.max(iconClientSize.height, textClientSize.height, menuClientSize.height, buttonClientHeight);
+        var titleRegionHeight = this.showTitle() ? _titleRegionHeight : 0;
+        var yTitle = (-height + _titleRegionHeight) / 2;
 
-        var titleTextHeight = Math.max(textClientSize.height, menuClientSize.height, buttonClientHeight);
+        var titleTextHeight = this.showTitle() ? Math.max(textClientSize.height, menuClientSize.height, buttonClientHeight) : 0;
 
         var topMargin = titleRegionHeight <= titleTextHeight ? 0 : (titleRegionHeight - titleTextHeight) / 2;
         var leftMargin = topMargin;
@@ -202,10 +196,14 @@
             .move({ x: (iconClientSize.width / 2 - menuClientSize.width / 2) / 2, y: yTitle })
         ;
 
-        var xPos = context._titleRect.node().getBoundingClientRect().left + (context._size.width - leftMargin * 2) - context.buttonGutter() - this.buttonContainer.node().offsetWidth + 'px';
-        var yPos = context._titleRect.node().getBoundingClientRect().top + ((titleTextHeight - this.buttonContainer.node().offsetHeight) / 2) + 'px';
-        this.buttonContainer.style('top', yPos);
-        this.buttonContainer.style('left', xPos);
+        var xPos = context._titleRect.node().getBoundingClientRect().left + (context._size.width - leftMargin * 2) - context.buttonGutter() - this.buttonContainer.node().offsetWidth;
+        var yPos = context._titleRect.node().getBoundingClientRect().top + ((titleTextHeight - this.buttonContainer.node().offsetHeight) / 2);
+        if (!isNaN(xPos)) {
+            this.buttonContainer.style("left", xPos + "px");
+        }
+        if (!isNaN(yPos)) {
+            this.buttonContainer.style("top", yPos + "px");
+        }
 
         if (this.showTitle()) {
             this._container
@@ -236,16 +234,16 @@
                 })
             ;
             content
+                .attr("transform", "translate(" + (leftMargin / 2) + ", " + (titleRegionHeight / 2 - topMargin / 2) +")")
                 .each(function (d) {
                     var padding = {
-                        left: 4,
-                        top: 4,
-                        right: 4,
-                        bottom: 4
+                        left: 0,
+                        top: 0,
+                        right: 1,
+                        bottom: 1
                     };
                     d
-                        .pos({ x: xOffset / 2, y: yOffset / 2 })
-                        .size({
+                        .resize({
                             width: width - xOffset - (padding.left + padding.right),
                             height: height - yOffset - (padding.top + padding.bottom)
                         })
@@ -254,8 +252,8 @@
             ;
             if (this.content()) {
                 this._clipRect
-                    .attr("x", -width / 2 + xOffset)
-                    .attr("y", -height / 2 + yOffset)
+                    .attr("x", -(width - xOffset) / 2)
+                    .attr("y", -(height - yOffset) / 2)
                     .attr("width", width - xOffset)
                     .attr("height", height - yOffset)
                 ;
@@ -274,22 +272,6 @@
             this.content().target(null);
         }
         SVGWidget.prototype.exit.apply(this, arguments);
-    };
-
-    Surface.prototype.render = function (callback) {
-        if (!this.content()) {
-            SVGWidget.prototype.render.apply(this, arguments);
-        }
-        SVGWidget.prototype.render.call(this);
-        var context = this;
-        if (this.content()) {
-            this.content().render(function (contentWidget) {
-                if (callback) {
-                    callback(context);
-                }
-            });
-        }
-        return this;
     };
 
     Surface.prototype.intersection = function (pointA, pointB) {

@@ -6,9 +6,12 @@
         root.chart_MultiChart = factory(root.d3, root.common_SVGWidget, root.api_INDChart, root.require);
     }
 }(this, function (d3, SVGWidget, INDChart, require) {
-    var _2dChartTypes = [
+    var _1DChartTypes = [
+        { id: "SUMMARY", display: "Summary", widgetClass: "chart_Summary" },
+        { id: "C3_GAUGE", display: "Gauge (C3)", widgetClass: "c3chart_Gauge" }
+    ];
+    var _2DChartTypes = [
         { id: "BUBBLE", display: "Bubble", widgetClass: "chart_Bubble" },
-        { id: "COLUMN", display: "Column", widgetClass: "chart_Column" },
         { id: "PIE", display: "Pie", widgetClass: "chart_Pie" },
         { id: "GOOGLE_PIE", display: "Pie (Google)", widgetClass: "google_Pie" },
         { id: "C3_DONUT", display: "Donut (C3)", widgetClass: "c3chart_Donut" },
@@ -18,8 +21,11 @@
         { id: "AM_PYRAMID", display: "Area (amCharts)", widgetClass: "amchart_Pyramid" },
         { id: "WORD_CLOUD", display: "Word Cloud", widgetClass: "other_WordCloud" }
     ];
-    var _multiChartTypes = [
+    var _NDChartTypes = [
+        { id: "COLUMN", display: "Column", widgetClass: "chart_Column" },
         { id: "LINE", display: "Line", widgetClass: "chart_Line" },
+        { id: "AREA", display: "Area", widgetClass: "chart_Area" },
+        { id: "STEP", display: "Step", widgetClass: "chart_Step" },
         { id: "GOOGLE_BAR", display: "Bar (Google)", widgetClass: "google_Bar" },
         { id: "GOOGLE_COLUMN", display: "Column (Google)", widgetClass: "google_Column" },
         { id: "GOOGLE_LINE", display: "Line (Google)", widgetClass: "google_Line" },
@@ -37,16 +43,15 @@
     var _anyChartTypes = [
         { id: "TABLE", display: "Table", widgetClass: "other_Table" }
     ];
-    var _allChartTypes = _2dChartTypes.concat(_multiChartTypes.concat(_anyChartTypes));
+    var _allChartTypes = _1DChartTypes.concat(_2DChartTypes.concat(_NDChartTypes.concat(_anyChartTypes)));
 
     function MultiChart() {
         SVGWidget.call(this);
         INDChart.call(this);
 
-        this.chart(null);
-
-        this._2dChartTypes = _2dChartTypes;
-        this._multiChartTypes = _multiChartTypes;
+        this._1DChartTypes = _1DChartTypes;
+        this._2DChartTypes = _2DChartTypes;
+        this._NDChartTypes = _NDChartTypes;
         this._anyChartTypes = _anyChartTypes;
         this._allChartTypes = _allChartTypes;
 
@@ -62,11 +67,12 @@
         this._allCharts["BAR"] = this._allCharts["COLUMN"];
     }
     MultiChart.prototype = Object.create(SVGWidget.prototype);
+    MultiChart.prototype.constructor = MultiChart;
     MultiChart.prototype._class += " chart_MultiChart";
     MultiChart.prototype.implements(INDChart.prototype);
 
-    MultiChart.prototype.publish("chartType", "BUBBLE", "set", "Chart Type", _allChartTypes.map(function (item) { return item.id; }),{tags:['Basic']});
-    MultiChart.prototype.publish("chart", null, "widget", "Chart",null,{tags:['Basic']});
+    MultiChart.prototype.publish("chartType", "BUBBLE", "set", "Chart Type", _allChartTypes.map(function (item) { return item.id; }),{tags:["Basic"]});
+    MultiChart.prototype.publish("chart", null, "widget", "Chart",null,{tags:["Basic"]});
 
     MultiChart.prototype.columns = function (_) {
         var retVal = SVGWidget.prototype.columns.apply(this, arguments);
@@ -84,6 +90,18 @@
         return retVal;
     };
 
+    MultiChart.prototype._origChart = MultiChart.prototype.chart;
+    MultiChart.prototype.chart = function (_) {
+        var retVal = MultiChart.prototype._origChart.apply(this, arguments);
+        if (arguments.length) {
+            var context = this;
+            _.click = function (row, column, selected) {
+                context.click(row, column, selected);
+            };
+        }
+        return retVal;
+    };
+
     MultiChart.prototype.hasOverlay = function () {
         return this.chart() && this.chart().hasOverlay();
     };
@@ -97,18 +115,9 @@
     };
 
     MultiChart.prototype.requireContent = function (chartType, callback) {
-        var retVal = this._allCharts[chartType].widget;
-        if (retVal) {
-            callback(retVal);
-            return;
-        }
-
-        var context = this;
         var path = "src/" + this._allCharts[chartType].widgetClass.split("_").join("/");
         require([path], function (WidgetClass) {
-            retVal = new WidgetClass();
-            context._allCharts[chartType].widget = retVal;
-            callback(retVal);
+            callback(new WidgetClass());
         });
     };
 
@@ -124,9 +133,6 @@
                     .size(size)
                 ;
                 context.chart(newContent);
-                newContent.click = function (row, column) {
-                    context.click(row, column);
-                };
                 if (oldContent) {
                     oldContent
                         .data([])
@@ -176,7 +182,7 @@
 
 
     MultiChart.prototype.render = function (callback) {
-        if (this.chartType() && (!this.chart() || (this.chart()._class !== this._allCharts[this.chartType()].widgetClass))) {
+        if (this.chartType() && (!this.chart() || (this.chart().classID() !== this._allCharts[this.chartType()].widgetClass))) {
             var context = this;
             var args = arguments;
             this.switchChart(function () {

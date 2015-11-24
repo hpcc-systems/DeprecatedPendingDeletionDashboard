@@ -12,21 +12,15 @@
         this._type = "donut";
     }
     Donut.prototype = Object.create(Common2D.prototype);
+    Donut.prototype.constructor = Donut;
     Donut.prototype._class += " c3chart_Donut";
 
-    /**
-     * Publish Params Common To Other Libraries
-     */
-
-    /**
-     * Publish Params Unique To This Widget
-     */   
-    Donut.prototype.publish("showLabel", true, "boolean", "Show Label",null,{tags:['Basic']});
-    //Donut.prototype.publish("labelFormat", null, "function", "???",null,{tags:['Intermediate']});
-    //Donut.prototype.publish("labelThreshold", 0.05, "number", "???",null,{tags:['Intermediate']});
-    Donut.prototype.publish("arcWidth", 45, "number", "Arc Width",null,{tags:['Basic']});
-    Donut.prototype.publish("expand", true, "boolean", "Arc Explode",null,{tags:['Intermediate']});
-    Donut.prototype.publish("title", "xxx", "string", "Center Label",null,{tags:['Intermediate']});
+    Donut.prototype.publish("showLabel", true, "boolean", "Show Label",null,{tags:["Basic"]});
+    //Donut.prototype.publish("labelFormat", null, "function", "???",null,{tags:["Intermediate"]});
+    //Donut.prototype.publish("labelThreshold", 0.05, "number", "???",null,{tags:["Intermediate"]});
+    Donut.prototype.publish("arcWidth", 45, "number", "Arc Width",null,{tags:["Basic"]});
+    Donut.prototype.publish("expand", true, "boolean", "Arc Explode",null,{tags:["Intermediate"]});
+    Donut.prototype.publish("title", "xxx", "string", "Center Label",null,{tags:["Intermediate"]});
 
     Donut.prototype.enter = function (domNode, element) {
         this._config.donut = {

@@ -1,51 +1,46 @@
 "use strict";
 (function(root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["d3", "../common/HTMLWidget", "amcharts.pie", "../api/I2DChart"], factory);
+        define(["d3", "../common/HTMLWidget", "amcharts.pie", "../api/I2DChart", "require"], factory);
     } else {
-        root.amchart_Pie = factory(root.d3, root.common_HTMLWidget, root.AmCharts, root.api_I2DChart);
+        root.amchart_Pie = factory(root.d3, root.common_HTMLWidget, root.AmCharts, root.api_I2DChart, root.require);
     }
-}(this, function(d3, HTMLWidget, AmCharts, I2DChart) {
+}(this, function(d3, HTMLWidget, AmCharts, I2DChart, require) {
     function Pie() {
         HTMLWidget.call(this);
-        this._class = "amchart_Pie";
         this._tag = "div";
-
         this._chart = {};
     }
-
     Pie.prototype = Object.create(HTMLWidget.prototype);
+    Pie.prototype.constructor = Pie;
+    Pie.prototype._class += " amchart_Pie";
     Pie.prototype.implements(I2DChart.prototype);
 
-    /**
-     * Publish Params Common To Other Libraries
-     */
-    Pie.prototype.publish("paletteID", "default", "set", "Palette ID", Pie.prototype._palette.switch(), {tags:['Basic','Shared']});
-    Pie.prototype.publish("fontFamily", "Verdana", "string", "Label Font Family",null,{tags:['Basic','Shared']});
-    Pie.prototype.publish("fontSize", 11, "number", "Label Font Size",null,{tags:['Basic','Shared']});
-    Pie.prototype.publish("fontColor", null, "html-color", "Label Font Color",null,{tags:['Basic','Shared']});
+    Pie.prototype.publish("paletteID", "default", "set", "Palette ID", Pie.prototype._palette.switch(), {tags:["Basic","Shared"]});
+    Pie.prototype.publish("fontFamily", "Verdana", "string", "Label Font Family",null,{tags:["Basic","Shared"]});
+    Pie.prototype.publish("fontSize", 11, "number", "Label Font Size",null,{tags:["Basic","Shared"]});
+    Pie.prototype.publish("fontColor", null, "html-color", "Label Font Color",null,{tags:["Basic","Shared"]});
 
-    /**
-     * Publish Params Unique To This Widget
-     */
-    Pie.prototype.publish("tooltipTemplate","[[title]]<br><span style='font-size:14px'><b>[[value]]</b> ([[percents]]%)</span>", "string", "Tooltip Text",null,{tags:['Intermediate']});
+    Pie.prototype.publish("tooltipTemplate","[[title]]<br><span style='font-size:14px'><b>[[value]]</b> ([[percents]]%)</span>", "string", "Tooltip Text",null,{tags:["Intermediate"]});
 
-    Pie.prototype.publish("Depth3D", 10, "number", "3D Depth (px)",null,{tags:['Basic']});
-    Pie.prototype.publish("Angle3D", 15, "number", "3D Angle (Deg)",null,{tags:['Basic']});
+    Pie.prototype.publish("Depth3D", 0, "number", "3D Depth (px)",null,{tags:["Basic"]});
+    Pie.prototype.publish("Angle3D", 0, "number", "3D Angle (Deg)",null,{tags:["Basic"]});
 
-    Pie.prototype.publish("marginLeft", 0, "number", "Margin (Left)",null,{tags:['Intermediate']});
-    Pie.prototype.publish("marginRight", 0, "number", "Margin (Right)",null,{tags:['Intermediate']});
-    Pie.prototype.publish("marginTop", 0, "number", "Margin (Top)",null,{tags:['Intermediate']});
-    Pie.prototype.publish("marginBottom", 0, "number", "Margin (Bottom)",null,{tags:['Intermediate']});
+    Pie.prototype.publish("marginLeft", 0, "number", "Margin (Left)",null,{tags:["Intermediate"]});
+    Pie.prototype.publish("marginRight", 0, "number", "Margin (Right)",null,{tags:["Intermediate"]});
+    Pie.prototype.publish("marginTop", 0, "number", "Margin (Top)",null,{tags:["Intermediate"]});
+    Pie.prototype.publish("marginBottom", 0, "number", "Margin (Bottom)",null,{tags:["Intermediate"]});
 
-    Pie.prototype.publish("reverseDataSorting", false, "boolean", "Reverse Data Sorting",null,{tags:['Intermediate']});
+    Pie.prototype.publish("reverseDataSorting", false, "boolean", "Reverse Data Sorting",null,{tags:["Intermediate"]});
 
-    Pie.prototype.publish("holePercent", 0, "number", "Hole Size (Percent)",null,{tags:['Basic']});
+    Pie.prototype.publish("holePercent", 0, "number", "Hole Size (Percent)",null,{tags:["Basic"]});
 
-    Pie.prototype.publish("radius", null, "number", "Radius",null,{tags:['Basic']});
-    Pie.prototype.publish("pieAlpha", [], "array", "Individual Alpha per Slice",null,{tags:['Private']});
+    Pie.prototype.publish("radius", null, "number", "Radius",null,{tags:["Basic"]});
+    Pie.prototype.publish("pieAlpha", [], "array", "Individual Alpha per Slice",null,{tags:["Private"]});
 
-    Pie.prototype.publish("labelPosition", "right", "set", "Label Position", ["left","right"],{tags:['Intermediate']});
+    Pie.prototype.publish("labelPosition", "right", "set", "Label Position", ["left","right"],{tags:["Intermediate"]});
+
+    Pie.prototype.publish("useClonedPalette", false, "boolean", "Enable or disable using a cloned palette",null,{tags:["Intermediate","Shared"]});
 
     Pie.prototype.updateChartOptions = function() {
         var context = this;
@@ -90,7 +85,7 @@
         }, this);
 
         this.pieAlpha().forEach(function(d,i) {
-            if (typeof(this._chart.chartData[i])==='undefined') {
+            if (typeof(this._chart.chartData[i])==="undefined") {
                 this._chart.chartData[i] = {};
             }
             this._chart.chartData[i].alpha = d;
@@ -129,18 +124,28 @@
 
     Pie.prototype.enter = function(domNode, element) {
         HTMLWidget.prototype.enter.apply(this, arguments);
+        var context = this;
         var initObj = {
             type: "pie",
             theme: "none"
         };
+        if (typeof define === "function" && define.amd) {
+            initObj.pathToImages = require.toUrl("amchartsImg");
+        }
         this._chart = AmCharts.makeChart(domNode, initObj);
+        this._chart.addListener("clickSlice", function(e) {
+            context.click(context.rowToObj(context._data[e.dataItem.index]));
+        });
     };
 
     Pie.prototype.update = function(domNode, element) {
         this._palette = this._palette.switch(this.paletteID());
+        if (this.useClonedPalette()) {
+            this._palette = this._palette.cloneNotExists(this.paletteID() + "_" + this.id());
+        }
 
-        domNode.style.width = this.size().width + 'px';
-        domNode.style.height = this.size().height + 'px';
+        domNode.style.width = this.size().width + "px";
+        domNode.style.height = this.size().height + "px";
 
         this.updateChartOptions();
 

@@ -11,16 +11,8 @@
 
         this._type = "scatter";
     }
-    
-    /**
-     * Publish Params Common To Other Libraries
-     */
-
-    /**
-     * Publish Params Unique To This Widget
-     */   
-
     Scatter.prototype = Object.create(CommonND.prototype);
+    Scatter.prototype.constructor = Scatter;
     Scatter.prototype._class += " c3chart_Scatter";
 
     return Scatter;

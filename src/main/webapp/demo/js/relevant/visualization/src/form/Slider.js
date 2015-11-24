@@ -3,7 +3,7 @@
     if (typeof define === "function" && define.amd) {
         define(["d3", "../common/SVGWidget", "../api/IInput", "../common/Icon", "css!./Slider"], factory);
     } else {
-        root.other_Slider = factory(root.d3, root.common_SVGWidget, root.api_IInput, root.common_Icon);
+        root.form_Slider = factory(root.d3, root.common_SVGWidget, root.api_IInput, root.common_Icon);
     }
 }(this, function (d3, SVGWidget, IInput, Icon) {
     function Slider() {
@@ -71,6 +71,7 @@
         ;
     }
     Slider.prototype = Object.create(SVGWidget.prototype);
+    Slider.prototype.constructor = Slider;
     Slider.prototype._class += " form_Slider";
     Slider.prototype.implements(IInput.prototype);
 
@@ -126,6 +127,7 @@
                 .data(tick)
                 .render()
             ;
+            this._click();
         }
         var context = this;
         this.intervalHandler = setInterval(function () {
@@ -137,6 +139,7 @@
                         .data(tick)
                         .render()
                     ;
+                    context._click();
                 } else {
                     context.pause();
                 }
@@ -145,6 +148,7 @@
                     .data(tick)
                     .render()
                 ;
+                context._click();
             }
         }, context.playInterval());
     };
@@ -220,10 +224,10 @@
              .attr("transform", "translate(0, -64)")
              .call(this.axis)
         ;
-        axisElement.selectAll('.tick > text')
-            .style('fill', this.fontColor())
-            .style('font-size', this.fontSize())
-            .style('font-family', this.fontFamily())
+        axisElement.selectAll(".tick > text")
+            .style("fill", this.fontColor())
+            .style("font-size", this.fontSize())
+            .style("font-family", this.fontFamily())
         ;
         var x_bbox = axisElement.node().getBBox();
         var retVal = {
@@ -272,10 +276,10 @@
             .call(this.axis)
         ;
 
-        this.axisElement.selectAll('.tick > text')
-            .style('fill', this.fontColor())
-            .style('font-size', this.fontSize())
-            .style('font-family', this.fontFamily())
+        this.axisElement.selectAll(".tick > text")
+            .style("fill", this.fontColor())
+            .style("font-size", this.fontSize())
+            .style("font-family", this.fontFamily())
         ;
 
         var range = this.xScale.range();
@@ -287,6 +291,14 @@
         this.handle
             .attr("d", function (d) { return context.handlePath(d); })
         ;
+
+        if (this._data.length === 0) {
+            if( this.allowRange()) {
+                  this._data = [this.low(),this.low()];
+             } else {
+                 this._data = this.low();
+            }
+        }
 
         this.brushg
             .call(this.brush.extent(this.allowRange() ? this._data : [this._data, this._data]))
@@ -321,13 +333,7 @@
                 .call(this.brush.extent([mouseX, mouseX]))
             ;
             this._data = mouseX;
-            if (this.selectionLabel()) {
-                var clickData = {};
-                clickData[this.selectionLabel()] = mouseX;
-                this.click(clickData);
-            } else {
-                this.click(mouseX);
-            }
+            this._click();
         } else {
             var extent = this.brush.extent();
             extent[0] = this.nearestStep(extent[0]);
@@ -367,6 +373,20 @@
             ;
         }
         return retVal;
+    };
+
+    Slider.prototype._click = function() {
+        if (this.selectionLabel()) {
+            var clickData = {};
+            clickData[this.selectionLabel()] = this._data;
+            this.click(clickData);
+        } else {
+            this.click(this._data);
+        }
+    };
+
+    Slider.prototype.newSelection = function (value, value2) {
+        console.log("newSelection:  " + value + ", " + value2);
     };
 
     return Slider;

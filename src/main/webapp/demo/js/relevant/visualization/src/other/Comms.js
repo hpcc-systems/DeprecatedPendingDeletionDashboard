@@ -6,6 +6,24 @@
         root.other_Comms = factory();
     }
 }(this, function () {
+    function espValFix(val) {
+        if (!val.trim) {
+            return val;
+        }
+        var retVal = val.trim();
+        if (retVal !== "" && !isNaN(retVal)) {
+            return Number(retVal);
+        }
+        return retVal;
+    }
+
+    function espRowFix(row) {
+        for (var key in row) {
+            row[key] = espValFix(row[key]);
+        }
+        return row;
+    }
+
     function ESPUrl() {
         this._protocol = "http:";
         this._hostname = "localhost";
@@ -14,7 +32,7 @@
     ESPUrl.prototype.url = function (_) {
         if (!arguments.length) return this._url;
         this._url = _;
-        var parser = document.createElement('a');
+        var parser = document.createElement("a");
         parser.href = this._url;
 
         var params = {};
@@ -146,7 +164,7 @@
     }
     Comms.prototype = Object.create(ESPUrl.prototype);
 
-    var exists = function (prop, scope) {
+    function exists(prop, scope) {
         var propParts = prop.split(".");
         var testScope = scope;
         for (var i = 0; i < propParts.length; ++i) {
@@ -157,7 +175,7 @@
             testScope = testScope[item];
         }
         return true;
-    };
+    }
 
     var serialize = function (obj) {
         var str = [];
@@ -189,13 +207,13 @@
 
         var respondedTimeout = 60000;
         var respondedTick = 5000;
-        var callbackName = 'jsonp_callback_' + Math.round(Math.random() * 999999);
+        var callbackName = "jsonp_callback_" + Math.round(Math.random() * 999999);
         window[callbackName] = function (response) {
             respondedTimeout = 0;
             doCallback(response);
         };
-        var script = document.createElement('script');
-        script.src = url + (url.indexOf('?') >= 0 ? '&' : '?') + 'jsonp=' + callbackName + "&" + serialize(request);
+        var script = document.createElement("script");
+        script.src = url + (url.indexOf("?") >= 0 ? "&" : "?") + "jsonp=" + callbackName + "&" + serialize(request);
         document.body.appendChild(script);
         var progress = setInterval(function () {
             if (respondedTimeout <= 0) {
@@ -231,6 +249,48 @@
         return this;
     };
 
+    function Basic() {
+        Comms.call(this);
+    }
+    Basic.prototype = Object.create(Comms.prototype);
+
+    Basic.prototype.cacheCalls = function (_) {
+        if (!arguments.length) return this._cacheCalls;
+        this._cacheCalls = _;
+        return this;
+    };
+
+    Basic.prototype.call = function (request, callback) {
+        var url = this._url + (this._url.indexOf("?") >= 0 ? "&" : "?") + serialize(request);
+        function doCall(request, callback) {
+            var xhr = new XMLHttpRequest();
+            xhr.open("GET", url, true);
+            xhr.onload = function (e) {
+                callback(JSON.parse(xhr.responseText));
+            };
+            xhr.onerror = function (e) {
+                callback({});
+            };
+            xhr.send(null);
+        }
+        if (this._cacheCalls) {
+            var response = localStorage.getItem("hpcc.viz." + url);
+            if (response && response !== null) {
+                setTimeout(function () {
+                    callback(JSON.parse(response));
+                }, 0);
+            } else {
+                doCall(request, function (response) {
+                    localStorage.setItem("hpcc.viz." + url,JSON.stringify(response));
+                    callback(response);
+                });
+            }
+        } else {
+            localStorage.removeItem("hpcc.viz." + url);
+            doCall(request, callback);
+        }
+    };
+
     function WsECL() {
         Comms.call(this);
 
@@ -256,11 +316,23 @@
                 }
             }
 
+            var pathParts, queryParts;
             if (!this._target && !this._query) {
                 // http://192.168.1.201:8002/WsEcl/res/query/hthor/quicktest/res/index.html
-                var pathParts = this._pathname.split("/res/");
+                pathParts = this._pathname.split("/res/");
                 if (pathParts.length >= 2) {
-                    var queryParts = pathParts[1].split("/");
+                    queryParts = pathParts[1].split("/");
+                    if (queryParts.length >= 3) {
+                        this.target(queryParts[1]);
+                        this.query(queryParts[2]);
+                    }
+                }
+            }
+            if (!this._target && !this._query) {
+                //http://10.241.100.157:8002/WsEcl/forms/default/query/roxie/wecare
+                pathParts = this._pathname.split("/forms/default/");
+                if (pathParts.length >= 2) {
+                    queryParts = pathParts[1].split("/");
                     if (queryParts.length >= 3) {
                         this.target(queryParts[1]);
                         this.query(queryParts[2]);
@@ -305,7 +377,8 @@
             }
             // Remove "response.result.Row"
             for (key in response) {
-                response[key] = response[key].Row;
+                response[key] = response[key].Row.map(espRowFix);
+
             }
             context._mappings.mapResponse(response);
             callback(response);
@@ -427,7 +500,7 @@
                 context._total = response[key].Total;
                 response = response[key].Result;
                 for (var responseKey in response) {
-                    response = response[responseKey].Row;
+                    response = response[responseKey].Row.map(espRowFix);
                     break;
                 }
                 break;
@@ -620,7 +693,7 @@
             }
             // Remove "response.result.Row"
             for (key in response) {
-                context._resultNameCache[key] = response[key].Row;
+                context._resultNameCache[key] = response[key].Row.map(espRowFix);
                 ++context._resultNameCacheCount;
             }
             callback(context._resultNameCache);
@@ -686,7 +759,7 @@
         } else {
             var changedFilter = {};
             for (var key in request) {
-                if (request[key] && request[key + "_changed"]) {
+                if (request[key] && request[key + "_changed"] !== undefined) {
                     changedFilter[key] = request[key];
                 }
             }
@@ -723,7 +796,7 @@
 
     HIPIEDatabomb.prototype.databomb = function (_) {
         if (!arguments.length) return this._databomb;
-        this._databomb = _;
+        this._databomb = _.map(espRowFix);
         return this;
     };
 
@@ -742,6 +815,7 @@
     };
 
     return {
+        Basic: Basic,
         ESPMappings: ESPMappings,
         ESPUrl: ESPUrl,
         WsECL: WsECL,

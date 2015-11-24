@@ -19,9 +19,14 @@
         ;
     }
     Edge.prototype = Object.create(SVGWidget.prototype);
+    Edge.prototype.constructor = Edge;
     Edge.prototype._class += " graph_Edge";
 
-    Edge.prototype.publish("arcDepth", 16, "number", "Arc Depth", null, { tags: ['Basic'] });
+    Edge.prototype.publish("arcDepth", 16, "number", "Arc Depth", null, { tags: ["Basic"] });
+
+    Edge.prototype.testData = function () {
+        return this;
+    };
 
     Edge.prototype.sourceVertex = function (_) {
         if (!arguments.length) return this._sourceVertex;
@@ -164,6 +169,9 @@
     };
 
     Edge.prototype._calculateEdgePoints = function (source, target, _points) {
+        if (!source || !target) {
+            return [{ x: 0, y: 0 }, { x: 0, y: 0 }];
+        }
         var points = _points ? _points.slice() : [];
         var p0 = points.length === 0 ? target.pos() : points[0];
         var p1 = points.length === 0 ? source.pos() : points[points.length - 1];

@@ -1,11 +1,11 @@
 ﻿"use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
-        define(["../other/Comms", "../common/Widget", "require"], factory);
+        define(["d3", "../other/Comms", "../common/Widget", "require"], factory);
     } else {
-        root.marshaller_HipieDDL = factory(root.other_Comms, root.common_Widget, root.require);
+        root.marshaller_HipieDDL = factory(root.d3, root.other_Comms, root.common_Widget, root.require);
     }
-}(this, function (Comms, Widget, require) {
+}(this, function (d3, Comms, Widget, require) {
     var Vertex = null;
     var Edge = null;
     var exists = function (prop, scope) {
@@ -53,13 +53,13 @@
     SourceMappings.prototype.doMap = function (item) {
         var retVal = [];
         for (var key in this.mappings) {
+            var rhsKey = this.mappings[key];
             try {
-                var rhsKey = this.mappings[key];
                 var val = item[rhsKey];
                 if (val === undefined) {
                     val = item[rhsKey.toLowerCase()];
                 }
-                //  Symposium AVE Hack 
+                //  Symposium AVE Hack
                 if (val === undefined && rhsKey.indexOf("_AVE") === rhsKey.length - 4 && item.base_count !== undefined) {
                     var rhsSum = rhsKey.substring(0, rhsKey.length - 4) + "_SUM";
                     val = item[rhsSum];
@@ -113,6 +113,14 @@
         this.init();
     }
     ChoroMappings.prototype = Object.create(SourceMappings.prototype);
+
+    function HeatMapMappings(visualization, mappings) {
+        SourceMappings.call(this, visualization, mappings);
+        this.columns = ["x", "y", "weight"];
+        this.columnsIdx = { x: 0, y:1, weight: 2 };
+        this.init();
+    }
+    HeatMapMappings.prototype = Object.create(SourceMappings.prototype);
 
     function LineMappings(visualization, mappings) {
         var newMappings = {
@@ -291,6 +299,9 @@
             case "CHORO":
                 this.mappings = new ChoroMappings(this.visualization, source.mappings, source.link);
                 break;
+            case "HEAT_MAP":
+                this.mappings = new HeatMapMappings(this.visualization, source.mappings, source.link);
+                break;
             default:
                 this.mappings = new ChartMappings(this.visualization, source.mappings);
                 break;
@@ -351,7 +362,7 @@
                     }
 
                     if (lVal !== rVal) {
-                        return reverse ? rVal - lVal : lVal - rVal;
+                        return reverse ? d3.descending(lVal, rVal) : d3.ascending(lVal,  rVal);
                     }
                 }
                 return 0;
@@ -385,7 +396,7 @@
         if (exists("_updates", this) && this._updates instanceof Array) {
             this._updates.forEach(function (item, idx) {
                 var datasource = this.visualization.dashboard.datasources[item.datasource];
-                var visualization = this.visualization.dashboard.visualizations[item.visualization];
+                var visualization = this.visualization.dashboard.getVisualization(item.visualization);
                 retVal.push({
                     eventID: this.eventID,
                     datasource: datasource,
@@ -399,15 +410,13 @@
     Event.prototype.getUpdatesDatasources = function () {
         var dedup = {};
         var retVal = [];
-        if (exists("_updates", this) && this._updates instanceof Array) {
-            this._updates.forEach(function (item, idx) {
-                var datasource = this.visualization.dashboard.datasources[item.datasource];
-                if (!dedup[datasource.id]) {
-                    dedup[datasource.id] = true;
-                    retVal.push(datasource);
-                }
-            }, this);
-        }
+        this.getUpdatesVisualizations().forEach(function (item, idx) {
+            var datasource = item.source.getDatasource();
+            if (datasource && !dedup[datasource.id]) {
+                dedup[datasource.id] = true;
+                retVal.push(datasource);
+            }
+        }, this);
         return retVal;
     };
 
@@ -416,7 +425,7 @@
         var retVal = [];
         if (exists("_updates", this) && this._updates instanceof Array) {
             this._updates.forEach(function (item, idx) {
-                var visualization = this.visualization.dashboard.visualizations[item.visualization];
+                var visualization = this.visualization.dashboard.getVisualization(item.visualization);
                 if (!dedup[visualization.id]) {
                     dedup[visualization.id] = true;
                     retVal.push(visualization);
@@ -438,12 +447,12 @@
         var context = this;
         for (var key in this.events) {
             if (widget["vertex_" + key]) {
-                widget["vertex_" + key] = function (d) {
-                    context.visualization.onEvent(key, context.events[key], d);
+                widget["vertex_" + key] = function (row) {
+                    context.visualization.onEvent(key, context.events[key], row);
                 };
             } else if (widget[key]) {
-                widget[key] = function (d) {
-                    context.visualization.onEvent(key, context.events[key], d);
+                widget[key] = function (row, col, selected) {
+                    context.visualization.onEvent(key, context.events[key], row, col, selected);
                 };
             }
         }
@@ -490,102 +499,115 @@
         this.source = new Source(this, visualization.source);
         this.events = new Events(this, visualization.events);
 
-        var context = this;
-        switch (this.type) {
-            case "CHORO":
-                this.loadWidget(this.source.mappings.contains("county") ? "src/map/ChoroplethCounties" : "src/map/ChoroplethStates", function (widget) {
-                    widget
-                        .id(visualization.id)
-                    ;
-                });
-                break;
-            case "2DCHART":
-            case "PIE":
-            case "BUBBLE":
-            case "BAR":
-            case "WORD_CLOUD":
-                this.loadWidget("src/chart/MultiChart", function (widget) {
-                    widget
-                        .id(visualization.id)
-                        .chartType(context.properties.charttype || context.type)
-                    ;
-                });
-                break;
-            case "LINE":
-                this.loadWidget("src/chart/MultiChart", function (widget) {
-                    widget
-                        .id(visualization.id)
-                        .chartType(context.properties.charttype || context.type)
-                    ;
-                });
-                break;
-            case "TABLE":
-                this.loadWidget("src/other/Table", function (widget) {
-                    widget
-                        .id(visualization.id)
-                        .columns(context.label)
-                    ;
-                });
-                break;
-            case "SLIDER":
-                this.loadWidget("src/form/Slider", function (widget) {
-                    widget
-                        .id(visualization.id)
-                    ;
-                    if (visualization.range) {
-                        var selectionLabel = "";
-                        for (var key in visualization.events.events.mappings) {
-                            selectionLabel = key;
-                            break;
-                        }
+        if (this.dashboard.marshaller._widgetMappings.has(visualization.id)) {
+            this.setWidget(this.dashboard.marshaller._widgetMappings.get(visualization.id), true);
+        } else {
+            var context = this;
+            switch (this.type) {
+                case "CHORO":
+                    this.loadWidget(this.source.mappings.contains("county") ? "src/map/ChoroplethCounties" : "src/map/ChoroplethStates", function (widget) {
                         widget
-                            .low(+visualization.range[0])
-                            .high(+visualization.range[1])
-                            .step(+visualization.range[2])
-                            .selectionLabel(selectionLabel)
+                            .id(visualization.id)
                         ;
-                    }
-                });
-                break;
-            case "GRAPH":
-                this.loadWidgets(["src/graph/Graph", "src/graph/Vertex", "src/graph/Edge"], function (widget, widgetClasses) {
-                    Vertex = widgetClasses[1];
-                    Edge = widgetClasses[2];
-                    widget
-                        .id(visualization.id)
-                        .layout("ForceDirected2")
-                        .applyScaleOnLayout(true)
-                    ;
-                });
-                break;
-            case "FORM":
-                this.loadWidgets(["src/form/Form", "src/form/Input"], function (widget, widgetClasses) {
-                    var Input = widgetClasses[1];
-                    widget
-                        .id(visualization.id)
-                        .inputs(visualization.fields.map(function(field) {
-                            return new Input()
-                                .name(field.id)
-                                .label((field.properties ? field.properties.label : null) || field.label)
-                                .type("textbox")
+                    });
+                    break;
+                case "2DCHART":
+                case "PIE":
+                case "BUBBLE":
+                case "BAR":
+                case "WORD_CLOUD":
+                    this.loadWidget("src/chart/MultiChart", function (widget) {
+                        widget
+                            .id(visualization.id)
+                            .chartType(context.properties.charttype || context.type)
+                        ;
+                    });
+                    break;
+                case "LINE":
+                    this.loadWidget("src/chart/MultiChart", function (widget) {
+                        widget
+                            .id(visualization.id)
+                            .chartType(context.properties.charttype || context.type)
+                        ;
+                    });
+                    break;
+                case "TABLE":
+                    this.loadWidget("src/other/Table", function (widget) {
+                        widget
+                            .id(visualization.id)
+                            .columns(context.label)
+                        ;
+                    });
+                    break;
+                case "SLIDER":
+                    this.loadWidget("src/form/Slider", function (widget) {
+                        widget
+                            .id(visualization.id)
+                        ;
+                        if (visualization.range) {
+                            var selectionLabel = "";
+                            for (var key in visualization.events.events.mappings) {
+                                selectionLabel = key;
+                                break;
+                            }
+                            widget
+                                .low(+visualization.range[0])
+                                .high(+visualization.range[1])
+                                .step(+visualization.range[2])
+                                .selectionLabel(selectionLabel)
                             ;
-                        }))
-                    ;
-                });
-                break;
-            default:
-                this.loadWidget("src/common/TextBox", function (widget) {
-                    widget
-                        .id(visualization.id)
-                        .text(context.id + "\n" + "TODO:  " + context.type)
-                    ;
-                });
-                break;
+                        }
+                    });
+                    break;
+                case "GRAPH":
+                    this.loadWidgets(["src/graph/Graph", "src/graph/Vertex", "src/graph/Edge"], function (widget, widgetClasses) {
+                        Vertex = widgetClasses[1];
+                        Edge = widgetClasses[2];
+                        widget
+                            .id(visualization.id)
+                            .layout("ForceDirected2")
+                            .applyScaleOnLayout(true)
+                        ;
+                    });
+                    break;
+                case "FORM":
+                    this.loadWidgets(["src/form/Form", "src/form/Input"], function (widget, widgetClasses) {
+                        var Input = widgetClasses[1];
+                        widget
+                            .id(visualization.id)
+                            .inputs(visualization.fields.map(function (field) {
+                                return new Input()
+                                    .name(field.id)
+                                    .label((field.properties ? field.properties.label : null) || field.label)
+                                    .type("textbox")
+                                    .value(field.properties.default ? field.properties.default : "")
+                                ;
+                            }))
+                        ;
+                    });
+                    break;
+                case "HEAT_MAP":
+                    this.loadWidgets(["src/other/HeatMap", ], function (widget, widgetClasses) {
+                        widget
+                            .id(visualization.id)
+                            .image(context.properties.imageUrl)
+                        ;
+                    });
+                    break;
+                default:
+                    this.loadWidget("src/common/TextBox", function (widget) {
+                        widget
+                            .id(visualization.id)
+                            .text(context.id + "\n" + "TODO:  " + context.type)
+                        ;
+                    });
+                    break;
+            }
         }
     }
 
     Visualization.prototype.getQualifiedID = function () {
-        return this.dashboard.getQualifiedID() + "." + this.id;
+        return this.id;
     };
 
     Visualization.prototype.isLoading = function (widgetPath, callback) {
@@ -656,20 +678,65 @@
         }
     };
 
-    Visualization.prototype.onEvent = function (eventID, event, d) {
-        if (event.exists()) {
-            var request = {};
-            for (var key in event.mappings) {
-                var origKey = (this.source.mappings && this.source.mappings.hasMappings) ? this.source.mappings.getReverseMap(key) : key;
-                request[event.mappings[key]] = d[origKey];
+    Visualization.prototype.onEvent = function (eventID, event, row, col, selected) {
+        var context = this;
+        setTimeout(function () {
+            selected = selected === undefined ? true : selected;
+            if (event.exists()) {
+                var request = {};
+                if (selected) {
+                    for (var key in event.mappings) {
+                        var origKey = (context.source.mappings && context.source.mappings.hasMappings) ? context.source.mappings.getReverseMap(key) : key;
+                        request[event.mappings[key]] = row[origKey];
+                    }
+                }
+
+                //  New request calculation:
+                context._eventValues = request;
+                var datasourceRequests = {};
+                var updatedVizs = event.getUpdatesVisualizations();
+                updatedVizs.forEach(function (updatedViz) {
+                    var dataSource = updatedViz.source.getDatasource();
+                    if (!datasourceRequests[dataSource.id]) {
+                        datasourceRequests[dataSource.id] = {
+                            datasource: dataSource,
+                            request: {
+                            },
+                            updates: []
+                        };
+                    }
+                    datasourceRequests[dataSource.id].updates.push(updatedViz.id);
+                    updatedViz.getInputVisualizations().forEach(function (inViz, idx) {
+                        if (inViz._eventValues) {
+                            for (var key in inViz._eventValues) {
+                                if (datasourceRequests[dataSource.id].request[key] && datasourceRequests[dataSource.id].request[key] !== inViz._eventValues[key]) {
+                                    console.log("Duplicate Filter, with mismatched value:  " + key + "=" + inViz._eventValues[key]);
+                                }
+                                datasourceRequests[dataSource.id].request[key] = inViz._eventValues[key];
+                            }
+                        }
+                    });
+                    if (dataSource.WUID || dataSource.databomb) { // TODO If we have filters for each output this would not be needed  ---
+                        dataSource.fetchData(datasourceRequests[dataSource.id].request, false, [updatedViz.id]);
+                    }
+                });
+                for (var drKey in datasourceRequests) {
+                    if (!datasourceRequests[drKey].datasource.WUID && !datasourceRequests[drKey].datasource.databomb) {  // TODO If we have filters for each output this would not be needed  ---
+                        datasourceRequests[drKey].datasource.fetchData(datasourceRequests[drKey].request, false, datasourceRequests[drKey].updates);
+                    }
+                }
             }
-            var dataSources = event.getUpdatesDatasources();
-            dataSources.forEach(function (item) {
-                item.fetchData(request, false, event._updates.map(function (item) {
-                    return item.visualization;
-                }));
-            });
-        }
+        }, 0);
+    };
+
+    Visualization.prototype.getInputVisualizations = function () {
+        return this.dashboard.marshaller.getVisualizationArray().filter(function (viz) {
+            var updates = viz.events.getUpdatesVisualizations();
+            if (updates.indexOf(this) >= 0) {
+                return true;
+            }
+            return false;
+        }, this);
     };
 
     //  Output  ---
@@ -707,7 +774,7 @@
         this.data = data;
         this.notify.forEach(function (item) {
             if (!updates || updates.indexOf(item) >= 0) {
-                var viz = context.dataSource.dashboard.visualizations[item];
+                var viz = context.dataSource.dashboard.getVisualization(item);
                 viz.notify();
             }
         });
@@ -722,6 +789,7 @@
         this.URL = dataSource.URL;
         this.databomb = dataSource.databomb;
         this.request = {};
+        this._loadedCount = 0;
 
         var context = this;
         this.outputs = {};
@@ -765,17 +833,34 @@
     };
 
     DataSource.prototype.fetchData = function (request, refresh, updates) {
+        if (!updates) {
+            updates = [];
+            for (var oKey in this.outputs) {
+                var output = this.outputs[oKey];
+                if (!output.filter || !output.filter.length) {
+                    output.notify.forEach(function (item) {
+                        updates.push(item);
+                    });
+                }
+            }
+        }
+
         var context = this;
         this.request.refresh = refresh ? true : false;
         this.filter.forEach(function (item) {
             context.request[item + "_changed"] = false;
-        });
-        for (var key in request) {
-            this.request[key] = request[key] === undefined ? "" : request[key];
-            this.request[key + "_changed"] = true;
+            var value = request[item] === undefined ? "" : request[item];
+            if (this.request[item] !== value) {
+                this.request[item] = value;
+                this.request[item + "_changed"] = true;
+            }
+        }, this);
+        if (window.__hpcc_debug) {
+            console.log("fetchData:  " + JSON.stringify(updates) + "(" + JSON.stringify(request) + ")");
         }
         this.comms.call(this.request, function (response) {
             context.processResponse(response, request, updates);
+            ++context._loadedCount;
         });
     };
 
@@ -790,11 +875,15 @@
                 //  Temp workaround for older services  ---
                 from = this.outputs[key].id.toLowerCase();
             }
-            if (exists(from, response) && (!exists(from + "_changed", response) || (exists(from + "_changed", response) && response[from + "_changed"].length && response[from + "_changed"][0][from + "_changed"]))) {
-                this.outputs[key].setData(response[from], request, updates);
-            } else if (exists(from, lowerResponse)) {// && exists(from + "_changed", lowerResponse) && lowerResponse[from + "_changed"].length && lowerResponse[from + "_changed"][0][from + "_changed"]) {
+            if (exists(from, response)) {
+                if (!exists(from + "_changed", response) || (exists(from + "_changed", response) && response[from + "_changed"].length && response[from + "_changed"][0][from + "_changed"])) {
+                    this.outputs[key].setData(response[from], request, updates);
+                }
+            } else if (exists(from, lowerResponse)) {
                 console.log("DDL 'DataSource.From' case is Incorrect");
-                this.outputs[key].setData(lowerResponse[from], request, updates);
+                if (!exists(from + "_changed", lowerResponse) || (exists(from + "_changed", lowerResponse) && response[from + "_changed"].length && lowerResponse[from + "_changed"][0][from + "_changed"])) {
+                    this.outputs[key].setData(lowerResponse[from], request, updates);
+                }
             } else {
                 var responseItems = [];
                 for (var responseKey2 in response) {
@@ -819,34 +908,36 @@
             ++context.datasourceTotal;
         });
 
-        this.visualizations = {};
-        this.visualizationsArray = [];
+        this._visualizations = {};
+        this._visualizationArray = [];
         dashboard.visualizations.forEach(function (item) {
-            var newItem = new Visualization(context, item);
-            context.visualizations[item.id] = newItem;
-            context.visualizationsArray.push(newItem);
-        });
-        this.visualizationTotal = this.visualizationsArray.length;
-        var vizIncluded = {};
-        this.visualizationsTree = [];
-        var walkSelect = function (viz, result) {
-            if (viz && !vizIncluded[viz.id]) {
-                vizIncluded[viz.id] = true;
-                var treeItem = { visualization: viz, children: [] };
-                result.push(treeItem);
-                var visualizations = viz.events.getUpdatesVisualizations();
-                visualizations.forEach(function (item) {
-                    walkSelect(item, treeItem.children);
-                });
-            }
-        };
-        this.visualizationsArray.forEach(function (item) {
-            walkSelect(item, this.visualizationsTree);
+            var newItem = new Visualization(this, item);
+            this._visualizations[item.id] = newItem;
+            this._visualizationArray.push(newItem);
+            this.marshaller._visualizations[item.id] = newItem;
+            this.marshaller._visualizationArray.push(newItem);
         }, this);
+        this._visualizationTotal = this._visualizationArray.length;
     }
 
     Dashboard.prototype.getQualifiedID = function () {
         return this.id;
+    };
+
+    Dashboard.prototype.getVisualization = function (id) {
+        return this._visualizations[id] || this.marshaller.getVisualization(id);
+    };
+
+    Dashboard.prototype.getVisualizations = function () {
+        return this._visualizations;
+    };
+
+    Dashboard.prototype.getVisualizationArray = function () {
+        return this._visualizationArray;
+    };
+
+    Dashboard.prototype.getVisualizationTotal = function () {
+        return this._visualizationTotal;
     };
 
     Dashboard.prototype.accept = function (visitor) {
@@ -854,20 +945,37 @@
         for (var key in this.datasources) {
             this.datasources[key].accept(visitor);
         }
-        this.visualizationsArray.forEach(function (item) {
+        this._visualizationArray.forEach(function (item) {
             item.accept(visitor);
         }, this);
     };
 
     Dashboard.prototype.allVisualizationsLoaded = function () {
-        var notLoaded = this.visualizationsArray.filter(function (item) { return !item.isLoaded(); });
+        var notLoaded = this._visualizationArray.filter(function (item) { return !item.isLoaded(); });
         return notLoaded.length === 0;
     };
 
     //  Marshaller  ---
     function Marshaller() {
         this._proxyMappings = {};
+        this._widgetMappings = d3.map();
     }
+
+    Marshaller.prototype.commsDataLoaded = function () {
+        for (var i = 0; i < this.dashboardArray.length; i++) {
+            for (var ds in this.dashboardArray[i].datasources) {
+                if (this.dashboardArray[i].datasources[ds]._loadedCount === 0) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    };
+
+    Marshaller.prototype.getVisualization = function (id) {
+        return this._visualizations[id];
+    };
+
 
     Marshaller.prototype.accept = function (visitor) {
         visitor.visit(this);
@@ -929,19 +1037,36 @@
         return this;
     };
 
+    Marshaller.prototype.widgetMappings = function (_) {
+        if (!arguments.length) return this._widgetMappings;
+        this._widgetMappings = _;
+        return this;
+    };
+
     Marshaller.prototype.parse = function (json, callback) {
         var context = this;
         this._json = json;
         this._jsonParsed = JSON.parse(this._json);
         this.dashboards = {};
         this.dashboardArray = [];
+        this._visualizations = {};
+        this._visualizationArray = [];
         this._jsonParsed.forEach(function (item) {
             var newDashboard = new Dashboard(context, item, context._proxyMappings);
             context.dashboards[item.id] = newDashboard;
             context.dashboardArray.push(newDashboard);
         });
+        this.dashboardTotal = this.dashboardArray.length;
         this.ready(callback);
         return this;
+    };
+
+    Marshaller.prototype.getVisualizations = function () {
+        return this._visualizations;
+    };
+
+    Marshaller.prototype.getVisualizationArray = function () {
+        return this._visualizationArray;
     };
 
     Marshaller.prototype.allDashboardsLoaded = function () {

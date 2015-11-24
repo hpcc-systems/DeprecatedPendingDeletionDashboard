@@ -8,22 +8,16 @@
 }(this, function(d3, CommonFunnel, AmCharts, I2DChart) {
     function Pyramid() {
         CommonFunnel.call(this);
-        this._class = "amchart_Pyramid";
         this._tag = "div";
     }
 
     Pyramid.prototype = Object.create(CommonFunnel.prototype);
+    Pyramid.prototype.constructor = Pyramid;
+    Pyramid.prototype._class += " amchart_Pyramid";
     Pyramid.prototype.implements(I2DChart.prototype);
 
-    /**
-     * Publish Params Common To Other Libraries
-     */
-    Pyramid.prototype.publish("paletteID", "default", "set", "Palette ID", Pyramid.prototype._palette.switch(), {tags:['Basic','Shared']});
-
-    /**
-     * Publish Params Unique To This Widget
-     */
-    Pyramid.prototype.publish("tooltipTemplate","[[category]]([[title]]): [[value]]", "string", "Tooltip Text",null,{tags:['Intermediate']});
+    Pyramid.prototype.publish("paletteID", "default", "set", "Palette ID", Pyramid.prototype._palette.switch(), {tags:["Basic","Shared"]});
+    Pyramid.prototype.publish("tooltipTemplate","[[category]]([[title]]): [[value]]", "string", "Tooltip Text",null,{tags:["Intermediate"]});
 
     Pyramid.prototype.testData = function() {
         this.columns(["Subject", "Year 1"]);
