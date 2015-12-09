@@ -749,7 +749,9 @@ public class ChartRenderer {
 	    
 	    XYChartData xyChartData = new XYChartData(chartData);
 	    xyChartData.setAttribute(chartData.getAttribute());
-	    xyChartData.getMeasures().add(chartData.getValue());
+	    if(chartData.getValue() != null){
+	        xyChartData.getMeasures().add(chartData.getValue());
+	    }
 	    if(chartData.getTotal() != null) {
 	        xyChartData.getMeasures().add(chartData.getTotal());
 	    }
@@ -764,7 +766,7 @@ public class ChartRenderer {
                 element = new GaugeElement();
                 element.setName(xyModel.getxAxisValues().iterator().next().toString());
                 
-                if(chartData.getIsTotalRequired()) {
+                if(chartData.getIsTotalRequired() && xyModel.getyAxisValues().size() >1) {
                     iterator = xyModel.getyAxisValues().iterator();
                     value = Float.valueOf(iterator.next().toString());
                     total = Float.valueOf(iterator.next().toString());
