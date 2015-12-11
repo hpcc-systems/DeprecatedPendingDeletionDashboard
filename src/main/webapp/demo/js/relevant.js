@@ -218,7 +218,7 @@ function createRelevantChart(divId, reqData) {
 			"main_injury_amount,main_car_amount,third_injury_amount,third_car_amount,third_property_amount,clm_rid,flagged_ind," +
 			"rejected_ind,qrypos,partition_id,estimate_factory_code,estimate_factory,balance_factory_code,balance_factory," +
 			"vehicle_list,person_list,policy_no,car_mark,driver_name,rack_no,certi_code,encrypt_flag,dob,fpos,person_id,cnt,date,amount" +
-			"name,address,zip,phone,by_claim,by_policy,lhs_person,rhs_person,policy_cnt,entity,roadAccident,thirdVehicle,injuryAccident";
+			"name,address,zip,phone,by_claim,by_policy,lhs_person,rhs_person,policy_cnt,entity,roadAccident,thirdVehicle,injuryAccident,edge";
 	zAu.send(new zk.Event(zk.Widget.$('$'+divId), "onTraslateLabels",   releventlayout1, {toServer:true}));
 }
 

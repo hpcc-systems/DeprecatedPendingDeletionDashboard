@@ -1,4 +1,4 @@
-﻿"use strict";
+﻿﻿"use strict";
 (function (root, factory) {
     if (typeof define === "function" && define.amd) {
         define(["src/layout/Surface", "src/layout/Tabbed", "src/layout/Grid", "src/other/Comms", "src/graph/Graph", "src/graph/Edge", "src/graph/Vertex", "src/other/Table", "src/chart/Column", "src/other/Persist"], factory);
@@ -16,7 +16,6 @@
         var context = this;
         var group_ids = null;
         var group_type_id = null;       
-       
         
         this.claimsChart = new Column()
             .columns([obj.date, obj.amount])
@@ -75,8 +74,13 @@
         };
         this.graph.vertex_click = function (d) {
             this.graph_selection(this.selection());
+           $(".common_Widget.common_HTMLWidget.other_Table").first().css("overflow", "auto");
         };
-
+        this.graph.edge_click = function (d) {
+            var source = d.sourceVertex();
+            var target = d.targetVertex();
+            alert(obj.edge+":  " + source.id() + "->" + target.id());
+        };
         this.selectionTable = new Table()
             .fixedHeader(true)
             .fixedColumn(true)
@@ -262,15 +266,17 @@
                 if (propIdx[key] === undefined) {
                     propIdx[key] = columns.length;
                     //get the Translated header column here
-                    columns.push([obj[key]]);
+                    columns.push(obj[key]);
                 }
                 row[propIdx[key]] = props[key];
             }
             data.push(row);
         });
         data.forEach(function (row, idx) {
-            row.length = columns.length + 1;
-            row[columns.length] = filteredSelection[idx];
+        //columns.length + 1 generates extra column, so taking columns.length alone
+            row.length = columns.length;
+            //Commenting this line as it generates [object Object] record
+           // row[columns.length] = filteredSelection[idx];
             if (table === this.allTable) {
                 selection[idx].__allTableRowIdx = row;
             } else if (table === this.claimsTable) {
@@ -428,8 +434,8 @@
                 });
 
                 context.graph
-                    .data({ vertices: context.vertices, edges: context.edges, merge: true })
-                    .render()
+                    .data({ vertices: context.vertices, edges: context.edges, merge: true })                   
+                    .render()             
                     .layout(context.graph.layout(), 250)
                 ;
                 var claimsData = [];
