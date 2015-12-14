@@ -18,9 +18,10 @@
             /* bottom: 8px;
             top: 8px; */
         }
-       .common_Widget.common_HTMLWidget.other_Table{
+        //Commenting this style as it adds scroll bar for both Horizontal and Right side table
+       /* .common_Widget.common_HTMLWidget.other_Table{
          overflow: auto;
-        }
+        } */        
         #table table {
             width: 100%
         }
