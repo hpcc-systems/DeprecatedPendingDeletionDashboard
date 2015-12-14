@@ -138,6 +138,7 @@
 
         //  Main Grid  ---
         this
+        	.surfacePadding(0) // need to keep this
             .setContent(0, 0, this.claimsChart, "", 1, 4)
             .setContent(1, 0, this.graph, "", 6, 4)
             .setContent(0, 4, this.selectionTable, obj.selection, 7, 1.23)
@@ -332,7 +333,7 @@
             element.classed("expanding", true);
         }
         var request=[] ;
-        if(id != "g"){
+        if(id !== "g"){
 	        var catId = id.split("_");
 	        switch (catId[0]) {
 	            case "c":
