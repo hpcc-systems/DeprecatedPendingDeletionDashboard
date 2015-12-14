@@ -20,6 +20,7 @@ import org.hpccsystems.dashboard.services.AuthenticationService;
 import org.hpccsystems.dashboard.services.HPCCQueryService;
 import org.hpccsystems.dashboard.services.HPCCService;
 import org.hpccsystems.dashboard.util.UiGenerator;
+import org.zkoss.util.resource.Labels;
 import org.zkoss.zk.ui.Component;
 import org.zkoss.zk.ui.Execution;
 import org.zkoss.zk.ui.Executions;
@@ -208,20 +209,26 @@ public class EditGaugeController extends SelectorComposer<Vlayout>{
         
         // Creating new instance purposefully
         Measure measure = (Measure) draggedListitem.getAttribute(Constants.MEASURE);
-        Measure newMeasure = new Measure(measure.getColumn(), measure.getAggregateFunction());
-        newMeasure.setFileName(tabpanel.getLinkedTab().getLabel());
-        
-        if("totalMeasuresListbox".equals(target.getId())){
-            chartData.setTotal(newMeasure);
-            target.appendChild(createMeasureItem(newMeasure, true));
-        } else {
-            chartData.setValue(newMeasure);
-            target.appendChild(createMeasureItem(newMeasure, false));
+        if(measure != null && measure instanceof Measure){
+            Measure newMeasure = new Measure(measure.getColumn(), measure.getAggregateFunction());
+            newMeasure.setFileName(tabpanel.getLinkedTab().getLabel());
+            
+            if("totalMeasuresListbox".equals(target.getId())){
+                chartData.setTotal(newMeasure);
+                target.appendChild(createMeasureItem(newMeasure, true));
+            } else {
+                chartData.setValue(newMeasure);
+                target.appendChild(createMeasureItem(newMeasure, false));
+            }
+            
+            target.setDroppable("false");
+            
+            drawChart();
+        }else{
+            Clients.showNotification(Labels.getLabel("dropMeasureOnly"), Constants.ERROR_NOTIFICATION, target, Constants.POSITION_END_CENTER, 3000, true);
+            return;
         }
-        
-        target.setDroppable("false");
-        
-        drawChart();
+       
     }
     
     

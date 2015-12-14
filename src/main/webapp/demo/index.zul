@@ -12,7 +12,7 @@
 <?script src="js/lib/d3.v3.min.js"?>
 <?script src="js/lib/topojson.v1.min.js"?>
 <?script src="js/lib/datamaps.usa.min.js"?>
-
+<?script src="js/lib/c3.js"?>
 <?style src="css/dashboard.css"?>
 <?style src="css/flat.css"?>
 
