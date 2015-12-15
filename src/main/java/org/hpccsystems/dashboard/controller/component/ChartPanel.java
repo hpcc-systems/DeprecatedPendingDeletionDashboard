@@ -581,11 +581,17 @@ public class ChartPanel extends Panel {
     }
 
     private void setHeight() {
-        int screenHeight = Integer.parseInt(Sessions.getCurrent()
-                .getAttribute(Constants.SCREEN_HEIGHT).toString());
+        int screenHeight = 0;
+        if(Sessions.getCurrent()
+                .getAttribute(Constants.SCREEN_HEIGHT) != null){
+            screenHeight = Integer.parseInt(Sessions.getCurrent()
+                    .getAttribute(Constants.SCREEN_HEIGHT).toString());
+        }
+        
         
         StringBuilder sb = new StringBuilder();
-        if(portlet.getIsSinglePortlet()){
+        if(portlet.getIsSinglePortlet() && Sessions.getCurrent()
+                .getAttribute(Constants.SCREEN_HEIGHT) != null){
         	sb.append(screenHeight-240);	
         } else {
         	sb.append(385);	
