@@ -1,3 +1,4 @@
+
 function createGeoChart(divId, reqData) {
 	var chartData = jq.parseJSON(reqData);
 	console.log(chartData);
@@ -23,7 +24,6 @@ function createGeoChart(divId, reqData) {
 	}
 	
 	var colorData = jq.extend(true, {}, chartData.states);
-
 	var arr = Object.keys(colorData).map(function(key) {
 		return colorData[key];
 	});
@@ -43,17 +43,50 @@ function createGeoChart(divId, reqData) {
 			return (values[half - 1] + values[half]) / 2.0;
 	}
 
-	var colors = d3.scale.linear()
-		.domain([ min, median(arr), max ])
-		.range([ "red", "yellow", "green" ]);
+	
+	var initialScaleData = arr;
+	var newScaledData = [];
+	var groupCount = Math.ceil((max-min)/10);
+	var loopVal = groupCount;
+	console.log("groupCount --->"+groupCount);
+	
+	for(var i=0 ; i<10 ; i++){		
+		newScaledData[i] = loopVal;
+		loopVal = loopVal+groupCount;
+	}
+	console.log("newScaledData --->"+newScaledData);
+
+	 var color_domain = newScaledData;
+		 
+	 var colors = d3.scale.threshold()
+	  .domain(color_domain)
+	  .range(["#a5b5cb","#7890b1","#627ea4","#4b6b97","#35598a","#1f477e", "#1f477e","#183864","#122a4b","#0c1c32"]);
+	 
 
 	var labelData = {
-			defaultFill : '#b2e5e5'
-	};
-	jq.each(colorData, function(key, val) {
-		colorData[key] = colors(val);
-		labelData[val]=colors(val);
+			defaultFill : '#e8ecf2'
+		};
+	 for(var i=0 ; i<newScaledData.length-1 ; i++){	
+		 if(i == 0){
+			 labelData["<" + newScaledData[i]]=colors(0);
+			 labelData[newScaledData[i] + "+"]=colors(newScaledData[i]);
+		 }else{
+			 labelData[newScaledData[i] + "+"]=colors(newScaledData[i]);
+		 }	
+		
+	 }
+	 labelData[">"+newScaledData[newScaledData.length-1]]=colors(newScaledData[newScaledData.length-1]);
+	 console.log("labelData --->",labelData);	 
+	
+	var arr = Object.keys(colorData).map(function(key) {
+		return colorData[key];
 	});
+	jq.each( colorData, function(key,value){
+		console.log(colors(value));
+		colorData[key] = colors(value);
+		});
+	console.log("colorData --->",colorData);
+	
 	var legendData = {
 			defaultFillName: "No data",
 	}
@@ -78,6 +111,9 @@ function createGeoChart(divId, reqData) {
 	});
 
 	election.labels();
+	election.legend({
+		    defaultFillName: "No data"
+		  });
 	election.legend(legendData);
 
 	election.updateChoropleth(colorData);
