@@ -185,7 +185,7 @@ public class TableRenderer {
                         listcell.setIconSclass("z-icon-long-arrow-up");
                         listcell.setStyle("background-color: rgb(136, 255, 136);");
                     }
-                    
+                    listcell.setStyle("cursor:default");
                   //Column chosen for interactivity shown different style 
                     if(interactivityColumn != null && interactivityColumn.equals(entry.getKey())){
                         listcell.setStyle("color:#5858FA");

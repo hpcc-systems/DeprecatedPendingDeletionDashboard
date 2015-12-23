@@ -248,6 +248,32 @@ background: #91C3E0;
     color: #fff;    
 }
 
-.datamaps-legend{
-	top: 0px;
+.list-inline {
+  padding-left: 0;
+  list-style: none;
+}
+
+li.key {
+  border-top-width: 15px;
+  border-top-style: solid;
+  font-size: .75em;
+  width: 30%;
+  padding-left: 0;
+  padding-right: 0;
+}
+
+.list-inline>li {
+ display: block;
+ padding-right: 0px;
+ padding-left: 0px;
+ text-align: left;
+}
+
+.datamaps-legend{  
+  left:15px;
+  top:-25px;  
+}
+
+.datamaps-legend h3{
+	visibility:hidden;
 }
