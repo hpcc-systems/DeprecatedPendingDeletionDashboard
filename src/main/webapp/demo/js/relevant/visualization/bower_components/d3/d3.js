@@ -2659,9 +2659,9 @@
     	  var translatedYear ="";
     	    var originalYear = d.getFullYear().toString();
     	    for(var i=0; i<originalYear.length; i++){
-    	           translatedYear = translatedYear + Number(originalYear.charAt(i)).toLocaleString('zh-Hans-CN-u-nu-hanidec');
-    	           console.log("translatedYear -->"+translatedYear);
+    	           translatedYear = translatedYear + Number(originalYear.charAt(i)).toLocaleString('zh-Hans-CN-u-nu-hanidec');    	           
     	    }
+    	    console.log("translatedYear -->"+translatedYear);
     	    return translatedYear;
       }
     };
