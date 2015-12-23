@@ -2654,6 +2654,15 @@
       Z: d3_time_zone,
       "%": function() {
         return "%";
+      },
+      o: function(d) {
+    	  var translatedYear ="";
+    	    var originalYear = d.getFullYear().toString();
+    	    for(var i=0; i<originalYear.length; i++){
+    	           translatedYear = translatedYear + Number(originalYear.charAt(i)).toLocaleString('zh-Hans-CN-u-nu-hanidec');
+    	           console.log("translatedYear -->"+translatedYear);
+    	    }
+    	    return translatedYear;
       }
     };
     var d3_time_parsers = {
