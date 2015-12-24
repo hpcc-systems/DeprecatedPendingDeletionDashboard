@@ -401,7 +401,7 @@
         
         var zhCN_formats = d3_locale_zhCN.timeFormat.multi([                                           
                                             ["%B", function(d) { return d.getMonth(); }],
-                                            ["%o", function(d) { return d.getFullYear().toString(); }]                                           
+                                            ["%o", function(d) { return true; }]                                           
                                           ]);
         
         var timeFormatPicker = function (formats) {

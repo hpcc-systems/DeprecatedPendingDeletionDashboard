@@ -2657,7 +2657,7 @@
       },
       o: function(d) {
     	  var translatedYear ="";
-    	    var yearPassed = d;
+    	    var yearPassed = d.getFullYear().toString();
     	    for(var i=0; i<yearPassed.length; i++){
     	           translatedYear = translatedYear + Number(yearPassed.charAt(i)).toLocaleString('zh-Hans-CN-u-nu-hanidec');    	           
     	    }
