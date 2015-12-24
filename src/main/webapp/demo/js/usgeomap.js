@@ -108,13 +108,53 @@ function createGeoChart(divId, reqData) {
 		fills : labelData,
 
 		data : chartData.states
-	});
+		
 
+	});
+	
+	
+
+	function addLegend2(layer, data, options) {
+	    data = data || {};
+	    if ( !this.options.fills ) {
+	      return;
+	    }
+
+	    var html = '<ul class="list-inline">';
+	    var label = '';
+	    if ( data.legendTitle ) {
+	      html = '<h3>' + data.legendTitle + '</h3>' + html;
+	    }
+	    for ( var fillKey in this.options.fills ) {
+
+	      if ( fillKey === 'defaultFill') {
+	        if (! data.defaultFillName ) {
+	          continue;
+	        }
+	        label = data.defaultFillName;
+	      } else {
+	        if (data.labels && data.labels[fillKey]) {
+	          label = data.labels[fillKey];
+	        } else {
+	          label= fillKey;
+	        }
+	      }
+	      html += '<li class="key" style="border-top-color:' + this.options.fills[fillKey] + '">' + label + '</li>' 
+	    }
+	    html += '</ul>';
+
+	    var hoverover = d3.select( this.options.element ).append('div')
+	      .attr('class', 'datamaps-legend')
+	      .html(html);
+	  }
+	    
+	election.addPlugin("mylegend", addLegend2);
+	    
+	election.mylegend({legendTitle: "legend"});
+	  
 	election.labels();
-	election.legend({
-		    defaultFillName: "No data"
-		  });
-	election.legend(legendData);
+	console.log("legendData --->",legendData);
+	//election.legend(legendData);
 
 	election.updateChoropleth(colorData);
 }
