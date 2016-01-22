@@ -203,7 +203,7 @@
 
         this._chart.type = "serial";
         this._chart.startDuration = this.startDuration();
-        this._chart.rotate = this.orientation() === "vertical";
+        this._chart.rotate = this.orientation() === "vertical"; // this messes up the hover over things
 
         this._chart.color = this.fontColor();
         this._chart.fontSize = this.fontSize();
@@ -404,11 +404,9 @@
             var graph = e.graph;
             var data  = e.item.dataContext;
             var field;
-            var field2;
 
             if (context._gType === "column") {
                 field = graph.fillColorsField;
-                field2 = graph.lineColorField;
             } else if (context._gType === "line") {
                 field = graph.colorField;
             } else if (context._gType === "area") {
@@ -417,25 +415,20 @@
             if (field) {
                 if (data[field] !== null && data[field] !== undefined) {
                     delete data[field];
-                    delete data[field2];
                     if (context.selectionMode() === "simple") {
                         if (context._selected !== null) {
                             delete context._selected.data[context._selected.field];
-                            delete context._selected.data[context._selected.field2];
                         }
                         context._selected = null;
                     }
                 } else {
                     data[field] = context.selectionColor();
-                    data[field2] = context.selectionColor();
                     if (context.selectionMode() === "simple") {
                         if (context._selected !== null) {
                             delete context._selected.data[context._selected.field];
-                            delete context._selected.data[context._selected.field2];
                         }
                         context._selected = {
                             field: field,
-                            field2: field2,
                             data: data
                         };
                     }
