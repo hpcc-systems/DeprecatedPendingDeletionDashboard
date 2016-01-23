@@ -496,10 +496,9 @@
                 var domainMax = this.xAxisDomainHigh() ? this.formatData(this.xAxisDomainHigh()) : d3.max(this.formattedData(), function (data) {
                     return data[0];
                 });
-                console.log("update");
-                console.log(domainMin);
-                console.log(domainMax);
-                this.dataScale.domain([domainMin, domainMax]);
+                if (domainMin !== undefined && domainMax !== undefined) {
+                    this.dataScale.domain([domainMin, domainMax]);
+                }
                 break;
         }
 

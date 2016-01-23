@@ -274,10 +274,13 @@
             data.push(row);
         });
         data.forEach(function (row, idx) {
-        //columns.length + 1 generates extra column, so taking columns.length alone
-            row.length = columns.length;
-            //Commenting this line as it generates [object Object] record
-           // row[columns.length] = filteredSelection[idx];
+			for (var col = 0; col < columns.length; ++col) {
+				if (row[col] === undefined) {
+					row[col] = "";
+				}
+			}
+            row.length = columns.length + 1;
+            row[columns.length] = filteredSelection[idx];
             if (table === this.allTable) {
                 selection[idx].__allTableRowIdx = row;
             } else if (table === this.claimsTable) {
