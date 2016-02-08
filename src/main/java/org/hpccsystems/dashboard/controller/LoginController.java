@@ -182,7 +182,7 @@ public class LoginController extends SelectorComposer<Component> {
     }
 
     @Listen("onClick=#login")
-    public void doLogin() throws IOException {       
+    public void doLogin() throws IOException {
         Boolean isLoginSuccessful = false;
         User user = null;
         if (LOG.isDebugEnabled()) {

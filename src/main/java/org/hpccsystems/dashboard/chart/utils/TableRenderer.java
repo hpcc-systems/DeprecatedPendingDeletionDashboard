@@ -79,8 +79,8 @@ public class TableRenderer {
         listBox.setHflex("1");
         listBox.setVflex("1");
         
-        listBox.setPageSize(10);
-        
+        listBox.setAutopaging(true);
+
         Listhead listhead = new Listhead();
 
         Listheader listheader = null;
