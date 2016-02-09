@@ -11,6 +11,10 @@
 		function screeRes() {
 		zAu.send(new zk.Event(zk.Widget.$("$loginDiv"),'onLoadPage', screen.height, {toServer:true}));
 		}
+		function updateWidgetObjects() {
+			zk.Widget.$('$account').updateChange_();
+			zk.Widget.$('$password').updateChange_();
+		}
 	</script>
   </head>
 
@@ -30,7 +34,6 @@
         </div>
       </div>
     </div>
-    
     <div class="container">
 
         <div id="login-wraper" class="login-form">
@@ -61,12 +64,11 @@
 	                	if(Executions.getCurrent().getParameter("auth") != null && Executions.getCurrent().getParameter("auth").equals("failed"))
 					        message.value = "Login failed. Provide valid credentials";
 	                	]]></zscript>
-                    <button type="submit" id="login" class="btn btn-success" value="Login"> ${labels.login} </button>
+                    <button type="submit" id="login" class="btn btn-success" value="Login" onClick="updateWidgetObjects()"> ${labels.login} </button>
                 </div>
         </div>
 
     </div>
-    
     <footer class="white navbar-fixed-bottom">
     	 <div style="float:right; margin: 5px 20px 5px 5px;">
 		      <label for="language">${labels.lblLanguage}</label >
