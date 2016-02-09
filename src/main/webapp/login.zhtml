@@ -26,7 +26,7 @@
 			" Attributes : " + Executions.getCurrent().getAttributes() + 
 			" User Principal: " +  Executions.getCurrent().getUserPrincipal() );
     </zscript>
-     <zul:div apply="org.hpccsystems.dashboard.controller.LoginController" id="loginDiv" xmlns:w="client"> 
+     <zul:div apply="org.hpccsystems.dashboard.controller.LoginController" id="loginDiv"> 
 	<div class="navbar navbar-fixed-top">
       <div class="navbar-inner">
         <div class="container">
@@ -34,7 +34,6 @@
         </div>
       </div>
     </div>
-    <form>
     <div class="container">
 
         <div id="login-wraper" class="login-form">
@@ -70,7 +69,6 @@
         </div>
 
     </div>
-    </form>
     <footer class="white navbar-fixed-bottom">
     	 <div style="float:right; margin: 5px 20px 5px 5px;">
 		      <label for="language">${labels.lblLanguage}</label >
