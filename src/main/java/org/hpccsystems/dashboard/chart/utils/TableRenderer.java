@@ -74,12 +74,13 @@ public class TableRenderer {
         }
 
         final Listbox listBox = new Listbox();
+        chartData.setTableContainer(listBox);
         listBox.setMold("paging");
         listBox.setSizedByContent(true);
         listBox.setHflex("1");
         listBox.setVflex("1");
         
-        listBox.setAutopaging(true);
+        listBox.setPageSize(8);
 
         Listhead listhead = new Listhead();
 
