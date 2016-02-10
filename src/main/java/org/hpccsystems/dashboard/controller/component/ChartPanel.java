@@ -486,7 +486,13 @@ public class ChartPanel extends Panel {
             }
             
             if (Constants.CATEGORY_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()) {
-                drawTableWidget(false);
+                    drawTableWidget(false);
+                    TableData tabledata = (TableData) portlet.getChartData();
+                    if (!ChartPanel.this.isMaximized()) {
+                        tabledata.getTableContainer().setPageSize(8);
+                    } else {
+                        tabledata.getTableContainer().setPageSize(13);
+                    }
             } else if (Constants.CATEGORY_TEXT_EDITOR == chartService.getCharts().get(portlet.getChartType()).getCategory()) {
                 //onCreateDocumentWidget();
             } else if(Constants.CATEGORY_SCORED_SEARCH_TABLE == chartService.getCharts().get(portlet.getChartType()).getCategory()){
@@ -582,16 +588,13 @@ public class ChartPanel extends Panel {
 
     private void setHeight() {
         int screenHeight = 0;
-        if(Sessions.getCurrent()
-                .getAttribute(Constants.SCREEN_HEIGHT) != null){
-            screenHeight = Integer.parseInt(Sessions.getCurrent()
-                    .getAttribute(Constants.SCREEN_HEIGHT).toString());
+        Object screenHeightObj = Sessions.getCurrent().getAttribute(Constants.SCREEN_HEIGHT);
+        if(screenHeightObj != null){
+            screenHeight = Integer.parseInt(screenHeightObj.toString());
         }
         
-        
         StringBuilder sb = new StringBuilder();
-        if(portlet.getIsSinglePortlet() && Sessions.getCurrent()
-                .getAttribute(Constants.SCREEN_HEIGHT) != null){
+        if(portlet.getIsSinglePortlet() && screenHeightObj != null){
         	sb.append(screenHeight-240);	
         } else {
         	sb.append(385);	

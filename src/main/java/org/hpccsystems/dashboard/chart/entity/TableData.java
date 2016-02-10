@@ -8,6 +8,8 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import org.zkoss.zul.Listbox;
+
 @XmlRootElement
 public class TableData extends ChartData {
 
@@ -16,6 +18,9 @@ public class TableData extends ChartData {
     private  Map<String, List<Attribute>> hpccTableData;
     private boolean hasInteractivity;
     private Interactivity interactivity;
+    //holds the listbox in which the records are rendered.
+    //Need this container to set PageSize based on minimized/maximized window
+    private Listbox tableContainer;
     
 
     public TableData() {
@@ -87,5 +92,14 @@ public class TableData extends ChartData {
 
     public void setInteractivity(Interactivity interactivity) {
         this.interactivity = interactivity;
+    }
+
+    @XmlTransient
+    public Listbox getTableContainer() {
+        return tableContainer;
+    }
+
+    public void setTableContainer(Listbox tableContainer) {
+        this.tableContainer = tableContainer;
     }
 }
