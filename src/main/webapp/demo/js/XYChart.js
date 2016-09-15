@@ -46,7 +46,8 @@ function createXYChart (divId, chartData) {
 	
 	var isLargeGraph = false;
 	if(response.xCategoryLabels.length > 25){
-		isLargeGraph = true;
+		// Uncomment the below line to if you want to enable subchart
+		//isLargeGraph = true;
 	}
 	
 	var xAxisType = 'categorized';
@@ -160,14 +161,21 @@ function createXYChart (divId, chartData) {
 		        }
 		    },
 			legend: {
-		        show: showLegend,
-		        equally: true
+		        show: showLegend
 		    },
 			subchart: {
 		        show: isLargeGraph
 		    },
 			zoom: {
-		        enabled: false
+				// Enabled this to and remove the subchart 
+		        enabled: true
+		    },
+		    padding: {
+		    	// Padding to add some space for the legend
+		        top: 0,
+		        right: 25,
+		        bottom: 30,
+		        left: 45,
 		    }
 		};
 	
